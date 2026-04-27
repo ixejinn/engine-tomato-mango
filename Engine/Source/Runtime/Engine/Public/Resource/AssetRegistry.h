@@ -1,0 +1,86 @@
+#ifndef MANGO_ASSETREGISTRY_H
+#define MANGO_ASSETREGISTRY_H
+
+#include <memory>
+#include <vector>
+#include <unordered_map>
+#include "Resource/ResourceFwd.h"
+#include "Resource/AssetHash.h"
+#include "Utils/Logger.h"
+
+namespace tomato {
+    /**
+     * @brief Singleton registry that manages assets of type T.
+     * Stores and provides access to assets via AssetID.
+     *
+     * Requirements for T:
+     * - static void Initialize()
+     * - static void Cleanup();
+     * - static void Create() for primitive asset creation
+     */
+    template<typename T>
+    class AssetRegistry {
+        AssetRegistry() {
+            T::Initialize();
+        }
+
+    public:
+        ~AssetRegistry() {
+            T::Cleanup();
+        }
+
+        AssetRegistry(const AssetRegistry&) = delete;
+        AssetRegistry& operator=(const AssetRegistry&) = delete;
+
+        static AssetRegistry& GetInstance() {
+            static AssetRegistry instance;
+            return instance;
+        }
+
+        void Register(const char* name, std::unique_ptr<T>&& asset);
+
+        T* Get(AssetID id);
+
+        void CreatePrimitives() {
+            T::Create();
+        }
+
+        void Clear() {
+            data_.clear();
+            idToIdx_.clear();
+        }
+
+    private:
+        std::vector<std::unique_ptr<T>> data_;
+        std::unordered_map<AssetID, uint32_t> idToIdx_;
+    };
+
+    template<typename T>
+    void AssetRegistry<T>::Register(const char* name, std::unique_ptr<T>&& asset)
+    {
+        const auto id = GetAssetID(name);
+        auto it = idToIdx_.find(id);
+        if (it == idToIdx_.end())
+        {
+            idToIdx_[id] = data_.size();
+            data_.emplace_back(std::move(asset));
+        }
+        else
+        {
+            TMT_WARN << "AssetID " << id << " already exists. Existing asset has been overwritten by " << name;
+            data_[it->second] = std::move(asset);
+        }
+    }
+
+    template<typename T>
+    T* AssetRegistry<T>::Get(const AssetID id)
+    {
+        auto it = idToIdx_.find(id);
+        if (it == idToIdx_.end())
+            TMT_ERR << "Invalid asset ID: " << id;
+
+        return data_[it->second].get();
+    }
+}
+
+#endif //MANGO_ASSETREGISTRY_H
