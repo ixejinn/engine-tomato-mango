@@ -23,6 +23,8 @@ namespace tomato {
                 MultiRun();
         }
 
+        InputRecorder& GetInputRecorder() { return inputRecorder_; }
+
     private:
         Window window_;
 

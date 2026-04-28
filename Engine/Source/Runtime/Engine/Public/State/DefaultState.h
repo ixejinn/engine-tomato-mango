@@ -6,7 +6,10 @@
 namespace tomato {
     class DefaultState : public State {
     public:
+        explicit DefaultState(Engine& engine) : State(engine) {}
+
         void Init() override {};
+        void Update() override {};
         void Exit() override {};
     };
 }

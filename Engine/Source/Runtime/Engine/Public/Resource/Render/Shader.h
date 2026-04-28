@@ -16,7 +16,6 @@ namespace tomato {
     public:
         ~Shader();
 
-        static void Initialize() {}
         static void Cleanup() {}
         static void Create();
         static void Create(const char* vsName, const char* fsName);

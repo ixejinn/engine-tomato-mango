@@ -14,15 +14,12 @@ namespace tomato {
      * Stores and provides access to assets via AssetID.
      *
      * Requirements for T:
-     * - static void Initialize()
      * - static void Cleanup();
      * - static AssetID Create() for primitive asset creation
      */
     template<typename T>
     class AssetRegistry {
-        AssetRegistry() {
-            T::Initialize();
-        }
+        AssetRegistry() = default;
 
     public:
         ~AssetRegistry() {

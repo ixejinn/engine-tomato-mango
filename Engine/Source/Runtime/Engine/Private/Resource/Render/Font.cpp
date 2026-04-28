@@ -8,6 +8,9 @@ namespace tomato {
     AtlasManager Font::atlasManager_;
 
     Font::Font(const char *path) {
+        if (!library_)
+            Initialize();
+
         if (FT_New_Face(library_, path, 0, &face_))
             TMT_ERR << "FreeType: Failed to load font " << path;
         else

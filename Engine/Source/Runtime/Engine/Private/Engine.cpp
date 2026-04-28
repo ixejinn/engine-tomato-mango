@@ -57,6 +57,10 @@ namespace tomato {
             simCtx.tick = tc.GetTick();
 
             systemManager_.Simulate(simCtx, inputCtx);
+
+            // !!!!!! temporary !!!!!!
+            currState_->Update();
+
             tc.AddTick();
         }
     }
@@ -69,7 +73,7 @@ namespace tomato {
     void Engine::ChangeState(TickClock& tc) {
         if (!nextState_) {
             if (!currState_)
-                nextState_ = std::make_unique<DefaultState>();
+                nextState_ = std::make_unique<DefaultState>(*this);
             else {
                 TMT_WARN << "Incorrect State configuration.";
                 isRunning_ = false;

@@ -1,19 +1,20 @@
 #ifndef MANGO_AUDIO_H
 #define MANGO_AUDIO_H
 
+#include <vector>
 #include <miniaudio/miniaudio.h>
 #include "Resource/ResourceFwd.h"
 
 namespace tomato {
     class Audio {
-        Audio(const char* filename);
+        explicit Audio(const char* filename, unsigned int simultaneousCnt);
 
     public:
         ~Audio();
 
         static void Initialize();
         static void Cleanup();
-        static AssetID Create(const char* filename);
+        static AssetID Create(const char* filename, unsigned int simultaneousCnt = 1);
 
         void SetLooping(bool repeat = true);
 
@@ -22,9 +23,10 @@ namespace tomato {
 
     private:
         static ma_engine engine_;
-        static ma_result engineResult_;
+        static ma_result engineInit_;
 
-        ma_sound sound_;
+        std::vector<ma_sound> sounds_;
+        std::size_t mask_;
     };
 }
 

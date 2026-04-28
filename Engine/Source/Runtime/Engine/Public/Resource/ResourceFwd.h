@@ -5,6 +5,8 @@
 
 namespace tomato {
     using AssetID = uint64_t;
+
+    struct Audio;
 }
 
 #endif //MANGO_RESOURCEFWD_H

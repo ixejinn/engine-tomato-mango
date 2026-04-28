@@ -30,7 +30,6 @@ namespace tomato {
     public:
         ~Texture();
 
-        static void Initialize() {}
         static void Cleanup() {}
         static void Create();
         static void Create(const char* filename, Format format = Format::RGBA8);

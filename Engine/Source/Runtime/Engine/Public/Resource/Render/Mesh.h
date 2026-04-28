@@ -50,7 +50,6 @@ namespace tomato {
     public:
         ~Mesh();
 
-        static void Initialize() {}
         static void Cleanup() {}
         static void Create();
 

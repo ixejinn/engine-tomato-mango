@@ -4,13 +4,16 @@
 #include <array>
 #include <entt/entity/registry.hpp>
 #include "State/StateFwd.h"
+#include "TomatoFwd.h"
 
 namespace tomato {
     class State {
     public:
+        explicit State(Engine& engine) : engine_(engine) {}
         virtual ~State() = default;
 
         virtual void Init() = 0;
+        virtual void Update() = 0;
         virtual void Exit() = 0;
 
         entt::registry& GetRegistry() { return registry_; }
@@ -19,7 +22,8 @@ namespace tomato {
 
         void SetPlayerInput(uint32_t tick, InputRecord input, int playerID = 0);
 
-    private:
+    protected:
+        Engine& engine_;
         entt::registry registry_;
 
         PlayerInputTimelines playerInputs_;
