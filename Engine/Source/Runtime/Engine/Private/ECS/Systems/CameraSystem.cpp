@@ -59,7 +59,7 @@ namespace tomato {
         if (mainCamCnt > 1)
             TMT_WARN << "Invalid main camera count: Expected 1, found " << mainCamCnt;
         else if (mainCamCnt < 1) {
-            TMT_WARN << "Invalid main camera count: Expected at least 1 camera";
+            // TMT_WARN << "Invalid main camera count: Expected at least 1 camera";
             renderCtx->mainCam = entt::null;
             return;
         }

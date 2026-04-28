@@ -1,9 +1,9 @@
 #include <stdexcept>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "../../Public/Services/Window.h"
+#include "Services/Window.h"
 #include "Utils/Logger.h"
-#include "../../Public/Tick/TickClock.h"
+#include "Tick/TickClock.h"
 
 namespace tomato {
     Window::Window(const int width, const int height, const char* title)

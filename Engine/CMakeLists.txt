@@ -1,5 +1,6 @@
 set(THIRD_PARTY_SOURCES
         Source/ThirdParty/glad/src/glad.c
+        Source/ThirdParty/miniaudio/miniaudio.c
 )
 
 set(ENGINE_HEADERS
@@ -66,6 +67,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/SystemConstants.h
         Source/Runtime/Engine/Public/ECS/SystemManager.h
         Source/Runtime/Engine/Public/Utils/RegistryEntry.h
+        Source/Runtime/Engine/Public/Resource/Audio/Audio.h
 )
 
 set(ENGINE_SOURCES
@@ -81,16 +83,17 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Systems/CollisionSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/KinematicMovementSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/RenderSystem.cpp
-        Source/Runtime/Engine/Private/Resource/Font.cpp
+        Source/Runtime/Engine/Private/Resource/Render/Font.cpp
         Source/Runtime/Engine/Private/Font/TextureAtlas.cpp
         Source/Runtime/Engine/Private/Font/AtlasManager.cpp
-        Source/Runtime/Engine/Private/Resource/Mesh.cpp
+        Source/Runtime/Engine/Private/Resource/Render/Mesh.cpp
         Source/Runtime/Engine/Private/State/State.cpp
-        Source/Runtime/Engine/Private/Resource/Shader.cpp
-        Source/Runtime/Engine/Private/Resource/Texture.cpp
+        Source/Runtime/Engine/Private/Resource/Render/Shader.cpp
+        Source/Runtime/Engine/Private/Resource/Render/Texture.cpp
         Source/Runtime/Engine/Private/ECS/Systems/TransformSystem.cpp
         Source/Runtime/Engine/Private/ECS/SystemRegistry.cpp
         Source/Runtime/Engine/Private/ECS/SystemManager.cpp
+        Source/Runtime/Engine/Private/Resource/Audio/Audio.cpp
 )
 
 add_library(engine STATIC

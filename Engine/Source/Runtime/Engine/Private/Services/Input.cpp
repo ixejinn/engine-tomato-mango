@@ -1,7 +1,7 @@
-#include "../../Public/Services/Input.h"
-#include "../../Public/Services/Window.h"
+#include "Services/Input.h"
+#include "Services/Window.h"
 #include "Input/InputRecorder.h"
-#include "../../Public/Tick/TickClock.h"
+#include "Tick/TickClock.h"
 #include "Utils/Logger.h"
 #include <GLFW/glfw3.h>
 

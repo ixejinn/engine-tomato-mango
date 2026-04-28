@@ -1,4 +1,4 @@
-#include "../../Public/Tick/TickClock.h"
+#include "Tick/TickClock.h"
 
 namespace tomato {
     int TickClock::GetSimulateNum() {

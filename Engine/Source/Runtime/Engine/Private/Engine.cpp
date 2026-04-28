@@ -1,6 +1,6 @@
 #include "Engine.h"
 #include "Event/EventDispatcher.h"
-#include "../Public/Tick/TickClock.h"
+#include "Tick/TickClock.h"
 #include "State/DefaultState.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "Utils/Logger.h"

@@ -16,7 +16,7 @@ namespace tomato {
      * Requirements for T:
      * - static void Initialize()
      * - static void Cleanup();
-     * - static void Create() for primitive asset creation
+     * - static AssetID Create() for primitive asset creation
      */
     template<typename T>
     class AssetRegistry {
@@ -26,6 +26,7 @@ namespace tomato {
 
     public:
         ~AssetRegistry() {
+            Clear();
             T::Cleanup();
         }
 

@@ -1,7 +1,7 @@
 #ifndef MANGO_INPUTRECORDER_H
 #define MANGO_INPUTRECORDER_H
 
-#include "../../../Core/Public/Containers/EnumArray.h"
+#include "Containers/EnumArray.h"
 #include "Input/KeyConstants.h"
 #include "Input/InputConstants.h"
 #include "Input/InputRecord.h"

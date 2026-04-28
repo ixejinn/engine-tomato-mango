@@ -11,7 +11,7 @@
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
 #include "Utils/RegistryEntry.h"
-//REGISTER_SYSTEM(tomato::SystemPhase::Rendering, RenderSystem);
+REGISTER_SYSTEM(tomato::SystemPhase::Rendering, RenderSystem);
 
 namespace tomato {
     RenderSystem::RenderSystem()
@@ -33,17 +33,17 @@ namespace tomato {
     }
 
     void RenderSystem::Update(SimContext& simCtx) {
-        auto& renderCtx = simCtx.registry.ctx().get<RenderContext>();
+        auto renderCtx = simCtx.registry.ctx().get<RenderContext*>();
 
         glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Get main camera from render context
-        if (renderCtx.mainCam == entt::null) {
-            TMT_WARN << "Main camera is not found.";
+        if (renderCtx->mainCam == entt::null) {
+            // TMT_WARN << "Main camera is not found.";
             return;
         }
-        auto viewProjMat = simCtx.registry.try_get<CameraComponent>(renderCtx.mainCam)->viewProjMat;
+        auto viewProjMat = simCtx.registry.try_get<CameraComponent>(renderCtx->mainCam)->viewProjMat;
 
         Mesh* mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
         mesh->Bind();

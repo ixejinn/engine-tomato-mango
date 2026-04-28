@@ -1,6 +1,5 @@
 #include <glm/glm.hpp>
 #include <fstream>
-#include <filesystem>
 #include <glm/gtc/type_ptr.hpp>
 #include "Resource/Render/Shader.h"
 #include "Resource/AssetRegistry.h"
@@ -8,7 +7,6 @@
 
 namespace tomato {
     Shader::Shader() {
-        std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
         ReadShaderSourceFile("Resources/Engine/Shaders/shader.vs", "Resources/Engine/Shaders/shader.fs");
     }
 

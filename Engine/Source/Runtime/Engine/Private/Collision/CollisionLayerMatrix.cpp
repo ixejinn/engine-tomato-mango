@@ -1,4 +1,4 @@
-#include "../../Public/Collision/CollisionLayerMatrix.h"
+#include "Collision/CollisionLayerMatrix.h"
 #include "Utils/BitmaskOperators.h"
 
 namespace tomato {

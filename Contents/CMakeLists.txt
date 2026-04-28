@@ -1,5 +1,10 @@
+set(CONTENTS_HEADERS
+        Source/TestState.h
+)
+
 set(CONTENTS_SOURCES
         Source/Main.cpp
+        Source/TestState.cpp
 )
 
 add_executable(contents
@@ -16,5 +21,5 @@ target_link_libraries(contents
 add_custom_command(TARGET contents POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_LIST_DIR}/Resources
-        $<TARGET_FILE_DIR:engine>/Resources/Contents
+        $<TARGET_FILE_DIR:contents>/Resources/Contents
 )
