@@ -40,7 +40,7 @@ namespace tomato {
 
         // Get main camera from render context
         if (renderCtx->mainCam == entt::null) {
-            // TMT_WARN << "Main camera is not found.";
+             TMT_WARN << "Main camera is not found.";
             return;
         }
         auto viewProjMat = simCtx.registry.try_get<CameraComponent>(renderCtx->mainCam)->viewProjMat;

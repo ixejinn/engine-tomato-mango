@@ -104,8 +104,8 @@ namespace tomato {
             {
                 glm::vec3 radius{col.halfExtents.x};
 
-                col.max = wPos + radius;
-                col.min = wPos - radius;
+                col.max = wPos + col.position + radius;
+                col.min = wPos + col.position - radius;
             }
                 break;
             default:
@@ -113,11 +113,12 @@ namespace tomato {
                 auto R = glm::toMat4(trf.GetQuaternion());
 
                 glm::vec3 aabbHalfExtents
-                {
-                    glm::abs(R[0][0]) * col.halfExtents.x + glm::abs(R[1][0]) * col.halfExtents.y + glm::abs(R[2][0]) * col.halfExtents.z,
-                    glm::abs(R[0][1]) * col.halfExtents.x + glm::abs(R[1][1]) * col.halfExtents.y + glm::abs(R[2][1]) * col.halfExtents.z,
-                    glm::abs(R[0][2]) * col.halfExtents.x + glm::abs(R[1][2]) * col.halfExtents.y + glm::abs(R[2][2]) * col.halfExtents.z
-                };
+//                {
+//                    glm::abs(R[0][0]) * col.halfExtents.x + glm::abs(R[1][0]) * col.halfExtents.y + glm::abs(R[2][0]) * col.halfExtents.z,
+//                    glm::abs(R[0][1]) * col.halfExtents.x + glm::abs(R[1][1]) * col.halfExtents.y + glm::abs(R[2][1]) * col.halfExtents.z,
+//                    glm::abs(R[0][2]) * col.halfExtents.x + glm::abs(R[1][2]) * col.halfExtents.y + glm::abs(R[2][2]) * col.halfExtents.z
+//                };
+                = col.halfExtents;
 
                 auto wOffset = glm::vec3(R * glm::vec4(col.position, 1.f));
                 col.max = wPos + wOffset + aabbHalfExtents;

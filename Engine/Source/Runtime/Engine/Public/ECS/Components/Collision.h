@@ -5,16 +5,18 @@
 #include <entt/fwd.hpp>
 #include "Collision/CollisionConstants.h"
 #include "Collision/CollisionEventFwd.h"
+#include "ECS/Components/Transform.h"
 
 namespace tomato {
     struct ColliderComponent {
         ColliderComponent(const ColliderType t,
+            const TransformComponent& trf,
             const CollisionLayer l = CollisionLayer::Default,
             const glm::vec3 pos = glm::vec3{0.f})
-                : position(pos), layer(l), type(t) {}
+                : position(pos), halfExtents(trf.GetScale() * 0.5f), layer(l), type(t) {}
 
         glm::vec3 position;
-        glm::vec3 halfExtents{0.5f, 0.5f, 0.5f};
+        glm::vec3 halfExtents;
         glm::vec3 min{}, max{}; // AABB for broad-phase collision detection
 
         CollisionLayer layer;
