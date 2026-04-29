@@ -69,6 +69,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Utils/RegistryEntry.h
         Source/Runtime/Engine/Public/Resource/Audio/Audio.h
         Source/Runtime/Engine/Public/TomatoFwd.h
+        Source/Runtime/Engine/Public/Collision/CollisionPair.h
 )
 
 set(ENGINE_SOURCES

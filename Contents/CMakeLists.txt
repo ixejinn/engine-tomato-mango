@@ -5,6 +5,7 @@ set(CONTENTS_HEADERS
 set(CONTENTS_SOURCES
         Source/Main.cpp
         Source/TestState.cpp
+        Source/CollisionTestComponent.h
 )
 
 add_executable(contents

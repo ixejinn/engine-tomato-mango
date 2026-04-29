@@ -2,12 +2,11 @@
 #define MANGO_COLLISION_H
 
 #include <glm/vec3.hpp>
+#include <entt/fwd.hpp>
 #include "Collision/CollisionConstants.h"
+#include "Collision/CollisionEventFwd.h"
 
 namespace tomato {
-    struct CollisionEvent;
-    struct TriggerEvent;
-
     struct ColliderComponent {
         ColliderComponent(const ColliderType t,
             const CollisionLayer l = CollisionLayer::Default,
@@ -25,18 +24,25 @@ namespace tomato {
         bool aabbDirty = true;
     };
 
-    // Callback function
-    using CollisionCallback = std::function<void(const CollisionEvent&)>;
+    // Component for callback function
+    using CollisionEnterCallback = std::function<void(const CollisionEnterEvent&, entt::entity)>;
+    using CollisionStayCallback = std::function<void(const CollisionStayEvent&, entt::entity)>;
+    using CollisionExitCallback = std::function<void(const CollisionExitEvent&, entt::entity)>;
     struct OnCollisionComponent
     {
-        CollisionCallback enter;
-        // exit, stay
+        CollisionEnterCallback enter{nullptr};
+        CollisionStayCallback stay{nullptr};
+        CollisionExitCallback exit{nullptr};
     };
 
-    using TriggerCallback = std::function<void(const TriggerEvent&)>;
+    using TriggerEnterCallback = std::function<void(const TriggerEnterEvent&, entt::entity)>;
+    using TriggerStayCallback = std::function<void(const TriggerStayEvent&, entt::entity)>;
+    using TriggerExitCallback = std::function<void(const TriggerExitEvent&, entt::entity)>;
     struct OnTriggerComponent
     {
-        TriggerCallback enter;
+        TriggerEnterCallback enter{nullptr};
+        TriggerStayCallback stay{nullptr};
+        TriggerExitCallback exit{nullptr};
     };
 }
 

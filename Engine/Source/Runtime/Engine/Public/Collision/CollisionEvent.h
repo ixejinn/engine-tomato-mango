@@ -1,15 +1,37 @@
 #ifndef MANGO_COLLISIONEVENT_H
 #define MANGO_COLLISIONEVENT_H
 
-#include <entt/fwd.hpp>
+#include <entt/entt.hpp>
 
 namespace tomato {
-    struct CollisionEvent {
+    struct CollisionEnterEvent {
         entt::entity e1, e2;
+        entt::registry* reg;
     };
 
-    struct TriggerEvent {
+    struct CollisionStayEvent {
         entt::entity e1, e2;
+        entt::registry* reg;
+    };
+
+    struct CollisionExitEvent {
+        entt::entity e1, e2;
+        entt::registry* reg;
+    };
+
+    struct TriggerEnterEvent {
+        entt::entity e1, e2;
+        entt::registry* reg;
+    };
+
+    struct TriggerStayEvent {
+        entt::entity e1, e2;
+        entt::registry* reg;
+    };
+
+    struct TriggerExitEvent {
+        entt::entity e1, e2;
+        entt::registry* reg;
     };
 }
 

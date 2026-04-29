@@ -4,10 +4,13 @@
 #include <entt/fwd.hpp>
 #include <glm/vec3.hpp>
 #include <vector>
+#include <functional>
+#include <unordered_map>
 #include "ECS/Systems/System.h"
 #include "ECS/PhysCompFwd.h"
 #include "Collision/CollisionEventFwd.h"
 #include "Collision/CollisionLayerMatrix.h"
+#include "Collision/CollisionPair.h"
 #include "Containers/EnumArray.h"
 
 namespace tomato {
@@ -18,7 +21,7 @@ namespace tomato {
         void Update(SimContext& simCtx) override;
 
     private:
-        void BroadPhase(entt::registry& reg) { SAP(reg); }
+        void BroadPhase(entt::registry& reg);
         void NarrowPhase(entt::registry& reg);
 
         static void SetAABB(ColliderComponent& col, const TransformComponent& trf);
@@ -40,14 +43,22 @@ namespace tomato {
             const glm::vec3& refP,
             const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2);
 
-        static void OnCollisionEvent(const CollisionEvent& e);
+        static void OnCollisionEnter(const CollisionEnterEvent& e);
+        static void OnCollisionStay(const CollisionStayEvent& e);
+        static void OnCollisionExit(const CollisionExitEvent& e);
+
+        static void OnTriggerEnter(const TriggerEnterEvent& e);
+        static void OnTriggerStay(const TriggerStayEvent& e);
+        static void OnTriggerExit(const TriggerExitEvent& e);
 
         CollisionLayerMatrix layerMatrix_;
 
-        std::vector<std::pair<entt::entity, entt::entity>> broadPairs_;
+        std::vector<CollisionPair> candidates_;
 
         using SupportFunc = std::function<glm::vec3(const glm::vec3& dir, const ColliderComponent& col)>;
         EnumArray<ColliderType, SupportFunc> supportFunctions_;
+
+        std::unordered_map<CollisionPair, bool> collisionPairs_;
     };
 }
 
