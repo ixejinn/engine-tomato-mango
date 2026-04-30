@@ -2,6 +2,7 @@
 #define MANGO_ENUMARRAY_H
 
 #include <array>
+#include <initializer_list>
 
 namespace tomato
 {
@@ -17,6 +18,11 @@ namespace tomato
     {
     public:
         EnumArray() : data_() {}
+
+        EnumArray(std::initializer_list<std::pair<E, T>> list) {
+            for (auto& p : list)
+                data_[static_cast<std::size_t>(p.first)] = p.second;
+        }
 
         T& operator[](E enumIdx) { return data_[static_cast<std::size_t>(enumIdx)]; }
         const T& operator[](E enumIdx) const { return data_[static_cast<std::size_t>(enumIdx)]; }

@@ -70,6 +70,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Resource/Audio/Audio.h
         Source/Runtime/Engine/Public/TomatoFwd.h
         Source/Runtime/Engine/Public/Collision/CollisionPair.h
+        Source/Runtime/Engine/Public/Collision/GJK.h
 )
 
 set(ENGINE_SOURCES
@@ -96,6 +97,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/SystemRegistry.cpp
         Source/Runtime/Engine/Private/ECS/SystemManager.cpp
         Source/Runtime/Engine/Private/Resource/Audio/Audio.cpp
+        Source/Runtime/Engine/Private/Collision/GJK.cpp
 )
 
 add_library(engine STATIC
