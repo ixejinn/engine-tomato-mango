@@ -34,17 +34,20 @@ void TestState::Init() {
     // Camera
     const auto cam = registry_.create();
     registry_.emplace<TransformComponent>(cam,
-//                                          glm::vec3(0.f, 1.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
-                                          glm::vec3(0.f, 7.5f, 15.f), glm::vec3(-30.f, 0.f, 0.f));
+                                          // glm::vec3(0.f, 1.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
+                                          glm::vec3(0.f, 5.f, 0.f), glm::vec3(-90.f, 0.f, 0.f));
+                                          // glm::vec3(0.f, 7.5f, 15.f), glm::vec3(-30.f, 0.f, 0.f));
     auto& camComp = registry_.emplace<CameraComponent>(cam);
-    camComp.mode = ProjectionMode::Perspective;
-//    camComp.mode = ProjectionMode::Orthogonal;
+    // camComp.mode = ProjectionMode::Perspective;
+    camComp.mode = ProjectionMode::Orthogonal;
     registry_.emplace<MainCameraTag>(cam);
 
     // Player character
     const auto me = registry_.create();
     auto& trfCompMe = registry_.emplace<TransformComponent>(me);
     trfCompMe.SetScale(2.f, 1.f, 1.f);
+    // trfCompMe.SetScale(2.f, 2.f, 1.f);
+    // trfCompMe.SetEulerDegree(0.f, 45.f, 0.f);
     registry_.emplace<SpeedComponent>(me, 2.f);
     registry_.emplace<InputChannelComponent>(me, static_cast<uint8_t>(0));
     registry_.emplace<JumpComponent>(me);
@@ -92,9 +95,9 @@ void TestState::Exit() {
 void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event, entt::entity e) {
     auto& trfScl = event.reg->get<TransformComponent>(e).GetScale();
     auto& colScl = event.reg->get<ColliderComponent>(e).halfExtents;
-    TMT_INFO << static_cast<uint32_t>(e);
-    TMT_INFO << "trf: " << trfScl.x << ", " << trfScl.y << ", " << trfScl.z;
-    TMT_INFO << "col: " << colScl.x << ", " << colScl.y << ", " << colScl.z;
+    // TMT_INFO << static_cast<uint32_t>(e);
+    // TMT_INFO << "trf: " << trfScl.x << ", " << trfScl.y << ", " << trfScl.z;
+    // TMT_INFO << "col: " << colScl.x << ", " << colScl.y << ", " << colScl.z;
 
     auto testComp = event.reg->try_get<CollisionTestComponent>(e);
     auto& render = event.reg->get<RenderComponent>(e);
@@ -107,9 +110,9 @@ void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event, en
 void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event, entt::entity e) {
     auto& trfScl = event.reg->get<TransformComponent>(e).GetScale();
     auto& colScl = event.reg->get<ColliderComponent>(e).halfExtents;
-    TMT_INFO << static_cast<uint32_t>(e);
-    TMT_INFO << "trf: " << trfScl.x << ", " << trfScl.y << ", " << trfScl.z;
-    TMT_INFO << "col: " << colScl.x << ", " << colScl.y << ", " << colScl.z;
+    // TMT_INFO << static_cast<uint32_t>(e);
+    // TMT_INFO << "trf: " << trfScl.x << ", " << trfScl.y << ", " << trfScl.z;
+    // TMT_INFO << "col: " << colScl.x << ", " << colScl.y << ", " << colScl.z;
 
     auto testComp = event.reg->try_get<CollisionTestComponent>(e);
     auto& render = event.reg->get<RenderComponent>(e);

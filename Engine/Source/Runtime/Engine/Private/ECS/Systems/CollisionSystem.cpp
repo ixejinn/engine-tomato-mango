@@ -28,6 +28,8 @@ namespace tomato {
     }
 
     void CollisionSystem::Update(SimContext& simCtx) {
+        candidates_.clear();
+
         BroadPhase(simCtx.registry);
         NarrowPhase(simCtx.registry);
     }
@@ -113,12 +115,11 @@ namespace tomato {
                 auto R = glm::toMat4(trf.GetQuaternion());
 
                 glm::vec3 aabbHalfExtents
-//                {
-//                    glm::abs(R[0][0]) * col.halfExtents.x + glm::abs(R[1][0]) * col.halfExtents.y + glm::abs(R[2][0]) * col.halfExtents.z,
-//                    glm::abs(R[0][1]) * col.halfExtents.x + glm::abs(R[1][1]) * col.halfExtents.y + glm::abs(R[2][1]) * col.halfExtents.z,
-//                    glm::abs(R[0][2]) * col.halfExtents.x + glm::abs(R[1][2]) * col.halfExtents.y + glm::abs(R[2][2]) * col.halfExtents.z
-//                };
-                = col.halfExtents;
+                {
+                    glm::abs(R[0][0]) * col.halfExtents.x + glm::abs(R[1][0]) * col.halfExtents.y + glm::abs(R[2][0]) * col.halfExtents.z,
+                    glm::abs(R[0][1]) * col.halfExtents.x + glm::abs(R[1][1]) * col.halfExtents.y + glm::abs(R[2][1]) * col.halfExtents.z,
+                    glm::abs(R[0][2]) * col.halfExtents.x + glm::abs(R[1][2]) * col.halfExtents.y + glm::abs(R[2][2]) * col.halfExtents.z
+                };
 
                 auto wOffset = glm::vec3(R * glm::vec4(col.position, 1.f));
                 col.max = wPos + wOffset + aabbHalfExtents;
@@ -215,7 +216,7 @@ namespace tomato {
         const glm::vec4 localDir = glm::transpose(R) * glm::vec4(worldDir, 0.f);
 
         const auto localSupportP = supportFunctions_[col.type](localDir, col);
-        return glm::vec3{trf.GetTransformMatrix() * glm::vec4(col.position + localSupportP, 1.f)};
+        return trf.GetPosition() + glm::vec3{R * glm::vec4(col.position + localSupportP, 1.f)};
     }
 
     bool CollisionSystem::AddSimplexPoint(
@@ -364,9 +365,9 @@ namespace tomato {
     }
 
     void CollisionSystem::OnCollisionEnter(const CollisionEnterEvent &e) {
-        TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        // TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
-        // 충돌 보정
+        // TODO: 충돌 보정
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->enter)
@@ -390,7 +391,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnCollisionExit(const CollisionExitEvent& e) {
-        TMT_INFO << "Collision Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        // TMT_INFO << "Collision Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->exit)
@@ -402,7 +403,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnTriggerEnter(const TriggerEnterEvent& e) {
-        TMT_INFO << "Trigger Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        // TMT_INFO << "Trigger Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnTriggerComponent>(e.e1);
         if (callback && callback->enter)
@@ -426,7 +427,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnTriggerExit(const TriggerExitEvent& e) {
-        TMT_INFO << "Trigger Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        // TMT_INFO << "Trigger Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnTriggerComponent>(e.e1);
         if (callback && callback->exit)
