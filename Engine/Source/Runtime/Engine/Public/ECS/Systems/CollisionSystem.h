@@ -10,7 +10,7 @@
 #include "ECS/PhysCompFwd.h"
 #include "Collision/CollisionEventFwd.h"
 #include "Collision/CollisionLayerMatrix.h"
-#include "Collision/CollisionPair.h"
+#include "Containers/UnorderedPair.h"
 #include "Collision/GJK.h"
 #include "Containers/EnumArray.h"
 
@@ -36,6 +36,7 @@ namespace tomato {
         static void OnTriggerStay(const TriggerStayEvent& e);
         static void OnTriggerExit(const TriggerExitEvent& e);
 
+        using CollisionPair = UnorderedPair<entt::entity>;
         CollisionLayerMatrix layerMatrix_;
         std::vector<CollisionPair> candidates_;
         std::unordered_map<CollisionPair, bool> collisionPairs_;

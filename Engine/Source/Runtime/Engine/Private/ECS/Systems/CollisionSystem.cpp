@@ -42,11 +42,11 @@ namespace tomato {
 
     void CollisionSystem::NarrowPhase(entt::registry& reg) {
         for (const auto& candidate : candidates_) {
-            auto& col1 = reg.get<ColliderComponent>(candidate.e1);
-            auto& col2 = reg.get<ColliderComponent>(candidate.e2);
+            auto& col1 = reg.get<ColliderComponent>(candidate.a);
+            auto& col2 = reg.get<ColliderComponent>(candidate.b);
 
-            auto& trf1 = reg.get<TransformComponent>(candidate.e1);
-            auto& trf2 = reg.get<TransformComponent>(candidate.e2);
+            auto& trf1 = reg.get<TransformComponent>(candidate.a);
+            auto& trf2 = reg.get<TransformComponent>(candidate.b);
 
             if (narrowCheckFunc_(col1, trf1, col2, trf2)) {
                 // Collision
@@ -54,16 +54,16 @@ namespace tomato {
                 if (collisionPairs_.find(candidate) == collisionPairs_.end()) {
                     // Enter
                     if (col1.isTrigger || col2.isTrigger)
-                        EventDispatcher::GetInstance().Enqueue(TriggerEnterEvent{candidate.e1, candidate.e2, &reg});
+                        EventDispatcher::GetInstance().Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &reg});
                     else
-                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.e1, candidate.e2, &reg});
+                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &reg});
                 }
                 else {
                     // Stay
                     if (col1.isTrigger || col2.isTrigger)
-                        EventDispatcher::GetInstance().Enqueue(TriggerStayEvent{candidate.e1, candidate.e2, &reg});
+                        EventDispatcher::GetInstance().Enqueue(TriggerStayEvent{candidate.a, candidate.b, &reg});
                     else
-                        EventDispatcher::GetInstance().Enqueue(CollisionStayEvent{candidate.e1, candidate.e2, &reg});
+                        EventDispatcher::GetInstance().Enqueue(CollisionStayEvent{candidate.a, candidate.b, &reg});
                 }
 
                 collisionPairs_[candidate] = true;
@@ -73,13 +73,13 @@ namespace tomato {
         for (auto it = collisionPairs_.begin(); it != collisionPairs_.end(); ) {
             if (!it->second) {
                 // Exit
-                auto& col1 = reg.get<ColliderComponent>(it->first.e1);
-                auto& col2 = reg.get<ColliderComponent>(it->first.e2);
+                auto& col1 = reg.get<ColliderComponent>(it->first.a);
+                auto& col2 = reg.get<ColliderComponent>(it->first.b);
 
                 if (col1.isTrigger || col2.isTrigger)
-                    EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{it->first.e1, it->first.e2, &reg});
+                    EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{it->first.a, it->first.b, &reg});
                 else
-                    EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{it->first.e1, it->first.e2, &reg});
+                    EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{it->first.a, it->first.b, &reg});
 
                 it = collisionPairs_.erase(it);
             }

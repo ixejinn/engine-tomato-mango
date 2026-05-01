@@ -2,6 +2,7 @@
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "Collision/ColliderSupport.h"
+#include "Math/Normal.h"
 #include "Utils/Logger.h"
 
 namespace tomato {
@@ -20,10 +21,13 @@ namespace tomato {
         while (true)
         {
             if (!AddSimplexPoint(simplex, col1, trf1, col2, trf2))
-                return false;   // 비충돌 종료
+                // 비충돌 종료
+                return false;
 
-            if (VoronoiRegion(simplex))
-                return true;    // 충돌 종료
+            if (VoronoiRegion(simplex)) {
+                // 충돌 종료
+                return true;
+            }
         }
     }
 
@@ -170,15 +174,5 @@ namespace tomato {
                 TMT_WARN << "Incorrect simplex size.";
                 return false;
         }
-    }
-
-    glm::vec3 GJK::GetOrientedNormal(
-            const glm::vec3 &refP,
-            const glm::vec3 &p0, const glm::vec3 &p1, const glm::vec3 &p2) {
-        const auto vec01 = p1 - p0;
-        const auto vec02 = p2 - p0;
-        auto normal = glm::cross(vec01, vec02);
-        auto x = glm::dot(normal, (refP - p0));
-        return (x > 0 ? normal : -normal);
     }
 }

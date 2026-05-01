@@ -24,10 +24,6 @@ namespace tomato {
 
         static bool VoronoiRegion(std::vector<glm::vec3>& simplex);
 
-        static glm::vec3 GetOrientedNormal(
-                const glm::vec3& refP,
-                const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2);
-
         using SupportFunc = std::function<glm::vec3(const glm::vec3& dir, const ColliderComponent& col)>;
         static EnumArray<ColliderType, SupportFunc> supportFunctions_;
     };

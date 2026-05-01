@@ -69,8 +69,10 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Utils/RegistryEntry.h
         Source/Runtime/Engine/Public/Resource/Audio/Audio.h
         Source/Runtime/Engine/Public/TomatoFwd.h
-        Source/Runtime/Engine/Public/Collision/CollisionPair.h
+        Source/Runtime/Core/Public/Containers/UnorderedPair.h
         Source/Runtime/Engine/Public/Collision/GJK.h
+        Source/Runtime/Engine/Public/Collision/EPA.h
+        Source/Runtime/Engine/Public/Math/Normal.h
 )
 
 set(ENGINE_SOURCES
@@ -98,6 +100,8 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/SystemManager.cpp
         Source/Runtime/Engine/Private/Resource/Audio/Audio.cpp
         Source/Runtime/Engine/Private/Collision/GJK.cpp
+        Source/Runtime/Engine/Private/Collision/EPA.cpp
+        Source/Runtime/Engine/Private/Math/Normal.cpp
 )
 
 add_library(engine STATIC
