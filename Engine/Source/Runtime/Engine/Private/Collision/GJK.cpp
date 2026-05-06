@@ -1,7 +1,9 @@
-#include "Collision/GJK.h"
+#include "../../Public/Collision/Narrow/GJK.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "Collision/ColliderSupport.h"
+#include "Collision/CollisionEvent.h"
+#include "Collision/Narrow/EPA.h"
 #include "Math/Normal.h"
 #include "Utils/Logger.h"
 
@@ -13,8 +15,9 @@ namespace tomato {
         {ColliderType::Capsule, support::Capsule}
     };
 
-    bool GJK::CheckCollision(const tomato::ColliderComponent &col1, const tomato::TransformComponent &trf1,
-                             const tomato::ColliderComponent &col2, const tomato::TransformComponent &trf2) {
+    std::optional<std::optional<CollisionInfo>> GJK::CheckNarrowCollision(
+        const tomato::ColliderComponent &col1, const tomato::TransformComponent &trf1,
+        const tomato::ColliderComponent &col2, const tomato::TransformComponent &trf2) {
         std::vector<glm::vec3> simplex;
         simplex.reserve(4);
 
@@ -22,11 +25,13 @@ namespace tomato {
         {
             if (!AddSimplexPoint(simplex, col1, trf1, col2, trf2))
                 // 비충돌 종료
-                return false;
+                return std::nullopt;
 
             if (VoronoiRegion(simplex)) {
                 // 충돌 종료
-                return true;
+                if (col1.isTrigger || col2.isTrigger)
+                    return std::optional<CollisionInfo>(std::nullopt);
+                return std::optional(EPA::GetNormalDepth(simplex, col1, col2, trf1, trf2));
             }
         }
     }

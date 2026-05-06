@@ -34,18 +34,18 @@ void TestState::Init() {
     // Camera
     const auto cam = registry_.create();
     registry_.emplace<TransformComponent>(cam,
-                                          // glm::vec3(0.f, 1.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
-                                          glm::vec3(0.f, 5.f, 0.f), glm::vec3(-90.f, 0.f, 0.f));
+                                          glm::vec3(0.f, 1.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
+                                          // glm::vec3(0.f, 5.f, 0.f), glm::vec3(-90.f, 0.f, 0.f));
                                           // glm::vec3(0.f, 7.5f, 15.f), glm::vec3(-30.f, 0.f, 0.f));
     auto& camComp = registry_.emplace<CameraComponent>(cam);
-    // camComp.mode = ProjectionMode::Perspective;
-    camComp.mode = ProjectionMode::Orthogonal;
+    camComp.mode = ProjectionMode::Perspective;
+    // camComp.mode = ProjectionMode::Orthogonal;
     registry_.emplace<MainCameraTag>(cam);
 
     // Player character
     const auto me = registry_.create();
     auto& trfCompMe = registry_.emplace<TransformComponent>(me);
-    trfCompMe.SetScale(2.f, 1.f, 1.f);
+    // trfCompMe.SetScale(2.f, 1.f, 1.f);
     // trfCompMe.SetScale(2.f, 2.f, 1.f);
     // trfCompMe.SetEulerDegree(0.f, 45.f, 0.f);
     registry_.emplace<SpeedComponent>(me, 2.f);

@@ -15,6 +15,9 @@ namespace tomato {
     struct CollisionStayEvent {
         entt::entity e1, e2;
         entt::registry* reg;
+
+        glm::vec3 normal;
+        float depth;
     };
 
     struct CollisionExitEvent {

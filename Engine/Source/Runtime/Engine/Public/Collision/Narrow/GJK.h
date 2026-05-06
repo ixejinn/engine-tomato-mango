@@ -2,16 +2,17 @@
 #define MANGO_GJK_H
 
 #include <glm/vec3.hpp>
-#include "ECS/PhysCompFwd.h"
+#include "Collision/Narrow/NarrowPhase.h"
 #include "Collision/CollisionConstants.h"
 #include "Containers/EnumArray.h"
+#include "Event/EventSignal.h"
 
 namespace tomato {
-    class GJK {
+    class GJK : public NarrowPhase {
     public:
-        static bool CheckCollision(
+        std::optional<std::optional<CollisionInfo>> CheckNarrowCollision(
                 const ColliderComponent& col1, const TransformComponent& trf1,
-                const ColliderComponent& col2, const TransformComponent& trf2);
+                const ColliderComponent& col2, const TransformComponent& trf2) override;
 
         static glm::vec3 Support(
                 const glm::vec3& worldDir,

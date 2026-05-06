@@ -6,27 +6,26 @@
 #include <vector>
 #include <functional>
 #include <unordered_map>
+#include <memory>
 #include "ECS/Systems/System.h"
 #include "ECS/PhysCompFwd.h"
 #include "Collision/CollisionEventFwd.h"
-#include "Collision/CollisionLayerMatrix.h"
-#include "Containers/UnorderedPair.h"
-#include "Collision/GJK.h"
-#include "Containers/EnumArray.h"
+#include "Collision/CollisionFwd.h"
+#include "Collision/Narrow/GJK.h"
 
 namespace tomato {
     class CollisionSystem : public System {
     public:
         CollisionSystem();
+        ~CollisionSystem();
 
         void Update(SimContext& simCtx) override;
 
     private:
-        void BroadPhase(entt::registry& reg);
-        void NarrowPhase(entt::registry& reg);
+        void BroadCheck(entt::registry& reg);
+        void NarrowCheck(entt::registry& reg);
 
         static void SetAABB(ColliderComponent& col, const TransformComponent& trf);
-        void SAP(entt::registry& reg);
 
         static void OnCollisionEnter(const CollisionEnterEvent& e);
         static void OnCollisionStay(const CollisionStayEvent& e);
@@ -36,15 +35,11 @@ namespace tomato {
         static void OnTriggerStay(const TriggerStayEvent& e);
         static void OnTriggerExit(const TriggerExitEvent& e);
 
-        using CollisionPair = UnorderedPair<entt::entity>;
-        CollisionLayerMatrix layerMatrix_;
+        std::unique_ptr<BroadPhase> broadPhase_;
+        std::unique_ptr<NarrowPhase> narrowPhase_;
+
         std::vector<CollisionPair> candidates_;
         std::unordered_map<CollisionPair, bool> collisionPairs_;
-
-        using NarrowCheckFunc = std::function<bool(
-            const ColliderComponent& col1, const TransformComponent& trf1,
-            const ColliderComponent& col2, const TransformComponent& trf2)>;
-        NarrowCheckFunc narrowCheckFunc_ = GJK::CheckCollision;
     };
 }
 

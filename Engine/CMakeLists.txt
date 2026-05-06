@@ -70,9 +70,14 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Resource/Audio/Audio.h
         Source/Runtime/Engine/Public/TomatoFwd.h
         Source/Runtime/Core/Public/Containers/UnorderedPair.h
-        Source/Runtime/Engine/Public/Collision/GJK.h
-        Source/Runtime/Engine/Public/Collision/EPA.h
+        Source/Runtime/Engine/Public/Collision/Narrow/GJK.h
+        Source/Runtime/Engine/Public/Collision/Narrow/EPA.h
         Source/Runtime/Engine/Public/Math/Normal.h
+        Source/Runtime/Engine/Public/Collision/Broad/BroadPhase.h
+        Source/Runtime/Engine/Public/Collision/CollisionFwd.h
+        Source/Runtime/Engine/Public/Collision/Broad/SAP.h
+        Source/Runtime/Engine/Public/Collision/Narrow/NarrowPhase.h
+        Source/Runtime/Engine/Public/Collision/CollisionInfo.h
 )
 
 set(ENGINE_SOURCES
@@ -102,6 +107,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/GJK.cpp
         Source/Runtime/Engine/Private/Collision/EPA.cpp
         Source/Runtime/Engine/Private/Math/Normal.cpp
+        Source/Runtime/Engine/Private/Collision/Broad/SAP.cpp
 )
 
 add_library(engine STATIC

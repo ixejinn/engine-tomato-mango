@@ -4,13 +4,16 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "Collision/CollisionEvent.h"
+#include "Collision/Broad/SAP.h"
+#include "Collision/Narrow/GJK.h"
 #include "Event/EventDispatcher.h"
 #include "Utils/Logger.h"
 #include "Utils/RegistryEntry.h"
 REGISTER_SYSTEM(tomato::SystemPhase::Physics, CollisionSystem)
 
 namespace tomato {
-    CollisionSystem::CollisionSystem() {
+    CollisionSystem::CollisionSystem()
+        : broadPhase_(std::make_unique<SAP>()), narrowPhase_(std::make_unique<GJK>()) {
         EventDispatcher::GetInstance().Connect<CollisionEnterEvent, &CollisionSystem::OnCollisionEnter>();
         EventDispatcher::GetInstance().Connect<CollisionStayEvent, &CollisionSystem::OnCollisionStay>();
         EventDispatcher::GetInstance().Connect<CollisionExitEvent, &CollisionSystem::OnCollisionExit>();
@@ -20,14 +23,19 @@ namespace tomato {
         EventDispatcher::GetInstance().Connect<TriggerExitEvent, &CollisionSystem::OnTriggerExit>();
     }
 
-    void CollisionSystem::Update(SimContext& simCtx) {
-        candidates_.clear();
+    CollisionSystem::~CollisionSystem() = default;
 
-        BroadPhase(simCtx.registry);
-        NarrowPhase(simCtx.registry);
+    void CollisionSystem::Update(SimContext& simCtx) {
+        int repeat = 1;
+        while (repeat--) {
+            candidates_.clear();
+
+            BroadCheck(simCtx.registry);
+            NarrowCheck(simCtx.registry);
+        }
     }
 
-    void CollisionSystem::BroadPhase(entt::registry &reg) {
+    void CollisionSystem::BroadCheck(entt::registry &reg) {
         auto group = reg.group<ColliderComponent>();
 
         for (auto [e, col] : group.each())
@@ -37,10 +45,10 @@ namespace tomato {
                 SetAABB(col, reg.get<TransformComponent>(e));
         }
 
-        SAP(reg);
+        broadPhase_->CheckBroadCollision(reg, candidates_);
     }
 
-    void CollisionSystem::NarrowPhase(entt::registry& reg) {
+    void CollisionSystem::NarrowCheck(entt::registry& reg) {
         for (const auto& candidate : candidates_) {
             auto& col1 = reg.get<ColliderComponent>(candidate.a);
             auto& col2 = reg.get<ColliderComponent>(candidate.b);
@@ -48,22 +56,23 @@ namespace tomato {
             auto& trf1 = reg.get<TransformComponent>(candidate.a);
             auto& trf2 = reg.get<TransformComponent>(candidate.b);
 
-            if (narrowCheckFunc_(col1, trf1, col2, trf2)) {
-                // Collision
+            if (auto result = narrowPhase_->CheckNarrowCollision(col1, trf1, col2, trf2)) {
+                // Collision detected
+                auto& collisionInfo = *result;
 
-                if (collisionPairs_.find(candidate) == collisionPairs_.end()) {
+                if (!collisionPairs_.contains(candidate)) {
                     // Enter
-                    if (col1.isTrigger || col2.isTrigger)
+                    if (!collisionInfo)
                         EventDispatcher::GetInstance().Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &reg});
                     else
-                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &reg});
+                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &reg, collisionInfo->normal, collisionInfo->depth});
                 }
                 else {
                     // Stay
-                    if (col1.isTrigger || col2.isTrigger)
+                    if (!collisionInfo)
                         EventDispatcher::GetInstance().Enqueue(TriggerStayEvent{candidate.a, candidate.b, &reg});
                     else
-                        EventDispatcher::GetInstance().Enqueue(CollisionStayEvent{candidate.a, candidate.b, &reg});
+                        EventDispatcher::GetInstance().Enqueue(CollisionStayEvent{candidate.a, candidate.b, &reg, collisionInfo->normal, collisionInfo->depth});
                 }
 
                 collisionPairs_[candidate] = true;
@@ -122,74 +131,13 @@ namespace tomato {
         }
     }
 
-    void CollisionSystem::SAP(entt::registry& reg) {
-        auto group = reg.group<ColliderComponent>();
-
-        // Sort by AABB.min.x for x-axis SAP
-        group.sort<ColliderComponent>([](const auto& l, const auto& r)
-                                      { return l.min.x < r.min.x; });
-
-        // Active list contains AABBs that are currently open on the sweep axis.
-        std::list<entt::entity> active;
-        float activeMaxX = std::numeric_limits<float>::lowest();
-
-        for (auto [e, col] : group.each())
-        {
-            // Initialize active list
-            if (activeMaxX < col.min.x)
-            {
-                active.clear();
-
-                active.push_back(e);
-                activeMaxX = col.max.x;
-            }
-            else
-            {
-                for (auto it = active.begin(); it != active.end();)
-                {
-                    auto& colAct = reg.get<ColliderComponent>(*it);
-
-                    // If active AABB.max < current AABB.min
-                    // active AABB does not overlap on the sweep axis and cannot collide.
-                    if (colAct.max.x < col.min.x)
-                    {
-                        active.erase(it++);
-                        continue;
-                    }
-
-                    // Check collision layer
-                    if (!layerMatrix_.CanCollide(col.layer, colAct.layer))
-                    {
-                        ++it;
-                        continue;
-                    }
-
-                    // Check AABB
-                    if (colAct.max.y < col.min.y || col.max.y < colAct.min.y)
-                    {
-                        ++it;
-                        continue;
-                    }
-                    if (colAct.max.z < col.min.z || col.max.z < colAct.min.z)
-                    {
-                        ++it;
-                        continue;
-                    }
-
-                    candidates_.emplace_back(e, *it);
-                    ++it;
-                }
-
-                active.push_back(e);
-                activeMaxX = std::max(activeMaxX, col.max.x);
-            }
-        }
-    }
-
     void CollisionSystem::OnCollisionEnter(const CollisionEnterEvent &e) {
-        // TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2 <<
+            " (" << e.depth << " : " << e.normal.x << "," << e.normal.y << "," << e.normal.z << ")";
 
         // TODO: 충돌 보정
+        auto& trf1 = e.reg->get<TransformComponent>(e.e1);
+        trf1.SetPosition(trf1.GetPosition() - e.normal * (e.depth + 0.01f));
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->enter)
@@ -203,6 +151,10 @@ namespace tomato {
     void CollisionSystem::OnCollisionStay(const CollisionStayEvent& e) {
 //        TMT_INFO << "Collision Stay";
 
+        // TODO: 충돌 보정
+        auto& trf1 = e.reg->get<TransformComponent>(e.e1);
+        trf1.SetPosition(trf1.GetPosition() - e.normal * (e.depth + 0.01f));
+
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->stay)
             callback->stay(e, e.e1);
@@ -213,7 +165,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnCollisionExit(const CollisionExitEvent& e) {
-        // TMT_INFO << "Collision Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        TMT_INFO << "Collision Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->exit)
