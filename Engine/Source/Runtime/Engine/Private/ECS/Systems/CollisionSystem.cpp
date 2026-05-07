@@ -135,9 +135,9 @@ namespace tomato {
         TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2 <<
             " (" << e.depth << " : " << e.normal.x << "," << e.normal.y << "," << e.normal.z << ")";
 
-        // TODO: 충돌 보정
-        auto& trf1 = e.reg->get<TransformComponent>(e.e1);
-        trf1.SetPosition(trf1.GetPosition() - e.normal * (e.depth + 0.01f));
+//        // TODO: 충돌 보정
+//        auto& trf1 = e.reg->get<TransformComponent>(e.e1);
+//        trf1.SetPosition(trf1.GetPosition() - e.normal * (e.depth + 0.01f));
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->enter)
@@ -151,9 +151,9 @@ namespace tomato {
     void CollisionSystem::OnCollisionStay(const CollisionStayEvent& e) {
 //        TMT_INFO << "Collision Stay";
 
-        // TODO: 충돌 보정
-        auto& trf1 = e.reg->get<TransformComponent>(e.e1);
-        trf1.SetPosition(trf1.GetPosition() - e.normal * (e.depth + 0.01f));
+//        // TODO: 충돌 보정
+//        auto& trf1 = e.reg->get<TransformComponent>(e.e1);
+//        trf1.SetPosition(trf1.GetPosition() - e.normal * (e.depth + 0.01f));
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->stay)

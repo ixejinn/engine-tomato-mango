@@ -1,8 +1,12 @@
 #ifndef MANGO_RIGIDBODY_H
 #define MANGO_RIGIDBODY_H
 
+#include <glm/vec3.hpp>
+
 namespace tomato {
-    struct SpeedComponent { float speed{1.f}; };
+    struct VelocityComponent {
+        glm::vec3 velocity;
+    };
 }
 
 #endif //MANGO_RIGIDBODY_H

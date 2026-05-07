@@ -48,9 +48,9 @@ void TestState::Init() {
     // trfCompMe.SetScale(2.f, 1.f, 1.f);
     // trfCompMe.SetScale(2.f, 2.f, 1.f);
     // trfCompMe.SetEulerDegree(0.f, 45.f, 0.f);
-    registry_.emplace<SpeedComponent>(me, 2.f);
+    registry_.emplace<VelocityComponent>(me);
     registry_.emplace<InputChannelComponent>(me, static_cast<uint8_t>(0));
-    registry_.emplace<JumpComponent>(me);
+    registry_.emplace<MovementComponent>(me);
     registry_.emplace<ColliderComponent>(me, ColliderType::Cube, trfCompMe);
     registry_.emplace<RenderComponent>(me,
                                        glm::vec4(1.f, 1.f, 0.f, 1.f),
@@ -67,9 +67,9 @@ void TestState::Init() {
     const auto east = registry_.create();
     auto& trfCompE = registry_.emplace<TransformComponent>(east,
                                           glm::vec3(5, 0, 0), glm::vec3(90, 0, 0));
-    registry_.emplace<SpeedComponent>(east, 2.f);
-    registry_.emplace<InputChannelComponent>(east, static_cast<uint8_t>(1));
-    registry_.emplace<JumpComponent>(east);
+//    registry_.emplace<SpeedComponent>(east, 2.f);
+//    registry_.emplace<InputChannelComponent>(east, static_cast<uint8_t>(1));
+//    registry_.emplace<MovementComponent>(east);
     registry_.emplace<ColliderComponent>(east, ColliderType::Cube, trfCompE);
     registry_.emplace<RenderComponent>(east,
                                        glm::vec4(0.f, 0.f, 1.f, 1.f),
@@ -81,7 +81,6 @@ void TestState::Init() {
     auto& onColCompE = registry_.emplace<OnCollisionComponent>(east);
     onColCompE.enter = TestState::TEST_CollisionEnter;
     onColCompE.exit = TestState::TEST_CollisionExit;
-
 }
 
 void TestState::Update() {
