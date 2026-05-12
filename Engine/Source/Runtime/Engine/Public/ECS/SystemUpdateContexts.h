@@ -1,4 +1,4 @@
-#ifndef MANGO_SYSTEMUPDATECONTEXTS_H
+﻿#ifndef MANGO_SYSTEMUPDATECONTEXTS_H
 #define MANGO_SYSTEMUPDATECONTEXTS_H
 
 #include <entt/entt.hpp>
@@ -23,6 +23,14 @@ namespace tomato {
 
         int width, height;
         entt::entity mainCam;
+    };
+
+    struct UIContext
+    {
+        std::vector<entt::entity> drawList;
+        std::vector<entt::entity> selectableList;
+
+        bool selectableDirty{ true };
     };
 }
 

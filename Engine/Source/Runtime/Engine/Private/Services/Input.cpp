@@ -1,6 +1,7 @@
-#include "Services/Input.h"
+﻿#include "Services/Input.h"
 #include "Services/Window.h"
 #include "Input/InputRecorder.h"
+#include "Input/InputUI.h"
 #include "Tick/TickClock.h"
 #include "Utils/Logger.h"
 #include <GLFW/glfw3.h>
@@ -143,12 +144,25 @@ namespace tomato {
         }
     }
 
-    Input::Input(Window& window, InputRecorder& recorder) {
+    bool Input::IsKeyPressed(Key key)
+    {
+        return latestKeyAction_[key] == KeyAction::Press;
+    }
+
+    bool Input::IsKeyReleased(Key key)
+    {
+        return latestKeyAction_[key] == KeyAction::Release;
+    }
+
+    Input::Input(Window& window, InputRecorder& recorder, InputUI& inputUI) {
         glfwSetKeyCallback(window.GetHandle(), OnKeyEvent);
         glfwSetMouseButtonCallback(window.GetHandle(), OnMouseButtonEvent);
+        glfwSetCursorPosCallback(window.GetHandle(), OnMouseMoveEvent);
 
         keySignal_.Connect<&InputRecorder::UpdateInputKey>(recorder);
+        moveSignal_.Connect<&InputUI::OnHover>(inputUI);
         mouseSignal_.Connect<&InputRecorder::UpdateInputMouse>(recorder);
+        mouseSignal_.Connect<&InputUI::OnClick>(inputUI);
     }
 
     void Input::OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -160,6 +174,7 @@ namespace tomato {
             TMT_WARN << "KeyAction of " << static_cast<int>(k) << " is invalid";
             return;
         }
+        latestKeyAction_[k] = a;
 
         auto winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
         auto input = winData->input;
@@ -178,6 +193,8 @@ namespace tomato {
             return;
         }
 
+        latestKeyAction_[k] = a;
+
         auto winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
         auto input = winData->input;
         auto tickClock = winData->tickClock;
@@ -187,5 +204,15 @@ namespace tomato {
 
         input->mouseSignal_.Collect(input->collector_,
                                    MouseEvent{k, a, a == KeyAction::Release ? 0.f : 1.f, tickClock->GetTick(), static_cast<float>(xPos), static_cast<float>(yPos)});
+    }
+
+    void Input::OnMouseMoveEvent(GLFWwindow* window, double xpos, double ypos)
+    {
+        auto winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+        auto input = winData->input;
+        auto tickClock = winData->tickClock;
+
+        input->moveSignal_.Collect(input->collector_,
+            MouseMoveEvent{ tickClock->GetTick(), static_cast<float>(xpos), static_cast<float>(ypos) });
     }
 }

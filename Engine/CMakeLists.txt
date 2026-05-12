@@ -1,4 +1,4 @@
-set(THIRD_PARTY_SOURCES
+﻿set(THIRD_PARTY_SOURCES
         Source/ThirdParty/glad/src/glad.c
         Source/ThirdParty/miniaudio/miniaudio.c
 )
@@ -57,6 +57,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Systems/RenderSystem.h
         Source/Runtime/Engine/Public/Resource/Render/Mesh.h
         Source/Runtime/Engine/Public/Resource/AssetRegistry.h
+        Source/Runtime/Engine/Public/Font/TextRenderer.h
         Source/Runtime/Engine/Public/Font/TextureAtlas.h
         Source/Runtime/Engine/Public/Font/AtlasManager.h
         Source/Runtime/Engine/Public/Resource/Render/Shader.h
@@ -67,6 +68,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/SystemConstants.h
         Source/Runtime/Engine/Public/ECS/SystemManager.h
         Source/Runtime/Engine/Public/Utils/RegistryEntry.h
+        Source/Runtime/Engine/Public/Utils/Utf.h
         Source/Runtime/Engine/Public/Resource/Audio/Audio.h
         Source/Runtime/Engine/Public/TomatoFwd.h
         Source/Runtime/Core/Public/Containers/UnorderedPair.h
@@ -78,7 +80,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Collision/Broad/SAP.h
         Source/Runtime/Engine/Public/Collision/Narrow/NarrowPhase.h
         Source/Runtime/Engine/Public/Collision/CollisionInfo.h
-)
+ "Source/Runtime/Engine/Public/Input/InputUI.h" "Source/Runtime/Engine/Public/ECS/Systems/UISystem.h")
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -95,6 +97,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Systems/RenderSystem.cpp
         Source/Runtime/Engine/Private/Resource/Render/Font.cpp
         Source/Runtime/Engine/Private/Font/TextureAtlas.cpp
+        Source/Runtime/Engine/Private/Font/TextRenderer.cpp
         Source/Runtime/Engine/Private/Font/AtlasManager.cpp
         Source/Runtime/Engine/Private/Resource/Render/Mesh.cpp
         Source/Runtime/Engine/Private/State/State.cpp
@@ -108,7 +111,8 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/EPA.cpp
         Source/Runtime/Engine/Private/Math/Normal.cpp
         Source/Runtime/Engine/Private/Collision/Broad/SAP.cpp
-)
+        Source/Runtime/Engine/Private/Utils/Utf.cpp
+ "Source/Runtime/Engine/Private/Input/InputUI.cpp" "Source/Runtime/Engine/Private/ECS/Systems/UISystem.cpp")
 
 add_library(engine STATIC
         ${ENGINE_HEADERS}

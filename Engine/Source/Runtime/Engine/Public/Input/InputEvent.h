@@ -1,4 +1,4 @@
-#ifndef MANGO_INPUTEVENT_H
+﻿#ifndef MANGO_INPUTEVENT_H
 #define MANGO_INPUTEVENT_H
 
 #include <cstdint>
@@ -29,6 +29,15 @@ namespace tomato {
         MouseEvent(Key k, KeyAction a, float v, uint32_t t, float x, float y)
         : KeyEvent(k, a, v, t), xPos(x), yPos(y) {}
 
+        float xPos, yPos;
+    };
+
+    /**
+     * @brief A move event for a mouse.
+     */
+    struct MouseMoveEvent
+    {
+        MouseMoveEvent(uint32_t t, float x, float y) : xPos(x), yPos(y) {}
         float xPos, yPos;
     };
 }

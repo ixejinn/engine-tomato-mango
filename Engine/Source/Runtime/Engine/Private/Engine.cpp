@@ -1,4 +1,4 @@
-#include "Engine.h"
+﻿#include "Engine.h"
 #include "Event/EventDispatcher.h"
 #include "Tick/TickClock.h"
 #include "State/DefaultState.h"
@@ -7,7 +7,7 @@
 
 namespace tomato {
     Engine::Engine(const int width, const int height, const char* title, const bool isSingle)
-        : window_(width, height, title), input_(window_, inputRecorder_), isSingle_(isSingle) {}
+        : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), isSingle_(isSingle) {}
 
     Engine::~Engine() = default;
 

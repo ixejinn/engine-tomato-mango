@@ -1,10 +1,11 @@
-#ifndef MANGO_ENGINE_H
+﻿#ifndef MANGO_ENGINE_H
 #define MANGO_ENGINE_H
 
 #include <memory>
 #include "Services/Window.h"
 #include "Services/Input.h"
 #include "Input/InputRecorder.h"
+#include "Input/InputUI.h"
 #include "ECS/SystemManager.h"
 #include "State/StateFwd.h"
 
@@ -35,6 +36,7 @@ namespace tomato {
         void ProcessInputEvents(uint32_t tick);
         Input input_;
         InputRecorder inputRecorder_;
+        InputUI inputUI_;
 
         void Simulate(TickClock& tc, SimContext& simCtx, InputContext& inputCtx);
         void Render(SimContext& simCtx, RenderContext& renderCtx);

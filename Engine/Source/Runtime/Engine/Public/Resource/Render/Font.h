@@ -1,11 +1,10 @@
-#ifndef MANGO_FONT_H
+﻿#ifndef MANGO_FONT_H
 #define MANGO_FONT_H
 
 #include <unordered_map>
 #include <glm/vec2.hpp>
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "Font/AtlasManager.h"
 
 namespace tomato {
     struct Glyph {
@@ -42,13 +41,11 @@ namespace tomato {
         static void Cleanup();
         static void Create(const char* path = defaultPath);
 
-        //void SetFontSize(int size);
-
         const Glyph& GetGlyph(char32_t codepoint);
+        glm::vec2 MeasureText(const std::u32string& text, float size);
 
     private:
         static FT_Library library_;
-        static AtlasManager atlasManager_;
 
         const Glyph& LoadGlyph(char32_t codepoint);
 
