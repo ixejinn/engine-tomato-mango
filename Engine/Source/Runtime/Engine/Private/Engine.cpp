@@ -87,6 +87,7 @@ namespace tomato {
         currState_ = std::move(nextState_);
         currState_->Init();
 
+        inputUI_.SetState(currState_.get());
         tc.ResetTick();
     }
 }

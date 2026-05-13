@@ -4,16 +4,17 @@
 #include "Services/Window.h"
 #include "Ecs/components/UI.h"
 #include "Ecs/components/Render.h"
+#include "State/State.h"
 #include <GLFW/glfw3.h>
 
 namespace tomato
 {
 	bool InputUI::OnClick(const MouseEvent& mouseEvent)
 	{
-		/*GLFWwindow* w = glfwGetCurrentContext();
-		auto winData = static_cast<WindowData*>(glfwGetWindowUserPointer(w));
-		
-		auto& r = engine->GetWorld().GetRegistry();
+		if (currentStatePtr_ == nullptr)
+			return true;
+
+		auto& r = currentStatePtr_->GetRegistry();
 
 		if (currentHovered == entt::null)
 			return true;
@@ -34,16 +35,17 @@ namespace tomato
 
 			if (pressed == currentHovered && selectable.click)
 				selectable.click(MouseEnterEvent{ currentHovered, &r });
-		}*/
+		}
 
 		return false;
 	}
 
 	bool InputUI::OnHover(const MouseMoveEvent& moveEvent)
 	{
-		/*GLFWwindow* w = glfwGetCurrentContext();
-		auto* engine = static_cast<WindowData*>(glfwGetWindowUserPointer(w))->engine;
-		auto& r = engine->GetWorld().GetRegistry();
+		if (currentStatePtr_ == nullptr)
+			return true;
+
+		auto& r = currentStatePtr_->GetRegistry();
 
 		previousHovered = currentHovered;
 		currentHovered = PickSelectable(glm::vec2{ moveEvent.xPos, moveEvent.yPos });
@@ -57,9 +59,14 @@ namespace tomato
 		auto& selectable = r.get<SelectableComponent>(currentHovered);
 		auto& render = r.get<RenderComponent>(currentHovered);
 
-		render.color = selectable.highlightedColor;*/
+		render.color = selectable.highlightedColor;
 
 		return false;
+	}
+
+	void InputUI::SetState(State* newState)
+	{
+		currentStatePtr_ = newState;
 	}
 
 	bool InputUI::PointInRect(glm::vec2 point, glm::vec2 min, glm::vec2 max)
@@ -73,11 +80,14 @@ namespace tomato
 
 	entt::entity InputUI::PickSelectable(glm::vec2 point)
 	{
-		/*GLFWwindow* w = glfwGetCurrentContext();
-		auto* engine = static_cast<WindowData*>(glfwGetWindowUserPointer(w))->engine;
-		auto& r = engine->GetWorld().GetRegistry();
-		float windowHeight = (float)engine->GetWindowService().GetHeight();
+		if (currentStatePtr_ == nullptr)
+			return entt::null;
 
+		auto& r = currentStatePtr_->GetRegistry();
+		GLFWwindow* w = glfwGetCurrentContext();
+		auto winData = static_cast<WindowData*>(glfwGetWindowUserPointer(w));
+		float windowHeight = (float)winData->window->GetHeight();
+		
 		auto* uiCtx = r.ctx().find<UIContext>();
 		if (uiCtx == nullptr)
 			return entt::null;
@@ -97,7 +107,8 @@ namespace tomato
 				else
 					render.color = button.normalColor;
 			}
-		}*/
+		}
+
 		return entt::null;
 	}
 }
