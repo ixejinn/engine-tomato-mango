@@ -38,12 +38,18 @@ namespace tomato {
                 dir = glm::normalize(dir);
 
             velocity.velocity.x = dir.x * move.horizontalSpeed;
-
-            // !!! for 2D MOVEMENT !!!
-            //pos.position.y += dir.y * speed.speed * Engine::FIXED_DELTA_TIME;
-
-            // !!! for 3D MOVEMENT !!!
             velocity.velocity.z = dir.y * move.horizontalSpeed;
+
+            // Rotation (!!!!TEST!!!!)
+            glm::vec3 eulerDegree = trf.GetEulerDegree();
+            if (HasFlag(keypress, InputIntent::TurnLeft))
+                trf.SetEulerDegree(eulerDegree + glm::vec3(0.f, 5.f, 0.f));
+            if (HasFlag(keypress, InputIntent::TurnRight))
+                trf.SetEulerDegree(eulerDegree + glm::vec3(0.f, -5.f, 0.f));
+            if (HasFlag(keypress, InputIntent::TurnUp))
+                trf.SetEulerDegree(eulerDegree + glm::vec3(5.f, 0.f, 0.f));
+            if (HasFlag(keypress, InputIntent::TurnDown))
+                trf.SetEulerDegree(eulerDegree + glm::vec3(-5.f, 0.f, 0.f));
 
             // Jump
             if (HasFlag(keydown, InputIntent::Jump) && move.jumpCnt < JUMP_COUNT_MAX)

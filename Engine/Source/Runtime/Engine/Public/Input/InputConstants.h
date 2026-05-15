@@ -1,11 +1,13 @@
 #ifndef MANGO_INPUTCONSTANTS_H
 #define MANGO_INPUTCONSTANTS_H
 
+#include <cstdint>
+
 namespace tomato {
     /**
      * @brief Bitmask for logical player intents for a single simulation tick.
      */
-    enum class InputIntent
+    enum class InputIntent : uint32_t
     {
         None    = 0,
 
@@ -16,11 +18,16 @@ namespace tomato {
 
         Jump    = 1 << 4,
 
+        TurnLeft    = 1 << 5,
+        TurnRight   = 1 << 6,
+        TurnUp      = 1 << 7,
+        TurnDown    = 1 << 8,
+
         // Debug
-        Test_1  = 1 << 5,
-        Test_2  = 1 << 6,
-        Test_3  = 1 << 7,
-        Test_4  = 1 << 8,
+        Test_1  = 1U << 28,
+        Test_2  = 1U << 29,
+        Test_3  = 1U << 30,
+        Test_4  = 1U << 31,
 
         COUNT
     };

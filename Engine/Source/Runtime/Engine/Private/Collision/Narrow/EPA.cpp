@@ -58,9 +58,7 @@ namespace tomato {
                 return std::nullopt;
             }
 
-            simplex.push_back(
-                    GJK::Support(nearestPlain->normal, col1, trf1) -
-                    GJK::Support(-nearestPlain->normal, col2, trf2));
+            simplex.push_back(GJK::GetSupportPoint(nearestPlain->normal, col1, trf1, col2, trf2));
             auto dist = glm::dot(nearestPlain->normal, simplex.back());
 
             auto diff = dist - nearestPlain->distance;

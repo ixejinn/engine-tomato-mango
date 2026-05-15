@@ -1,11 +1,15 @@
 #include <entt/entt.hpp>
 #include "ECS/Systems/CollisionSystem.h"
+
+#include "SimulationConfig.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "Collision/CollisionEvent.h"
 #include "Collision/Broad/SAP.h"
 #include "Collision/Narrow/GJK.h"
+#include "ECS/Components/Rigidbody.h"
+#include "ECS/Systems/KinematicMovementSystem.h"
 #include "Event/EventDispatcher.h"
 #include "Utils/Logger.h"
 #include "Utils/RegistryEntry.h"
@@ -26,29 +30,26 @@ namespace tomato {
     CollisionSystem::~CollisionSystem() = default;
 
     void CollisionSystem::Update(SimContext& simCtx) {
-        int repeat = 1;
-        while (repeat--) {
-            candidates_.clear();
+        candidates_.clear();
 
-            BroadCheck(simCtx.registry);
-            NarrowCheck(simCtx.registry);
-        }
+        DetectBroad(simCtx.registry);
+        DetectNarrow(simCtx.registry);
     }
 
-    void CollisionSystem::BroadCheck(entt::registry &reg) {
+    void CollisionSystem::DetectBroad(entt::registry &reg) {
         auto group = reg.group<ColliderComponent>();
 
         for (auto [e, col] : group.each())
         {
             if (col.aabbDirty)
                 // Update AABB min, max
-                SetAABB(col, reg.get<TransformComponent>(e));
+                SetAABB(reg, e);
         }
 
-        broadPhase_->CheckBroadCollision(reg, candidates_);
+        broadPhase_->DetectCollision(reg, candidates_);
     }
 
-    void CollisionSystem::NarrowCheck(entt::registry& reg) {
+    void CollisionSystem::DetectNarrow(entt::registry& reg) {
         for (const auto& candidate : candidates_) {
             auto& col1 = reg.get<ColliderComponent>(candidate.a);
             auto& col2 = reg.get<ColliderComponent>(candidate.b);
@@ -56,23 +57,21 @@ namespace tomato {
             auto& trf1 = reg.get<TransformComponent>(candidate.a);
             auto& trf2 = reg.get<TransformComponent>(candidate.b);
 
-            if (auto result = narrowPhase_->CheckNarrowCollision(col1, trf1, col2, trf2)) {
+            if (auto result = narrowPhase_->DetectCollision(col1, trf1, col2, trf2)) {
                 // Collision detected
-                auto& collisionInfo = *result;
-
                 if (!collisionPairs_.contains(candidate)) {
                     // Enter
-                    if (!collisionInfo)
+                    if (col1.isTrigger || col2.isTrigger)
                         EventDispatcher::GetInstance().Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &reg});
                     else
-                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &reg, collisionInfo->normal, collisionInfo->depth});
+                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &reg, result->normal, result->depth});
                 }
                 else {
                     // Stay
-                    if (!collisionInfo)
+                    if (col1.isTrigger || col2.isTrigger)
                         EventDispatcher::GetInstance().Enqueue(TriggerStayEvent{candidate.a, candidate.b, &reg});
                     else
-                        EventDispatcher::GetInstance().Enqueue(CollisionStayEvent{candidate.a, candidate.b, &reg, collisionInfo->normal, collisionInfo->depth});
+                        EventDispatcher::GetInstance().Enqueue(CollisionStayEvent{candidate.a, candidate.b, &reg, result->normal, result->depth});
                 }
 
                 collisionPairs_[candidate] = true;
@@ -99,45 +98,41 @@ namespace tomato {
         }
     }
 
-    void CollisionSystem::SetAABB(ColliderComponent& col, const TransformComponent& trf) {
-        const auto& wPos = trf.GetPosition();
+    void CollisionSystem::SetAABB(entt::registry& reg, const entt::entity e) {
+        auto& col = reg.get<ColliderComponent>(e);
+        auto& trf = reg.get<TransformComponent>(e);
 
-        switch (col.type)
-        {
-            case ColliderType::Sphere:
+        auto velPtr = reg.try_get<VelocityComponent>(e);
+
+        glm::vec3 wPos = trf.GetPosition();
+        if (velPtr && reg.try_get<KinematicMovementSystem>(e))
+            wPos += velPtr->velocity * FIXED_DELTA_TIME;    // Sweep AABB
+
+        if (col.type == ColliderType::Sphere) {
+            const glm::vec3 radius{col.halfExtents.x};
+
+            col.max = wPos + col.position + radius;
+            col.min = wPos + col.position - radius;
+        }
+        else {
+            auto R = glm::toMat4(trf.GetQuaternion());
+
+            glm::vec3 aabbHalfExtents
             {
-                glm::vec3 radius{col.halfExtents.x};
+                glm::abs(R[0][0]) * col.halfExtents.x + glm::abs(R[1][0]) * col.halfExtents.y + glm::abs(R[2][0]) * col.halfExtents.z,
+                glm::abs(R[0][1]) * col.halfExtents.x + glm::abs(R[1][1]) * col.halfExtents.y + glm::abs(R[2][1]) * col.halfExtents.z,
+                glm::abs(R[0][2]) * col.halfExtents.x + glm::abs(R[1][2]) * col.halfExtents.y + glm::abs(R[2][2]) * col.halfExtents.z
+            };
 
-                col.max = wPos + col.position + radius;
-                col.min = wPos + col.position - radius;
-            }
-                break;
-            default:
-            {
-                auto R = glm::toMat4(trf.GetQuaternion());
-
-                glm::vec3 aabbHalfExtents
-                {
-                    glm::abs(R[0][0]) * col.halfExtents.x + glm::abs(R[1][0]) * col.halfExtents.y + glm::abs(R[2][0]) * col.halfExtents.z,
-                    glm::abs(R[0][1]) * col.halfExtents.x + glm::abs(R[1][1]) * col.halfExtents.y + glm::abs(R[2][1]) * col.halfExtents.z,
-                    glm::abs(R[0][2]) * col.halfExtents.x + glm::abs(R[1][2]) * col.halfExtents.y + glm::abs(R[2][2]) * col.halfExtents.z
-                };
-
-                auto wOffset = glm::vec3(R * glm::vec4(col.position, 1.f));
-                col.max = wPos + wOffset + aabbHalfExtents;
-                col.min = wPos + wOffset - aabbHalfExtents;
-            }
-                break;
+            auto wOffset = glm::vec3(R * glm::vec4(col.position, 1.f));
+            col.max = wPos + wOffset + aabbHalfExtents;
+            col.min = wPos + wOffset - aabbHalfExtents;
         }
     }
 
     void CollisionSystem::OnCollisionEnter(const CollisionEnterEvent &e) {
         TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2 <<
             " (" << e.depth << " : " << e.normal.x << "," << e.normal.y << "," << e.normal.z << ")";
-
-//        // TODO: 충돌 보정
-//        auto& trf1 = e.reg->get<TransformComponent>(e.e1);
-//        trf1.SetPosition(trf1.GetPosition() - e.normal * (e.depth + 0.01f));
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->enter)
@@ -150,10 +145,6 @@ namespace tomato {
 
     void CollisionSystem::OnCollisionStay(const CollisionStayEvent& e) {
 //        TMT_INFO << "Collision Stay";
-
-//        // TODO: 충돌 보정
-//        auto& trf1 = e.reg->get<TransformComponent>(e.e1);
-//        trf1.SetPosition(trf1.GetPosition() - e.normal * (e.depth + 0.01f));
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->stay)
@@ -177,7 +168,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnTriggerEnter(const TriggerEnterEvent& e) {
-        // TMT_INFO << "Trigger Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        TMT_INFO << "Trigger Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnTriggerComponent>(e.e1);
         if (callback && callback->enter)
@@ -201,7 +192,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnTriggerExit(const TriggerExitEvent& e) {
-        // TMT_INFO << "Trigger Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        TMT_INFO << "Trigger Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnTriggerComponent>(e.e1);
         if (callback && callback->exit)

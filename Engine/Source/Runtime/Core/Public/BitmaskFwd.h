@@ -5,7 +5,7 @@
 #include <type_traits>
 
 namespace tomato {
-    enum class InputIntent;
+    enum class InputIntent : uint32_t;
     enum class CollisionLayer : uint32_t;
     enum class ColliderType : uint8_t;
 

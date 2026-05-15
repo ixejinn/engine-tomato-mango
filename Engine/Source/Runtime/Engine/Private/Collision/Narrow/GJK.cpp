@@ -1,4 +1,4 @@
-#include "../../Public/Collision/Narrow/GJK.h"
+#include "Collision/Narrow/GJK.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "Collision/ColliderSupport.h"
@@ -15,9 +15,9 @@ namespace tomato {
         {ColliderType::Capsule, support::Capsule}
     };
 
-    std::optional<std::optional<CollisionInfo>> GJK::CheckNarrowCollision(
-        const tomato::ColliderComponent &col1, const tomato::TransformComponent &trf1,
-        const tomato::ColliderComponent &col2, const tomato::TransformComponent &trf2) {
+    std::optional<CollisionInfo> GJK::DetectCollision(
+        const ColliderComponent &col1, const TransformComponent &trf1,
+        const ColliderComponent &col2, const TransformComponent &trf2) {
         std::vector<glm::vec3> simplex;
         simplex.reserve(4);
 
@@ -30,10 +30,17 @@ namespace tomato {
             if (VoronoiRegion(simplex)) {
                 // 충돌 종료
                 if (col1.isTrigger || col2.isTrigger)
-                    return std::optional<CollisionInfo>(std::nullopt);
-                return std::optional(EPA::GetNormalDepth(simplex, col1, col2, trf1, trf2));
+                    return CollisionInfo{};
+                return EPA::GetNormalDepth(simplex, col1, col2, trf1, trf2);
             }
         }
+    }
+
+    glm::vec3 GJK::GetSupportPoint(
+                const glm::vec3& worldDir,
+                const ColliderComponent& col1, const TransformComponent& trf1,
+                const ColliderComponent& col2, const TransformComponent& trf2) {
+        return Support(worldDir, col1, trf1) - Support(-worldDir, col2, trf2);
     }
 
     glm::vec3 GJK::Support(

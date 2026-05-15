@@ -10,10 +10,16 @@
 namespace tomato {
     class GJK : public NarrowPhase {
     public:
-        std::optional<std::optional<CollisionInfo>> CheckNarrowCollision(
+        std::optional<CollisionInfo> DetectCollision(
                 const ColliderComponent& col1, const TransformComponent& trf1,
                 const ColliderComponent& col2, const TransformComponent& trf2) override;
 
+        static glm::vec3 GetSupportPoint(
+                const glm::vec3& worldDir,
+                const ColliderComponent& col1, const TransformComponent& trf1,
+                const ColliderComponent& col2, const TransformComponent& trf2);
+
+    private:
         static glm::vec3 Support(
                 const glm::vec3& worldDir,
                 const ColliderComponent& col, const TransformComponent& trf);

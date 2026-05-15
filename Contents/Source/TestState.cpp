@@ -60,8 +60,8 @@ void TestState::Init() {
 
     registry_.emplace<CollisionTestComponent>(me);
     auto& onColCompMe = registry_.emplace<OnCollisionComponent>(me);
-    onColCompMe.enter = TestState::TEST_CollisionEnter;
-    onColCompMe.exit = TestState::TEST_CollisionExit;
+    onColCompMe.enter = TEST_CollisionEnter;
+    onColCompMe.exit = TEST_CollisionExit;
 
     // NPCs
     const auto east = registry_.create();
@@ -79,8 +79,8 @@ void TestState::Init() {
 
     registry_.emplace<CollisionTestComponent>(east);
     auto& onColCompE = registry_.emplace<OnCollisionComponent>(east);
-    onColCompE.enter = TestState::TEST_CollisionEnter;
-    onColCompE.exit = TestState::TEST_CollisionExit;
+    onColCompE.enter = TEST_CollisionEnter;
+    onColCompE.exit = TEST_CollisionExit;
 }
 
 void TestState::Update() {

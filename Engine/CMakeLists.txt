@@ -104,8 +104,8 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/SystemRegistry.cpp
         Source/Runtime/Engine/Private/ECS/SystemManager.cpp
         Source/Runtime/Engine/Private/Resource/Audio/Audio.cpp
-        Source/Runtime/Engine/Private/Collision/GJK.cpp
-        Source/Runtime/Engine/Private/Collision/EPA.cpp
+        Source/Runtime/Engine/Private/Collision/Narrow/GJK.cpp
+        Source/Runtime/Engine/Private/Collision/Narrow/EPA.cpp
         Source/Runtime/Engine/Private/Math/Normal.cpp
         Source/Runtime/Engine/Private/Collision/Broad/SAP.cpp
 )

@@ -10,12 +10,10 @@ namespace tomato {
     public:
         virtual ~BroadPhase() = default;
 
-        virtual void CheckBroadCollision(entt::registry& reg, std::vector<CollisionPair>& candidates) = 0;
+        virtual void DetectCollision(entt::registry& reg, std::vector<CollisionPair>& candidates) = 0;
 
     protected:
         inline static CollisionLayerMatrix layerMatrix_;
-
-        static void SetAABB(ColliderComponent& col, const TransformComponent& trf);
     };
 }
 

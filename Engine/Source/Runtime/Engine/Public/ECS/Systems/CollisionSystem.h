@@ -17,15 +17,15 @@ namespace tomato {
     class CollisionSystem : public System {
     public:
         CollisionSystem();
-        ~CollisionSystem();
+        ~CollisionSystem() override;
 
         void Update(SimContext& simCtx) override;
 
     private:
-        void BroadCheck(entt::registry& reg);
-        void NarrowCheck(entt::registry& reg);
+        void DetectBroad(entt::registry& reg);
+        void DetectNarrow(entt::registry& reg);
 
-        static void SetAABB(ColliderComponent& col, const TransformComponent& trf);
+        static void SetAABB(entt::registry& reg, const entt::entity e);
 
         static void OnCollisionEnter(const CollisionEnterEvent& e);
         static void OnCollisionStay(const CollisionStayEvent& e);

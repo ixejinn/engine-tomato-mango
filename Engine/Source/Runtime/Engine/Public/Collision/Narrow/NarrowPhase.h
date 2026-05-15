@@ -10,7 +10,7 @@ namespace tomato {
     public:
         virtual ~NarrowPhase() = default;
 
-        virtual std::optional<std::optional<CollisionInfo>> CheckNarrowCollision(
+        virtual std::optional<CollisionInfo> DetectCollision(
             const ColliderComponent& col1, const TransformComponent& trf1,
             const ColliderComponent& col2, const TransformComponent& trf2) = 0;
     };
