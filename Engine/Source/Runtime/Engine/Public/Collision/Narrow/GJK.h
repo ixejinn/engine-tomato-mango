@@ -11,18 +11,21 @@ namespace tomato {
     class GJK : public NarrowPhase {
     public:
         std::optional<CollisionInfo> DetectCollision(
-                const ColliderComponent& col1, const TransformComponent& trf1,
-                const ColliderComponent& col2, const TransformComponent& trf2) override;
+            const ColliderComponent& col1, const TransformComponent& trf1,
+            const ColliderComponent& col2, const TransformComponent& trf2) override;
 
         static glm::vec3 GetSupportPoint(
-                const glm::vec3& worldDir,
-                const ColliderComponent& col1, const TransformComponent& trf1,
-                const ColliderComponent& col2, const TransformComponent& trf2);
+            const glm::vec3& worldDir,
+            const ColliderComponent& col1, const TransformComponent& trf1,
+            const ColliderComponent& col2, const TransformComponent& trf2);
 
     private:
         static glm::vec3 Support(
-                const glm::vec3& worldDir,
-                const ColliderComponent& col, const TransformComponent& trf);
+            const glm::vec3& worldDir,
+            const ColliderComponent& col, const TransformComponent& trf);
+
+        static std::optional<glm::vec3> FindClosestPointOnSimplex(std::vector<glm::vec3>& simplex);
+        static glm::vec3 FindClosestPointOnTriangle(std::vector<glm::vec3>& simplex);
 
         static bool AddSimplexPoint(
                 std::vector<glm::vec3>& simplex,

@@ -58,6 +58,11 @@ namespace tomato {
             auto& trf2 = reg.get<TransformComponent>(candidate.b);
 
             if (auto result = narrowPhase_->DetectCollision(col1, trf1, col2, trf2)) {
+                if (result->depth < 0 && !col1.isTrigger && !col2.isTrigger) {
+                    TMT_INFO << "kinematic collision correction: " << -result->depth ;
+                    continue;
+                }
+
                 // Collision detected
                 if (!collisionPairs_.contains(candidate)) {
                     // Enter
@@ -102,11 +107,10 @@ namespace tomato {
         auto& col = reg.get<ColliderComponent>(e);
         auto& trf = reg.get<TransformComponent>(e);
 
-        auto velPtr = reg.try_get<VelocityComponent>(e);
-
         glm::vec3 wPos = trf.GetPosition();
-        if (velPtr && reg.try_get<KinematicMovementSystem>(e))
-            wPos += velPtr->velocity * FIXED_DELTA_TIME;    // Sweep AABB
+        // Sweep AABB
+        if (const auto velPtr = reg.try_get<VelocityComponent>(e))
+            wPos += velPtr->velocity * FIXED_DELTA_TIME;
 
         if (col.type == ColliderType::Sphere) {
             const glm::vec3 radius{col.halfExtents.x};
