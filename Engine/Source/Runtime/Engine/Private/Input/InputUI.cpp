@@ -1,11 +1,13 @@
-﻿#include "Input/InputUI.h"
+﻿#include <GLFW/glfw3.h>
+
+#include "Input/InputUI.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "Services/Input.h"
 #include "Services/Window.h"
-#include "Ecs/components/UI.h"
-#include "Ecs/components/Render.h"
+#include "ECS/Components/Render.h"
+#include "ECS/Components/UI.h"
+#include "ECS/Components/UIEvents.h"
 #include "State/State.h"
-#include <GLFW/glfw3.h>
 
 namespace tomato
 {
@@ -22,6 +24,9 @@ namespace tomato
 		auto& rect = r.get<RectTransformComponent>(currentHovered);
 		auto& selectable = r.get<SelectableComponent>(currentHovered);
 		auto& render = r.get<RenderComponent>(currentHovered);
+		if (!r.all_of<MouseEventComponent>(currentHovered))
+			return false;
+		auto& mouseEvnt = r.get<MouseEventComponent>(currentHovered);
 
 		if (mouseEvent.action == KeyAction::Press)
 		{
@@ -33,8 +38,8 @@ namespace tomato
 		{
 			render.color = selectable.normalColor;
 
-			if (pressed == currentHovered && selectable.click)
-				selectable.click(MouseEnterEvent{ currentHovered, &r });
+			if (pressed == currentHovered && mouseEvnt.onClick)
+				mouseEvnt.onClick(MouseEnterEvent{ currentHovered, &r });
 		}
 
 		return false;

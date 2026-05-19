@@ -1,4 +1,4 @@
-#ifndef MANGO_SYSTEMMANAGER_H
+﻿#ifndef MANGO_SYSTEMMANAGER_H
 #define MANGO_SYSTEMMANAGER_H
 
 #include <vector>
@@ -27,13 +27,15 @@ namespace tomato {
 
         static constexpr SystemPhase simOrder_[] = {
             SystemPhase::Input,
+            SystemPhase::UI,
             SystemPhase::Physics,
             SystemPhase::Collision
         };
 
         static constexpr SystemPhase renderOrder_[] = {
             SystemPhase::Camera,
-            SystemPhase::Rendering
+            SystemPhase::Rendering,
+            SystemPhase::ScreenUI
         };
 
         EnumArray<SystemPhase, std::vector<SystemPtr>> systems_;

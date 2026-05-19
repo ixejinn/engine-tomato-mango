@@ -1,4 +1,4 @@
-#include "TestState.h"
+﻿#include "TestState.h"
 #include "Engine.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Audio/Audio.h"
@@ -17,6 +17,9 @@
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Render.h"
+#include "ECS/Components/Text.h"
+#include "ECS/Components/UI.h"
+#include "ECS/Components/UIEvents.h"
 
 #include "Collision/CollisionEvent.h"
 #include "CollisionTestComponent.h"
@@ -82,6 +85,45 @@ void TestState::Init() {
     onColCompE.enter = TestState::TEST_CollisionEnter;
     onColCompE.exit = TestState::TEST_CollisionExit;
 
+    const auto canvas = registry_.create();
+    registry_.emplace<tomato::CanvasComponent>(canvas);
+    registry_.emplace<tomato::UIComponent>(canvas, canvas);
+    registry_.emplace<tomato::RectTransformComponent>(canvas);
+    registry_.emplace<tomato::HierarchyComponent>(canvas);
+    registry_.emplace<tomato::RenderComponent>(canvas,
+        glm::vec4{ 1.f, 1.f, 1.f, 0.5f },
+        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
+        GetAssetID("UIShader"),
+        GetAssetID(Texture::PrimitiveName));
+
+
+    const auto button = registry_.create();
+    registry_.emplace<tomato::UIComponent>(button, canvas, 1);
+    registry_.emplace<tomato::RectTransformComponent>(button, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(200.f, 200.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    registry_.emplace<tomato::SelectableComponent>(button);
+    registry_.emplace<tomato::MouseEventComponent>(button);
+    registry_.emplace<tomato::HierarchyComponent>(button);
+    SetParent(registry_, button, canvas);
+    registry_.emplace<tomato::RenderComponent>(button,
+        glm::vec4{ 0.2f, 0.75f, 0.4f, 1.0f },
+        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
+        GetAssetID("UIShader"),
+        GetAssetID(Texture::PrimitiveName));
+
+    const auto buttonText = registry_.create();
+    registry_.emplace<tomato::UIComponent>(buttonText, canvas, 2);
+    registry_.emplace<tomato::TextComponent>(buttonText, "Button1임", glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f }, 30.f);
+    registry_.emplace<tomato::RectTransformComponent>(buttonText, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    registry_.emplace<tomato::HierarchyComponent>(buttonText);
+    SetParent(registry_, buttonText, button);
+
+    const auto TargetLabel = registry_.create();
+    registry_.emplace<tomato::UIComponent>(TargetLabel, canvas, 2);
+    registry_.emplace<tomato::TextComponent>(TargetLabel, "player1", glm::vec4{ 1.f, 1.f, 0.5f, 1.0f }, 24.f);
+    registry_.emplace<tomato::RectTransformComponent>(TargetLabel, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    registry_.emplace<tomato::HierarchyComponent>(TargetLabel);
+    registry_.emplace<tomato::TargetComponent>(TargetLabel, me);
+    SetParent(registry_, TargetLabel, canvas);
 }
 
 void TestState::Update() {

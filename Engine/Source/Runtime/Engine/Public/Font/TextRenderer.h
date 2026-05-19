@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <glad/glad.h>
 
 #include "Resource/Render/Font.h"
 

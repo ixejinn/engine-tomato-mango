@@ -30,6 +30,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Resource/Render/Font.h
         Source/Runtime/Engine/Public/ECS/Components/Transform.h
         Source/Runtime/Engine/Public/ECS/Components/UI.h
+        Source/Runtime/Engine/Public/ECS/Components/UIEvents.h
         Source/Runtime/Engine/Public/ECS/Systems/CameraSystem.h
         Source/Runtime/Engine/Public/ECS/Systems/System.h
         Source/Runtime/Engine/Public/Engine.h
@@ -42,10 +43,11 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Input/InputRecord.h
         Source/Runtime/Engine/Public/Input/InputRecorder.h
         Source/Runtime/Engine/Public/Input/InputEvent.h
+        Source/Runtime/Engine/Public/Input/InputUI.h
         Source/Runtime/Engine/Public/Input/KeyConstants.h
+        Source/Runtime/Engine/Public/Input/InputEventFwd.h
         Source/Runtime/Engine/Public/Services/Input.h
         Source/Runtime/Engine/Public/Tick/TickClock.h
-        Source/Runtime/Engine/Public/Input/InputEventFwd.h
         Source/Runtime/Engine/Public/Tick/TickFwd.h
         Source/Runtime/Engine/Public/State/DefaultState.h
         Source/Runtime/Engine/Public/GameplayConfig.h
@@ -62,7 +64,9 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Font/AtlasManager.h
         Source/Runtime/Engine/Public/Resource/Render/Shader.h
         Source/Runtime/Engine/Public/Resource/Render/Texture.h
+        Source/Runtime/Engine/Public/ECS/Systems/ScreenUIRenderSystem.h
         Source/Runtime/Engine/Public/ECS/Systems/TransformSystem.h
+        Source/Runtime/Engine/Public/ECS/Systems/UISystem.h
         Source/Runtime/Engine/Public/ECS/SystemRegistry.h
         Source/Runtime/Engine/Public/ECS/SystemFwd.h
         Source/Runtime/Engine/Public/ECS/SystemConstants.h
@@ -74,13 +78,13 @@ set(ENGINE_HEADERS
         Source/Runtime/Core/Public/Containers/UnorderedPair.h
         Source/Runtime/Engine/Public/Collision/Narrow/GJK.h
         Source/Runtime/Engine/Public/Collision/Narrow/EPA.h
-        Source/Runtime/Engine/Public/Math/Normal.h
         Source/Runtime/Engine/Public/Collision/Broad/BroadPhase.h
         Source/Runtime/Engine/Public/Collision/CollisionFwd.h
         Source/Runtime/Engine/Public/Collision/Broad/SAP.h
         Source/Runtime/Engine/Public/Collision/Narrow/NarrowPhase.h
         Source/Runtime/Engine/Public/Collision/CollisionInfo.h
- "Source/Runtime/Engine/Public/Input/InputUI.h" "Source/Runtime/Engine/Public/ECS/Systems/UISystem.h")
+        Source/Runtime/Engine/Public/Math/Normal.h
+)
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -112,7 +116,9 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Math/Normal.cpp
         Source/Runtime/Engine/Private/Collision/Broad/SAP.cpp
         Source/Runtime/Engine/Private/Utils/Utf.cpp
- "Source/Runtime/Engine/Private/Input/InputUI.cpp" "Source/Runtime/Engine/Private/ECS/Systems/UISystem.cpp")
+        Source/Runtime/Engine/Private/Input/InputUI.cpp
+        Source/Runtime/Engine/Private/ECS/Systems/UISystem.cpp
+        Source/Runtime/Engine/Private/ECS/Systems/ScreenUIRenderSystem.cpp)
 
 add_library(engine STATIC
         ${ENGINE_HEADERS}

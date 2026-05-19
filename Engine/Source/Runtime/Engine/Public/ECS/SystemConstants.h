@@ -8,9 +8,10 @@ namespace tomato {
         Input = 0,
         Physics,
         Collision,
+        UI,
         Rendering,
         Camera,
-        UI,
+        ScreenUI,
         COUNT
     };
 }
