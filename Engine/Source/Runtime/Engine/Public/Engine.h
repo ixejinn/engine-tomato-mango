@@ -8,6 +8,7 @@
 #include "Input/InputUI.h"
 #include "ECS/SystemManager.h"
 #include "State/StateFwd.h"
+#include "Network/NetworkService.h"
 
 namespace tomato {
     class Engine {
@@ -28,6 +29,7 @@ namespace tomato {
 
     private:
         Window window_;
+        NetworkService network_;
 
         void SingleRun();
         void MultiRun();

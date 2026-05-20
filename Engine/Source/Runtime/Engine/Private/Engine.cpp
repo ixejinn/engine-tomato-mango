@@ -7,7 +7,7 @@
 
 namespace tomato {
     Engine::Engine(const int width, const int height, const char* title, const bool isSingle)
-        : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), isSingle_(isSingle) {}
+        : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), isSingle_(isSingle), network_(isSingle == true ? NetMode::NM_Alone : NetMode::NM_Client) {}
 
     Engine::~Engine() = default;
 

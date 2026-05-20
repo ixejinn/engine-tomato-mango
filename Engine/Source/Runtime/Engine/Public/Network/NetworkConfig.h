@@ -13,6 +13,9 @@ namespace tomato {
     // 300틱 - 5초
     // 500틱 - 8.33초
     constexpr int ROLLBACK_WINDOW{128};
+
+    static constexpr const char* SERVER_ADDRESS = "192.168.31.234";
+    static constexpr uint16_t SERVER_PORT_NUM = 7777;
 }
 
 #endif //MANGO_NETWORKCONFIG_H

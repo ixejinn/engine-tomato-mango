@@ -84,7 +84,16 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Collision/Narrow/NarrowPhase.h
         Source/Runtime/Engine/Public/Collision/CollisionInfo.h
         Source/Runtime/Engine/Public/Math/Normal.h
-)
+        Source/Runtime/Engine/Public/Network/NetworkFwd.h
+        Source/Runtime/Engine/Public/Network/NetConnection.h
+        Source/Runtime/Engine/Public/Network/SocketAddress.h
+        Source/Runtime/Engine/Public/Network/SocketUtil.h
+        Source/Runtime/Engine/Public/Network/PacketTypes.h
+        Source/Runtime/Engine/Public/Network/TCPSocket.h
+        Source/Runtime/Engine/Public/Network/TCPNetDriver.h
+        Source/Runtime/Engine/Public/Network/UDPSocket.h
+        Source/Runtime/Engine/Public/Network/UDPNetDriver.h
+ "Source/Runtime/Engine/Public/Network/NetworkService.h" "Source/Runtime/Engine/Public/Network/NetBitReader.h" "Source/Runtime/Engine/Public/Network/NetBitWriter.h" "Source/Runtime/Engine/Public/Network/WinsockContext.h" "Source/Runtime/Engine/Public/Network/NetCommon.h")
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -118,7 +127,14 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Utils/Utf.cpp
         Source/Runtime/Engine/Private/Input/InputUI.cpp
         Source/Runtime/Engine/Private/ECS/Systems/UISystem.cpp
-        Source/Runtime/Engine/Private/ECS/Systems/ScreenUIRenderSystem.cpp)
+        Source/Runtime/Engine/Private/ECS/Systems/ScreenUIRenderSystem.cpp
+        Source/Runtime/Engine/Private/Network/SocketAddress.cpp
+        Source/Runtime/Engine/Private/Network/SocketUtil.cpp
+        Source/Runtime/Engine/Private/Network/TCPSocket.cpp
+        Source/Runtime/Engine/Private/Network/TCPNetDriver.cpp
+        Source/Runtime/Engine/Private/Network/UDPSocket.cpp
+        Source/Runtime/Engine/Private/Network/UDPNetDriver.cpp
+ "Source/Runtime/Engine/Private/Network/NetworkService.cpp" "Source/Runtime/Engine/Private/Network/NetBitReader.cpp" "Source/Runtime/Engine/Private/Network/NetBitWriter.cpp")
 
 add_library(engine STATIC
         ${ENGINE_HEADERS}
