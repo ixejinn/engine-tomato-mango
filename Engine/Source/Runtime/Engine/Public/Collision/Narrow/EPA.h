@@ -25,7 +25,7 @@ namespace tomato {
     public:
         static std::optional<CollisionInfo> GetNormalDepth(std::vector<glm::vec3>& simplex,
                  const ColliderComponent& col1, const ColliderComponent& col2,
-                 const TransformComponent& trf1, const TransformComponent& trf2);
+                 TransformComponent& trf1, TransformComponent& trf2);
     };
 }
 

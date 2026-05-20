@@ -13,7 +13,7 @@
 #include "Event/EventDispatcher.h"
 #include "Utils/Logger.h"
 #include "Utils/RegistryEntry.h"
-REGISTER_SYSTEM(tomato::SystemPhase::Physics, CollisionSystem)
+REGISTER_SYSTEM(tomato::SystemPhase::Collision, CollisionSystem)
 
 namespace tomato {
     CollisionSystem::CollisionSystem()
@@ -57,11 +57,24 @@ namespace tomato {
             auto& trf1 = reg.get<TransformComponent>(candidate.a);
             auto& trf2 = reg.get<TransformComponent>(candidate.b);
 
-            if (auto result = narrowPhase_->DetectCollision(col1, trf1, col2, trf2)) {
-                if (result->depth < 0 && !col1.isTrigger && !col2.isTrigger) {
-                    TMT_INFO << "kinematic collision correction: " << -result->depth ;
-                    continue;
+            if (auto result = narrowPhase_->DetectCollision(reg, candidate.a, candidate.b)) {
+                if (auto velPtr = reg.try_get<VelocityComponent>(candidate.a)) {
+                    static constexpr float SKIN = 1e-2f;
+                    glm::vec3 remainingMove = (1 - result->depth) * velPtr->velocity;
+
+                    if (result->depth > 0) {
+                        trf1.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth - result->normal * SKIN);
+                        // velPtr->velocity = glm::vec3{0.f};
+                        velPtr->velocity = remainingMove - glm::dot(remainingMove, result->normal) * result->normal;
+                    }
+
+                    // TMT_INFO << result->depth << " : " << result->normal.x << " " << result->normal.y << " " << result->normal.z;
                 }
+
+
+
+
+
 
                 // Collision detected
                 if (!collisionPairs_.contains(candidate)) {

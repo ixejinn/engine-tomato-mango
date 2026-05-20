@@ -4,8 +4,10 @@
 #include "Collision/ColliderSupport.h"
 #include "Collision/CollisionEvent.h"
 #include "Collision/Narrow/EPA.h"
+#include "ECS/Components/Rigidbody.h"
 #include "Math/Normal.h"
 #include "Utils/Logger.h"
+#include "SimulationConfig.h"
 
 namespace tomato {
     // Registry support function per collider
@@ -16,63 +18,90 @@ namespace tomato {
     };
 
     std::optional<CollisionInfo> GJK::DetectCollision(
-        const ColliderComponent &col1, const TransformComponent &trf1,
-        const ColliderComponent &col2, const TransformComponent &trf2) {
-        glm::vec3 wPosCol1 = trf1.GetTransformMatrix() * glm::vec4(col1.position, 1.f);
-        glm::vec3 wPosCol2 = trf2.GetTransformMatrix() * glm::vec4(col2.position, 1.f);
-        glm::vec3 closestP = GetSupportPoint(wPosCol1 - wPosCol2, col1, trf1, col2, trf2);
-        glm::vec3 supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
+        entt::registry& reg, entt::entity e1, entt::entity e2) {
+        auto& col1 = reg.get<ColliderComponent>(e1);
+        auto& col2 = reg.get<ColliderComponent>(e2);
+        auto& trf1 = reg.get<TransformComponent>(e1);
+        auto& trf2 = reg.get<TransformComponent>(e2);
 
+        glm::vec3 rayDir{0.f};
+        auto velPtr = reg.try_get<VelocityComponent>(e1);
+        if (velPtr)
+            rayDir += velPtr->velocity;
+        velPtr = reg.try_get<VelocityComponent>(e2);
+        if (velPtr)
+            rayDir -= velPtr->velocity;
+        rayDir *= -FIXED_DELTA_TIME;
+
+        float hitFraction = 0.f;
+        glm::vec3 rayOrigin{0.f};
+        glm::vec3 curRayPos = rayOrigin;
+        glm::vec3 hitNormal{0.f};
+        glm::vec3 searchDir = curRayPos - GetSupportPoint(rayDir, col1, trf1, col2, trf2);
         std::vector<glm::vec3> simplex;
-        simplex.reserve(4);
 
-        static constexpr auto epsilonSqr = std::numeric_limits<float>::epsilon() * std::numeric_limits<float>::epsilon();
-        while (glm::length2(closestP) - glm::dot(closestP, supportP) > epsilonSqr) {
-            simplex.push_back(supportP);
+        int cnt = 0;
+        while (glm::length2(searchDir) > 1e-6f) {
+            ++cnt;
+            glm::vec3 supportP = GetSupportPoint(searchDir, col1, trf1, col2, trf2);
+            glm::vec3 supportToRay = curRayPos - supportP;
 
+            if (glm::dot(searchDir, supportToRay) > 0) {
+                if (glm::dot(searchDir, rayDir) >= -1e-5f) {
+                    return std::nullopt;
+                }
+                else {
+                    hitFraction -= glm::dot(searchDir, supportToRay) / glm::dot(searchDir, rayDir);
+                    if (hitFraction > 1) {
+                        return std::nullopt;
+                    }
+
+                    glm::vec3 preRayPos = curRayPos;
+                    curRayPos = rayOrigin + hitFraction * rayDir;
+
+                    glm::vec3 deltaPos = curRayPos - preRayPos;
+                    for (auto& p : simplex)
+                        p += deltaPos;
+
+                    hitNormal = searchDir;
+                }
+            }
+
+            simplex.push_back(curRayPos - supportP);
             if (auto result = FindClosestPointOnSimplex(simplex))
-                closestP = *result;
-            else
-                return EPA::GetNormalDepth(simplex, col1, col2, trf1, trf2);
-
-            supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
-        }
-
-        auto length = glm::length(closestP);
-        if (length > 1.f)
-            return std::nullopt;
-        return CollisionInfo{glm::vec3{0.f}, -length};
-
-        while (true)
-        {
-            if (!AddSimplexPoint(simplex, col1, trf1, col2, trf2))
-                // 비충돌 종료
-                return std::nullopt;
-
-            if (VoronoiRegion(simplex)) {
-                // 충돌 종료
-                if (col1.isTrigger || col2.isTrigger)
-                    return CollisionInfo{};
-                return EPA::GetNormalDepth(simplex, col1, col2, trf1, trf2);
+                searchDir = *result;
+            else {
+                TMT_WARN << "Collision error";
+                break;
             }
         }
+
+        if (hitFraction <= 1) {
+            float hitNormalLenSq = glm::length2(hitNormal);
+            if (hitNormalLenSq > 1e-6f)
+                return CollisionInfo{glm::normalize(hitNormal), hitFraction};
+            else
+                return CollisionInfo{hitNormal, 0.f};
+        }
+
+        return std::nullopt;
     }
 
     glm::vec3 GJK::GetSupportPoint(
                 const glm::vec3& worldDir,
-                const ColliderComponent& col1, const TransformComponent& trf1,
-                const ColliderComponent& col2, const TransformComponent& trf2) {
+                const ColliderComponent& col1, TransformComponent& trf1,
+                const ColliderComponent& col2, TransformComponent& trf2) {
         return Support(worldDir, col1, trf1) - Support(-worldDir, col2, trf2);
     }
 
     glm::vec3 GJK::Support(
             const glm::vec3& worldDir,
-            const ColliderComponent& col, const TransformComponent& trf) {
+            const ColliderComponent& col, TransformComponent& trf) {
         const auto R = glm::toMat4(trf.GetQuaternion());
         const glm::vec4 localDir = glm::transpose(R) * glm::vec4(worldDir, 0.f);
 
         const auto localSupportP = supportFunctions_[col.type](localDir, col);
-        return trf.GetPosition() + glm::vec3{R * glm::vec4(col.position + localSupportP, 1.f)};
+        return trf.GetPosition() + glm::vec3{R * glm::vec4(localSupportP, 1.f)};
     }
 
     std::optional<glm::vec3> GJK::FindClosestPointOnSimplex(std::vector<glm::vec3>& simplex) {
@@ -84,40 +113,90 @@ namespace tomato {
                 const auto ao = -simplex[0];
                 const auto ab = simplex[1] - simplex[0];
 
-                const auto x = glm::dot(ao, ab);
-                if (x <= 0) {
+                auto t = glm::dot(ao, ab);
+                if (t <= 0) {
                     simplex.pop_back();
                     return simplex[0];
                 }
-                else if (x >= glm::length2(ab)) {
-                    simplex.erase(simplex.begin());
-                    return simplex[0];
-                }
+                else {
+                    float denom = glm::length2(ab);
 
-                return simplex[0] + ab * glm::dot(ab, ao) / glm::length2(ab);
+                    if (t >= denom) {
+                        simplex.erase(simplex.begin());
+                        return simplex[0];
+                    }
+                    else {
+                        t /= denom;
+                        return simplex[0] + t * ab;
+                    }
+                }
             }
 
             case 3:
                 return FindClosestPointOnTriangle(simplex);
 
             case 4: {
-                glm::vec3 closestP{0.f};
+                glm::vec3 p{0.f};
+                glm::vec3 a = simplex[0];
+                glm::vec3 b = simplex[1];
+                glm::vec3 c = simplex[2];
+                glm::vec3 d = simplex[3];
 
-                const auto lo = -simplex[3];
-                if (glm::dot(-GetOrientedNormal(simplex[1], simplex[3], simplex[0], simplex[2]), lo) >= 0) {
-                    simplex.erase(++simplex.begin());
-                    return FindClosestPointOnTriangle(simplex);
-                }
-                if (glm::dot(-GetOrientedNormal(simplex[0], simplex[3], simplex[2], simplex[1]), lo) >= 0) {
-                    simplex.erase(simplex.begin());
-                    return FindClosestPointOnTriangle(simplex);
-                }
-                if (glm::dot(-GetOrientedNormal(simplex[2], simplex[3], simplex[1], simplex[0]), lo) >= 0) {
-                    simplex.erase(simplex.begin() + 2);
-                    return FindClosestPointOnTriangle(simplex);
+                glm::vec3 closestP = p;
+                float bestSqDist = std::numeric_limits<float>::max();
+                std::vector<glm::vec3> bestSimplex;
+
+                // ABC
+                if (PointOutsideOfPlane(p, a, b, c, d)) {
+                    auto q = ClosestPtPointTriangle(p, a, b, c);
+                    float sqDist = glm::length2(q - p);
+
+                    if (sqDist < bestSqDist) {
+                        bestSqDist = sqDist;
+                        closestP = q;
+                        bestSimplex = {a, b, c};
+                    }
                 }
 
-                return std::nullopt;
+                // ACD
+                if (PointOutsideOfPlane(p, a, c, d, b)) {
+                    auto q = ClosestPtPointTriangle(p, a, c, d);
+                    float sqDist = glm::length2(q - p);
+                    if (sqDist < bestSqDist) {
+                        bestSqDist = sqDist;
+                        closestP = q;
+                        bestSimplex = {a, c, d};
+                    }
+                }
+
+                // ADB
+                if (PointOutsideOfPlane(p, a, d, b, c)) {
+                    auto q = ClosestPtPointTriangle(p, a, d, b);
+                    float sqDist = glm::length2(q - p);
+                    if (sqDist < bestSqDist) {
+                        bestSqDist = sqDist;
+                        closestP = q;
+                        bestSimplex = {a, d, b};
+                    }
+                }
+
+                // BDC
+                if (PointOutsideOfPlane(p, b, d, c, a)) {
+                    auto q = ClosestPtPointTriangle(p, b, d, c);
+                    float sqDist = glm::length2(q - p);
+                    if (sqDist < bestSqDist) {
+                        bestSqDist = sqDist;
+                        closestP = q;
+                        bestSimplex = {b, d, c};
+                    }
+                }
+
+                if (bestSimplex.empty())
+                    return std::nullopt;
+                else {
+                    simplex = bestSimplex;
+                    return closestP;
+                }
             }
 
             default:
@@ -126,44 +205,152 @@ namespace tomato {
         }
     }
 
-    // 가장 나중에 추가된 점이 포함되는 feature에 대해서만 확인
     glm::vec3 GJK::FindClosestPointOnTriangle(std::vector<glm::vec3>& simplex) {
-        const glm::vec3 ca = simplex[0] - simplex[2];
-        const glm::vec3 cb = simplex[1] - simplex[2];
-        const glm::vec3 co = -simplex[2];
+        const glm::vec3 a = simplex[0];
+        const glm::vec3 b = simplex[1];
+        const glm::vec3 c = simplex[2];
 
-        const auto dotCA = glm::dot(co, ca);
-        const auto dotCB = glm::dot(co, cb);
+        // Vertex A region
+        const glm::vec3 ab = b - a;
+        const glm::vec3 ac = c - a;
+        const glm::vec3 ao = -a;
 
-        const auto len2CA = glm::length2(ca);
-        const auto len2CB = glm::length2(cb);
-
-        if (dotCA <= 0 && dotCB <= 0) {
-            simplex[0] = simplex[2];
-            simplex.pop_back();
-            simplex.pop_back();
-            return simplex[0];
+        const float d1 = glm::dot(ab, ao);
+        const float d2 = glm::dot(ac, ao);
+        if (d1 <= 0.f && d2 <= 0.f) {
+            simplex = {a};
+            return a;
         }
 
-        const auto normal = GetOrientedNormal(glm::vec3{0.f}, simplex[0], simplex[1], simplex[2]);
+        // Vertex B region
+        glm::vec3 bo = -b;
 
-        if (dotCA >= 0 && dotCB < 0 && dotCA <=len2CA) {
-            simplex.erase(++simplex.begin());
-            return simplex[1] + ca * dotCA / len2CA;
+        const float d3 = glm::dot(ab, bo);
+        const float d4 = glm::dot(ac, bo);
+        if (d3 >= 0.f && d4 <= d3) {
+            simplex = {b};
+            return b;
         }
 
-        if (dotCB >= 0 && dotCA < 0 && dotCB <=len2CB) {
-            simplex.erase(simplex.begin());
-            return simplex[1] + cb * dotCB / len2CB;
+        // Edge AB region
+        const float vc = d1 * d4 - d3 * d2;
+        if (vc <= 0.f && d1 >= 0.f && d3 <= 0.f) {
+            float v = d1 / (d1 - d3);
+            simplex = {a, b};
+            return a + v * ab;
         }
 
-        return glm::dot(normal, -simplex[0]) / glm::length2(normal) * -normal;
+        // Vertex C region
+        const glm::vec3 co = -c;
+
+        const float d5 = glm::dot(ab, co);
+        const float d6 = glm::dot(ac, co);
+        if (d6 >= 0.f && d5 <= d6) {
+            simplex = {c};
+            return c;
+        }
+
+        // Edge AC region
+        const float vb = d5 * d2 - d1 * d6;
+        if (vb <= 0.f && d2 >= 0.f && d6 <= 0.f) {
+            float w = d2 / (d2 - d6);
+            simplex = {a, c};
+            return a + w * ac;
+        }
+
+        // Edge BC region
+        const float va = d3 * d6 - d5 * d4;
+        if (va <= 0.f && (d4 - d3) >= 0.f && (d5 - d6) >= 0.f) {
+            float w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+            simplex = {b, c};
+            return b + w * (c - b);
+        }
+
+        // Face region
+        float denom = 1.f / (va + vb + vc);
+        float v = vb * denom;
+        float w = vc * denom;
+        return a + ab * v + ac * w;
+    }
+
+    glm::vec3 GJK::ClosestPtPointTriangle(
+            const glm::vec3& p,
+            const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
+        // Vertex A region
+        const glm::vec3 ab = b - a;
+        const glm::vec3 ac = c - a;
+        const glm::vec3 ap = p - a;
+
+        const float d1 = glm::dot(ab, ap);
+        const float d2 = glm::dot(ac, ap);
+        if (d1 <= 0.f && d2 <= 0.f) {
+            return a;
+        }
+
+        // Vertex B region
+        glm::vec3 bp = p - b;
+
+        const float d3 = glm::dot(ab, bp);
+        const float d4 = glm::dot(ac, bp);
+        if (d3 >= 0.f && d4 <= d3) {
+            return b;
+        }
+
+        // Edge AB region
+        const float vc = d1 * d4 - d3 * d2;
+        if (vc <= 0.f && d1 >= 0.f && d3 <= 0.f) {
+            float v = d1 / (d1 - d3);
+            return a + v * ab;
+        }
+
+        // Vertex C region
+        const glm::vec3 cp = p - c;
+
+        const float d5 = glm::dot(ab, cp);
+        const float d6 = glm::dot(ac, cp);
+        if (d6 >= 0.f && d5 <= d6) {
+            return c;
+        }
+
+        // Edge AC region
+        const float vb = d5 * d2 - d1 * d6;
+        if (vb <= 0.f && d2 >= 0.f && d6 <= 0.f) {
+            float w = d2 / (d2 - d6);
+            return a + w * ac;
+        }
+
+        // Edge BC region
+        const float va = d3 * d6 - d5 * d4;
+        if (va <= 0.f && (d4 - d3) >= 0.f && (d5 - d6) >= 0.f) {
+            float w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+            return b + w * (c - b);
+        }
+
+        // Face region
+        float denom = 1.f / (va + vb + vc);
+        float v = vb * denom;
+        float w = vc * denom;
+        return a + ab * v + ac * w;
+    }
+
+    int GJK::PointOutsideOfPlane(
+            const glm::vec3& p,
+            const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
+        return glm::dot(p - a, glm::cross(b - a, c - a)) >= 0.f;
+    }
+
+    int GJK::PointOutsideOfPlane(
+            const glm::vec3& p,
+            const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& d) {
+        float signp = glm::dot(p - a, glm::cross(b - a, c - a));
+        float signd = glm::dot(d - a, glm::cross(b - a, c - a));
+        return signp * signd < 0.f;
     }
 
     bool GJK::AddSimplexPoint(
             std::vector<glm::vec3>& simplex,
-            const ColliderComponent& col1, const TransformComponent& trf1,
-            const ColliderComponent& col2, const TransformComponent& trf2) {
+            const ColliderComponent& col1, TransformComponent& trf1,
+            const ColliderComponent& col2, TransformComponent& trf2) {
         glm::vec3 dir;
         auto simplexSize = simplex.size();
 
@@ -174,13 +361,13 @@ namespace tomato {
                 glm::vec3 wPosCol1 = trf1.GetTransformMatrix() * glm::vec4(col1.position, 1.f);
                 glm::vec3 wPosCol2 = trf2.GetTransformMatrix() * glm::vec4(col2.position, 1.f);
 
-                simplex.push_back(Support(wPosCol2 - wPosCol1, col1, trf1) - Support(wPosCol1 - wPosCol2, col2, trf2));
+                simplex.push_back(GetSupportPoint(wPosCol2 - wPosCol1, col1, trf1, col2, trf2));
             }
                 break;
 
             case 1:
                 dir = -simplex[0];
-                simplex.push_back(Support(dir, col1, trf1) - Support(-dir, col2, trf2));
+                simplex.push_back(GetSupportPoint(dir, col1, trf1, col2, trf2));
 
                 if (glm::dot(dir, simplex[1]) < 0)
                     return false;   // 심플렉스가 원점을 포함할 수 없음
@@ -191,7 +378,7 @@ namespace tomato {
                 const auto ab = simplex[1] - simplex[0];
                 const auto ao = -simplex[0];
                 dir = glm::cross(glm::cross(ab, ao), ab);
-                simplex.push_back(Support(dir, col1, trf1) - Support(-dir, col2, trf2));
+                simplex.push_back(GetSupportPoint(dir, col1, trf1, col2, trf2));
 
                 if (glm::dot(dir, simplex[2]) < 0)
                     return false;
@@ -200,7 +387,7 @@ namespace tomato {
 
             case 3:
                 dir = GetOrientedNormal(glm::vec3{0.f}, simplex[0], simplex[1], simplex[2]);
-                simplex.push_back(Support(dir, col1, trf1) - Support(-dir, col2, trf2));
+                simplex.push_back(GetSupportPoint(dir, col1, trf1, col2, trf2));
 
                 if (glm::dot(dir, simplex[3]) < 0)
                     return false;

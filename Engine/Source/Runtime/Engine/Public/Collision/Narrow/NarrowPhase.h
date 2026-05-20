@@ -2,6 +2,7 @@
 #define MANGO_NARROWPHASE_H
 
 #include <optional>
+#include <entt/fwd.hpp>
 #include "ECS/PhysCompFwd.h"
 #include "Collision/CollisionInfo.h"
 
@@ -11,8 +12,7 @@ namespace tomato {
         virtual ~NarrowPhase() = default;
 
         virtual std::optional<CollisionInfo> DetectCollision(
-            const ColliderComponent& col1, const TransformComponent& trf1,
-            const ColliderComponent& col2, const TransformComponent& trf2) = 0;
+            entt::registry& reg, entt::entity e1, entt::entity e2) = 0;
     };
 }
 

@@ -16,22 +16,28 @@ namespace tomato {
                 : position(pos), eulerDegree(eulerRot), scale(scl) {}
 
         const glm::vec3& GetPosition() const { return position; }
-        void SetPosition(const glm::vec3& newPos) { position = newPos; }
-        void SetPosition(const float x, const float y, const float z) { position = glm::vec3{x, y, z}; }
+        void AddPosition(const glm::vec3& offset) {
+            position += offset;
+            posDirty = true;
+        }
+        // void SetPosition(const glm::vec3& newPos) { position = newPos; }
+        // void SetPosition(const float x, const float y, const float z) { position = glm::vec3{x, y, z}; }
 
         const glm::vec3& GetEulerDegree() const { return eulerDegree; }
         void SetEulerDegree(const glm::vec3& newRot) {
             eulerDegree = newRot;
-            rotDirty = true;
+            rotation = glm::quat(glm::radians(eulerDegree));
         }
         void SetEulerDegree(const float x, const float y, const float z) {
             eulerDegree = glm::vec3{x, y, z};
             rotDirty = true;
         }
 
-        const glm::quat& GetQuaternion() const {
-            if (rotDirty)
-                TMT_WARN << "Quaternion is dirty. Update required.";
+        const glm::quat& GetQuaternion() {
+            if (rotDirty) {
+                rotation = glm::quat(glm::radians(eulerDegree));
+                rotDirty = false;
+            }
 
             return rotation;
         }
@@ -49,6 +55,7 @@ namespace tomato {
 
         glm::quat rotation{};
         bool rotDirty{true};
+        bool posDirty{false};
 
         /// Local to World.
         glm::mat4 transformMatrix{};

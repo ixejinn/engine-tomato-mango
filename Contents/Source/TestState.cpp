@@ -34,9 +34,9 @@ void TestState::Init() {
     // Camera
     const auto cam = registry_.create();
     registry_.emplace<TransformComponent>(cam,
-                                          glm::vec3(0.f, 1.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
+                                          // glm::vec3(0.f, 1.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
                                           // glm::vec3(0.f, 5.f, 0.f), glm::vec3(-90.f, 0.f, 0.f));
-                                          // glm::vec3(0.f, 7.5f, 15.f), glm::vec3(-30.f, 0.f, 0.f));
+                                          glm::vec3(0.f, 7.5f, 15.f), glm::vec3(-30.f, 0.f, 0.f));
     auto& camComp = registry_.emplace<CameraComponent>(cam);
     camComp.mode = ProjectionMode::Perspective;
     // camComp.mode = ProjectionMode::Orthogonal;
@@ -66,7 +66,7 @@ void TestState::Init() {
     // NPCs
     const auto east = registry_.create();
     auto& trfCompE = registry_.emplace<TransformComponent>(east,
-                                          glm::vec3(5, 0, 0), glm::vec3(90, 0, 0));
+                                          glm::vec3(3, 0, 0), glm::vec3(0, 0, 0));
 //    registry_.emplace<SpeedComponent>(east, 2.f);
 //    registry_.emplace<InputChannelComponent>(east, static_cast<uint8_t>(1));
 //    registry_.emplace<MovementComponent>(east);
