@@ -16,14 +16,14 @@ namespace tomato {
                 // if (!trf.posDirty) {
                     trf.position += velocity->velocity * FIXED_DELTA_TIME;
 
-                    // // !!!!! TEMP !!!!!
-                    // if (trf.position.y < 0) {
-                    //     trf.position.y = 0;
-                    //     velocity->velocity.y = 0;
-                    //
-                    //     if (auto move = simCtx.registry.try_get<MovementComponent>(e))
-                    //         move->jumpCnt = 0;
-                    // }
+                    // !!!!! TEMP !!!!!
+                    if (trf.position.y < 0) {
+                        trf.position.y = 0;
+                        velocity->velocity.y = 0;
+
+                        if (auto move = simCtx.registry.try_get<MovementComponent>(e))
+                            move->jumpCnt = 0;
+                    }
                 // }
 
                 trf.posDirty = false;

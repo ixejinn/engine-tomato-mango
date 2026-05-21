@@ -63,12 +63,11 @@ namespace tomato {
                     glm::vec3 remainingMove = (1 - result->depth) * velPtr->velocity;
 
                     // if (result->depth > 0) {
+                        // trf1.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth - result->normal * SKIN);
                         trf1.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth - result->normal * SKIN);
-                        // velPtr->velocity = glm::vec3{0.f};
+                        // velPtr->velocity = remainingMove - glm::dot(remainingMove, result->normal) * result->normal;
                         velPtr->velocity = remainingMove - glm::dot(remainingMove, result->normal) * result->normal;
                     // }
-
-                    // TMT_INFO << result->depth << " : " << result->normal.x << " " << result->normal.y << " " << result->normal.z;
                 }
 
 
