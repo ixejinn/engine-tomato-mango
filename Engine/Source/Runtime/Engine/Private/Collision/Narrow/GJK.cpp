@@ -27,26 +27,27 @@ namespace tomato {
         auto vel1 = reg.try_get<VelocityComponent>(e1);
         auto vel2 = reg.try_get<VelocityComponent>(e2);
 
-        glm::vec3 relVel = (vel1 ? vel1->velocity : glm::vec3{0.f}) - (vel2 ? vel2->velocity : glm::vec3{0.f}) * FIXED_DELTA_TIME;
-        glm::vec3 rayDir = -relVel;
+        glm::vec3 relVel = ((vel1 ? vel1->velocity : glm::vec3{0.f}) - (vel2 ? vel2->velocity : glm::vec3{0.f}));
+        glm::vec3 ray = -relVel * FIXED_DELTA_TIME;
 
         float hitFraction = 0.f;
         glm::vec3 rayOrigin{0.f};
         glm::vec3 curRayPos = rayOrigin;
-        glm::vec3 hitNormal{0.f};
-        glm::vec3 searchDir = curRayPos - GetSupportPoint(rayDir, col1, trf1, col2, trf2);  // CSO → curRayPos
+        glm::vec3 searchDir = curRayPos - GetSupportPoint(ray, col1, trf1, col2, trf2);  // CSO → curRayPos
+        // glm::vec3 hitNormal{0.f};
+        glm::vec3 hitNormal = searchDir;
         std::vector<glm::vec3> simplex;
 
         while (glm::length2(searchDir) > 1e-6f) {
             glm::vec3 supportP = GetSupportPoint(searchDir, col1, trf1, col2, trf2);
-            glm::vec3 supportToRay = curRayPos - supportP;                          // 새로 얻은 심플렉스 점 → curRayPos
+            glm::vec3 supportToRay = curRayPos - supportP;                         // 새로 얻은 심플렉스 점 → curRayPos
 
             float dotVW = glm::dot(searchDir, supportToRay);
             if (dotVW > 0) {
                 // 새로 얻은 심플렉스 점이 아직 curRayPos에 미치지 못함
                 // curRayPos가 아직 CSO 외부에 있으므로 ray 전진 가능
 
-                float dotVR = glm::dot(searchDir, rayDir);
+                float dotVR = glm::dot(searchDir, ray);
                 if (dotVR >= -1e-5f)
                     // Ray와 CSO가 같은 방향(평행) 또는 수직으로 멀어짐
                     // Ray를 계속 전진시켜도 CSO에 닿을 수 없음
@@ -59,20 +60,20 @@ namespace tomato {
                     return std::nullopt;
 
                 glm::vec3 preRayPos = curRayPos;
-                curRayPos = rayOrigin + hitFraction * rayDir;
+                curRayPos = rayOrigin + hitFraction * ray;
 
-                glm::vec3 deltaPos = curRayPos - preRayPos;
+                glm::vec3 deltaRay = curRayPos - preRayPos;
                 for (auto& p : simplex)
-                    p += deltaPos;
+                    p += deltaRay;
 
                 hitNormal = searchDir;
             }
 
-            simplex.push_back(curRayPos - supportP);
+            simplex.push_back(curRayPos - supportP);    // Support point
             if (auto result = FindClosestPointOnSimplex(simplex))
                 searchDir = *result;
             else {
-                TMT_WARN << "Collision error";
+                TMT_WARN << "Simplex already encloses origin.";
                 break;
             }
         }
@@ -82,7 +83,7 @@ namespace tomato {
             if (hitNormalLenSq > 1e-6f)
                 return CollisionInfo{glm::normalize(hitNormal), hitFraction};
             else
-                return CollisionInfo{hitNormal, 0.f};
+                return CollisionInfo{hitNormal, hitFraction};
         }
 
         return std::nullopt;
