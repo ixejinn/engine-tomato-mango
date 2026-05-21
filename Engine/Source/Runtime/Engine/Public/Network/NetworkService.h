@@ -1,4 +1,4 @@
-#ifndef MANGO_NETWORKSERVICE_H
+﻿#ifndef MANGO_NETWORKSERVICE_H
 #define MANGO_NETWORKSERVICE_H
 
 #include <bitset>
@@ -8,15 +8,16 @@
 #include <atomic>
 #include <thread>
 
-#include "Network/PacketTypes.h"
+#include "../../Core/Private/Containers/MemoryPool.h"
+#include "../../Core/Private/Containers/SPSCQueue.h"
+
+#include "Network/NetTypes.h"
 #include "Network/NetworkFwd.h"
-#include "Network/WinsockContext.h"
+#include "Network/WinsockInitializer.h"
 #include "Network/UDPNetDriver.h"
 #include "Network/TCPNetDriver.h"
 #include "Network/NetConnection.h"
 
-#include "../../Core/Private/Containers/MemoryPool.h"
-#include "../../Core/Private/Containers/SPSCQueue.h"
 namespace tomato
 {
     class Engine;
@@ -65,9 +66,10 @@ namespace tomato
         PlayerId GetPeerPlayerID(const SocketAddress& addr);
 
         NetworkServiceState GetNetState() const { return netState_; }
+        ServerTimeMs GetLocalStartTime() const { return localStartTime; }
 
     private:
-        WinsockContext winsock_;
+        WinsockInitializer winsockInit_;
         UDPNetDriver driver_;
         TCPNetDriver server_;
 
@@ -75,10 +77,10 @@ namespace tomato
         bool TCPRecvThreadRunning_{ false }, UDPRecvThreadRunning_{ false };
 
         std::vector<uint8_t> recvBuffer;
-        SPSCQueue<std::unique_ptr<TCPPacket>, 128> pendingTCPPackets_;
+        SPSCQueue<std::unique_ptr<TCPPacket>, 1024> pendingTCPPackets_;
 
-        MemoryPool<RawBuffer, 128> bufferPool_;
-        SPSCQueue<Packet, 128> pendingPackets_;
+        MemoryPool<RawBuffer, 1024> bufferPool_;
+        SPSCQueue<Packet, 1024> pendingPackets_;
 
         std::vector<bool> peerConnected;
         std::unordered_map<PlayerId, NetConnection> conn;
@@ -91,7 +93,6 @@ namespace tomato
 
         ServerTimeMs sendTime{ 0 }, recvTime{ 0 };
         ServerTimeMs serverTimeOffset{ 0 }, localStartTime{ 0 };
-        //uint32_t estimatedServerTick{ 0 }, estimatedStartTick{ 0 };
     };
 }
 

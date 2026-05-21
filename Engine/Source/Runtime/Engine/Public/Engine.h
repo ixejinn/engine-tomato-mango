@@ -17,6 +17,7 @@ namespace tomato {
         ~Engine();
 
         void SetNextState(std::unique_ptr<State>&& newState);
+        void TryStartGame(std::unique_ptr<State>&& newState);
 
         void Run() {
             if (isSingle_)
@@ -47,6 +48,7 @@ namespace tomato {
         void ChangeState(TickClock& tc);
         std::unique_ptr<State> currState_{nullptr};
         std::unique_ptr<State> nextState_{nullptr};
+
         bool isRunning_{true};
     };
 }

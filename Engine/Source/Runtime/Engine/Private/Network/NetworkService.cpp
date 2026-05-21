@@ -1,7 +1,8 @@
-#include "Network/NetworkService.h"
-#include "Network/NetCommon.h"
+﻿#include "Network/NetworkService.h"
+#include "Network/NetTypes.h"
 #include "Network/NetBitReader.h"
 #include "Network/NetBitWriter.h"
+#include "GameNetwork/Message/InputMessage.h"
 #include "Utils/Logger.h"
 
 namespace tomato
@@ -72,6 +73,7 @@ namespace tomato
         {
             //auto tmp = NetMessageRegistry::GetInstance().GetFactory(NetMessageType::INPUT)();
             //tmp->Read(reader, engine_, inToAddress);
+            SendUDPPacket(UDPPacketType::INPUT, SendPolicy::Broadcast);
             break;
         }
         }
@@ -93,6 +95,8 @@ namespace tomato
         {
             //auto tmp = NetMessageRegistry::GetInstance().GetFactory(NetMessageType::INPUT)();
             //tmp->Write(writer, engine_);
+            InputNetMessage inputMessage;
+            inputMessage.Write(writer);
             break;
         }
         }

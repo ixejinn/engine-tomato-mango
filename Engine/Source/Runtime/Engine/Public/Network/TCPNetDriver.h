@@ -1,8 +1,8 @@
-#ifndef MANGO_TCPNETDRIVER_H
+﻿#ifndef MANGO_TCPNETDRIVER_H
 #define MANGO_TCPNETDRIVER_H
 
 #include "Network/NetworkFwd.h"
-#include "Network/NetCommon.h"
+#include "Network/NetTypes.h"
 
 namespace tomato
 {

@@ -1,8 +1,8 @@
-#ifndef MANGO_UDPNETDRIVER_H
+﻿#ifndef MANGO_UDPNETDRIVER_H
 #define MANGO_UDPNETDRIVER_H
 
 #include "Network/NetworkFwd.h"
-#include "Network/NetCommon.h"
+#include "Network/NetTypes.h"
 namespace tomato
 {
 	/**

@@ -1,4 +1,4 @@
-#ifndef MANGO_NETWORKFWD_H
+﻿#ifndef MANGO_NETWORKFWD_H
 #define MANGO_NETWORKFWD_H
 
 #include <memory>
@@ -21,6 +21,8 @@ namespace tomato
 
 	class NetBitReader;
 	class NetBitWriter;
+
+	class NetworkService;
 }
 
 #endif // !MANGO_NETWORKFWD_H

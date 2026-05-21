@@ -1,16 +1,10 @@
-#ifndef MANGO_PACKET_TYPES_H
+﻿#ifndef MANGO_PACKET_TYPES_H
 #define MANGO_PACKET_TYPES_H
 
 #include <vector>
 #include "Network/NetworkFwd.h"
-#include "Network/NetCommon.h"
+#include "Network/NetTypes.h"
 #include "Network/SocketAddress.h"
-
-using PlayerId = uint8_t;
-using MatchId = uint16_t;
-using RequestId = uint32_t;
-using SessionId = uint32_t;
-using ServerTimeMs = uint32_t;
 
 namespace tomato
 {

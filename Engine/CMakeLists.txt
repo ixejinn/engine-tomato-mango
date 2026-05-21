@@ -93,7 +93,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Network/TCPNetDriver.h
         Source/Runtime/Engine/Public/Network/UDPSocket.h
         Source/Runtime/Engine/Public/Network/UDPNetDriver.h
- "Source/Runtime/Engine/Public/Network/NetworkService.h" "Source/Runtime/Engine/Public/Network/NetBitReader.h" "Source/Runtime/Engine/Public/Network/NetBitWriter.h" "Source/Runtime/Engine/Public/Network/WinsockContext.h" "Source/Runtime/Engine/Public/Network/NetCommon.h")
+ "Source/Runtime/Engine/Public/Network/NetworkService.h" "Source/Runtime/Engine/Public/Network/NetBitReader.h" "Source/Runtime/Engine/Public/Network/NetBitWriter.h" "Source/Runtime/Engine/Public/Network/WinsockInitializer.h"  "Source/Runtime/Engine/Public/GameNetwork/Message/InputMessage.h" "Source/Runtime/Engine/Public/GameNetwork/Message/NetMessage.h" "Source/Runtime/Engine/Public/Network/NetTypes.h" "Source/Runtime/Engine/Private/GameNetwork/Message/InputMessage.cpp")
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
