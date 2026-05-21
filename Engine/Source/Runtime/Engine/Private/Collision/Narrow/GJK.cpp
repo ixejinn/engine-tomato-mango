@@ -24,47 +24,48 @@ namespace tomato {
         auto& trf1 = reg.get<TransformComponent>(e1);
         auto& trf2 = reg.get<TransformComponent>(e2);
 
-        glm::vec3 rayDir{0.f};
-        auto velPtr = reg.try_get<VelocityComponent>(e1);
-        if (velPtr)
-            rayDir += velPtr->velocity;
-        velPtr = reg.try_get<VelocityComponent>(e2);
-        if (velPtr)
-            rayDir -= velPtr->velocity;
-        rayDir *= -FIXED_DELTA_TIME;
+        auto vel1 = reg.try_get<VelocityComponent>(e1);
+        auto vel2 = reg.try_get<VelocityComponent>(e2);
+
+        glm::vec3 relVel = (vel1 ? vel1->velocity : glm::vec3{0.f}) - (vel2 ? vel2->velocity : glm::vec3{0.f}) * FIXED_DELTA_TIME;
+        glm::vec3 rayDir = -relVel;
 
         float hitFraction = 0.f;
         glm::vec3 rayOrigin{0.f};
         glm::vec3 curRayPos = rayOrigin;
         glm::vec3 hitNormal{0.f};
-        glm::vec3 searchDir = curRayPos - GetSupportPoint(rayDir, col1, trf1, col2, trf2);
+        glm::vec3 searchDir = curRayPos - GetSupportPoint(rayDir, col1, trf1, col2, trf2);  // CSO → curRayPos
         std::vector<glm::vec3> simplex;
 
-        int cnt = 0;
         while (glm::length2(searchDir) > 1e-6f) {
-            ++cnt;
             glm::vec3 supportP = GetSupportPoint(searchDir, col1, trf1, col2, trf2);
-            glm::vec3 supportToRay = curRayPos - supportP;
+            glm::vec3 supportToRay = curRayPos - supportP;                          // 새로 얻은 심플렉스 점 → curRayPos
 
-            if (glm::dot(searchDir, supportToRay) > 0) {
-                if (glm::dot(searchDir, rayDir) >= -1e-5f) {
+            float dotVW = glm::dot(searchDir, supportToRay);
+            if (dotVW > 0) {
+                // 새로 얻은 심플렉스 점이 아직 curRayPos에 미치지 못함
+                // curRayPos가 아직 CSO 외부에 있으므로 ray 전진 가능
+
+                float dotVR = glm::dot(searchDir, rayDir);
+                if (dotVR >= -1e-5f)
+                    // Ray와 CSO가 같은 방향(평행) 또는 수직으로 멀어짐
+                    // Ray를 계속 전진시켜도 CSO에 닿을 수 없음
                     return std::nullopt;
-                }
-                else {
-                    hitFraction -= glm::dot(searchDir, supportToRay) / glm::dot(searchDir, rayDir);
-                    if (hitFraction > 1) {
-                        return std::nullopt;
-                    }
 
-                    glm::vec3 preRayPos = curRayPos;
-                    curRayPos = rayOrigin + hitFraction * rayDir;
+                // Ray가 CSO를 향하므로 ray를 전진
+                hitFraction -= dotVW / dotVR;
+                if (hitFraction > 1)
+                    // 이번 틱에서 충돌하지 않음 (비충돌 종료)
+                    return std::nullopt;
 
-                    glm::vec3 deltaPos = curRayPos - preRayPos;
-                    for (auto& p : simplex)
-                        p += deltaPos;
+                glm::vec3 preRayPos = curRayPos;
+                curRayPos = rayOrigin + hitFraction * rayDir;
 
-                    hitNormal = searchDir;
-                }
+                glm::vec3 deltaPos = curRayPos - preRayPos;
+                for (auto& p : simplex)
+                    p += deltaPos;
+
+                hitNormal = searchDir;
             }
 
             simplex.push_back(curRayPos - supportP);
