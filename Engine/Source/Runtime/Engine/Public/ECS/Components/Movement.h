@@ -5,7 +5,10 @@
 
 namespace tomato {
     /// Identifies which player's input timeline this entity uses.
-    struct InputChannelComponent { uint8_t channel; };
+    struct InputChannelComponent {
+        uint8_t channel;
+        bool is1P = true;
+    };
 
     struct MovementComponent
     {

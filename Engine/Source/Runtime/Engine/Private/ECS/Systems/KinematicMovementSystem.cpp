@@ -25,13 +25,13 @@ namespace tomato {
 
             // Move
             int x = 0, y = 0;
-            if (HasFlag(keypress, InputIntent::Up))
+            if (HasFlag(keypress, ch.is1P ? InputIntent::Up : InputIntent::Up2))
                 y++;
-            if (HasFlag(keypress, InputIntent::Down))
+            if (HasFlag(keypress, ch.is1P ? InputIntent::Down : InputIntent::Down2))
                 y--;
-            if (HasFlag(keypress, InputIntent::Left))
+            if (HasFlag(keypress, ch.is1P ? InputIntent::Left : InputIntent::Left2))
                 x--;
-            if (HasFlag(keypress, InputIntent::Right))
+            if (HasFlag(keypress, ch.is1P ? InputIntent::Right : InputIntent::Right2))
                 x++;
             glm::vec2 dir = glm::vec2{x, -y};
             if (glm::length(dir) > 1)
@@ -41,20 +41,20 @@ namespace tomato {
             velocity.velocity.z = dir.y * move.horizontalSpeed;
 
             // Rotation (!!!!TEST!!!!)
-            x = 0; y = 0;
-            if (HasFlag(keypress, InputIntent::TurnLeft))
-                x += 5;
-            if (HasFlag(keypress, InputIntent::TurnRight))
-                x -= 5;
-            if (HasFlag(keypress, InputIntent::TurnUp))
-                y += 5;
-            if (HasFlag(keypress, InputIntent::TurnDown))
-                y -= 5;
-            glm::vec3 newDegree = trf.GetEulerDegree() + glm::vec3{x, y, 0.f};
-            trf.SetEulerDegree(newDegree);
+//            x = 0; y = 0;
+//            if (HasFlag(keypress, InputIntent::TurnLeft))
+//                x += 5;
+//            if (HasFlag(keypress, InputIntent::TurnRight))
+//                x -= 5;
+//            if (HasFlag(keypress, InputIntent::TurnUp))
+//                y += 5;
+//            if (HasFlag(keypress, InputIntent::TurnDown))
+//                y -= 5;
+//            glm::vec3 newDegree = trf.GetEulerDegree() + glm::vec3{x, y, 0.f};
+//            trf.SetEulerDegree(newDegree);
 
             // Jump
-            if (HasFlag(keydown, InputIntent::Jump) && move.jumpCnt < JUMP_COUNT_MAX)
+            if (HasFlag(keydown, ch.is1P ? InputIntent::Jump : InputIntent::Jump2) && move.jumpCnt < JUMP_COUNT_MAX)
             {
                 // Start move
                 move.jumpCnt++;
