@@ -29,6 +29,7 @@ namespace tomato {
             SystemPhase::Input,
             SystemPhase::Physics,
             SystemPhase::Collision,
+            SystemPhase::Integration,
             SystemPhase::Transformation
         };
 

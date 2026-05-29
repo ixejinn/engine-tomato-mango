@@ -8,6 +8,7 @@ namespace tomato {
         Input = 0,
         Physics,
         Collision,
+        Integration,
         Transformation,
         Rendering,
         Camera,

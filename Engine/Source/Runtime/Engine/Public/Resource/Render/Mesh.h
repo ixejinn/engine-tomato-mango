@@ -60,6 +60,7 @@ namespace tomato {
         static void Plain(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
         static void Cube(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
         static void Sphere(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
+        static void Capsule(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
         static void Cylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
 
         /**

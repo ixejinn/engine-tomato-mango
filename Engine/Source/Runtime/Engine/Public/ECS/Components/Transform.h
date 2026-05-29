@@ -13,38 +13,39 @@ namespace tomato {
             const glm::vec3& pos = glm::vec3{0.f},
             const glm::vec3& eulerRot = glm::vec3{0.f},
             const glm::vec3& scl = glm::vec3{1.f})
-                : position(pos), eulerDegree(eulerRot), scale(scl) {}
+                : position(pos), eulerDegree(eulerRot), scale(scl) {
+            rotation = glm::quat(glm::radians(eulerDegree));
+        }
 
         const glm::vec3& GetPosition() const { return position; }
         void AddPosition(const glm::vec3& offset) {
             position += offset;
-            posDirty = true;
+            dirty = true;
         }
-        // void SetPosition(const glm::vec3& newPos) { position = newPos; }
-        // void SetPosition(const float x, const float y, const float z) { position = glm::vec3{x, y, z}; }
 
         const glm::vec3& GetEulerDegree() const { return eulerDegree; }
         void SetEulerDegree(const glm::vec3& newRot) {
             eulerDegree = newRot;
             rotation = glm::quat(glm::radians(eulerDegree));
+            dirty = true;
         }
         void SetEulerDegree(const float x, const float y, const float z) {
             eulerDegree = glm::vec3{x, y, z};
-            rotDirty = true;
+            rotation = glm::quat(glm::radians(eulerDegree));
+            dirty = true;
         }
 
-        const glm::quat& GetQuaternion() {
-            if (rotDirty) {
-                rotation = glm::quat(glm::radians(eulerDegree));
-                rotDirty = false;
-            }
-
-            return rotation;
-        }
+        const glm::quat& GetQuaternion() { return rotation; }
 
         const glm::vec3& GetScale() const { return scale; }
-        void SetScale(const glm::vec3& newScl) { scale = newScl; }
-        void SetScale(const float x, const float y, const float z) { scale = glm::vec3{x, y, z}; }
+        void SetScale(const glm::vec3& newScl) {
+            scale = newScl;
+            dirty = true;
+        }
+        void SetScale(const float x, const float y, const float z) {
+            scale = glm::vec3{x, y, z};
+            dirty = true;
+        }
 
         const glm::mat4& GetTransformMatrix() const { return transformMatrix; }
 
@@ -54,8 +55,7 @@ namespace tomato {
         glm::vec3 scale;
 
         glm::quat rotation{};
-        bool rotDirty{true};
-        bool posDirty{false};
+        bool dirty{ true };
 
         /// Local to World.
         glm::mat4 transformMatrix{};

@@ -78,6 +78,9 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Collision/Broad/SAP.h
         Source/Runtime/Engine/Public/Collision/Narrow/NarrowPhase.h
         Source/Runtime/Engine/Public/Collision/CollisionInfo.h
+        Source/Runtime/Engine/Public/ECS/Components/Hierarchy.h
+        Source/Runtime/Engine/Private/ECS/Hierarchy/Hierarchy.h
+        Source/Runtime/Engine/Public/ECS/Systems/IntegrationSystem.h
 )
 
 set(ENGINE_SOURCES
@@ -108,6 +111,8 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/Narrow/EPA.cpp
         Source/Runtime/Engine/Private/Math/Normal.cpp
         Source/Runtime/Engine/Private/Collision/Broad/SAP.cpp
+        Source/Runtime/Engine/Private/ECS/Hierarchy/Hierarchy.cpp
+        Source/Runtime/Engine/Private/ECS/Systems/IntegrationSystem.cpp
 )
 
 add_library(engine STATIC

@@ -14,6 +14,9 @@ namespace tomato {
         auto view = simCtx.registry.view<TransformComponent, CameraComponent>();
 
         for (auto [e, trf, cam] : view.each()) {
+            if (!cam.dirty)
+                continue;
+
             auto quaternion = trf.GetQuaternion();
             glm::vec3 b = quaternion * glm::vec3(0, 0, 1);
             glm::vec3 r = quaternion * glm::vec3(1, 0, 0);
@@ -51,6 +54,8 @@ namespace tomato {
             }
 
             cam.viewProjMat = projection * viewMtx;
+
+            cam.dirty = false;
         }
 
         // Set main camera to render context

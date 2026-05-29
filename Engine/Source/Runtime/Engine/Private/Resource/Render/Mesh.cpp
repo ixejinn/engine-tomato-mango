@@ -158,6 +158,10 @@ namespace tomato {
         FillMeshData(southPole, southRow[0], southRow[sectorCnt - 1], vertices, indices);
     }
 
+    void Mesh::Capsule(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices) {
+
+    }
+
     void Mesh::Cylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices)
     {
         constexpr int sectorCnt = 10;

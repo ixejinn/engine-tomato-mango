@@ -23,6 +23,8 @@ namespace tomato {
         float zNear;
         float zFar;
         glm::mat4 viewProjMat;
+
+        bool dirty{ true };
     };
 
     struct MainCameraTag {};
