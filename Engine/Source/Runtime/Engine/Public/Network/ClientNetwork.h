@@ -36,7 +36,7 @@ namespace tomato
     class ClientNetwork
     {
     public:
-        explicit ClientNetwork(NetMode mode);
+        explicit ClientNetwork(NetMode mode, SPSCQueue<InputCommand, 256>& inputQueue);
         ~ClientNetwork();
 
         void SetNetState(ClientNetworkState state) { netState_ = state; }
@@ -94,6 +94,8 @@ namespace tomato
 
         ServerTimeMs sendTime{ 0 }, recvTime{ 0 };
         ServerTimeMs serverTimeOffset{ 0 }, localStartTime{ 0 };
+
+        SPSCQueue<InputCommand, 256>& inputCmdQueue;
     };
 }
 

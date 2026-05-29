@@ -78,7 +78,7 @@ namespace tomato
             inputCmd.Read(reader);
             inputCmd.id = GetPeerPlayerID(inToAddress);
             //Queue push
-
+            inputCmdQueue.Emplace(inputCmd);
             break;
         }
         }
