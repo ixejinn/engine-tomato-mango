@@ -7,7 +7,7 @@
 
 namespace tomato {
     Engine::Engine(const int width, const int height, const char* title, const bool isSingle)
-        : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), isSingle_(isSingle), network_(isSingle == true ? NetMode::NM_Alone : NetMode::NM_Client)
+        : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), isSingle_(isSingle), network_(nullptr)
     {
         
     }
@@ -43,7 +43,36 @@ namespace tomato {
     }
 
     void Engine::MultiRun() {
+        network_->ThreadStart();
 
+        TickClock tickClock;
+        window_.SetWindowUserPointer(&window_, &input_, &tickClock);
+
+        ChangeState(tickClock);
+
+        while (!window_.ShouldClose() && isRunning_) {
+            if (nextState_)
+                ChangeState(tickClock);
+
+            network_->ProcessQueuedUDPPacket();
+
+            ProcessInputEvents(tickClock.GetTick());
+            EventDispatcher::GetInstance().Update();
+
+            SimContext simCtx{ currState_->GetRegistry(), tickClock.GetTick() };
+            InputContext inputCtx{ currState_->GetPlayerInputTimelines() };
+            Simulate(tickClock, simCtx, inputCtx);
+
+            //if (network_.GetNetState() == NetworkServiceState::NSS_Playing)
+                network_->SendUDPPacket(UDPPacketType::INPUT, SendPolicy::Broadcast);
+
+            RenderContext renderCtx{ window_.GetWidth(), window_.GetHeight() };
+            Render(simCtx, renderCtx);
+
+            inputRecorder_.UpdateCurrInputRecord(tickClock.GetTick());
+        }
+
+        network_->ThreadStop();
     }
 
     void Engine::ProcessInputEvents(uint32_t tick) {
@@ -96,9 +125,9 @@ namespace tomato {
 
     void Engine::TryStartGame(std::unique_ptr<State>&& newState)
     {
-        if (network_.GetNetState() == NetworkServiceState::NSS_Starting)
+        if (network_->GetNetState() == ClientNetworkState::NSS_Starting)
         {
-            ServerTimeMs startTime = network_.GetLocalStartTime();
+            ServerTimeMs startTime = network_->GetLocalStartTime();
             if (startTime == 0) return;
             auto now = static_cast<ServerTimeMs>(
                 duration_cast<std::chrono::milliseconds>(
@@ -106,7 +135,7 @@ namespace tomato {
 
             if (static_cast<int32_t>(now - startTime) >= 0)
             {
-                network_.SetNetState(NetworkServiceState::NSS_Playing);
+                network_->SetNetState(ClientNetworkState::NSS_Playing);
                 //SetNextState(newState);
                 std::cout << now << "\n##### Game Start #####\n\n";
             }

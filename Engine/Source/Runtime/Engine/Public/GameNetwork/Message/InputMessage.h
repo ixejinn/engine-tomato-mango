@@ -18,15 +18,13 @@ namespace tomato
      */
 
      // TODO: 입력 타임라인 복구 및 패킷 손실을 대비하여 최근 여러 tick의 입력을 묶어서 전송할 수 있도록 수정
-    struct InputNetMessage : public NetMessage
+
+    struct InputCommand
     {
-    private:
-        void Serialize(NetBitWriter& writer) override;
-        void Build(SimContext& ctx, NetworkService* network) override;
+        void Read(NetBitReader& reader);
+        void Write(NetBitWriter& writer);
 
-        void Deserialize(NetBitReader& reader) override;
-        void Apply(const SocketAddress& fromAddr, SimContext& ctx, NetworkService* network) override;
-
+        PlayerId id;
         uint32_t tick{ 0 };
         InputRecord inputRecord;
     };

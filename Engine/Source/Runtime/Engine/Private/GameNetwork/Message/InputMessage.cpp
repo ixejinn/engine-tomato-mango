@@ -5,31 +5,34 @@
 #include "Network/NetBitReader.h"
 #include "Network/NetBitWriter.h"
 #include "Network/SocketAddress.h"
-#include "Network/NetworkService.h"
+#include "Network/ClientNetwork.h"
 
 #include "ECS/SystemUpdateContexts.h"
 
 namespace tomato
 {
-    void InputNetMessage::Serialize(NetBitWriter& writer)
-    {
-        writer.WriteInt(tick, std::numeric_limits<uint32_t>::max());
-        writer.WriteInt(static_cast<uint16_t>(inputRecord.down), static_cast<uint16_t>(InputIntent::COUNT));
-        writer.WriteInt(static_cast<uint16_t>(inputRecord.held), static_cast<uint16_t>(InputIntent::COUNT));
-    }
+    //void InputNetMessage::Build(SimContext& ctx, ClientNetwork* network)
+    //{
+    //    tick = ctx.tick;
 
-    void InputNetMessage::Build(SimContext& ctx, NetworkService* network)
-    {
-        tick = ctx.tick;
+    //    auto input = ctx.registry.ctx().get<InputContext*>();
+    //    //auto net = ctx.registry.ctx().get<NetworkContext*>();
 
-        auto input = ctx.registry.ctx().get<InputContext*>();
-        //auto net = ctx.registry.ctx().get<NetworkContext*>();
+    //    inputRecord = input->timelines[network->GetMyPlayerID()][tick];
+    //    //inputRecord = engine.GetInputTimeline()[engine.GetNetworkService().GetMyPlayerID()][tick];
+    //}
 
-        inputRecord = input->timelines[network->GetMyPlayerID()][tick];
-        //inputRecord = engine.GetInputTimeline()[engine.GetNetworkService().GetMyPlayerID()][tick];
-    }
+    //void InputNetMessage::Apply(const SocketAddress& fromAddr, SimContext& ctx, ClientNetwork* network)
+    //{
+    //    //engine.SetInputData(engine.GetNetworkService().GetPeerPlayerID(fromAddr), inputRecord);
+    //    //engine.SetLatestTick(inputRecord.tick);
 
-    void InputNetMessage::Deserialize(NetBitReader& reader)
+    //    auto input = ctx.registry.ctx().get<InputContext*>();
+    //    input->timelines[network->GetPeerPlayerID(fromAddr)][inputRecord.tick] = inputRecord;
+    //    //ctx.tick = std::min(tick, inputRecord.tick);
+    //}
+
+    void InputCommand::Read(NetBitReader& reader)
     {
         reader.ReadInt(inputRecord.tick, std::numeric_limits<uint32_t>::max());
 
@@ -40,13 +43,10 @@ namespace tomato
         inputRecord.held = static_cast<InputIntent>(value);
     }
 
-    void InputNetMessage::Apply(const SocketAddress& fromAddr, SimContext& ctx, NetworkService* network)
+    void InputCommand::Write(NetBitWriter& writer)
     {
-        //engine.SetInputData(engine.GetNetworkService().GetPeerPlayerID(fromAddr), inputRecord);
-        //engine.SetLatestTick(inputRecord.tick);
-
-        auto input = ctx.registry.ctx().get<InputContext*>();
-        input->timelines[network->GetPeerPlayerID(fromAddr)][tick] = inputRecord;
-        ctx.tick = std::min(tick, inputRecord.tick);
+        writer.WriteInt(tick, std::numeric_limits<uint32_t>::max());
+        writer.WriteInt(static_cast<uint16_t>(inputRecord.down), static_cast<uint16_t>(InputIntent::COUNT));
+        writer.WriteInt(static_cast<uint16_t>(inputRecord.held), static_cast<uint16_t>(InputIntent::COUNT));
     }
 }

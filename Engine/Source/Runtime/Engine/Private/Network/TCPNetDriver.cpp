@@ -1,4 +1,4 @@
-#include "Network/TCPNetDriver.h"
+﻿#include "Network/TCPNetDriver.h"
 #include "Network/TCPSocket.h"
 #include "Network/SocketAddress.h"
 #include "Network/NetworkConfig.h"
@@ -11,8 +11,8 @@ namespace tomato
 		if (mode_ == NetMode::NM_ListenServer)
 			InitListenServerMode();
 
-		else if (mode_ == NetMode::NM_Client)
-			InitClientMode();
+		//else if (mode_ == NetMode::NM_Client)
+		//	InitClientMode();
 	}
 
 	TCPNetDriver::~TCPNetDriver() {}

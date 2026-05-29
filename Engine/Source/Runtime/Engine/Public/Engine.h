@@ -8,7 +8,7 @@
 #include "Input/InputUI.h"
 #include "ECS/SystemManager.h"
 #include "State/StateFwd.h"
-#include "Network/NetworkService.h"
+#include "Network/ClientNetwork.h"
 
 namespace tomato {
     class Engine {
@@ -30,7 +30,7 @@ namespace tomato {
 
     private:
         Window window_;
-        NetworkService network_;
+        std::unique_ptr<ClientNetwork> network_{ nullptr };
 
         void SingleRun();
         void MultiRun();

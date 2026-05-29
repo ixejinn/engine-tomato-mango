@@ -1,5 +1,4 @@
-﻿#include "Network/NetworkService.h"
-#include "Network/NetTypes.h"
+﻿#include "Network/ClientNetwork.h"
 #include "Network/NetBitReader.h"
 #include "Network/NetBitWriter.h"
 #include "GameNetwork/Message/InputMessage.h"
@@ -7,15 +6,19 @@
 
 namespace tomato
 {
-    NetworkService::NetworkService(NetMode mode)
-        : server_(mode), driver_(mode), playerID_(0), netState_(NetworkServiceState::NSS_Uninitialized)
+    ClientNetwork::ClientNetwork(NetMode mode, SPSCQueue<InputCommand, 256>& inputQueue)
+        : server_(mode), driver_(mode), playerID_(0), netState_(ClientNetworkState::NSS_Uninitialized), inputCmdQueue(inputQueue)
     {
+        conn.try_emplace((PlayerId)0, NetConnection{ 0, 0, 0, "me", {"192.168.31.231", 9000} });
+        conn.try_emplace((PlayerId)1, NetConnection{ 1, 0, 1, "you", {"192.168.31.231", 9001} });
+        addToId.try_emplace({ "192.168.31.231", 9000 }, 0);
+        addToId.try_emplace({ "192.168.31.231", 9001 }, 1);
     }
 
-    NetworkService::~NetworkService() {}
+    ClientNetwork::~ClientNetwork() {}
 
     // use network thread
-    void NetworkService::NetThreadLoop()
+    void ClientNetwork::NetThreadLoop()
     {
         SocketAddress fromAddr;
         while (UDPRecvThreadRunning_)
@@ -29,7 +32,7 @@ namespace tomato
         }
     }
 
-    void NetworkService::ProcessQueuedUDPPacket()
+    void ClientNetwork::ProcessQueuedUDPPacket()
     {
         while (!pendingPackets_.Empty())
         {
@@ -46,7 +49,7 @@ namespace tomato
         }
     }
 
-    void NetworkService::ProcessUDPPacket(const UDPPacketType& type, NetBitReader& reader, const SocketAddress& inToAddress)
+    void ClientNetwork::ProcessUDPPacket(const UDPPacketType type, NetBitReader& reader, const SocketAddress& inToAddress)
     {
         switch (type)
         {
@@ -63,7 +66,7 @@ namespace tomato
             {
                 std::cout << "All Checked\n";
                 SendTCPPacket(TCPPacketType::MATCH_INTRO_SUCCESS);
-                netState_ = NetworkServiceState::NSS_Lobby;
+                netState_ = ClientNetworkState::NSS_Lobby;
             }
 
             //TODO@ timeout
@@ -71,15 +74,17 @@ namespace tomato
 
         case UDPPacketType::INPUT:
         {
-            //auto tmp = NetMessageRegistry::GetInstance().GetFactory(NetMessageType::INPUT)();
-            //tmp->Read(reader, engine_, inToAddress);
-            SendUDPPacket(UDPPacketType::INPUT, SendPolicy::Broadcast);
+            InputCommand inputCmd;
+            inputCmd.Read(reader);
+            inputCmd.id = GetPeerPlayerID(inToAddress);
+            //Queue push
+
             break;
         }
         }
     }
 
-    void NetworkService::BuildUDPPacket(NetBitWriter& writer, UDPPacketType messageType)
+    void ClientNetwork::BuildUDPPacket(NetBitWriter& writer, UDPPacketType messageType)
     {
         writer.WriteInt(static_cast<uint16_t>(messageType), static_cast<uint16_t>(UDPPacketType::COUNT));
 
@@ -93,16 +98,16 @@ namespace tomato
 
         case UDPPacketType::INPUT:
         {
-            //auto tmp = NetMessageRegistry::GetInstance().GetFactory(NetMessageType::INPUT)();
-            //tmp->Write(writer, engine_);
-            InputNetMessage inputMessage;
-            inputMessage.Write(writer);
+            //Queue pop
+            InputCommand inputCmd;
+            inputCmd.Write(writer);
+
             break;
         }
         }
     }
 
-    void NetworkService::BroadcastToPeers(const void* buffer)
+    void ClientNetwork::BroadcastToPeers(const void* buffer)
     {
         for (auto it = conn.begin(); it != conn.end(); it++)
         {
@@ -114,13 +119,17 @@ namespace tomato
         }
     }
 
-    void NetworkService::SendUDPPacket(UDPPacketType messageType, SendPolicy policy, const SocketAddress* inToAddress)
+    void ClientNetwork::SendUDPPacket(const UDPPacketType messageType, SendPolicy policy, const SocketAddress* inToAddress)
     {
         RawBuffer rawBuffer{};
         NetBitWriter writer{ &rawBuffer };
 
         BuildUDPPacket(writer, messageType);
 
+        NetBitReader reader{ rawBuffer.data(), rawBuffer.size()};
+        uint16_t type;
+        reader.ReadInt(type, std::numeric_limits<uint16_t>::max());
+        //std::cout << type << '\n';
         if (inToAddress)
         {
             int byteSentCount{};
@@ -131,7 +140,7 @@ namespace tomato
             BroadcastToPeers(rawBuffer.data());
     }
 
-    bool NetworkService::HandleWelcomePacket(const SocketAddress& inToAddress)
+    bool ClientNetwork::HandleWelcomePacket(const SocketAddress& inToAddress)
     {
         PlayerId id = GetPeerPlayerID(inToAddress);
         peerConnected[id] = true;
@@ -145,7 +154,7 @@ namespace tomato
         return true;
     }
 
-    void NetworkService::TCPNetRecvThreadLoop()
+    void ClientNetwork::TCPNetRecvThreadLoop()
     {
         uint8_t segment[MAX_PACKET_SIZE]{};
         while (TCPRecvThreadRunning_)
@@ -173,7 +182,7 @@ namespace tomato
         }
     }
 
-    void NetworkService::ProcessQueuedTCPPacket()
+    void ClientNetwork::ProcessQueuedTCPPacket()
     {
         while (!pendingTCPPackets_.Empty())
         {
@@ -189,12 +198,12 @@ namespace tomato
         }
     }
 
-    void NetworkService::ProcessTCPPacket(const TCPPacketType& header, NetBitReader& reader)
+    void ClientNetwork::ProcessTCPPacket(const TCPPacketType& header, NetBitReader& reader)
     {
         switch (header)
         {
         case TCPPacketType::MATCH_INTRO:
-            netState_ = NetworkServiceState::NSS_Hello;
+            netState_ = ClientNetworkState::NSS_Hello;
             //Set NetConnections
             std::cout << "Receive MATCH_INTRO\n";
             HandleMatchIntroPacket(reader);
@@ -217,7 +226,7 @@ namespace tomato
         }
     }
 
-    void NetworkService::SendTCPPacket(TCPPacketType messageType)
+    void ClientNetwork::SendTCPPacket(TCPPacketType messageType)
     {
         std::cout << "Send ";
 
@@ -262,7 +271,7 @@ namespace tomato
         server_.SendPacket(rawBuffer.data(), byteSize);
     }
 
-    void NetworkService::HandleMatchIntroPacket(NetBitReader& reader)
+    void ClientNetwork::HandleMatchIntroPacket(NetBitReader& reader)
     {
         uint8_t readMyId{ 0 }, readPlayerNum{ 0 };
         uint16_t readMatchId{ 0 };
@@ -308,7 +317,7 @@ namespace tomato
         peerConnected[playerID_] = true;
     }
 
-    void NetworkService::HandleServerTimeSyncPacket(NetBitReader& reader)
+    void ClientNetwork::HandleServerTimeSyncPacket(NetBitReader& reader)
     {
         recvTime = static_cast<ServerTimeMs>(
             duration_cast<std::chrono::milliseconds>(
@@ -332,9 +341,9 @@ namespace tomato
                 //std::cout << "[Server Tick] " << int(estimatedServerTick) << "\n[Local Tick] " << int(engine_.GetTick()) << '\n';
     }
 
-    void NetworkService::HandleMatchStartPacket(NetBitReader& reader)
+    void ClientNetwork::HandleMatchStartPacket(NetBitReader& reader)
     {
-        if (netState_ == NetworkServiceState::NSS_Lobby)
+        if (netState_ == ClientNetworkState::NSS_Lobby)
         {
             ServerTimeMs serverStartTime{};
             reader.ReadInt(serverStartTime, std::numeric_limits<ServerTimeMs>::max());
@@ -363,11 +372,11 @@ namespace tomato
 
             //engine_.SetStartTimes(localStartTime);
             std::cout << "[Now] " << localSteadyTimeNow << "\n[Start Time] " << localStartTime << '\n';
-            netState_ = NetworkServiceState::NSS_Starting;
+            netState_ = ClientNetworkState::NSS_Starting;
         }
     }
 
-    PlayerId NetworkService::GetPeerPlayerID(const SocketAddress& addr)
+    PlayerId ClientNetwork::GetPeerPlayerID(const SocketAddress& addr)
     {
         auto it = addToId.find(addr);
         if (it == addToId.end())
@@ -376,22 +385,27 @@ namespace tomato
         return it->second;
     }
 
-    void NetworkService::ThreadStart()
+    void ClientNetwork::ThreadStart()
     {
-        TCPRecvThread = std::thread(&NetworkService::TCPNetRecvThreadLoop, this);
-        UDPRecvThread = std::thread(&NetworkService::NetThreadLoop, this);
+        UDPRecvThread = std::thread(&ClientNetwork::NetThreadLoop, this);
+        UDPRecvThreadRunning_ = true;
 
         if (server_.IsConnectedToServer())
+        {
+            TCPRecvThread = std::thread(&ClientNetwork::TCPNetRecvThreadLoop, this);
             TCPRecvThreadRunning_ = true;
-        UDPRecvThreadRunning_ = true;
+        }
     }
 
-    void NetworkService::ThreadStop()
+    void ClientNetwork::ThreadStop()
     {
-        TCPRecvThreadRunning_ = false;
         UDPRecvThreadRunning_ = false;
-
-        TCPRecvThread.join();
         UDPRecvThread.join();
+
+        if (server_.IsConnectedToServer())
+        {
+            TCPRecvThreadRunning_ = false;
+            TCPRecvThread.join();
+        }
     }
 }

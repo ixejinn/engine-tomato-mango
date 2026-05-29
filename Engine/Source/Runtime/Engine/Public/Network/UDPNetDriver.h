@@ -30,7 +30,7 @@ namespace tomato
 	private:
 		NetMode mode_;
 
-		uint16_t port{ 9001 };
+		uint16_t port{ 9000 };
 		UDPSocketPtr socket_;
 	};
 

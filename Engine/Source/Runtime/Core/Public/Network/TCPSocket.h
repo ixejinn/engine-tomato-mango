@@ -1,4 +1,4 @@
-#ifndef MANGO_TCP_SOCKET_H
+﻿#ifndef MANGO_TCP_SOCKET_H
 #define MANGO_TCP_SOCKET_H
 
 #include <typeinfo>
@@ -23,6 +23,7 @@ namespace tomato
 		int Receive(void* inBuffer, int inLen);
 
 		int GetSocketAddress(SocketAddress& inFromAddress, int inLen);
+		int SetNonBlockingMode(bool nonBlocking);
 	private:
 		friend class SocketUtil;
 		TCPSocket(SOCKET inSocket) : socket_(inSocket) {};

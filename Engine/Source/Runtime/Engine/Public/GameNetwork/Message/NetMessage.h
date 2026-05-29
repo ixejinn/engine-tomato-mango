@@ -22,7 +22,7 @@ namespace tomato
          * @param engine Engine instance to apply the message.
          * @param fromAddr Source address of the received datagram.
          */
-        void Read(NetBitReader& reader, SimContext& ctx, NetworkService* network, const SocketAddress& fromAddr)
+        void Read(NetBitReader& reader, SimContext& ctx, ClientNetwork* network, const SocketAddress& fromAddr)
         {
             Deserialize(reader);
             Apply(fromAddr, ctx, network);
@@ -46,7 +46,7 @@ namespace tomato
          *
          * Calls Build() followed by Serialize().
          */
-        void Write(NetBitWriter& writer, SimContext& ctx, NetworkService* network)
+        void Write(NetBitWriter& writer, SimContext& ctx, ClientNetwork* network)
         {
             Build(ctx, network);
             Serialize(writer);
@@ -56,9 +56,9 @@ namespace tomato
          * @brief Serializes the message without engine context.
          * @param writer Bit writer to append the serialized payload.
          */
-        void Write(NetBitWriter& writer)
+        void Write(NetBitWriter& writer, ClientNetwork* network)
         {
-            Build();
+            Build(network);
             Serialize(writer);
         }
 
@@ -69,8 +69,8 @@ namespace tomato
          */
         virtual void Serialize(NetBitWriter&) = 0;
 
-        virtual void Build(SimContext&, NetworkService*) {};
-        virtual void Build() {};
+        virtual void Build(SimContext&, ClientNetwork*) {};
+        virtual void Build(ClientNetwork* network) {};
 
         /**
          * @brief Deserializes member variables from a bit-stream.
@@ -78,7 +78,7 @@ namespace tomato
          */
         virtual void Deserialize(NetBitReader&) = 0;
 
-        virtual void Apply(const SocketAddress&, SimContext&, NetworkService* network) {};
+        virtual void Apply(const SocketAddress&, SimContext&, ClientNetwork* network) {};
         virtual void Apply(const SocketAddress&) {};
     };
 }

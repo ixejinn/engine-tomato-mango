@@ -4,7 +4,7 @@
 #include <entt/entt.hpp>
 #include "State/StateFwd.h"
 #include "Network/NetTypes.h"
-#include "Network/NetworkService.h"
+#include "Network/ClientNetwork.h"
 
 namespace tomato {
     struct SimContext {

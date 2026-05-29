@@ -1,4 +1,4 @@
-#include "Network/TCPSocket.h"
+﻿#include "Network/TCPSocket.h"
 #include "Network/SocketAddress.h"
 #include "Utils/Logger.h"
 
@@ -110,5 +110,19 @@ namespace tomato
 			TMT_ERR << "Failed to TCPSocket::GetSocketAddress";
 			return WSAGetLastError();
 		}
+	}
+
+	int TCPSocket::SetNonBlockingMode(bool nonBlocking)
+	{
+		u_long arg = nonBlocking ? 1 : 0;
+		int result = ioctlsocket(socket_, FIONBIO, &arg);
+
+		if (result == SOCKET_ERROR)
+		{
+			TMT_ERR << "Failed to TCPSocket::SetNonBlockingMode";
+			return WSAGetLastError();
+		}
+		else
+			return NO_ERROR;
 	}
 }

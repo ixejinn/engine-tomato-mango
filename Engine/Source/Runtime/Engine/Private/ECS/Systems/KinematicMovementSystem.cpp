@@ -1,4 +1,4 @@
-#include <entt/entt.hpp>
+﻿#include <entt/entt.hpp>
 #include <glm/glm.hpp>
 #include "ECS/Systems/KinematicMovementSystem.h"
 #include "ECS/Components/Transform.h"
@@ -21,7 +21,7 @@ namespace tomato {
             const auto& inputRec = input->timelines[ch.channel][simCtx.tick];
             if (inputRec.tick != simCtx.tick)
                 continue;
-
+            //std::cout << inputRec.tick << " " << (int)inputRec.held << " " << (int)inputRec.down << '\n';
             InputIntent keypress{inputRec.held};
             InputIntent keydown{inputRec.down};
 

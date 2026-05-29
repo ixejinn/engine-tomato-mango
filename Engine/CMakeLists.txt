@@ -86,14 +86,21 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Math/Normal.h
         Source/Runtime/Engine/Public/Network/NetworkFwd.h
         Source/Runtime/Engine/Public/Network/NetConnection.h
-        Source/Runtime/Engine/Public/Network/SocketAddress.h
+        Source/Runtime/Core/Public/Network/SocketAddress.h
+        Source/Runtime/Core/Public/Network/TCPSocket.h
+        Source/Runtime/Core/Public/Network/UDPSocket.h
+        Source/Runtime/Core/Public/Network/NetBitReader.h
+        Source/Runtime/Core/Public/Network/NetBitWriter.h
         Source/Runtime/Engine/Public/Network/SocketUtil.h
         Source/Runtime/Engine/Public/Network/PacketTypes.h
-        Source/Runtime/Engine/Public/Network/TCPSocket.h
         Source/Runtime/Engine/Public/Network/TCPNetDriver.h
-        Source/Runtime/Engine/Public/Network/UDPSocket.h
         Source/Runtime/Engine/Public/Network/UDPNetDriver.h
- "Source/Runtime/Engine/Public/Network/NetworkService.h" "Source/Runtime/Engine/Public/Network/NetBitReader.h" "Source/Runtime/Engine/Public/Network/NetBitWriter.h" "Source/Runtime/Engine/Public/Network/WinsockInitializer.h"  "Source/Runtime/Engine/Public/GameNetwork/Message/InputMessage.h" "Source/Runtime/Engine/Public/GameNetwork/Message/NetMessage.h" "Source/Runtime/Engine/Public/Network/NetTypes.h" "Source/Runtime/Engine/Private/GameNetwork/Message/InputMessage.cpp")
+        Source/Runtime/Engine/Public/Network/ClientNetwork.h
+        Source/Runtime/Engine/Public/Network/WinsockInitializer.h
+        Source/Runtime/Engine/Public/Network/NetTypes.h
+        Source/Runtime/Engine/Public/GameNetwork/Message/InputMessage.h
+        Source/Runtime/Engine/Public/GameNetwork/Message/NetMessage.h
+ "Source/Runtime/Engine/Public/GameNetwork/GamePlayNetSystem.h" )
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -128,13 +135,18 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Input/InputUI.cpp
         Source/Runtime/Engine/Private/ECS/Systems/UISystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/ScreenUIRenderSystem.cpp
-        Source/Runtime/Engine/Private/Network/SocketAddress.cpp
+        Source/Runtime/Core/Private/Network/SocketAddress.cpp
+        Source/Runtime/Core/Private/Network/TCPSocket.cpp
+        Source/Runtime/Core/Private/Network/UDPSocket.cpp
+        Source/Runtime/Core/Private/Network/NetBitReader.cpp
+        Source/Runtime/Core/Private/Network/NetBitWriter.cpp
         Source/Runtime/Engine/Private/Network/SocketUtil.cpp
-        Source/Runtime/Engine/Private/Network/TCPSocket.cpp
         Source/Runtime/Engine/Private/Network/TCPNetDriver.cpp
-        Source/Runtime/Engine/Private/Network/UDPSocket.cpp
         Source/Runtime/Engine/Private/Network/UDPNetDriver.cpp
- "Source/Runtime/Engine/Private/Network/NetworkService.cpp" "Source/Runtime/Engine/Private/Network/NetBitReader.cpp" "Source/Runtime/Engine/Private/Network/NetBitWriter.cpp")
+        Source/Runtime/Engine/Private/Network/CilentNetwork.cpp
+        Source/Runtime/Engine/Private/GameNetwork/Message/InputMessage.cpp
+        Source/Runtime/Engine/Private/GameNetwork/GamePlayNetSystem.cpp
+)
 
 add_library(engine STATIC
         ${ENGINE_HEADERS}
