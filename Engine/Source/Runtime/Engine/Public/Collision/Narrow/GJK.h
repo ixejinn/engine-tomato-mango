@@ -19,6 +19,15 @@ namespace tomato {
             const ColliderComponent& col2, TransformComponent& trf2);
 
     private:
+        static bool GJKBool(
+                entt::registry& reg, entt::entity e1, entt::entity e2);
+
+        static CollisionInfo GJKDistance(
+                entt::registry& reg, entt::entity e1, entt::entity e2);
+
+        static std::optional<CollisionInfo> GJKRaycast(
+                entt::registry& reg, entt::entity e1, entt::entity e2);
+
         static glm::vec3 Support(
             const glm::vec3& worldDir,
             const ColliderComponent& col, TransformComponent& trf);

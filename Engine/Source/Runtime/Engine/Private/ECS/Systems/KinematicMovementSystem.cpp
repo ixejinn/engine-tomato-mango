@@ -41,17 +41,17 @@ namespace tomato {
             velocity.velocity.z = dir.y * move.horizontalSpeed;
 
             // Rotation (!!!!TEST!!!!)
-//            x = 0; y = 0;
-//            if (HasFlag(keypress, InputIntent::TurnLeft))
-//                x += 5;
-//            if (HasFlag(keypress, InputIntent::TurnRight))
-//                x -= 5;
-//            if (HasFlag(keypress, InputIntent::TurnUp))
-//                y += 5;
-//            if (HasFlag(keypress, InputIntent::TurnDown))
-//                y -= 5;
-//            glm::vec3 newDegree = trf.GetEulerDegree() + glm::vec3{x, y, 0.f};
-//            trf.SetEulerDegree(newDegree);
+            x = 0; y = 0;
+            if (HasFlag(keypress, InputIntent::TurnLeft))
+                x += 5;
+            if (HasFlag(keypress, InputIntent::TurnRight))
+                x -= 5;
+            if (HasFlag(keypress, InputIntent::TurnUp))
+                y += 5;
+            if (HasFlag(keypress, InputIntent::TurnDown))
+                y -= 5;
+            glm::vec3 newDegree = trf.GetEulerDegree() + glm::vec3{x, y, 0.f};
+            trf.SetEulerDegree(newDegree);
 
             // Jump
             if (HasFlag(keydown, ch.is1P ? InputIntent::Jump : InputIntent::Jump2) && move.jumpCnt < JUMP_COUNT_MAX)

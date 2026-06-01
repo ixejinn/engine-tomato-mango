@@ -66,10 +66,10 @@ namespace tomato {
         keyIntents_[Key::D] = InputIntent::Right;
         keyIntents_[Key::SpaceBar] = InputIntent::Jump;
 
-//        keyIntents_[Key::Left]  = InputIntent::TurnLeft;
-//        keyIntents_[Key::Right] = InputIntent::TurnRight;
-//        keyIntents_[Key::Up]    = InputIntent::TurnUp;
-//        keyIntents_[Key::Down]  = InputIntent::TurnDown;
+        keyIntents_[Key::Left]  = InputIntent::TurnLeft;
+        keyIntents_[Key::Right] = InputIntent::TurnRight;
+        keyIntents_[Key::Up]    = InputIntent::TurnUp;
+        keyIntents_[Key::Down]  = InputIntent::TurnDown;
 
         keyIntents_[Key::KP_8] = InputIntent::Up2;
         keyIntents_[Key::KP_5] = InputIntent::Down2;

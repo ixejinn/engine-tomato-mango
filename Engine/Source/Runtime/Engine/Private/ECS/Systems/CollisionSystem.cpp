@@ -58,26 +58,23 @@ namespace tomato {
             auto& trf2 = reg.get<TransformComponent>(candidate.b);
 
             if (auto result = narrowPhase_->DetectCollision(reg, candidate.a, candidate.b)) {
-                if (auto velPtr = reg.try_get<VelocityComponent>(candidate.a)) {
-                    static constexpr float SKIN = 1e-2f;
-                    glm::vec3 remainingMove = (1 - result->depth) * velPtr->velocity;
+                if (!col1.isTrigger && !col2.isTrigger) {
+                    if (auto velPtr = reg.try_get<VelocityComponent>(candidate.a)) {
+                        static constexpr float SKIN = 1e-2f;
+                        glm::vec3 remainingMove = (1 - result->depth) * velPtr->velocity;
 
-                    trf1.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth - result->normal * SKIN);
-                    velPtr->velocity = remainingMove - glm::dot(remainingMove, result->normal) * result->normal;
+                        trf1.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth - result->normal * SKIN);
+                        velPtr->velocity = remainingMove - glm::dot(remainingMove, result->normal) * result->normal;
+                    }
+
+                    if (auto velPtr = reg.try_get<VelocityComponent>(candidate.b)) {
+                        static constexpr float SKIN = 1e-2f;
+                        glm::vec3 remainingMove = (1 - result->depth) * velPtr->velocity;
+
+                        trf2.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth + result->normal * SKIN);
+                        velPtr->velocity = remainingMove + glm::dot(remainingMove, -result->normal) * result->normal;
+                    }
                 }
-
-                if (auto velPtr = reg.try_get<VelocityComponent>(candidate.b)) {
-                    static constexpr float SKIN = 1e-2f;
-                    glm::vec3 remainingMove = (1 - result->depth) * velPtr->velocity;
-
-                    trf2.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth + result->normal * SKIN);
-                    velPtr->velocity = remainingMove + glm::dot(remainingMove, -result->normal) * result->normal;
-                }
-
-
-
-
-
 
                 // Collision detected
                 if (!collisionPairs_.contains(candidate)) {

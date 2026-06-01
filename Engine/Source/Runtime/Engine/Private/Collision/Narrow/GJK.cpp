@@ -21,6 +21,90 @@ namespace tomato {
         entt::registry& reg, entt::entity e1, entt::entity e2) {
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
+
+        if (col1.isTrigger || col2.isTrigger) {
+            if (GJKBool(reg, e1, e2))
+                return CollisionInfo{};
+            else
+                return std::nullopt;
+        }
+        else
+            return GJKRaycast(reg, e1, e2);
+    }
+
+    glm::vec3 GJK::GetSupportPoint(
+                const glm::vec3& worldDir,
+                const ColliderComponent& col1, TransformComponent& trf1,
+                const ColliderComponent& col2, TransformComponent& trf2) {
+        return Support(worldDir, col1, trf1) - Support(-worldDir, col2, trf2);
+    }
+
+    bool GJK::GJKBool(
+            entt::registry& reg, entt::entity e1, entt::entity e2) {
+        auto& col1 = reg.get<ColliderComponent>(e1);
+        auto& col2 = reg.get<ColliderComponent>(e2);
+        auto& trf1 = reg.get<TransformComponent>(e1);
+        auto& trf2 = reg.get<TransformComponent>(e2);
+
+        std::vector<glm::vec3> simplex;
+        simplex.reserve(4);
+
+        glm::vec3 wPosCol1 = trf1.GetTransformMatrix() * glm::vec4(col1.position, 1.f);
+        glm::vec3 wPosCol2 = trf2.GetTransformMatrix() * glm::vec4(col2.position, 1.f);
+        glm::vec3 closestP = GetSupportPoint(wPosCol1 - wPosCol2, col1, trf1, col2, trf2);
+        glm::vec3 supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
+        simplex.push_back(supportP);
+
+        while (true) {
+            if (auto result = FindClosestPointOnSimplex(simplex))
+                closestP = *result;
+            else
+                return true;
+
+            supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
+            simplex.push_back(supportP);
+            if (glm::dot(-closestP, supportP) < 0)
+                return false;
+        }
+    }
+
+    CollisionInfo GJK::GJKDistance(
+            entt::registry& reg, entt::entity e1, entt::entity e2) {
+        auto& col1 = reg.get<ColliderComponent>(e1);
+        auto& col2 = reg.get<ColliderComponent>(e2);
+        auto& trf1 = reg.get<TransformComponent>(e1);
+        auto& trf2 = reg.get<TransformComponent>(e2);
+
+        glm::vec3 wPosCol1 = trf1.GetTransformMatrix() * glm::vec4(col1.position, 1.f);
+        glm::vec3 wPosCol2 = trf2.GetTransformMatrix() * glm::vec4(col2.position, 1.f);
+        glm::vec3 closestP = GetSupportPoint(wPosCol1 - wPosCol2, col1, trf1, col2, trf2);
+        glm::vec3 supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
+
+        std::vector<glm::vec3> simplex;
+        simplex.reserve(4);
+
+        while (glm::length2(closestP) - glm::dot(closestP, supportP) > 1e-6f) {
+            simplex.push_back(supportP);
+
+            if (auto result = FindClosestPointOnSimplex(simplex))
+                closestP = *result;
+            else
+                return CollisionInfo{glm::vec3{0.f}, 0.f};
+
+            supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
+        }
+
+        auto length = glm::length(closestP);
+        if (length > 1e-4f)
+            return CollisionInfo{closestP, length};
+//            return std::nullopt;
+        return CollisionInfo{glm::vec3{0.f}, 0.f};
+    }
+
+    std::optional<CollisionInfo> GJK::GJKRaycast(
+            entt::registry& reg, entt::entity e1, entt::entity e2) {
+        auto& col1 = reg.get<ColliderComponent>(e1);
+        auto& col2 = reg.get<ColliderComponent>(e2);
         auto& trf1 = reg.get<TransformComponent>(e1);
         auto& trf2 = reg.get<TransformComponent>(e2);
 
@@ -87,13 +171,6 @@ namespace tomato {
         }
 
         return std::nullopt;
-    }
-
-    glm::vec3 GJK::GetSupportPoint(
-                const glm::vec3& worldDir,
-                const ColliderComponent& col1, TransformComponent& trf1,
-                const ColliderComponent& col2, TransformComponent& trf2) {
-        return Support(worldDir, col1, trf1) - Support(-worldDir, col2, trf2);
     }
 
     glm::vec3 GJK::Support(
@@ -202,7 +279,7 @@ namespace tomato {
             }
 
             default:
-                TMT_ERR << "Incorrect simplex size";
+                TMT_ERR << "Incorrect simplex size: " << simplex.size();
                 return glm::vec3{0.f};
         }
     }
