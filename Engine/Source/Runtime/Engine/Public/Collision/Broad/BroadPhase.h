@@ -14,6 +14,14 @@ namespace tomato {
 
     protected:
         inline static CollisionLayerMatrix layerMatrix_;
+
+        static bool CheckAABBAxisX(ColliderComponent& col1, ColliderComponent& col2);
+        static bool CheckAABBAxisY(ColliderComponent& col1, ColliderComponent& col2);
+        static bool CheckAABBAxisZ(ColliderComponent& col1, ColliderComponent& col2);
+
+        static bool CanCollide(
+            entt::registry& reg, entt::entity e1, entt::entity e2,
+            ColliderComponent& col1, ColliderComponent& col2);
     };
 }
 

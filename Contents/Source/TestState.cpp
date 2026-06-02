@@ -51,9 +51,9 @@ void TestState::Init() {
     registry_.emplace<VelocityComponent>(me);
     registry_.emplace<InputChannelComponent>(me, static_cast<uint8_t>(0), true);
     registry_.emplace<MovementComponent>(me);
-//     registry_.emplace<ColliderComponent>(me, ColliderType::Cube, trfCompMe);
+     registry_.emplace<ColliderComponent>(me, ColliderType::Cube, trfCompMe);
 //    registry_.emplace<ColliderComponent>(me, ColliderType::Sphere, trfCompMe);
-    registry_.emplace<ColliderComponent>(me, ColliderType::Cube, trfCompMe, true);
+    // registry_.emplace<ColliderComponent>(me, ColliderType::Cube, trfCompMe, true);
 
     registry_.emplace<RenderComponent>(me,
                                        glm::vec4(1.f, 1.f, 0.f, 1.f),

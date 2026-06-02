@@ -19,7 +19,6 @@ namespace tomato {
         entt::registry& GetRegistry() { return registry_; }
 
         PlayerInputTimelines& GetPlayerInputTimelines() { return playerInputs_; }
-
         void SetPlayerInput(uint32_t tick, InputRecord input, int playerID = 0);
 
     protected:

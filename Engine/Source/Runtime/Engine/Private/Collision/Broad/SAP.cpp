@@ -2,6 +2,7 @@
 #include <entt/entt.hpp>
 #include "Collision/Broad/SAP.h"
 #include "ECS/Components/Collision.h"
+#include "ECS/Components/Hierarchy.h"
 #include "ECS/Systems/CollisionSystem.h"
 
 namespace tomato {
@@ -40,24 +41,38 @@ namespace tomato {
                         continue;
                     }
 
-                    // Check collision layer
-                    if (!layerMatrix_.CanCollide(col.layer, colAct.layer))
-                    {
+                    if (!CanCollide(reg, e, *it, col, colAct)) {
                         ++it;
                         continue;
                     }
 
+                    // // Check parent
+                    // if (GetRootEntity(reg, e) == GetRootEntity(reg, *it))
+                    //     continue;
+                    //
+                    // // Check collision layer
+                    // if (!layerMatrix_.CanCollide(col.layer, colAct.layer))
+                    // {
+                    //     ++it;
+                    //     continue;
+                    // }
+
                     // Check AABB
-                    if (colAct.max.y < col.min.y || col.max.y < colAct.min.y)
-                    {
+                    if (!CheckAABBAxisY(col, colAct) || !CheckAABBAxisZ(col, colAct)) {
                         ++it;
                         continue;
                     }
-                    if (colAct.max.z < col.min.z || col.max.z < colAct.min.z)
-                    {
-                        ++it;
-                        continue;
-                    }
+
+                    // if (colAct.max.y < col.min.y || col.max.y < colAct.min.y)
+                    // {
+                    //     ++it;
+                    //     continue;
+                    // }
+                    // if (colAct.max.z < col.min.z || col.max.z < colAct.min.z)
+                    // {
+                    //     ++it;
+                    //     continue;
+                    // }
 
                     candidates.emplace_back(e, *it);
                     ++it;
