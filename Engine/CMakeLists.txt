@@ -118,6 +118,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Objects/Object.cpp
         Source/Runtime/Engine/Private/Objects/Collider/Collider.cpp
         Source/Runtime/Engine/Private/Collision/Broad/BroadPhase.cpp
+        Source/Runtime/Engine/Private/ECS/Components/Transform.cpp
 )
 
 add_library(engine STATIC

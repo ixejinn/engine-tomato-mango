@@ -50,7 +50,7 @@ namespace tomato {
                 y += 5;
             if (HasFlag(keypress, InputIntent::TurnDown))
                 y -= 5;
-            glm::vec3 newDegree = trf.GetEulerDegree() + glm::vec3{x, y, 0.f};
+            glm::vec3 newDegree = trf.GetLocalEulerDegree() + glm::vec3{x, y, 0.f};
             trf.SetEulerDegree(newDegree);
 
             // Jump

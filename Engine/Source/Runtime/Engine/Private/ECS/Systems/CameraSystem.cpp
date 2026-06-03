@@ -17,12 +17,12 @@ namespace tomato {
             if (!cam.dirty)
                 continue;
 
-            auto quaternion = trf.GetQuaternion();
+            auto quaternion = trf.GetWorldQuaternion();
             glm::vec3 b = quaternion * glm::vec3(0, 0, 1);
             glm::vec3 r = quaternion * glm::vec3(1, 0, 0);
             glm::vec3 u = quaternion * glm::vec3(0, 1, 0);
 
-            auto pos = trf.GetPosition();
+            auto pos = trf.GetWorldPosition();
             glm::mat4 viewMtx{
                 r.x, u.x, b.x, 0,   // column 0
                 r.y, u.y, b.y, 0,   // column 1

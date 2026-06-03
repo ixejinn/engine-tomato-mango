@@ -5,9 +5,9 @@
 #include "ECS/PhysCompFwd.h"
 
 namespace tomato::support {
-    glm::vec3 Cube(const glm::vec3& dir, const ColliderComponent& col);
-    glm::vec3 Sphere(const glm::vec3& dir, const ColliderComponent& col);
-    glm::vec3 Capsule(const glm::vec3& dir, const ColliderComponent& col);
+    glm::vec3 Cube(const glm::vec3& dir, const TransformComponent& trf);
+    glm::vec3 Sphere(const glm::vec3& dir, const TransformComponent& trf);
+    glm::vec3 Capsule(const glm::vec3& dir, const TransformComponent& trf);
 }
 
 #endif //MANGO_COLLIDERSUPPORT_H

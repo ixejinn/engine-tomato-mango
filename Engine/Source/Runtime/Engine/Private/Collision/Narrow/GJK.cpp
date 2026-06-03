@@ -49,8 +49,8 @@ namespace tomato {
         std::vector<glm::vec3> simplex;
         simplex.reserve(4);
 
-        glm::vec3 wPosCol1 = trf1.GetTransformMatrix() * glm::vec4(col1.position, 1.f);
-        glm::vec3 wPosCol2 = trf2.GetTransformMatrix() * glm::vec4(col2.position, 1.f);
+        glm::vec3 wPosCol1 = trf1.GetWorldPosition();
+        glm::vec3 wPosCol2 = trf2.GetWorldPosition();
         glm::vec3 closestP = GetSupportPoint(wPosCol1 - wPosCol2, col1, trf1, col2, trf2);
         glm::vec3 supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
         simplex.push_back(supportP);
@@ -75,8 +75,8 @@ namespace tomato {
         auto& trf1 = reg.get<TransformComponent>(e1);
         auto& trf2 = reg.get<TransformComponent>(e2);
 
-        glm::vec3 wPosCol1 = trf1.GetTransformMatrix() * glm::vec4(col1.position, 1.f);
-        glm::vec3 wPosCol2 = trf2.GetTransformMatrix() * glm::vec4(col2.position, 1.f);
+        glm::vec3 wPosCol1 = trf1.GetWorldPosition();
+        glm::vec3 wPosCol2 = trf2.GetWorldPosition();
         glm::vec3 closestP = GetSupportPoint(wPosCol1 - wPosCol2, col1, trf1, col2, trf2);
         glm::vec3 supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
 
@@ -176,11 +176,12 @@ namespace tomato {
     glm::vec3 GJK::Support(
             const glm::vec3& worldDir,
             const ColliderComponent& col, TransformComponent& trf) {
-        const auto R = glm::toMat4(trf.GetQuaternion());
-        const glm::vec4 localDir = glm::transpose(R) * glm::vec4(worldDir, 0.f);
+        const auto worldRot = glm::toMat4(trf.GetWorldQuaternion());
 
-        const auto localSupportP = supportFunctions_[col.type](localDir, col);
-        return trf.GetPosition() + glm::vec3{R * glm::vec4(localSupportP, 1.f)};
+        const glm::vec3 localDir = glm::transpose(worldRot) * glm::vec4(worldDir, 0.f);
+
+        const auto localSupportP = supportFunctions_[col.type](localDir, trf);
+        return trf.GetWorldPosition() + glm::vec3{worldRot * glm::vec4(localSupportP, 1.f)};
     }
 
     std::optional<glm::vec3> GJK::FindClosestPointOnSimplex(std::vector<glm::vec3>& simplex) {
@@ -424,140 +425,5 @@ namespace tomato {
         float signp = glm::dot(p - a, glm::cross(b - a, c - a));
         float signd = glm::dot(d - a, glm::cross(b - a, c - a));
         return signp * signd < 0.f;
-    }
-
-    bool GJK::AddSimplexPoint(
-            std::vector<glm::vec3>& simplex,
-            const ColliderComponent& col1, TransformComponent& trf1,
-            const ColliderComponent& col2, TransformComponent& trf2) {
-        glm::vec3 dir;
-        auto simplexSize = simplex.size();
-
-        switch (simplexSize)
-        {
-            case 0:
-            {
-                glm::vec3 wPosCol1 = trf1.GetTransformMatrix() * glm::vec4(col1.position, 1.f);
-                glm::vec3 wPosCol2 = trf2.GetTransformMatrix() * glm::vec4(col2.position, 1.f);
-
-                simplex.push_back(GetSupportPoint(wPosCol2 - wPosCol1, col1, trf1, col2, trf2));
-            }
-                break;
-
-            case 1:
-                dir = -simplex[0];
-                simplex.push_back(GetSupportPoint(dir, col1, trf1, col2, trf2));
-
-                if (glm::dot(dir, simplex[1]) < 0)
-                    return false;   // 심플렉스가 원점을 포함할 수 없음
-                break;
-
-            case 2:
-            {
-                const auto ab = simplex[1] - simplex[0];
-                const auto ao = -simplex[0];
-                dir = glm::cross(glm::cross(ab, ao), ab);
-                simplex.push_back(GetSupportPoint(dir, col1, trf1, col2, trf2));
-
-                if (glm::dot(dir, simplex[2]) < 0)
-                    return false;
-            }
-                break;
-
-            case 3:
-                dir = GetOrientedNormal(glm::vec3{0.f}, simplex[0], simplex[1], simplex[2]);
-                simplex.push_back(GetSupportPoint(dir, col1, trf1, col2, trf2));
-
-                if (glm::dot(dir, simplex[3]) < 0)
-                    return false;
-                break;
-
-            default:
-                TMT_WARN << "Incorrect simplex points.";
-        }
-
-        return true;
-    }
-
-    bool GJK::VoronoiRegion(std::vector<glm::vec3> &simplex) {
-        auto simplexSize = simplex.size();
-        switch (simplexSize)
-        {
-            case 1:
-                // if (simplex[0] == Vector3{0.f}) return true;
-                return false;
-
-            case 2:
-            {
-                const auto ao = -simplex[0];
-                const auto ab = simplex[1] - simplex[0];
-
-                const auto dotV = glm::dot(ao, ab);
-                if (dotV < 0)
-                    simplex.pop_back();
-                else if (dotV > glm::dot(ab, ab))
-                    simplex.erase(simplex.begin());
-
-                return false;
-            }
-
-            case 3:
-            {
-                const auto ab = simplex[1] - simplex[0];
-                const auto bc = simplex[2] - simplex[1];
-                const auto ac = simplex[2] - simplex[0];
-                const auto ao = -simplex[0];
-                const auto bo = -simplex[1];
-
-                const auto normal = glm::cross(ac, ab);
-
-                if (glm::dot(ao, glm::cross(normal, ab)) > 0)
-                {
-                    simplex.pop_back();
-                    return false;
-                }
-
-                if (glm::dot(bo, glm::cross(normal, bc)) > 0)
-                {
-                    simplex.erase(simplex.begin());
-                    return false;
-                }
-
-                if (glm::dot(ao, glm::cross(normal, -ac)) > 0)
-                {
-                    simplex.erase(++simplex.begin());
-                    return false;
-                }
-
-                // 2차원이면 return true;
-                return false;
-            }
-
-            case 4:
-            {
-                const auto lo = -simplex[3];
-
-                if (glm::dot(-GetOrientedNormal(simplex[1], simplex[3], simplex[0], simplex[2]), lo) > 0)
-                {
-                    simplex.erase(++simplex.begin());
-                    return false;
-                }
-                if (glm::dot(-GetOrientedNormal(simplex[0], simplex[3], simplex[2], simplex[1]), lo) > 0)
-                {
-                    simplex.erase(simplex.begin());
-                    return false;
-                }
-                if (glm::dot(-GetOrientedNormal(simplex[2], simplex[3], simplex[1], simplex[0]), lo) > 0)
-                {
-                    simplex.erase(simplex.begin() + 2);
-                    return false;
-                }
-                return true;
-            }
-
-            default:
-                TMT_WARN << "Incorrect simplex size.";
-                return false;
-        }
     }
 }

@@ -14,7 +14,7 @@ namespace tomato {
         for (auto [e, trf, vel] : view.each()) {
             trf.AddPosition(vel.velocity * FIXED_DELTA_TIME);
 
-            auto pos = trf.GetPosition();
+            auto pos = trf.GetWorldPosition();
             // !!!!! TEMP JUMP !!!!!
             if (pos.y < 0) {
                 pos.y = 0;

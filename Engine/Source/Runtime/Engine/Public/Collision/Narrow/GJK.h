@@ -45,14 +45,7 @@ namespace tomato {
             const glm::vec3& p,
             const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& d);
 
-        static bool AddSimplexPoint(
-                std::vector<glm::vec3>& simplex,
-                const ColliderComponent& col1, TransformComponent& trf1,
-                const ColliderComponent& col2, TransformComponent& trf2);
-
-        static bool VoronoiRegion(std::vector<glm::vec3>& simplex);
-
-        using SupportFunc = std::function<glm::vec3(const glm::vec3& dir, const ColliderComponent& col)>;
+        using SupportFunc = std::function<glm::vec3(const glm::vec3& dir, const TransformComponent& trf)>;
         static EnumArray<ColliderType, SupportFunc> supportFunctions_;
     };
 }

@@ -11,14 +11,10 @@ namespace tomato {
     struct ColliderComponent {
         ColliderComponent(
             const ColliderType t,
-            const TransformComponent& trf,
             const bool trigger = false,
-            const CollisionLayer l = CollisionLayer::Default,
-            const glm::vec3 pos = glm::vec3{0.f})
-                : position(pos), halfExtents(trf.GetScale() * 0.5f), layer(l), type(t), isTrigger(trigger) {}
+            const CollisionLayer l = CollisionLayer::Default)
+                : layer(l), type(t), isTrigger(trigger) {}
 
-        glm::vec3 position;
-        glm::vec3 halfExtents;
         glm::vec3 min{}, max{}; // AABB for broad-phase collision detection
 
         CollisionLayer layer;
