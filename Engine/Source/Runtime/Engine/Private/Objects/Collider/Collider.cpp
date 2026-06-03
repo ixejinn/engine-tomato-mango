@@ -1,6 +1,7 @@
 #include "Objects/Collider/Collider.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/Render.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
@@ -8,13 +9,10 @@
 
 namespace tomato {
     Collider::Collider(entt::registry& reg, entt::entity parent) : Object(reg) {
-        // reg.emplace<ColliderComponent>(entity_,
-        //     glm::vec4(1.f),
-        //     GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
-        //     GetAssetID(Shader::PrimitiveName),
-        //     GetAssetID(Texture::PrimitiveName));
+        // ColliderComponent& col = reg.emplace<ColliderComponent>(entity_);
+        // RenderComponent& render = reg.emplace<RenderComponent>(entity_);
         //
-        // HierarchyComponent& hc = reg.emplace<HierarchyComponent>(entity_);
-        // hc.parent = parent;
+        // HierarchyComponent& hierarchy = reg.emplace<HierarchyComponent>(entity_);
+        // hierarchy.parent = parent;
     }
 }

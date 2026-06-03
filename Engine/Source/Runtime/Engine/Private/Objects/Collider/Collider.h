@@ -7,6 +7,9 @@ namespace tomato {
     class Collider : public Object {
     public:
         Collider(entt::registry& reg, entt::entity parent);
+
+    private:
+
     };
 }
 

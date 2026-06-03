@@ -17,6 +17,7 @@
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Render.h"
+#include "ECS/Components/Hierarchy.h"
 
 #include "Collision/CollisionEvent.h"
 #include "CollisionTestComponent.h"
@@ -35,11 +36,11 @@ void TestState::Init() {
     const auto cam = registry_.create();
     registry_.emplace<TransformComponent>(cam,
 //                                          glm::vec3(0.f, 1.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
-                                           glm::vec3(0.f, 5.f, 0.f), glm::vec3(-90.f, 0.f, 0.f));
-//                                           glm::vec3(0.f, 7.5f, 15.f), glm::vec3(-30.f, 0.f, 0.f));
+                                           // glm::vec3(0.f, 5.f, 0.f), glm::vec3(-90.f, 0.f, 0.f));
+                                           glm::vec3(0.f, 7.5f, 15.f), glm::vec3(-30.f, 0.f, 0.f));
     auto& camComp = registry_.emplace<CameraComponent>(cam);
-//    camComp.mode = ProjectionMode::Perspective;
-     camComp.mode = ProjectionMode::Orthogonal;
+    camComp.mode = ProjectionMode::Perspective;
+     // camComp.mode = ProjectionMode::Orthogonal;
     registry_.emplace<MainCameraTag>(cam);
 
     // Player character
@@ -107,6 +108,19 @@ void TestState::Init() {
     auto& onColCompW = registry_.emplace<OnCollisionComponent>(west);
     onColCompW.enter = TEST_CollisionEnter;
     onColCompW.exit = TEST_CollisionExit;
+
+    // NPC player child
+    const auto pc = registry_.create();
+    auto& trfCompPc = registry_.emplace<TransformComponent>(pc,
+                                                           glm::vec3(1.5, 0, 0), glm::vec3(0, 0, 0));
+    registry_.emplace<ColliderComponent>(pc, ColliderType::Cube, trfCompPc);
+    registry_.emplace<RenderComponent>(pc,
+                                       glm::vec4(1.f, 1.f, 0.f, 1.f) * 0.8f,
+                                       GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
+                                       GetAssetID(Shader::PrimitiveName),
+                                       GetAssetID(Texture::PrimitiveName));
+
+    SetHierarchy(registry_, me, pc);
 }
 
 void TestState::Update() {
