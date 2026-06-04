@@ -55,24 +55,30 @@ namespace tomato {
             auto& col1 = reg.get<ColliderComponent>(candidate.a);
             auto& col2 = reg.get<ColliderComponent>(candidate.b);
 
-            auto& trf1 = reg.get<TransformComponent>(candidate.a);
-            auto& trf2 = reg.get<TransformComponent>(candidate.b);
+            // auto& trf1 = reg.get<TransformComponent>(candidate.a);
+            // auto& trf2 = reg.get<TransformComponent>(candidate.b);
 
             if (auto result = narrowPhase_->DetectCollision(reg, candidate.a, candidate.b)) {
                 if (!col1.isTrigger && !col2.isTrigger) {
-                    if (auto velPtr = reg.try_get<VelocityComponent>(candidate.a)) {
+                    entt::entity rootA = GetRootEntity(reg, candidate.a);
+                    entt::entity rootB = GetRootEntity(reg, candidate.b);
+
+                    auto& trfRootA = reg.get<TransformComponent>(rootA);
+                    auto& trfRootB = reg.get<TransformComponent>(rootB);
+
+                    if (auto* velPtr = reg.try_get<VelocityComponent>(rootA)) {
                         static constexpr float SKIN = 1e-2f;
                         glm::vec3 remainingMove = (1 - result->depth) * velPtr->velocity;
 
-                        trf1.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth - result->normal * SKIN);
+                        trfRootA.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth - result->normal * SKIN);
                         velPtr->velocity = remainingMove - glm::dot(remainingMove, result->normal) * result->normal;
                     }
 
-                    if (auto velPtr = reg.try_get<VelocityComponent>(candidate.b)) {
+                    if (auto* velPtr = reg.try_get<VelocityComponent>(rootB)) {
                         static constexpr float SKIN = 1e-2f;
                         glm::vec3 remainingMove = (1 - result->depth) * velPtr->velocity;
 
-                        trf2.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth + result->normal * SKIN);
+                        trfRootB.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth + result->normal * SKIN);
                         velPtr->velocity = remainingMove + glm::dot(remainingMove, -result->normal) * result->normal;
                     }
                 }

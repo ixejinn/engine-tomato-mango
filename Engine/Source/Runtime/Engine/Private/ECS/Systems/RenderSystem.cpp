@@ -87,6 +87,7 @@ namespace tomato {
             shader->SetUniformVec4("uColor", render.color);
 
             mesh->Draw();
+            // mesh->Draw(true);
         }
     }
 }

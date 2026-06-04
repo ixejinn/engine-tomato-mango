@@ -19,6 +19,16 @@ namespace tomato {
         dirty = true;
     }
 
+    void TransformComponent::SetPosition(const glm::vec3& newPos) {
+        position = newPos;
+        dirty = true;
+    }
+
+    void TransformComponent::SetPosition(float x, float y, float z) {
+        position = glm::vec3{x, y, z};
+        dirty = true;
+    }
+
     void TransformComponent::SetEulerDegree(const glm::vec3& newRot) {
         eulerDegree = newRot;
         lRotation = glm::quat(glm::radians(eulerDegree));

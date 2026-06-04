@@ -18,6 +18,9 @@ namespace tomato {
         glm::vec3 GetWorldPosition() const { return transformMatrix[3]; }
         void AddPosition(const glm::vec3& offset);
 
+        void SetPosition(const glm::vec3& newPos);
+        void SetPosition(float x, float y, float z);
+
         glm::vec3 GetLocalEulerDegree() const { return eulerDegree; }
         glm::vec3 GetWorldEulerDegree() const { return glm::eulerAngles(wRotation); }
         void SetEulerDegree(const glm::vec3& newRot);

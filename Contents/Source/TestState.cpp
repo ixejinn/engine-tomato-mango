@@ -36,8 +36,8 @@ void TestState::Init() {
     const auto cam = registry_.create();
     registry_.emplace<TransformComponent>(cam,
 //                                          glm::vec3(0.f, 1.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
-                                           // glm::vec3(0.f, 5.f, 0.f), glm::vec3(-90.f, 0.f, 0.f));
-                                           glm::vec3(0.f, 7.5f, 15.f), glm::vec3(-30.f, 0.f, 0.f));
+                                           glm::vec3(0.f, 5.f, 0.f), glm::vec3(-90.f, 0.f, 0.f));
+                                           // glm::vec3(0.f, 7.5f, 15.f), glm::vec3(-30.f, 0.f, 0.f));
     auto& camComp = registry_.emplace<CameraComponent>(cam);
     camComp.mode = ProjectionMode::Perspective;
      // camComp.mode = ProjectionMode::Orthogonal;
@@ -59,16 +59,31 @@ void TestState::Init() {
 
     registry_.emplace<RenderComponent>(me,
                                        glm::vec4(1.f, 1.f, 0.f, 1.f),
-                                        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
-//                                       GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
+                                        // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
+                                       GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
                                        GetAssetID(Shader::PrimitiveName),
                                        GetAssetID(Texture::PrimitiveName));
     registry_.emplace<RootEntityTag>(me);
 
-//     registry_.emplace<CollisionTestComponent>(me);
-//     auto& onColCompMe = registry_.emplace<OnCollisionComponent>(me);
-//     onColCompMe.enter = TEST_CollisionEnter;
-//     onColCompMe.exit = TEST_CollisionExit;
+     // registry_.emplace<CollisionTestComponent>(me);
+     // auto& onColCompMe = registry_.emplace<OnCollisionComponent>(me);
+     // onColCompMe.enter = TEST_CollisionEnter;
+     // onColCompMe.exit = TEST_CollisionExit;
+
+    // Player collider
+    const auto colP = registry_.create();
+    SetHierarchy(registry_, me, colP);
+
+    auto& trfColP = registry_.emplace<TransformComponent>(colP);
+    // trfColP.SetPosition(0.f, 0.5f, 0.f);
+    registry_.emplace<ColliderComponent>(colP, ColliderType::Cube);
+    // registry_.emplace<ColliderComponent>(colP, ColliderType::Sphere);
+    registry_.emplace<RenderComponent>(colP,
+        glm::vec4(1.f, 1.f, 1.f, 1.f),
+        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
+        // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
+        GetAssetID(Shader::PrimitiveName),
+        GetAssetID(Texture::PrimitiveName));
 //
 //     auto& onTgrCompMe = registry_.emplace<OnTriggerComponent>(me);
 //     onTgrCompMe.enter = TEST_TriggerEnter;
@@ -95,21 +110,37 @@ void TestState::Init() {
 //     onColCompE.enter = TEST_CollisionEnter;
 //     onColCompE.exit = TEST_CollisionExit;
 //
-//     // NPC west
-//     const auto west = registry_.create();
-//     auto& trfCompW = registry_.emplace<TransformComponent>(west,
-//                                                            glm::vec3(-3, 0, 0), glm::vec3(0, 0, 0));
+     // NPC west
+     const auto west = registry_.create();
+
+     auto& trfCompW = registry_.emplace<TransformComponent>(west,
+                                                            glm::vec3(-3, 0, 0), glm::vec3(0, 0, 0));
 //     registry_.emplace<ColliderComponent>(west, ColliderType::Cube);
-//     registry_.emplace<RenderComponent>(west,
-//                                        glm::vec4(1.f, 1.f, 1.f, 1.f),
-//                                        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
-//                                        GetAssetID(Shader::PrimitiveName),
-//                                        GetAssetID(Texture::PrimitiveName));
+     registry_.emplace<RenderComponent>(west,
+                                        glm::vec4(1.f, 1.f, 1.f, 1.f),
+                                        // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
+                                        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
+                                        GetAssetID(Shader::PrimitiveName),
+                                        GetAssetID(Texture::PrimitiveName));
 //
 //     registry_.emplace<CollisionTestComponent>(west);
 //     auto& onColCompW = registry_.emplace<OnCollisionComponent>(west);
 //     onColCompW.enter = TEST_CollisionEnter;
 //     onColCompW.exit = TEST_CollisionExit;
+
+    // NPC west collider
+    const auto colW = registry_.create();
+    SetHierarchy(registry_, west, colW);
+
+    auto& trfColW = registry_.emplace<TransformComponent>(colW);
+    registry_.emplace<ColliderComponent>(colW, ColliderType::Cube);
+    // registry_.emplace<ColliderComponent>(colW, ColliderType::Sphere);
+    registry_.emplace<RenderComponent>(colW,
+        glm::vec4(1.f, 1.f, 1.f, 1.f),
+        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
+        // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
+        GetAssetID(Shader::PrimitiveName),
+        GetAssetID(Texture::PrimitiveName));
 //
 //     // NPC player child
 //     const auto pc = registry_.create();
