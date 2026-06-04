@@ -18,6 +18,7 @@
 #include "Network/UDPNetDriver.h"
 #include "Network/TCPNetDriver.h"
 #include "Network/NetConnection.h"
+#include "GameNetwork/GamePlayNetSystem.h"
 
 namespace tomato
 {
@@ -36,7 +37,7 @@ namespace tomato
     class ClientNetwork
     {
     public:
-        explicit ClientNetwork(NetMode mode, SPSCQueue<InputCommand, 256>& inputQueue);
+        explicit ClientNetwork(NetMode mode);
         ~ClientNetwork();
 
         void SetNetState(ClientNetworkState state) { netState_ = state; }
@@ -45,10 +46,10 @@ namespace tomato
         void ProcessQueuedUDPPacket();
         void ProcessUDPPacket(const UDPPacketType type, NetBitReader& reader, const SocketAddress& inToAddress);
 
-        void BuildUDPPacket(NetBitWriter& writer, UDPPacketType messageType);
+        void BuildUDPPacketHeader(NetBitWriter& writer, UDPPacketType messageType);
         void BroadcastToPeers(const void* buffer);
         void SendUDPPacket(const UDPPacketType messageType, SendPolicy policy, const SocketAddress* inToAddress = nullptr);
-
+        void SendUDPInputPacket(InputCommand& inputCmd);
         bool HandleWelcomePacket(const SocketAddress& inToAddress);
 
         void TCPNetRecvThreadLoop();
@@ -68,6 +69,8 @@ namespace tomato
 
         ClientNetworkState GetNetState() const { return netState_; }
         ServerTimeMs GetLocalStartTime() const { return localStartTime; }
+
+        void SetGameplaySystem(GamePlayNetSystem* gameNetSys) { gameNetSystem_ = gameNetSys; }
 
     private:
         WinsockInitializer winsockInit_;
@@ -95,7 +98,7 @@ namespace tomato
         ServerTimeMs sendTime{ 0 }, recvTime{ 0 };
         ServerTimeMs serverTimeOffset{ 0 }, localStartTime{ 0 };
 
-        SPSCQueue<InputCommand, 256>& inputCmdQueue;
+        GamePlayNetSystem* gameNetSystem_{ nullptr };
     };
 }
 

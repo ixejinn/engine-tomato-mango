@@ -7,37 +7,31 @@
 #include "State/State.h"
 #include "ECS/SystemUpdateContexts.h"
 
-tomato::GamePlayNetSystem::GamePlayNetSystem(State* state, ClientNetwork* network, SPSCQueue<InputCommand, 256>& inputQueue, SPSCQueue<NetMessage*, 256>& dataQueue)
-	: currentStatePtr_(state), network_(network), inputCmdQueue(inputQueue), gameDataQueue(dataQueue)
+namespace tomato
 {
-}
-
-void tomato::GamePlayNetSystem::BeginFrame()
-{
-	auto& r = currentStatePtr_->GetRegistry();
-	while (!inputCmdQueue.Empty())
+	GamePlayNetSystem::GamePlayNetSystem(State* state)
+		: currentStatePtr_(state)
 	{
-		InputCommand inputCmd;
-		inputCmdQueue.Dequeue(inputCmd);
-
-		auto inputCtx = r.ctx().get<InputContext*>();
-		inputCtx->timelines[inputCmd.id][inputCmd.tick] = inputCmd.inputRecord;
 	}
 
-	/* @TODO : add net message registry
-	while (!gameDataQueue.Empty())
+	void GamePlayNetSystem::HandleInput(const InputCommand& inputCmd)
 	{
-		NetMessage* gameData;
-		gameDataQueue.Dequeue(gameData);
-
-		//gameData->Read();
+		currentStatePtr_->SetPlayerInput(inputCmd.inputRecord.tick, inputCmd.inputRecord, inputCmd.id);
+		//std::cout << inputCmd.inputRecord.tick << " " << (int)inputCmd.inputRecord.down << " " << (int)inputCmd.inputRecord.held << '\n';
+		//currentStatePtr_->GetPlayerInputTimelines()[inputCmd.id][inputCmd.inputRecord.tick] = inputCmd.inputRecord;
+		//std::cout << "[ INPUT ] " << inputCmd.inputRecord.tick << " " << (int)inputCmd.inputRecord.down << " " << (int)inputCmd.inputRecord.held << '\n';
 	}
-	*/
-}
 
-void tomato::GamePlayNetSystem::EndFrame()
-{
-	auto& r = currentStatePtr_->GetRegistry();
-	//auto inputCtx = r.ctx().get<InputContext*>();
-	//network_->SendUDPPacket(UDPPacketType::INPUT, SendPolicy::Broadcast);
+	void GamePlayNetSystem::ProcessOutgoingMessages(uint32_t tick)
+	{
+		PlayerId myId = network_->GetMyPlayerID();
+
+		InputCommand inputCmd{
+			myId,
+			tick,
+			currentStatePtr_->GetPlayerInputTimelines()[myId][tick]
+		};
+		//std::cout << inputCmd.inputRecord.tick << " " << (int)inputCmd.inputRecord.down << " " << (int)inputCmd.inputRecord.held << '\n';
+		network_->SendUDPInputPacket(inputCmd);
+	}
 }

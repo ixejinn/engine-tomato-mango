@@ -1,4 +1,4 @@
-#ifndef MANGO_STATE_H
+﻿#ifndef MANGO_STATE_H
 #define MANGO_STATE_H
 
 #include <array>
@@ -20,7 +20,7 @@ namespace tomato {
 
         PlayerInputTimelines& GetPlayerInputTimelines() { return playerInputs_; }
 
-        void SetPlayerInput(uint32_t tick, InputRecord input, int playerID = 0);
+        void SetPlayerInput(uint32_t tick, InputRecord input, int playerID);
 
     protected:
         Engine& engine_;

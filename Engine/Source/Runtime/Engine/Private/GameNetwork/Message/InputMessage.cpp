@@ -41,6 +41,7 @@ namespace tomato
         inputRecord.down = static_cast<InputIntent>(value);
         reader.ReadInt(value, uint16_t(InputIntent::COUNT));
         inputRecord.held = static_cast<InputIntent>(value);
+        std::cout << "[ INPUT ] " << inputRecord.tick << " " << (int)inputRecord.down << " " << (int)inputRecord.held << '\n';
     }
 
     void InputCommand::Write(NetBitWriter& writer)
@@ -48,5 +49,7 @@ namespace tomato
         writer.WriteInt(tick, std::numeric_limits<uint32_t>::max());
         writer.WriteInt(static_cast<uint16_t>(inputRecord.down), static_cast<uint16_t>(InputIntent::COUNT));
         writer.WriteInt(static_cast<uint16_t>(inputRecord.held), static_cast<uint16_t>(InputIntent::COUNT));
+        //std::cout << "Write : " << tick << '\n';
+        std::cout << "[ OUT ] " << inputRecord.tick << " " << (int)inputRecord.down << " " << (int)inputRecord.held << '\n';
     }
 }

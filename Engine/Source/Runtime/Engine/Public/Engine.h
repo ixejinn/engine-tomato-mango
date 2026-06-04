@@ -9,6 +9,7 @@
 #include "ECS/SystemManager.h"
 #include "State/StateFwd.h"
 #include "Network/ClientNetwork.h"
+#include "GameNetwork/GamePlayNetSystem.h"
 
 namespace tomato {
     class Engine {
@@ -31,6 +32,7 @@ namespace tomato {
     private:
         Window window_;
         std::unique_ptr<ClientNetwork> network_{ nullptr };
+        std::unique_ptr<GamePlayNetSystem> gameNet_{ nullptr };
 
         void SingleRun();
         void MultiRun();

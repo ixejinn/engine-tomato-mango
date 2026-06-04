@@ -1,9 +1,9 @@
 ﻿#ifndef MANGO_GAMEPLAYNETSYSTEM_H
 #define MANGO_GAMEPLAYNETSYSTEM_H
 
+#include "../../Core/Private/Containers/SPSCQueue.h"
 #include "Network/NetworkFwd.h"
 #include "State/StateFwd.h"
-#include "Containers/SPSCQueue.h"
 
 namespace tomato
 {
@@ -14,19 +14,19 @@ namespace tomato
 	class GamePlayNetSystem
 	{
 	public:
-		GamePlayNetSystem(State* state, ClientNetwork* network, SPSCQueue<InputCommand, 256>& inputCmdQueue, SPSCQueue<NetMessage*, 256>& dataQueue);
+		GamePlayNetSystem(State* state);
 
-		void BeginFrame(); // Start Sync
-		void EndFrame();	// End Serialize
+		void HandleInput(const InputCommand& inputCmd);
+		//void HandleMessage(std::unique_ptr<NetMessage> message);
+
+		void ProcessOutgoingMessages(uint32_t tick);
 
 		void SetState(State* newState) { currentStatePtr_ = newState; }
+		void SetNetwork(ClientNetwork* network) { network_ = network; }
 
 	private:
 		State* currentStatePtr_{ nullptr };
 		ClientNetwork* network_;
-
-		SPSCQueue<InputCommand, 256>& inputCmdQueue;
-		SPSCQueue<NetMessage*, 256>& gameDataQueue;
 	};
 }
 #endif // !MANGO_GAMEPLAYNETSYSTEM_H

@@ -6,8 +6,8 @@
 
 namespace tomato
 {
-    ClientNetwork::ClientNetwork(NetMode mode, SPSCQueue<InputCommand, 256>& inputQueue)
-        : server_(mode), driver_(mode), playerID_(0), netState_(ClientNetworkState::NSS_Uninitialized), inputCmdQueue(inputQueue)
+    ClientNetwork::ClientNetwork(NetMode mode)
+        : server_(mode), driver_(mode), playerID_(0), netState_(ClientNetworkState::NSS_Uninitialized)
     {
         conn.try_emplace((PlayerId)0, NetConnection{ 0, 0, 0, "me", {"192.168.31.231", 9000} });
         conn.try_emplace((PlayerId)1, NetConnection{ 1, 0, 1, "you", {"192.168.31.231", 9001} });
@@ -51,6 +51,8 @@ namespace tomato
 
     void ClientNetwork::ProcessUDPPacket(const UDPPacketType type, NetBitReader& reader, const SocketAddress& inToAddress)
     {
+        std::cout << (int)type << '\n';
+
         switch (type)
         {
         case UDPPacketType::HELLO:
@@ -77,14 +79,14 @@ namespace tomato
             InputCommand inputCmd;
             inputCmd.Read(reader);
             inputCmd.id = GetPeerPlayerID(inToAddress);
-            //Queue push
-            inputCmdQueue.Emplace(inputCmd);
+            
+            gameNetSystem_->HandleInput(inputCmd);
             break;
         }
         }
     }
 
-    void ClientNetwork::BuildUDPPacket(NetBitWriter& writer, UDPPacketType messageType)
+    void ClientNetwork::BuildUDPPacketHeader(NetBitWriter& writer, UDPPacketType messageType)
     {
         writer.WriteInt(static_cast<uint16_t>(messageType), static_cast<uint16_t>(UDPPacketType::COUNT));
 
@@ -97,13 +99,7 @@ namespace tomato
             break;
 
         case UDPPacketType::INPUT:
-        {
-            //Queue pop
-            InputCommand inputCmd;
-            inputCmd.Write(writer);
-
             break;
-        }
         }
     }
 
@@ -124,7 +120,7 @@ namespace tomato
         RawBuffer rawBuffer{};
         NetBitWriter writer{ &rawBuffer };
 
-        BuildUDPPacket(writer, messageType);
+        BuildUDPPacketHeader(writer, messageType);
 
         NetBitReader reader{ rawBuffer.data(), rawBuffer.size()};
         uint16_t type;
@@ -138,6 +134,22 @@ namespace tomato
 
         else
             BroadcastToPeers(rawBuffer.data());
+    }
+
+    void ClientNetwork::SendUDPInputPacket(InputCommand& inputCmd)
+    {
+        RawBuffer rawBuffer{};
+        NetBitWriter writer{ &rawBuffer };
+
+        BuildUDPPacketHeader(writer, UDPPacketType::INPUT);
+        inputCmd.Write(writer);
+
+        /*NetBitReader reader{ rawBuffer.data(), rawBuffer.size() };
+        uint16_t type;
+        reader.ReadInt(type, std::numeric_limits<uint16_t>::max());
+        std::cout << type << '\n';*/
+
+        BroadcastToPeers(rawBuffer.data());
     }
 
     bool ClientNetwork::HandleWelcomePacket(const SocketAddress& inToAddress)

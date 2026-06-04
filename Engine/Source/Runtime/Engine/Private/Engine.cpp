@@ -7,7 +7,7 @@
 
 namespace tomato {
     Engine::Engine(const int width, const int height, const char* title, const bool isSingle)
-        : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), isSingle_(isSingle), network_(nullptr)
+        : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), isSingle_(isSingle), network_(nullptr), gameNet_(nullptr)
     {
         
     }
@@ -43,6 +43,11 @@ namespace tomato {
     }
 
     void Engine::MultiRun() {
+        network_ = std::make_unique<ClientNetwork>(NetMode::NM_Client);
+        gameNet_ = std::make_unique<GamePlayNetSystem>(currState_.get());
+        network_->SetGameplaySystem(gameNet_.get());
+        gameNet_->SetNetwork(network_.get());
+
         network_->ThreadStart();
 
         TickClock tickClock;
@@ -63,9 +68,6 @@ namespace tomato {
             InputContext inputCtx{ currState_->GetPlayerInputTimelines() };
             Simulate(tickClock, simCtx, inputCtx);
 
-            //if (network_.GetNetState() == NetworkServiceState::NSS_Playing)
-                network_->SendUDPPacket(UDPPacketType::INPUT, SendPolicy::Broadcast);
-
             RenderContext renderCtx{ window_.GetWidth(), window_.GetHeight() };
             Render(simCtx, renderCtx);
 
@@ -79,7 +81,7 @@ namespace tomato {
         window_.TMP_CheckEscapeKey();
         Window::PollEvents();
 
-        currState_->SetPlayerInput(tick, inputRecorder_.GetCurrInputRecord());
+        currState_->SetPlayerInput(tick, inputRecorder_.GetCurrInputRecord(), network_ == nullptr ? 0 : network_->GetMyPlayerID());
     }
 
     void Engine::Simulate(TickClock& tc, SimContext& simCtx, InputContext& inputCtx) {
@@ -92,6 +94,9 @@ namespace tomato {
 
             // !!!!!! temporary !!!!!!
             currState_->Update();
+
+            //if (network_->GetNetState() == NetworkServiceState::NSS_Playing)
+            gameNet_->ProcessOutgoingMessages(simCtx.tick);
 
             tc.AddTick();
         }
@@ -120,6 +125,7 @@ namespace tomato {
         currState_->Init();
 
         inputUI_.SetState(currState_.get());
+        gameNet_->SetState(currState_.get());
         tc.ResetTick();
     }
 
