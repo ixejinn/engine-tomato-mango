@@ -1,4 +1,4 @@
-#ifndef MANGO_TESTSTATE_H
+﻿#ifndef MANGO_TESTSTATE_H
 #define MANGO_TESTSTATE_H
 
 #include <entt/fwd.hpp>

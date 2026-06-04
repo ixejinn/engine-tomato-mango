@@ -1,4 +1,4 @@
-#include "TestState.h"
+﻿#include "TestState.h"
 #include "Engine.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Audio/Audio.h"
@@ -17,6 +17,9 @@
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Render.h"
+#include "ECS/Components/Text.h"
+#include "ECS/Components/UI.h"
+#include "ECS/Components/UIEvents.h"
 #include "ECS/Components/Hierarchy.h"
 
 #include "Collision/CollisionEvent.h"

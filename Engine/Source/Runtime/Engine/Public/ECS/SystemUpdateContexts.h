@@ -1,8 +1,10 @@
-#ifndef MANGO_SYSTEMUPDATECONTEXTS_H
+﻿#ifndef MANGO_SYSTEMUPDATECONTEXTS_H
 #define MANGO_SYSTEMUPDATECONTEXTS_H
 
 #include <entt/entt.hpp>
 #include "State/StateFwd.h"
+#include "Network/NetTypes.h"
+#include "Network/ClientNetwork.h"
 
 namespace tomato {
     struct SimContext {
@@ -23,6 +25,14 @@ namespace tomato {
 
         int width, height;
         entt::entity mainCam;
+    };
+
+    struct UIContext
+    {
+        std::vector<entt::entity> drawList;
+        std::vector<entt::entity> selectableList;
+
+        bool selectableDirty{ true };
     };
 }
 

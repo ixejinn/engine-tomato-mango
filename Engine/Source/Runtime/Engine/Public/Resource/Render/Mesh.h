@@ -1,4 +1,4 @@
-#ifndef MANGO_MESH_H
+﻿#ifndef MANGO_MESH_H
 #define MANGO_MESH_H
 
 #include <vector>
@@ -21,6 +21,7 @@ namespace tomato {
     public:
         enum class Primitive {
             Plain,
+            LBPlain,
             Cube,
             Sphere,
             Cylinder,
@@ -31,6 +32,8 @@ namespace tomato {
             switch (type) {
                 case Primitive::Plain:
                     return "Primitive::Plain";
+                case Primitive::LBPlain:
+                    return "Primitive::LBPlain";
 
                 case Primitive::Cube:
                 default:
@@ -58,6 +61,7 @@ namespace tomato {
 
     private:
         static void Plain(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
+        static void LBPlain(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
         static void Cube(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
         static void Sphere(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
         static void Capsule(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);

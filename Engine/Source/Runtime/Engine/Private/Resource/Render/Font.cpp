@@ -1,11 +1,11 @@
-#include <string>
+﻿#include <string>
 #include "Resource/Render/Font.h"
 #include "Resource/AssetRegistry.h"
+#include "Font/AtlasManager.h"
 #include "Utils/Logger.h"
 
 namespace tomato {
     FT_Library Font::library_ = nullptr;
-    AtlasManager Font::atlasManager_;
 
     Font::Font(const char *path) {
         if (!library_)
@@ -76,6 +76,22 @@ namespace tomato {
         return LoadGlyph(codepoint);
     }
 
+    glm::vec2 Font::MeasureText(const std::u32string& text, float size)
+    {
+        float width{ 0 }, height{ 0 };
+
+        std::u32string::const_iterator c;
+        for (c = text.begin(); c != text.end(); c++)
+        {
+            const Glyph& glyph = GetGlyph(*c);
+
+            width += glyph.advance * size;
+            height = std::max(height, glyph.size.y * size);
+        }
+
+        return glm::vec2{ width, height };
+    }
+
     const Glyph& Font::LoadGlyph(char32_t codepoint)
     {
         if (FT_Load_Char(face_, codepoint, FT_LOAD_RENDER))
@@ -88,9 +104,10 @@ namespace tomato {
         int width = slot->bitmap.width;
         int rows = slot->bitmap.rows;
 
-        auto res = atlasManager_.RequestAllocate(width, rows);
+        AtlasManager& atlasMgr = AtlasManager::GetInstance();
+        auto res = atlasMgr.RequestAllocate(width, rows);
 
-        TextureAtlas* atlas = atlasManager_.GetAtlas(res.atlasIndex);
+        TextureAtlas* atlas = atlasMgr.GetAtlas(res.atlasIndex);
         atlas->Upload(res.x, res.y, width, rows, slot->bitmap.buffer);
 
         // Calcuate UV coordinates (Normalized 0.0 to 1.0)

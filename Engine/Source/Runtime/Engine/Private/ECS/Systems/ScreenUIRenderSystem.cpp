@@ -1,0 +1,122 @@
+﻿#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include "ECS/Systems/ScreenUIRenderSystem.h"
+#include "ECS/SystemUpdateContexts.h"
+
+#include "ECS/Components/Camera.h"
+#include "ECS/Components/Render.h"
+#include "ECS/Components/Text.h"
+#include "ECS/Components/UI.h"
+
+#include "Resource/AssetHash.h"
+#include "Resource/AssetRegistry.h"
+#include "Resource/Render/Mesh.h"
+#include "Resource/Render/Shader.h"
+#include "Resource/Render/Texture.h"
+#include "Resource/Render/Font.h"
+
+#include "Utils/RegistryEntry.h"
+REGISTER_SYSTEM(tomato::SystemPhase::ScreenUI, ScreenUIRenderSystem);
+
+namespace tomato
+{
+	ScreenUIRenderSystem::ScreenUIRenderSystem()
+    :   curMesh_(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain))),
+        curShader_(GetAssetID("UIShader")),
+        curTexture_(GetAssetID(Texture::PrimitiveName))
+	{
+        AssetRegistry<Font>::GetInstance().CreatePrimitives();
+        textRenderer_.Init(AssetRegistry<Shader>::GetInstance().Get(GetAssetID("FontShader")));
+	}
+
+	void ScreenUIRenderSystem::Update(SimContext& simCtx)
+	{
+
+        glDisable(GL_DEPTH_TEST);
+
+        auto* uiCtx = simCtx.registry.ctx().find<UIContext>();
+        if (uiCtx == nullptr)
+            return;
+
+        Mesh* mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
+        mesh->Bind();
+
+        Shader* shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
+        shader->Use();
+
+        AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
+
+        for (auto e : uiCtx->drawList)
+        {
+            auto& ui = simCtx.registry.get<UIComponent>(e);
+            if (ui.type == 2) continue; //text
+
+            auto& rect = simCtx.registry.get<RectTransformComponent>(e);
+            auto& render = simCtx.registry.get<RenderComponent>(e);
+
+            if (curShader_ != render.shader)
+            {
+                curShader_ = render.shader;
+                shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
+                shader->Use();
+            }
+
+            if (curTexture_ != render.texture)
+            {
+                curTexture_ = render.texture;
+                AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
+            }
+
+            if (curMesh_ != render.mesh)
+            {
+                curMesh_ = render.mesh;
+                mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
+                mesh->Bind();
+            }
+
+            glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(1600), 0.0f, static_cast<float>(900), -1.0f, 1.0f);
+
+            shader->SetUniformInt("tex", 0);
+            shader->SetUniformMat4("uModel", rect.model_matrix);
+            shader->SetUniformMat4("projection", projection);
+            shader->SetUniformVec4("uColor", render.color);
+
+            mesh->Draw();
+        }
+
+        //TextComponent Render
+        shader = AssetRegistry<Shader>::GetInstance().Get(GetAssetID("FontShader"));
+        shader->Use();
+        shader->SetUniformInt("text", 0);
+
+        auto view = simCtx.registry.view<TextComponent, RectTransformComponent>();
+        for (auto [e, text, rect] : view.each())
+        {
+            Font* font = AssetRegistry<Font>::GetInstance().Get(text.font);
+
+            glm::vec2 pivotOffset;
+            pivotOffset = -(rect.computedSize * rect.pivot);
+
+            if (font)
+            {
+                textRenderer_.DrawString(
+                    text.codepoints,
+                    pivotOffset.x, pivotOffset.y,
+                    text.fontSize / 64.f,
+                    text.color,
+                    font,
+                    rect.model_matrix
+                );
+            }
+        }
+        textRenderer_.Flush();
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+
+	}
+
+
+
+}
