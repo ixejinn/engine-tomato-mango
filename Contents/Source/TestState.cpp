@@ -68,11 +68,6 @@ void TestState::Init() {
                                        GetAssetID(Texture::PrimitiveName));
     registry_.emplace<RootEntityTag>(me);
 
-     // registry_.emplace<CollisionTestComponent>(me);
-     // auto& onColCompMe = registry_.emplace<OnCollisionComponent>(me);
-     // onColCompMe.enter = TEST_CollisionEnter;
-     // onColCompMe.exit = TEST_CollisionExit;
-
     // Player collider
     const auto colP = registry_.create();
     SetHierarchy(registry_, me, colP);
@@ -87,32 +82,7 @@ void TestState::Init() {
         // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
         GetAssetID(Shader::PrimitiveName),
         GetAssetID(Texture::PrimitiveName));
-//
-//     auto& onTgrCompMe = registry_.emplace<OnTriggerComponent>(me);
-//     onTgrCompMe.enter = TEST_TriggerEnter;
-//     onTgrCompMe.exit = TEST_TriggerExit;
-//
-//     // NPC east
-//     const auto east = registry_.create();
-//     auto& trfCompE = registry_.emplace<TransformComponent>(east,
-//                                           glm::vec3(3, 0, 0), glm::vec3(0, 0, 0));
-//     registry_.emplace<VelocityComponent>(east);
-//     registry_.emplace<InputChannelComponent>(east, static_cast<uint8_t>(0), false);
-//     registry_.emplace<MovementComponent>(east);
-//      registry_.emplace<ColliderComponent>(east, ColliderType::Cube);
-// //    registry_.emplace<ColliderComponent>(east, ColliderType::Sphere, trfCompE);
-//     registry_.emplace<RenderComponent>(east,
-//                                        glm::vec4(0.f, 0.f, 1.f, 1.f),
-//                                         GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
-// //                                       GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
-//                                        GetAssetID(Shader::PrimitiveName),
-//                                        GetAssetID(Texture::PrimitiveName));
-//
-//     registry_.emplace<CollisionTestComponent>(east);
-//     auto& onColCompE = registry_.emplace<OnCollisionComponent>(east);
-//     onColCompE.enter = TEST_CollisionEnter;
-//     onColCompE.exit = TEST_CollisionExit;
-//
+
      // NPC west
      const auto west = registry_.create();
 
@@ -125,11 +95,6 @@ void TestState::Init() {
                                         GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
                                         GetAssetID(Shader::PrimitiveName),
                                         GetAssetID(Texture::PrimitiveName));
-//
-//     registry_.emplace<CollisionTestComponent>(west);
-//     auto& onColCompW = registry_.emplace<OnCollisionComponent>(west);
-//     onColCompW.enter = TEST_CollisionEnter;
-//     onColCompW.exit = TEST_CollisionExit;
 
     // NPC west collider
     const auto colW = registry_.create();
@@ -144,19 +109,49 @@ void TestState::Init() {
         // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
         GetAssetID(Shader::PrimitiveName),
         GetAssetID(Texture::PrimitiveName));
-//
-//     // NPC player child
-//     const auto pc = registry_.create();
-//     auto& trfCompPc = registry_.emplace<TransformComponent>(pc,
-//                                                            glm::vec3(1.5, 0, 0), glm::vec3(0, 0, 0));
-//     registry_.emplace<ColliderComponent>(pc, ColliderType::Cube, trfCompPc);
-//     registry_.emplace<RenderComponent>(pc,
-//                                        glm::vec4(1.f, 1.f, 0.f, 1.f) * 0.8f,
-//                                        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
-//                                        GetAssetID(Shader::PrimitiveName),
-//                                        GetAssetID(Texture::PrimitiveName));
-//
-//     SetHierarchy(registry_, me, pc);
+
+
+    //UI
+    const auto canvas = registry_.create();
+    registry_.emplace<tomato::CanvasComponent>(canvas);
+    registry_.emplace<tomato::UIComponent>(canvas, canvas);
+    registry_.emplace<tomato::RectTransformComponent>(canvas);
+    registry_.emplace<tomato::HierarchyComponent>(canvas);
+    registry_.emplace<tomato::RenderComponent>(canvas,
+        glm::vec4{ 1.f, 1.f, 1.f, 0.5f },
+        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
+        GetAssetID("UIShader"),
+        GetAssetID(Texture::PrimitiveName));
+
+
+    const auto button = registry_.create();
+    registry_.emplace<tomato::UIComponent>(button, canvas, 1);
+    registry_.emplace<tomato::RectTransformComponent>(button, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(200.f, 200.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    registry_.emplace<tomato::SelectableComponent>(button);
+    registry_.emplace<tomato::MouseEventComponent>(button);
+    registry_.emplace<tomato::HierarchyComponent>(button);
+    SetHierarchy(registry_, canvas, button);
+    registry_.emplace<tomato::RenderComponent>(button,
+        glm::vec4{ 0.2f, 0.75f, 0.4f, 1.0f },
+        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
+        GetAssetID("UIShader"),
+        GetAssetID(Texture::PrimitiveName));
+
+    const auto buttonText = registry_.create();
+    registry_.emplace<tomato::UIComponent>(buttonText, canvas, 2);
+    registry_.emplace<tomato::TextComponent>(buttonText, "Button1임", glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f }, 30.f);
+    registry_.emplace<tomato::RectTransformComponent>(buttonText, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    registry_.emplace<tomato::HierarchyComponent>(buttonText);
+    SetHierarchy(registry_, button, buttonText);
+
+    const auto TargetLabel = registry_.create();
+    registry_.emplace<tomato::UIComponent>(TargetLabel, canvas, 2);
+    registry_.emplace<tomato::TextComponent>(TargetLabel, "player1", glm::vec4{ 1.f, 1.f, 0.5f, 1.0f }, 24.f);
+    registry_.emplace<tomato::RectTransformComponent>(TargetLabel, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    registry_.emplace<tomato::HierarchyComponent>(TargetLabel);
+    registry_.emplace<tomato::TargetComponent>(TargetLabel, me);
+    SetHierarchy(registry_, canvas, TargetLabel);
+
 }
 
 void TestState::Update() {

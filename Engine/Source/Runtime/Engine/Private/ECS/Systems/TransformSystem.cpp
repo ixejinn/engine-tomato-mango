@@ -1,11 +1,11 @@
 ﻿#include "ECS/Systems/TransformSystem.h"
 
 #include "ECS/Components/Transform.h"
+#include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/UI.h"
 
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Camera.h"
-#include "ECS/Components/Hierarchy.h"
 #include "ECS/SystemUpdateContexts.h"
 
 #include "Utils/RegistryEntry.h"
@@ -22,7 +22,7 @@ namespace tomato {
         for (auto [e, trf] : rootView.each())
             UpdateFrom(simCtx.registry, e, rootQuat, rootScale, rootMat, false);
 
-        //UpdateScreenUI(simCtx);
+        UpdateScreenUI(simCtx);
     }
 
     void TransformSystem::UpdateFrom(
@@ -57,8 +57,15 @@ namespace tomato {
     void TransformSystem::UpdateScreenUI(SimContext& simCtx)
     {
         auto& r = simCtx.registry;
-        auto& uiCtx = r.ctx().get<UIContext>();
-        for (auto e : uiCtx.drawList)
+        auto* uiCtx = r.ctx().find<UIContext>();
+        if (uiCtx == nullptr)
+        {
+            std::cout << "NULL DRAWLIST\n";
+            r.ctx().emplace<UIContext>();
+            uiCtx = r.ctx().find<UIContext>();
+        }
+
+        for (auto e : uiCtx->drawList)
         {
             auto& hierarchy = r.get<HierarchyComponent>(e);
             auto& rect = r.get<RectTransformComponent>(e);
