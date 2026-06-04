@@ -22,6 +22,8 @@ namespace tomato {
         void Simulate(SimContext& sim, InputContext& input);
         void Render(SimContext& sim, RenderContext& render);
 
+        void InitializeTransform(SimContext& sim);
+
     private:
         using SystemPtr = std::unique_ptr<System>;
 

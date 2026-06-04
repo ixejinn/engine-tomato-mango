@@ -88,5 +88,8 @@ namespace tomato {
         currState_->Init();
 
         tc.ResetTick();
+
+        SimContext simCtx{currState_->GetRegistry(), tc.GetTick()};
+        systemManager_.InitializeTransform(simCtx);
     }
 }

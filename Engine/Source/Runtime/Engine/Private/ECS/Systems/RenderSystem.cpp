@@ -4,6 +4,7 @@
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Render.h"
+#include "ECS/Components/Hierarchy.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "Resource/AssetHash.h"
 #include "Resource/AssetRegistry.h"
@@ -86,8 +87,10 @@ namespace tomato {
             shader->SetUniformVec3("uLightPos", glm::vec3(0, 10, 0));
             shader->SetUniformVec4("uColor", render.color);
 
-            mesh->Draw();
-            // mesh->Draw(true);
+            if (simCtx.registry.all_of<RootEntityTag>(e))
+                mesh->Draw();
+            else
+                mesh->Draw(true);
         }
     }
 }

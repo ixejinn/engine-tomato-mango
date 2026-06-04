@@ -1,6 +1,7 @@
 #include "Collision/Narrow/GJK.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
+#include "ECS/Components/Hierarchy.h"
 #include "Collision/ColliderSupport.h"
 #include "Collision/CollisionEvent.h"
 #include "Collision/Narrow/EPA.h"
@@ -22,13 +23,14 @@ namespace tomato {
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
 
-        if (col1.isTrigger || col2.isTrigger) {
-            if (GJKBool(reg, e1, e2))
-                return CollisionInfo{};
-            else
-                return std::nullopt;
-        }
-        else
+//        if (col1.isTrigger || col2.isTrigger) {
+//            if (GJKBool(reg, e1, e2))
+//                return CollisionInfo{};
+//            else
+//                return std::nullopt;
+//        }
+//        else
+//////////// TODO: GJKBool 무한 루프 문제 있음 (초기 GJKBool로 바꾸면 사용 가능)
             return GJKRaycast(reg, e1, e2);
     }
 
@@ -108,8 +110,8 @@ namespace tomato {
         auto& trf1 = reg.get<TransformComponent>(e1);
         auto& trf2 = reg.get<TransformComponent>(e2);
 
-        auto vel1 = reg.try_get<VelocityComponent>(e1);
-        auto vel2 = reg.try_get<VelocityComponent>(e2);
+        auto vel1 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e1));
+        auto vel2 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e2));
 
         glm::vec3 relVel = ((vel1 ? vel1->velocity : glm::vec3{0.f}) - (vel2 ? vel2->velocity : glm::vec3{0.f}));
         glm::vec3 ray = -relVel * FIXED_DELTA_TIME;

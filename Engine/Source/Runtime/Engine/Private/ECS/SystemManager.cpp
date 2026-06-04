@@ -37,4 +37,9 @@ namespace tomato {
                 system->Update(sim);
         }
     }
+
+    void SystemManager::InitializeTransform(SimContext& sim) {
+        for (const auto& system : systems_[SystemPhase::Transformation])
+            system->Update(sim);
+    }
 }

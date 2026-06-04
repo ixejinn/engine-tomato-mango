@@ -132,7 +132,7 @@ namespace tomato {
         if (const auto velPtr = reg.try_get<VelocityComponent>(GetRootEntity(reg, e)))
             wPos += velPtr->velocity * FIXED_DELTA_TIME;
 
-        auto halfExtents = trf.GetLocalScale() * 0.5f;
+        auto halfExtents = trf.GetWorldScale() * 0.5f;
         if (col.type == ColliderType::Sphere) {
             const glm::vec3 radius{halfExtents.x};
 
@@ -140,7 +140,7 @@ namespace tomato {
             col.min = wPos - radius;
         }
         else {
-            auto R = glm::toMat4(trf.GetLocalQuaternion());
+            auto R = glm::toMat4(trf.GetWorldQuaternion());
 
             glm::vec3 aabbHalfExtents
             {
