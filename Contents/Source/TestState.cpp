@@ -24,6 +24,8 @@
 
 #include "Collision/CollisionEvent.h"
 #include "CollisionTestComponent.h"
+
+#include "Prefab/Prefab.h"
 using namespace tomato;
 
 void TestState::Init() {

@@ -67,18 +67,16 @@ namespace tomato {
                     auto& trfRootB = reg.get<TransformComponent>(rootB);
 
                     if (auto* velPtr = reg.try_get<VelocityComponent>(rootA)) {
-                        static constexpr float SKIN = 1e-2f;
                         glm::vec3 remainingMove = (1 - result->depth) * velPtr->velocity;
 
-                        trfRootA.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth - result->normal * SKIN);
+                        trfRootA.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth - result->normal * COLLISION_SKIN);
                         velPtr->velocity = remainingMove - glm::dot(remainingMove, result->normal) * result->normal;
                     }
 
                     if (auto* velPtr = reg.try_get<VelocityComponent>(rootB)) {
-                        static constexpr float SKIN = 1e-2f;
                         glm::vec3 remainingMove = (1 - result->depth) * velPtr->velocity;
 
-                        trfRootB.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth + result->normal * SKIN);
+                        trfRootB.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth + result->normal * COLLISION_SKIN);
                         velPtr->velocity = remainingMove + glm::dot(remainingMove, -result->normal) * result->normal;
                     }
                 }
