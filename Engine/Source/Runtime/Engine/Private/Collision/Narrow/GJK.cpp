@@ -15,7 +15,7 @@ namespace tomato {
     EnumArray<ColliderType, GJK::SupportFunc> GJK::supportFunctions_ = {
         {ColliderType::Cube, support::Cube},
         {ColliderType::Sphere, support::Sphere},
-        {ColliderType::Capsule, support::Capsule}
+//        {ColliderType::Capsule, support::Capsule}
     };
 
     std::optional<CollisionInfo> GJK::DetectCollision(

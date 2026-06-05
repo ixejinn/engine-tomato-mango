@@ -4,6 +4,8 @@
 #include <cstdint>
 
 namespace tomato {
+    static constexpr float COLLISION_SKIN = 1e-2f;
+
     enum class CollisionLayer : uint32_t
     {
         Default = 1 << 0,
@@ -14,7 +16,7 @@ namespace tomato {
     {
         Cube,
         Sphere,
-        Capsule,
+//        Capsule,
         COUNT
     };
 }
