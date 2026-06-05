@@ -51,7 +51,7 @@ namespace tomato
 
     void ClientNetwork::ProcessUDPPacket(const UDPPacketType type, NetBitReader& reader, const SocketAddress& inToAddress)
     {
-        std::cout << (int)type << '\n';
+        //std::cout << (int)type << '\n';
 
         switch (type)
         {
