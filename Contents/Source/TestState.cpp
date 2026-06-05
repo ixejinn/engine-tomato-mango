@@ -38,8 +38,8 @@ void TestState::Init() {
     // Camera
     const auto cam = registry_.create();
     registry_.emplace<TransformComponent>(cam,
-//                                          glm::vec3(0.f, 1.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
-                                           glm::vec3(0.f, 5.f, 0.f), glm::vec3(-90.f, 0.f, 0.f));
+                                          glm::vec3(0.f, 1.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
+                                           //glm::vec3(0.f, 5.f, 0.f), glm::vec3(-90.f, 0.f, 0.f));
                                            // glm::vec3(0.f, 7.5f, 15.f), glm::vec3(-30.f, 0.f, 0.f));
     auto& camComp = registry_.emplace<CameraComponent>(cam);
     camComp.mode = ProjectionMode::Perspective;
@@ -50,16 +50,10 @@ void TestState::Init() {
     // Player character
     const auto me = registry_.create();
     auto& trfCompMe = registry_.emplace<TransformComponent>(me);
-    // trfCompMe.SetScale(2.f, 1.f, 1.f);
-    // trfCompMe.SetScale(2.f, 2.f, 1.f);
-    // trfCompMe.SetEulerDegree(0.f, 45.f, 0.f);
+
     registry_.emplace<VelocityComponent>(me);
     registry_.emplace<InputChannelComponent>(me, static_cast<uint8_t>(0), true);
     registry_.emplace<MovementComponent>(me);
-     // registry_.emplace<ColliderComponent>(me, ColliderType::Cube);
-//    registry_.emplace<ColliderComponent>(me, ColliderType::Sphere, trfCompMe);
-    // registry_.emplace<ColliderComponent>(me, ColliderType::Cube, trfCompMe, true);
-
     registry_.emplace<RenderComponent>(me,
                                        glm::vec4(1.f, 1.f, 0.f, 1.f),
                                         // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
@@ -83,33 +77,32 @@ void TestState::Init() {
         GetAssetID(Shader::PrimitiveName),
         GetAssetID(Texture::PrimitiveName));
 
-     // NPC west
-     const auto west = registry_.create();
 
-     auto& trfCompW = registry_.emplace<TransformComponent>(west,
-                                                            glm::vec3(-3, 0, 0), glm::vec3(0, 0, 0));
-//     registry_.emplace<ColliderComponent>(west, ColliderType::Cube);
-     registry_.emplace<RenderComponent>(west,
-                                        glm::vec4(1.f, 1.f, 1.f, 1.f),
-                                        // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
-                                        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
-                                        GetAssetID(Shader::PrimitiveName),
-                                        GetAssetID(Texture::PrimitiveName));
+    // You
+    const auto you = registry_.create();
+    auto& trfCompW = registry_.emplace<TransformComponent>(you, glm::vec3(-3, 0, 0), glm::vec3(0, 0, 0));
 
-    // NPC west collider
+    registry_.emplace<VelocityComponent>(you);
+    registry_.emplace<InputChannelComponent>(you, static_cast<uint8_t>(1), true);
+    registry_.emplace<MovementComponent>(you);
+    registry_.emplace<RenderComponent>(you,
+        glm::vec4(1.f, 1.f, 1.f, 1.f),
+        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
+        GetAssetID(Shader::PrimitiveName),
+        GetAssetID(Texture::PrimitiveName));
+    registry_.emplace<RootEntityTag>(you);
+
+    // collider
     const auto colW = registry_.create();
-    SetHierarchy(registry_, west, colW);
+    SetHierarchy(registry_, you, colW);
 
     auto& trfColW = registry_.emplace<TransformComponent>(colW);
     registry_.emplace<ColliderComponent>(colW, ColliderType::Cube);
-    // registry_.emplace<ColliderComponent>(colW, ColliderType::Sphere);
     registry_.emplace<RenderComponent>(colW,
         glm::vec4(1.f, 1.f, 1.f, 1.f),
         GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
-        // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
         GetAssetID(Shader::PrimitiveName),
         GetAssetID(Texture::PrimitiveName));
-
 
     //UI
     const auto canvas = registry_.create();
