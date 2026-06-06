@@ -10,9 +10,15 @@ namespace tomato {
         bool is1P = true;
     };
 
+    enum MovementMode {
+        Walking,
+        Falling
+    };
+
     struct MovementComponent
     {
         float horizontalSpeed{2.f};
+        MovementMode mode{Walking};
         uint8_t jumpCnt{0};
     };
 }

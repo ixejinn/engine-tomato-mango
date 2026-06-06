@@ -105,6 +105,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Private/ECS/Hierarchy/Hierarchy.h
         Source/Runtime/Engine/Public/ECS/Systems/IntegrationSystem.h
         Source/Runtime/Engine/Public/Prefab/Prefab.h
+        Source/Runtime/Engine/Public/ECS/Systems/GravitySystem.h
+        Source/Runtime/Engine/Private/Prefab/Character/CharacterMovement.h
 )
 
 set(ENGINE_SOURCES
@@ -156,6 +158,8 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/Broad/BroadPhase.cpp
         Source/Runtime/Engine/Private/ECS/Components/Transform.cpp
         Source/Runtime/Engine/Private/Prefab/Prefab.cpp
+        Source/Runtime/Engine/Private/ECS/Systems/GravitySystem.cpp
+        Source/Runtime/Engine/Private/Prefab/Character/CharacterMovement.cpp
 )
 
 add_library(engine STATIC

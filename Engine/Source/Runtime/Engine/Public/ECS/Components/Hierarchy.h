@@ -24,6 +24,18 @@ namespace tomato {
         return root;
     }
 
+    inline entt::entity GetRootEntity(entt::registry* reg, entt::entity cur) {
+        entt::entity root = cur;
+
+        auto* hierarchy = reg->try_get<HierarchyComponent>(root);
+        while (hierarchy && hierarchy->parent != entt::null) {
+            root = hierarchy->parent;
+            hierarchy = reg->try_get<HierarchyComponent>(root);
+        }
+
+        return root;
+    }
+
     inline void SetHierarchy(entt::registry& reg, entt::entity parent, entt::entity child) {
         auto* cHierarchy = reg.try_get<HierarchyComponent>(child);
         if (!cHierarchy)

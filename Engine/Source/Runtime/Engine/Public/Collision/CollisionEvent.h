@@ -1,6 +1,7 @@
 #ifndef MANGO_COLLISIONEVENT_H
 #define MANGO_COLLISIONEVENT_H
 
+#include <glm/vec3.hpp>
 #include <entt/entt.hpp>
 
 namespace tomato {

@@ -59,10 +59,9 @@ namespace tomato {
                 // Start move
                 move.jumpCnt++;
                 velocity.velocity.y = std::max(velocity.velocity.y, 0.f) + JUMP_SPEED;
-            }
 
-            if (move.jumpCnt > 0)
-                velocity.velocity.y += GRAVITY;
+                move.mode = MovementMode::Falling;
+            }
         }
     }
 }

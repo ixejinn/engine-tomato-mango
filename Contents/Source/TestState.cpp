@@ -39,8 +39,8 @@ void TestState::Init() {
 
     // Camera
     Prefab::CreateCamera(registry_,
-                         glm::vec3(0.f, 5.f, 0.f),
-                         glm::vec3(-90.f, 0.f, 0.f),
+                         glm::vec3(0.f, 7.5f, 15.f),
+                         glm::vec3(-30.f, 0.f, 0.f),
                          true);
 
     // Player character

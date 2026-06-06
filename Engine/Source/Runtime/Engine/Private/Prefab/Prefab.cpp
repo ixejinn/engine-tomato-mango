@@ -1,5 +1,6 @@
 #include <entt/entt.hpp>
 #include "Prefab/Prefab.h"
+#include "Prefab/Character/CharacterMovement.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Collision.h"
@@ -93,6 +94,10 @@ namespace tomato {
         trfC.AddPosition({0.f, -(trfP.GetLocalScale().y * 0.1 + COLLISION_SKIN + 0.001f), 0.f});
 
         reg.get<ColliderComponent>(ground).isTrigger = true;
+
+        auto& trg = reg.emplace<OnTriggerComponent>(ground);
+        trg.enter = CharacterMovement::AfterLanding;
+        trg.exit = CharacterMovement::StartFalling;
 
         return col;
     }
