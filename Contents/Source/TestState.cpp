@@ -39,80 +39,30 @@ void TestState::Init() {
 
     // Camera
     Prefab::CreateCamera(registry_,
-                         glm::vec3(0.f, 7.5f, 15.f),
+                         glm::vec3(0.f, 4.f, 10.f),
+                         // glm::vec3(0.f, 6.f, 0.f),
                          glm::vec3(-30.f, 0.f, 0.f),
+                         // glm::vec3(-90.f, 0.f, 0.f),
                          true);
 
     // Player character
-    entt::entity center = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube);
+    entt::entity center = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, {0, 5, 0});
     auto& renderCe = registry_.get<RenderComponent>(center);
     renderCe.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
     renderCe.color = {1.f, 1.f, 0.f, 1.f};
-//    const auto me = registry_.create();
-//    auto& trfCompMe = registry_.emplace<TransformComponent>(me);
-//    // trfCompMe.SetScale(2.f, 1.f, 1.f);
-//    // trfCompMe.SetScale(2.f, 2.f, 1.f);
-//    // trfCompMe.SetEulerDegree(0.f, 45.f, 0.f);
-//    registry_.emplace<VelocityComponent>(me);
-//    registry_.emplace<InputChannelComponent>(me, static_cast<uint8_t>(0), true);
-//    registry_.emplace<MovementComponent>(me);
-//     // registry_.emplace<ColliderComponent>(me, ColliderType::Cube);
-////    registry_.emplace<ColliderComponent>(me, ColliderType::Sphere, trfCompMe);
-//    // registry_.emplace<ColliderComponent>(me, ColliderType::Cube, trfCompMe, true);
-//
-//    registry_.emplace<RenderComponent>(me,
-//                                       glm::vec4(1.f, 1.f, 0.f, 1.f),
-//                                        // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
-//                                       GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
-//                                       GetAssetID(Shader::PrimitiveName),
-//                                       GetAssetID(Texture::PrimitiveName));
-//    registry_.emplace<RootEntityTag>(me);
-//
-//    // Player collider
-//    const auto colP = registry_.create();
-//    SetHierarchy(registry_, me, colP);
-//
-//    auto& trfColP = registry_.emplace<TransformComponent>(colP);
-//    // trfColP.SetPosition(0.f, 0.5f, 0.f);
-//    registry_.emplace<ColliderComponent>(colP, ColliderType::Cube);
-//    // registry_.emplace<ColliderComponent>(colP, ColliderType::Sphere);
-//    registry_.emplace<RenderComponent>(colP,
-//        glm::vec4(1.f, 1.f, 1.f, 1.f),
-//        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
-//        // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
-//        GetAssetID(Shader::PrimitiveName),
-//        GetAssetID(Texture::PrimitiveName));
 
      // NPC west
-     entt::entity west = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, {-3, 0, 0});
+     entt::entity west = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, {0, -2, 0});
      auto& renderW = registry_.get<RenderComponent>(west);
      renderW.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-     renderW.color = {1.f, 1.f, 1.f, 1.f};
-//     const auto west = registry_.create();
-//
-//     auto& trfCompW = registry_.emplace<TransformComponent>(west,
-//                                                            glm::vec3(-3, 0, 0), glm::vec3(0, 0, 0));
-////     registry_.emplace<ColliderComponent>(west, ColliderType::Cube);
-//     registry_.emplace<RenderComponent>(west,
-//                                        glm::vec4(1.f, 1.f, 1.f, 1.f),
-//                                        // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
-//                                        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
-//                                        GetAssetID(Shader::PrimitiveName),
-//                                        GetAssetID(Texture::PrimitiveName));
-//
-//    // NPC west collider
-//    const auto colW = registry_.create();
-//    SetHierarchy(registry_, west, colW);
-//
-//    auto& trfColW = registry_.emplace<TransformComponent>(colW);
-//    registry_.emplace<ColliderComponent>(colW, ColliderType::Cube);
-//    // registry_.emplace<ColliderComponent>(colW, ColliderType::Sphere);
-//    registry_.emplace<RenderComponent>(colW,
-//        glm::vec4(1.f, 1.f, 1.f, 1.f),
-//        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
-//        // GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere)),
-//        GetAssetID(Shader::PrimitiveName),
-//        GetAssetID(Texture::PrimitiveName));
+     renderW.color = {1.f, 0.f, 0.f, 1.f};
+
+    // Ground
+    entt::entity ground = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, {0, -3, 0});
+    auto& trfGnd = registry_.get<TransformComponent>(ground);
+    trfGnd.SetScale(10, 0.1, 10);
+    auto& renderGnd = registry_.get<RenderComponent>(ground);
+    renderGnd.color = {0.f, 1.f, 0.f, 1.f};
 
 
     //UI
@@ -126,27 +76,27 @@ void TestState::Init() {
         GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
         GetAssetID("UIShader"),
         GetAssetID(Texture::PrimitiveName));
-
-
-    const auto button = registry_.create();
-    registry_.emplace<tomato::UIComponent>(button, canvas, 1);
-    registry_.emplace<tomato::RectTransformComponent>(button, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(200.f, 200.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
-    registry_.emplace<tomato::SelectableComponent>(button);
-    registry_.emplace<tomato::MouseEventComponent>(button);
-    registry_.emplace<tomato::HierarchyComponent>(button);
-    SetHierarchy(registry_, canvas, button);
-    registry_.emplace<tomato::RenderComponent>(button,
-        glm::vec4{ 0.2f, 0.75f, 0.4f, 1.0f },
-        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
-        GetAssetID("UIShader"),
-        GetAssetID(Texture::PrimitiveName));
-
-    const auto buttonText = registry_.create();
-    registry_.emplace<tomato::UIComponent>(buttonText, canvas, 2);
-    registry_.emplace<tomato::TextComponent>(buttonText, "Button1임", glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f }, 30.f);
-    registry_.emplace<tomato::RectTransformComponent>(buttonText, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
-    registry_.emplace<tomato::HierarchyComponent>(buttonText);
-    SetHierarchy(registry_, button, buttonText);
+    //
+    //
+    // const auto button = registry_.create();
+    // registry_.emplace<tomato::UIComponent>(button, canvas, 1);
+    // registry_.emplace<tomato::RectTransformComponent>(button, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(200.f, 200.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    // registry_.emplace<tomato::SelectableComponent>(button);
+    // registry_.emplace<tomato::MouseEventComponent>(button);
+    // registry_.emplace<tomato::HierarchyComponent>(button);
+    // SetHierarchy(registry_, canvas, button);
+    // registry_.emplace<tomato::RenderComponent>(button,
+    //     glm::vec4{ 0.2f, 0.75f, 0.4f, 1.0f },
+    //     GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
+    //     GetAssetID("UIShader"),
+    //     GetAssetID(Texture::PrimitiveName));
+    //
+    // const auto buttonText = registry_.create();
+    // registry_.emplace<tomato::UIComponent>(buttonText, canvas, 2);
+    // registry_.emplace<tomato::TextComponent>(buttonText, "Button1임", glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f }, 30.f);
+    // registry_.emplace<tomato::RectTransformComponent>(buttonText, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    // registry_.emplace<tomato::HierarchyComponent>(buttonText);
+    // SetHierarchy(registry_, button, buttonText);
 
     const auto TargetLabel = registry_.create();
     registry_.emplace<tomato::UIComponent>(TargetLabel, canvas, 2);

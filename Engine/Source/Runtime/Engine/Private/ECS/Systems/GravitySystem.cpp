@@ -2,6 +2,8 @@
 #include "ECS/SystemUpdateContexts.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Rigidbody.h"
+#include "Utils/RegistryEntry.h"
+REGISTER_SYSTEM(tomato::SystemPhase::Physics, GravitySystem)
 
 namespace tomato {
     void GravitySystem::Update(SimContext& simCtx) {

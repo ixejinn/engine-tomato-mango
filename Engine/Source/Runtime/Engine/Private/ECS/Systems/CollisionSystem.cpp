@@ -5,6 +5,7 @@
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/Movement.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "Collision/CollisionEvent.h"
 #include "Collision/Broad/SAP.h"
@@ -71,6 +72,11 @@ namespace tomato {
 
                         trfRootA.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth - result->normal * COLLISION_SKIN);
                         velPtr->velocity = remainingMove - glm::dot(remainingMove, result->normal) * result->normal;
+
+                        if (auto* move = reg.try_get<MovementComponent>(rootA)) {
+                            if (move->mode == MovementMode::Walking)
+                                velPtr->velocity.y = 0.f;
+                        }
                     }
 
                     if (auto* velPtr = reg.try_get<VelocityComponent>(rootB)) {
@@ -78,6 +84,11 @@ namespace tomato {
 
                         trfRootB.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth + result->normal * COLLISION_SKIN);
                         velPtr->velocity = remainingMove + glm::dot(remainingMove, -result->normal) * result->normal;
+
+                        if (auto* move = reg.try_get<MovementComponent>(rootB)) {
+                            if (move->mode == MovementMode::Walking)
+                                velPtr->velocity.y = 0.f;
+                        }
                     }
                 }
 
@@ -153,8 +164,8 @@ namespace tomato {
     }
 
     void CollisionSystem::OnCollisionEnter(const CollisionEnterEvent &e) {
-        TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2 <<
-            " (" << e.depth << " : " << e.normal.x << "," << e.normal.y << "," << e.normal.z << ")";
+        // TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2 <<
+            // " (" << e.depth << " : " << e.normal.x << "," << e.normal.y << "," << e.normal.z << ")";
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->enter)
@@ -178,7 +189,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnCollisionExit(const CollisionExitEvent& e) {
-        TMT_INFO << "Collision Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        // TMT_INFO << "Collision Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->exit)

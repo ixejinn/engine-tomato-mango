@@ -159,7 +159,7 @@ namespace tomato {
             if (auto result = FindClosestPointOnSimplex(simplex))
                 searchDir = *result;
             else {
-                TMT_WARN << "Simplex already encloses origin.";
+                // TMT_WARN << "Simplex already encloses origin.";
                 break;
             }
         }

@@ -12,17 +12,18 @@ namespace tomato {
         auto view = simCtx.registry.view<TransformComponent, VelocityComponent>();
 
         for (auto [e, trf, vel] : view.each()) {
+            // TMT_INFO << vel.velocity.x << ", " << vel.velocity.y << ", " << vel.velocity.z;
             trf.AddPosition(vel.velocity * FIXED_DELTA_TIME);
 
             auto pos = trf.GetWorldPosition();
             // !!!!! TEMP JUMP !!!!!
-            if (pos.y < 0) {
-                trf.SetPosition(pos.x, 0.f, pos.z);
-                vel.velocity.y = 0;
-
-                if (auto move = simCtx.registry.try_get<MovementComponent>(e))
-                    move->jumpCnt = 0;
-            }
+            // if (pos.y < 0) {
+            //     trf.SetPosition(pos.x, 0.f, pos.z);
+            //     vel.velocity.y = 0;
+            //
+            //     if (auto move = simCtx.registry.try_get<MovementComponent>(e))
+            //         move->jumpCnt = 0;
+            // }
         }
     }
 }

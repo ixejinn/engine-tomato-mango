@@ -18,7 +18,7 @@ namespace tomato {
     struct MovementComponent
     {
         float horizontalSpeed{2.f};
-        MovementMode mode{Walking};
+        MovementMode mode{Falling};
         uint8_t jumpCnt{0};
     };
 }
