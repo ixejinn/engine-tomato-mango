@@ -31,13 +31,14 @@ namespace tomato
         return canvas;
 	}
 
-    entt::entity CreateButton(entt::registry& reg)
+    entt::entity CreateButton(entt::registry& reg, glm::vec2 pos)
     {
+        entt::entity canvas = GetCanvas(reg);
+
         const auto button = reg.create();
 
-        entt::entity canvas = GetCanvas(reg);
-        reg.emplace<UIComponent>(button, canvas, 1);
-        reg.emplace<RectTransformComponent>(button, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(100.f, 100.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+        reg.emplace<UIComponent>(button, canvas, 0, 1);
+        reg.emplace<RectTransformComponent>(button, pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(100.f, 100.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
         auto& selectable = reg.emplace<SelectableComponent>(button);
         reg.emplace<MouseEventComponent>(button);
         reg.emplace<HierarchyComponent>(button);
@@ -49,7 +50,7 @@ namespace tomato
             GetAssetID(Texture::PrimitiveName));
 
         const auto buttonText = reg.create();
-        reg.emplace<UIComponent>(buttonText, canvas, 2);
+        reg.emplace<UIComponent>(buttonText, canvas, 0, 2);
         reg.emplace<TextComponent>(buttonText, "Button", glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f }, 30.f);
         reg.emplace<RectTransformComponent>(buttonText, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
         reg.emplace<HierarchyComponent>(buttonText);
@@ -58,14 +59,14 @@ namespace tomato
         return button;
     }
 
-    entt::entity CreateText(entt::registry& reg, glm::vec2 pos, std::string inText, glm::vec4 color, float size)
+    entt::entity CreateText(entt::registry& reg, glm::vec2 pos, std::string inText, glm::vec4 color, float size, const char* fontName)
     {
-        const auto text = reg.create();
-
         entt::entity canvas = GetCanvas(reg);
 
-        reg.emplace<UIComponent>(text, canvas, 2);
-        reg.emplace<TextComponent>(text, inText, color, size);
+        const auto text = reg.create();
+
+        reg.emplace<UIComponent>(text, canvas, 0, 2);
+        reg.emplace<TextComponent>(text, inText, color, size, GetAssetID(fontName));
         reg.emplace<RectTransformComponent>(text, pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
         reg.emplace<HierarchyComponent>(text);
         SetHierarchy(reg, canvas, text);
@@ -75,11 +76,11 @@ namespace tomato
 
     entt::entity CreateImage(entt::registry& reg, const char* textureName, glm::vec2 pos, glm::vec2 size)
     {
-        const auto img = reg.create();
-        
         entt::entity canvas = GetCanvas(reg);
         
-        reg.emplace<UIComponent>(img, canvas, 1);
+        const auto img = reg.create();
+        
+        reg.emplace<UIComponent>(img, canvas, 0, 1);
 
         auto texture = AssetRegistry<Texture>::GetInstance().Get(GetAssetID(textureName));
         reg.emplace<RectTransformComponent>(

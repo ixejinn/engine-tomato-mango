@@ -5,19 +5,24 @@
 #include <glm/glm.hpp>
 #include <string>
 #include "Resource/Render/Texture.h"
+#include "Resource/Render/Font.h"
 
 namespace tomato
 {
 	entt::entity CreateCanvas(entt::registry& reg);
 
-	entt::entity CreateButton(entt::registry& reg);
+	entt::entity CreateButton(
+		entt::registry& reg,
+		glm::vec2		pos = {0.f, 0.f}
+	);
 
 	entt::entity CreateText(
 		entt::registry& reg,
 		glm::vec2		pos = { 0.f, 0.f },
 		std::string		inText = "Text",
 		glm::vec4		color = { 1.f, 1.f, 1.f, 1.f },
-		float			size = 12.f
+		float			size = 12.f,
+		const char*		fontName = Font::PrimitiveName
 	);
 
 	entt::entity CreateImage(

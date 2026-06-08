@@ -28,6 +28,8 @@ namespace tomato {
 	struct UIComponent
 	{
 		entt::entity canvas{ entt::null };
+		int sortOrder{ 0 };
+
 		int type{ 0 };
 	}; // Tag
 

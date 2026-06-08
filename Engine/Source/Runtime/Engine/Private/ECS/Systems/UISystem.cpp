@@ -67,6 +67,18 @@ namespace tomato
 		for (auto canvas : canvases)
 			Traverse(ctx, canvas, drawList);
 
+		std::stable_sort(
+			drawList.begin(),
+			drawList.end(),
+			[&](entt::entity a, entt::entity b)
+			{
+				auto& uiA = ctx.registry.get<UIComponent>(a);
+				auto& uiB = ctx.registry.get<UIComponent>(b);
+
+				return uiA.sortOrder < uiB.sortOrder;
+			}
+		);
+
 		uiCtx->drawList.clear();
 		uiCtx->drawList = std::move(drawList);
 	}

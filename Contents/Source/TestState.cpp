@@ -152,13 +152,17 @@ void TestState::Init() {
     SetHierarchy(registry_, canvas, TargetLabel);
 #elif 1
     //CreateCanvas(registry_);
-    CreateButton(registry_);
+    auto btn = CreateButton(registry_, {0.f, -10.f});
+    auto& btnuiCmp = registry_.get<UIComponent>(btn);
+    btnuiCmp.sortOrder = 100;
     CreateText(registry_, { 100.f, 0.f });
 
     auto targetLabel = CreateText(registry_, { 0.f, 0.f }, "player1", {1.0f, 1.0f, 0.f, 1.f}, 20.f);
     registry_.emplace<TargetComponent>(targetLabel, me);
     SetHierarchy(registry_, GetCanvas(registry_), targetLabel);
 
+    auto& uiCmp = registry_.get<UIComponent>(targetLabel);
+    uiCmp.sortOrder = 1;
     CreateImage(registry_, "Resources/Contents/WATER_GAME_LOGO.png", {200.f, 300.f});
 #endif
 
