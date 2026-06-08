@@ -95,8 +95,8 @@ namespace tomato {
             // !!!!!! temporary !!!!!!
             currState_->Update();
 
-            //if (network_->GetNetState() == NetworkServiceState::NSS_Playing)
-            gameNet_->ProcessOutgoingMessages(simCtx.tick);
+            if (!isSingle_) // !!!!!!!! temporary !!!!!!!!!!
+                gameNet_->ProcessOutgoingMessages(simCtx.tick);
 
             tc.AddTick();
         }
@@ -125,7 +125,8 @@ namespace tomato {
         currState_->Init();
 
         inputUI_.SetState(currState_.get());
-        gameNet_->SetState(currState_.get());
+        if (!isSingle_) // !!!!!!!!!! temporary !!!!!!!!!!!
+            gameNet_->SetState(currState_.get());
         tc.ResetTick();
 
         SimContext simCtx{currState_->GetRegistry(), tc.GetTick()};

@@ -125,7 +125,10 @@ namespace tomato {
         std::vector<glm::vec3> simplex;
 
         float maxDistSq = 1.f;
-        while (glm::length2(searchDir) > 1e-6f * maxDistSq) {
+        int iteration = 0;
+        while (glm::length2(searchDir) > 1e-6f * maxDistSq && iteration < 20) {
+            ++iteration;
+
             glm::vec3 supportP = GetSupportPoint(searchDir, col1, trf1, col2, trf2);
             glm::vec3 supportToRay = curRayPos - supportP;                         // 새로 얻은 심플렉스 점 → curRayPos
 

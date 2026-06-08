@@ -7,20 +7,26 @@
 
 namespace tomato::CharacterMovement {
     void StartFalling(const TriggerExitEvent& event, entt::entity e) {
-        auto& move = event.reg->get<MovementComponent>(GetRootEntity(event.reg, e));
-        move.mode = MovementMode::Falling;
+        entt::entity root = GetRootEntity(event.reg, e);
 
-        TMT_INFO << "Falling";
+        auto& move = event.reg->get<MovementComponent>(root);
+        if (--move.gndStayCnt == 0) {
+            move.mode = MovementMode::Falling;
+            TMT_INFO << "Falling";
+        }
     }
 
     void AfterLanding(const TriggerEnterEvent& event, entt::entity e) {
-        entt::entity rootEntity = GetRootEntity(event.reg, e);
+        entt::entity other = event.e1 == e ? event.e2 : event.e1;
+        entt::entity root = GetRootEntity(event.reg, e);
 
-        auto& move = event.reg->get<MovementComponent>(rootEntity);
+        auto& move = event.reg->get<MovementComponent>(root);
+        ++move.gndStayCnt;
+
         move.mode = MovementMode::Walking;
         move.jumpCnt = 0;
 
-        auto& velocity = event.reg->get<VelocityComponent>(rootEntity);
+        auto& velocity = event.reg->get<VelocityComponent>(root);
         velocity.velocity.y = 0;
 
         TMT_INFO << "Walking";

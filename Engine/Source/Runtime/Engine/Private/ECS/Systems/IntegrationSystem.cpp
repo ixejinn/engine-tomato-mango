@@ -16,14 +16,6 @@ namespace tomato {
             trf.AddPosition(vel.velocity * FIXED_DELTA_TIME);
 
             auto pos = trf.GetWorldPosition();
-            // !!!!! TEMP JUMP !!!!!
-            // if (pos.y < 0) {
-            //     trf.SetPosition(pos.x, 0.f, pos.z);
-            //     vel.velocity.y = 0;
-            //
-            //     if (auto move = simCtx.registry.try_get<MovementComponent>(e))
-            //         move->jumpCnt = 0;
-            // }
         }
     }
 }
