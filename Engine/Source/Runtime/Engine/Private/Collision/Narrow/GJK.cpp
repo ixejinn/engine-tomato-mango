@@ -124,7 +124,8 @@ namespace tomato {
         glm::vec3 hitNormal = searchDir;
         std::vector<glm::vec3> simplex;
 
-        while (glm::length2(searchDir) > 1e-6f) {
+        float maxDistSq = 1.f;
+        while (glm::length2(searchDir) > 1e-6f * maxDistSq) {
             glm::vec3 supportP = GetSupportPoint(searchDir, col1, trf1, col2, trf2);
             glm::vec3 supportToRay = curRayPos - supportP;                         // 새로 얻은 심플렉스 점 → curRayPos
 
@@ -162,6 +163,9 @@ namespace tomato {
                 // TMT_WARN << "Simplex already encloses origin.";
                 break;
             }
+
+            for (auto& p : simplex)
+                maxDistSq = std::max(maxDistSq, glm::length2(curRayPos - p));
         }
 
         if (hitFraction <= 1) {
