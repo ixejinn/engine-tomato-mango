@@ -26,12 +26,15 @@
 #include "CollisionTestComponent.h"
 
 #include "Prefab/Prefab.h"
+#include "Prefab/UIPrefab.h"
 using namespace tomato;
 
 void TestState::Init() {
     // Audio test
     auto id = Audio::Create("Resources/Contents/sfx_get_heart.mp3", 8);
     audioPtr_ = AssetRegistry<Audio>::GetInstance().Get(id);
+
+    Texture::Create("Resources/Contents/WATER_GAME_LOGO.png");
 
     engine_.GetInputRecorder().BindInputIntent(Key::J, InputIntent::Test_1);
 
@@ -107,6 +110,7 @@ void TestState::Init() {
         GetAssetID(Texture::PrimitiveName));
 
     //UI
+#if 0
     const auto canvas = registry_.create();
     registry_.emplace<tomato::CanvasComponent>(canvas);
     registry_.emplace<tomato::UIComponent>(canvas, canvas);
@@ -146,6 +150,17 @@ void TestState::Init() {
     registry_.emplace<tomato::HierarchyComponent>(TargetLabel);
     registry_.emplace<tomato::TargetComponent>(TargetLabel, me);
     SetHierarchy(registry_, canvas, TargetLabel);
+#elif 1
+    //CreateCanvas(registry_);
+    CreateButton(registry_);
+    CreateText(registry_, { 100.f, 0.f });
+
+    auto targetLabel = CreateText(registry_, { 0.f, 0.f }, "player1", {1.0f, 1.0f, 0.f, 1.f}, 20.f);
+    registry_.emplace<TargetComponent>(targetLabel, me);
+    SetHierarchy(registry_, GetCanvas(registry_), targetLabel);
+
+    CreateImage(registry_, "Resources/Contents/WATER_GAME_LOGO.png", {200.f, 300.f});
+#endif
 
 }
 

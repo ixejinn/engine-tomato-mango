@@ -1,4 +1,4 @@
-#include <entt/entt.hpp>
+﻿#include <entt/entt.hpp>
 #include "Prefab/Prefab.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
@@ -13,7 +13,7 @@
 #include "Resource/Render/Texture.h"
 
 namespace tomato {
-    entt::entity Prefab::CreateStaticObject(entt::registry& reg,
+    entt::entity CreateStaticObject(entt::registry& reg,
                                             Primitive mesh, glm::vec3 pos) {
         const entt::entity obj = reg.create();
 
@@ -30,7 +30,7 @@ namespace tomato {
         return obj;
     }
 
-    entt::entity Prefab::CreateCharacter(entt::registry& reg,
+    entt::entity CreateCharacter(entt::registry& reg,
                                          Primitive mesh, glm::vec3 pos) {
         const entt::entity obj = reg.create();
 
@@ -51,7 +51,7 @@ namespace tomato {
         return obj;
     }
 
-    entt::entity Prefab::CreateCamera(entt::registry& reg,
+    entt::entity CreateCamera(entt::registry& reg,
                                       glm::vec3 pos, glm::vec3 rot,
                                       bool isMain) {
         const entt::entity obj = reg.create();
@@ -66,7 +66,7 @@ namespace tomato {
         return obj;
     }
 
-    entt::entity Prefab::AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
+    entt::entity AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
         const entt::entity col = reg.create();
         SetHierarchy(reg, parent, col);
 
@@ -82,7 +82,7 @@ namespace tomato {
         return col;
     }
 
-    entt::entity Prefab::AttachCharacterCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
+    entt::entity AttachCharacterCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
         const entt::entity col = AttachCollider(reg, parent, type);
         const entt::entity ground = AttachCollider(reg, col, type);
 

@@ -1,4 +1,4 @@
-#ifndef MANGO_TEXTURE_H
+﻿#ifndef MANGO_TEXTURE_H
 #define MANGO_TEXTURE_H
 
 #include <glad/glad.h>
@@ -36,6 +36,8 @@ namespace tomato {
 
         void Bind() const;
 
+        int GetWidth() const { return width; }
+        int GetHeight() const { return height; }
     private:
         struct GLFormat
         {
@@ -49,6 +51,7 @@ namespace tomato {
 
         GLuint textureID_{0};
         GLFormat format_;
+        int width, height;
     };
 }
 
