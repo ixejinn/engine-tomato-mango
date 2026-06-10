@@ -45,12 +45,16 @@ namespace tomato
         Shader* shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
         shader->Use();
 
+        glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(1600), 0.0f, static_cast<float>(900), -1.0f, 1.0f);
+        shader->SetUniformInt("tex", 0);
+        shader->SetUniformMat4("projection", projection);
+
         AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
 
         for (auto e : uiCtx->drawList)
         {
             auto& ui = simCtx.registry.get<UIComponent>(e);
-            if (ui.type == 2) continue; //text
+            if (ui.type == UIType::Text) continue; //text
 
             auto& rect = simCtx.registry.get<RectTransformComponent>(e);
             auto& render = simCtx.registry.get<RenderComponent>(e);
@@ -60,6 +64,9 @@ namespace tomato
                 curShader_ = render.shader;
                 shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
                 shader->Use();
+
+                shader->SetUniformInt("tex", 0);
+                shader->SetUniformMat4("projection", projection);
             }
 
             if (curTexture_ != render.texture)
@@ -75,11 +82,7 @@ namespace tomato
                 mesh->Bind();
             }
 
-            glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(1600), 0.0f, static_cast<float>(900), -1.0f, 1.0f);
-
-            shader->SetUniformInt("tex", 0);
             shader->SetUniformMat4("uModel", rect.model_matrix);
-            shader->SetUniformMat4("projection", projection);
             shader->SetUniformVec4("uColor", render.color);
 
             mesh->Draw();
@@ -90,25 +93,26 @@ namespace tomato
         shader->Use();
         shader->SetUniformInt("text", 0);
 
-        auto view = simCtx.registry.view<TextComponent, RectTransformComponent>();
-        for (auto [e, text, rect] : view.each())
+        for (auto e : uiCtx->drawList)
         {
+            auto& ui = simCtx.registry.get<UIComponent>(e);
+            if (ui.type != UIType::Text) continue; //text
+
+            auto& text = simCtx.registry.get<TextComponent>(e);
+            auto& rect = simCtx.registry.get<RectTransformComponent>(e);
+
             Font* font = AssetRegistry<Font>::GetInstance().Get(text.font);
+            if (!font) continue;
+            glm::vec2 pivotOffset = -(rect.computedSize * rect.pivot);
 
-            glm::vec2 pivotOffset;
-            pivotOffset = -(rect.computedSize * rect.pivot);
-
-            if (font)
-            {
-                textRenderer_.DrawString(
-                    text.codepoints,
-                    pivotOffset.x, pivotOffset.y,
-                    text.fontSize / 64.f,
-                    text.color,
-                    font,
-                    rect.model_matrix
-                );
-            }
+            textRenderer_.DrawString(
+                text.codepoints,
+                pivotOffset.x, pivotOffset.y,
+                text.fontSize / 64.f,
+                text.color,
+                font,
+                rect.model_matrix
+            );
         }
         textRenderer_.Flush();
 
@@ -116,7 +120,4 @@ namespace tomato
         glEnable(GL_CULL_FACE);
 
 	}
-
-
-
 }

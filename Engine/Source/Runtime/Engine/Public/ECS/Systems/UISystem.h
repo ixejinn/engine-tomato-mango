@@ -26,9 +26,8 @@ namespace tomato
 			float screenWidth,
 			float screenHeight);
 
+		void UpdateTextContentSize(SimContext& ctx);
 		void UpdateRectTransform(SimContext& ctx);
-
-	private:
 	};
 
 }

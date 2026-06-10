@@ -25,6 +25,7 @@ namespace tomato
 	{
 		BuildDrawList(ctx);
 
+		UpdateTextContentSize(ctx);
 		UpdateRectTransform(ctx);
 
 		BulidSelectableList(ctx);
@@ -101,6 +102,26 @@ namespace tomato
 		uiCtx->selectableDirty = false;
 	}
 
+	void UISystem::UpdateTextContentSize(SimContext& ctx)
+	{
+		auto textView = ctx.registry.view<UIComponent, RectTransformComponent, TextComponent>();
+		for (auto [e, ui, rect, text] : textView.each())
+		{
+			if (ui.type == UIType::Text)
+			{
+				auto& text = ctx.registry.get<TextComponent>(e);
+				if (text.dirty)
+				{
+					text.codepoints = UTF8ToUTF32(text.text);
+					Font* font = AssetRegistry<Font>::GetInstance().Get(text.font);
+
+					rect.sizeDelta = font->MeasureText(text.codepoints, text.fontSize / 64.f);
+					text.dirty = false;
+				}
+			}
+		}
+	}
+
 	void UISystem::UpdateRectTransform(SimContext& ctx)
 	{
 		auto& uiCtx = ctx.registry.ctx().get<UIContext>();
@@ -148,19 +169,6 @@ namespace tomato
 			{
 				glm::vec2 anchorPos = parentSize * rect.anchorMin;
 				glm::vec2 localPos = (anchorPos - parentPivotPos) + rect.anchoredPosition;
-
-				if (ui.type == 2)
-				{
-					auto& text = ctx.registry.get<TextComponent>(entity);
-					if (text.dirty)
-					{
-						text.codepoints = UTF8ToUTF32(text.text);
-						Font* font = AssetRegistry<Font>::GetInstance().Get(text.font);
-
-						rect.sizeDelta = font->MeasureText(text.codepoints, text.fontSize / 64.f);
-						text.dirty = false;
-					}
-				}
 
 				// World Name Label
 				if (ctx.registry.all_of<TargetComponent>(entity))

@@ -25,12 +25,21 @@ namespace tomato {
 		int sortOrder{ 0 };
 	};
 
+	enum class UIType
+	{
+		Canvas,
+		Default,
+		Text,
+
+		COUNT
+	};
+
 	struct UIComponent
 	{
 		entt::entity canvas{ entt::null };
 		int sortOrder{ 0 };
 
-		int type{ 0 };
+		UIType type{ UIType::Default };
 	}; // Tag
 
 	struct UIRect

@@ -29,11 +29,12 @@ namespace tomato {
 
         static constexpr SystemPhase simOrder_[] = {
             SystemPhase::Input,
-            SystemPhase::UI,
             SystemPhase::Physics,
             SystemPhase::Collision,
             SystemPhase::Integration,
-            SystemPhase::Transformation
+            SystemPhase::Transformation,
+            SystemPhase::UI,
+            SystemPhase::UITransformation
         };
 
         static constexpr SystemPhase renderOrder_[] = {
