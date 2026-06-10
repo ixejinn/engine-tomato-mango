@@ -1,14 +1,13 @@
-#include "Network/UDPNetDriver.h"
+﻿#include "Network/UDPNetDriver.h"
 #include "Network/SocketAddress.h"
 #include "Network/UDPSocket.h"
 #include "Utils/Logger.h"
 
 namespace tomato
 {
-    UDPNetDriver::UDPNetDriver(NetMode mode) : mode_(mode)
+    UDPNetDriver::UDPNetDriver()
     {
-        if(mode == NetMode::NM_Client)
-            InitSocket();
+        InitSocket();
     }
 
     UDPNetDriver::~UDPNetDriver() {}

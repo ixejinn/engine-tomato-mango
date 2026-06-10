@@ -6,8 +6,8 @@
 #include "Utils/Logger.h"
 
 namespace tomato {
-    Engine::Engine(const int width, const int height, const char* title, const bool isSingle)
-        : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), isSingle_(isSingle), network_(nullptr), gameNet_(nullptr)
+    Engine::Engine(const int width, const int height, const char* title, NetMode netMode)
+        : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), netMode_(netMode), network_(nullptr), gameNet_(nullptr)
     {
         
     }
@@ -43,7 +43,7 @@ namespace tomato {
     }
 
     void Engine::MultiRun() {
-        network_ = std::make_unique<ClientNetwork>(NetMode::NM_Client);
+        network_ = std::make_unique<ClientNetwork>();
         gameNet_ = std::make_unique<GamePlayNetSystem>(currState_.get());
         network_->SetGameplaySystem(gameNet_.get());
         gameNet_->SetNetwork(network_.get());
@@ -57,7 +57,10 @@ namespace tomato {
 
         while (!window_.ShouldClose() && isRunning_) {
             if (nextState_)
+            {
                 ChangeState(tickClock);
+                gameNet_->SetState(currState_.get());
+            }
 
             network_->ProcessQueuedUDPPacket();
 
@@ -96,7 +99,8 @@ namespace tomato {
             currState_->Update();
 
             //if (network_->GetNetState() == NetworkServiceState::NSS_Playing)
-            gameNet_->ProcessOutgoingMessages(simCtx.tick);
+            if(gameNet_)
+                gameNet_->ProcessOutgoingMessages(simCtx.tick);
 
             tc.AddTick();
         }
@@ -125,7 +129,7 @@ namespace tomato {
         currState_->Init();
 
         inputUI_.SetState(currState_.get());
-        gameNet_->SetState(currState_.get());
+        
         tc.ResetTick();
 
         SimContext simCtx{currState_->GetRegistry(), tc.GetTick()};

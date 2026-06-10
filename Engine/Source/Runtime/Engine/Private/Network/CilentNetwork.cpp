@@ -6,8 +6,8 @@
 
 namespace tomato
 {
-    ClientNetwork::ClientNetwork(NetMode mode)
-        : server_(mode), driver_(mode), playerID_(0), netState_(ClientNetworkState::NSS_Uninitialized)
+    ClientNetwork::ClientNetwork()
+        : playerID_(0), netState_(ClientNetworkState::NSS_Uninitialized)
     {
         conn.try_emplace((PlayerId)0, NetConnection{ 0, 0, 0, "me", {"192.168.31.231", 9000} });
         conn.try_emplace((PlayerId)1, NetConnection{ 1, 0, 1, "you", {"192.168.31.231", 9001} });

@@ -37,7 +37,7 @@ namespace tomato
     class ClientNetwork
     {
     public:
-        explicit ClientNetwork(NetMode mode);
+        explicit ClientNetwork();
         ~ClientNetwork();
 
         void SetNetState(ClientNetworkState state) { netState_ = state; }
@@ -92,7 +92,7 @@ namespace tomato
 
         ClientNetworkState netState_;
         std::string name_ = "testing";
-        PlayerId playerID_{ 0 };
+        PlayerId playerID_;
         MatchId matchID_{ 0 };
 
         ServerTimeMs sendTime{ 0 }, recvTime{ 0 };

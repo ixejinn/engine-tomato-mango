@@ -14,17 +14,23 @@
 namespace tomato {
     class Engine {
     public:
-        Engine(int width, int height, const char* title, bool isSingle = true);
+        Engine(int width, int height, const char* title, NetMode netMode = NetMode::NM_Alone);
         ~Engine();
 
         void SetNextState(std::unique_ptr<State>&& newState);
         void TryStartGame(std::unique_ptr<State>&& newState);
 
         void Run() {
-            if (isSingle_)
+            switch (netMode_)
+            {
+            case NetMode::NM_Alone:
                 SingleRun();
-            else
+                break;
+
+            case NetMode::NM_Client:
                 MultiRun();
+                break;
+            }
         }
 
         InputRecorder& GetInputRecorder() { return inputRecorder_; }
@@ -36,7 +42,8 @@ namespace tomato {
 
         void SingleRun();
         void MultiRun();
-        bool isSingle_;
+
+        NetMode netMode_;
 
         void ProcessInputEvents(uint32_t tick);
         Input input_;
