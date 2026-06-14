@@ -107,7 +107,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Prefab/Prefab.h
         Source/Runtime/Engine/Public/Prefab/UIPrefab.h
         Source/Runtime/Engine/Public/ECS/Systems/UITransformSystem.h
-        )
+         "Source/Runtime/Engine/Public/Serialization/ComponentSerializer.h" "Source/Runtime/Engine/Public/ECS/Components/Nametag.h" "Source/Runtime/Core/Public/UUID.h" "Source/Runtime/Engine/Public/Prefab/EntityUtils.h")
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -160,7 +160,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Prefab/Prefab.cpp
         Source/Runtime/Engine/Private/Prefab/UIPrefab.cpp
         Source/Runtime/Engine/Private/ECS/Systems/UITransformSystem.cpp
-)
+ "Source/Runtime/Engine/Private/Serialization/ComponentSerializer.cpp" "Source/Runtime/Core/Private/UUID.cpp" "Source/Runtime/Engine/Private/Prefab/EntityUtils.cpp")
 
 add_library(engine STATIC
         ${ENGINE_HEADERS}
