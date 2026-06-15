@@ -5,7 +5,7 @@
 using namespace tomato;
 
 int main() {
-    Engine engine(1600, 900, "TOMATO", true);
+    Engine engine(1600, 900, "TOMATO", false);
     engine.SetNextState(std::make_unique<TestState>(engine));
     engine.Run();
 }
