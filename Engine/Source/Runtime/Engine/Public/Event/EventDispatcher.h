@@ -43,6 +43,11 @@ namespace tomato {
             dispatcher_->trigger(e);
         }
 
+        template<typename E>
+        void Update() {
+            dispatcher_->update<E>();
+        }
+
         void Update()
         {
             dispatcher_->update();

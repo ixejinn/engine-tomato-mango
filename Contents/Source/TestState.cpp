@@ -46,13 +46,15 @@ void TestState::Init() {
                          true);
 
     // Player character
-    entt::entity center = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, {0, 5, 0});
+    entt::entity center = Prefab::CreateCharacter(registry_, Prefab::Primitive::Sphere, {0, 2, 0});
+    // entt::entity center = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, {0, 0, 0});
     auto& renderCe = registry_.get<RenderComponent>(center);
     renderCe.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
     renderCe.color = {1.f, 1.f, 0.f, 1.f};
 
      // NPC west
-     entt::entity west = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, {0, -2, 0});
+     entt::entity west = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, {0, -2.45, 0});
+     // entt::entity west = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, {-2, 0, 0});
      auto& renderW = registry_.get<RenderComponent>(west);
      renderW.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
      renderW.color = {1.f, 0.f, 0.f, 1.f};
@@ -72,7 +74,7 @@ void TestState::Init() {
     registry_.emplace<tomato::RectTransformComponent>(canvas);
     registry_.emplace<tomato::HierarchyComponent>(canvas);
     registry_.emplace<tomato::RenderComponent>(canvas,
-        glm::vec4{ 1.f, 1.f, 1.f, 0.5f },
+        glm::vec4{ 1.f, 1.f, 1.f, 0.f },
         GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
         GetAssetID("UIShader"),
         GetAssetID(Texture::PrimitiveName));

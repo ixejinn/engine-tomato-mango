@@ -12,10 +12,11 @@ namespace tomato {
         auto view = simCtx.registry.view<TransformComponent, VelocityComponent>();
 
         for (auto [e, trf, vel] : view.each()) {
-            // TMT_INFO << vel.velocity.x << ", " << vel.velocity.y << ", " << vel.velocity.z;
+            // TMT_INFO << "velocity: " << vel.velocity.x << ", " << vel.velocity.y << ", " << vel.velocity.z;
             trf.AddPosition(vel.velocity * FIXED_DELTA_TIME);
 
-            auto pos = trf.GetWorldPosition();
+            // auto pos = trf.GetLocalPosition();
+            // TMT_INFO << "position: " << pos.x << ", " << pos.y << ", " << pos.z;
         }
     }
 }
