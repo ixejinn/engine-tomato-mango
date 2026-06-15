@@ -15,7 +15,7 @@ namespace tomato {
     EnumArray<ColliderType, GJK::SupportFunc> GJK::supportFunctions_ = {
         {ColliderType::Cube, support::Cube},
         {ColliderType::Sphere, support::Sphere},
-        {ColliderType::Capsule, support::Capsule}
+//        {ColliderType::Capsule, support::Capsule}
     };
 
     std::optional<CollisionInfo> GJK::DetectCollision(
@@ -23,14 +23,13 @@ namespace tomato {
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
 
-//        if (col1.isTrigger || col2.isTrigger) {
-//            if (GJKBool(reg, e1, e2))
-//                return CollisionInfo{};
-//            else
-//                return std::nullopt;
-//        }
-//        else
-//////////// TODO: GJKBool 무한 루프 문제 있음 (초기 GJKBool로 바꾸면 사용 가능)
+        if (col1.isTrigger || col2.isTrigger) {
+            if (GJKBool(reg, e1, e2))
+                return CollisionInfo{};
+            else
+                return std::nullopt;
+        }
+        else
             return GJKRaycast(reg, e1, e2);
     }
 
@@ -57,7 +56,8 @@ namespace tomato {
         glm::vec3 supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
         simplex.push_back(supportP);
 
-        while (true) {
+        int iteration = 0;
+        while (++iteration < 20) {
             if (auto result = FindClosestPointOnSimplex(simplex))
                 closestP = *result;
             else
@@ -65,11 +65,13 @@ namespace tomato {
 
             supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
             simplex.push_back(supportP);
-            if (glm::dot(-closestP, supportP) < 0)
-                return false;
+            if (glm::dot(-closestP, supportP) < 1e-6f)
+                return false;   // 거의 가깝게 가는데 원점을 포함은 못하는 상황
         }
+        return true;
     }
 
+    // TODO: 무한루프
     CollisionInfo GJK::GJKDistance(
             entt::registry& reg, entt::entity e1, entt::entity e2) {
         auto& col1 = reg.get<ColliderComponent>(e1);
@@ -85,7 +87,10 @@ namespace tomato {
         std::vector<glm::vec3> simplex;
         simplex.reserve(4);
 
-        while (glm::length2(closestP) - glm::dot(closestP, supportP) > 1e-6f) {
+        auto upperLimit = glm::length2(closestP);
+        auto lowerLimit = glm::dot(closestP, supportP);
+        // while (glm::length2(closestP) - glm::dot(closestP, supportP) > 1e-6f) {
+        while (upperLimit - lowerLimit > 1e-6f) {
             simplex.push_back(supportP);
 
             if (auto result = FindClosestPointOnSimplex(simplex))
@@ -94,12 +99,14 @@ namespace tomato {
                 return CollisionInfo{glm::vec3{0.f}, 0.f};
 
             supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
+
+            upperLimit = glm::length2(closestP);
+            lowerLimit = glm::dot(closestP, supportP);
         }
 
         auto length = glm::length(closestP);
         if (length > 1e-4f)
             return CollisionInfo{closestP, length};
-//            return std::nullopt;
         return CollisionInfo{glm::vec3{0.f}, 0.f};
     }
 
@@ -114,7 +121,10 @@ namespace tomato {
         auto vel2 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e2));
 
         glm::vec3 relVel = ((vel1 ? vel1->velocity : glm::vec3{0.f}) - (vel2 ? vel2->velocity : glm::vec3{0.f}));
+        if (glm::length2(relVel) < 1e-6f)
+            return std::nullopt;
         glm::vec3 ray = -relVel * FIXED_DELTA_TIME;
+        // TMT_INFO << "GJK raycast " << (int)e1 << " " << (int)e2 << " relVel: " << relVel.x << " " << relVel.y << " " << relVel.z;
 
         float hitFraction = 0.f;
         glm::vec3 rayOrigin{0.f};
@@ -124,26 +134,37 @@ namespace tomato {
         glm::vec3 hitNormal = searchDir;
         std::vector<glm::vec3> simplex;
 
-        while (glm::length2(searchDir) > 1e-6f) {
+        float maxDistSq = 1.f;
+        int iteration = 0;
+        while (glm::length2(searchDir) > 1e-6f * maxDistSq && iteration < 20) {
+            // TMT_INFO << "(" << iteration << ") maxDistSq: " << maxDistSq;
+            ++iteration;
+
             glm::vec3 supportP = GetSupportPoint(searchDir, col1, trf1, col2, trf2);
             glm::vec3 supportToRay = curRayPos - supportP;                         // 새로 얻은 심플렉스 점 → curRayPos
 
             float dotVW = glm::dot(searchDir, supportToRay);
+            // TMT_INFO << "(" << iteration << ") dotVW: " << dotVW;
             if (dotVW > 0) {
                 // 새로 얻은 심플렉스 점이 아직 curRayPos에 미치지 못함
                 // curRayPos가 아직 CSO 외부에 있으므로 ray 전진 가능
 
                 float dotVR = glm::dot(searchDir, ray);
-                if (dotVR >= -1e-5f)
+                // TMT_INFO << "(" << iteration << ") dotVR: " << dotVR;
+                if (dotVR >= -1e-5f) {
+                    TMT_INFO << "Ray가 닿을 수 없음 " << dotVR << " | relative velocity: " << relVel.x << " " << relVel.y << " " << relVel.z;
                     // Ray와 CSO가 같은 방향(평행) 또는 수직으로 멀어짐
                     // Ray를 계속 전진시켜도 CSO에 닿을 수 없음
                     return std::nullopt;
+                }
 
                 // Ray가 CSO를 향하므로 ray를 전진
                 hitFraction -= dotVW / dotVR;
-                if (hitFraction > 1)
+                if (hitFraction > 1) {
+                    TMT_INFO << "비충돌 종료";
                     // 이번 틱에서 충돌하지 않음 (비충돌 종료)
                     return std::nullopt;
+                }
 
                 glm::vec3 preRayPos = curRayPos;
                 curRayPos = rayOrigin + hitFraction * ray;
@@ -157,21 +178,38 @@ namespace tomato {
 
             simplex.push_back(curRayPos - supportP);    // Support point
             if (auto result = FindClosestPointOnSimplex(simplex))
-                searchDir = *result;
+                searchDir = result.value();
             else {
-                TMT_WARN << "Simplex already encloses origin.";
+                if (!col1.isTrigger && !col2.isTrigger)
+                    TMT_WARN << "Simplex already encloses origin. " << (int)e1 << " " << (int)e2;
                 break;
             }
+
+            maxDistSq = 1e-6f;
+            for (auto& p : simplex)
+                maxDistSq = std::max(maxDistSq, glm::length2(curRayPos - p));
+
+            // TMT_INFO << "(" << iteration << ") searchDir: " << searchDir.x << " " << searchDir.y << " " << searchDir.z;
         }
 
         if (hitFraction <= 1) {
             float hitNormalLenSq = glm::length2(hitNormal);
-            if (hitNormalLenSq > 1e-6f)
-                return CollisionInfo{glm::normalize(hitNormal), hitFraction};
-            else
-                return CollisionInfo{hitNormal, hitFraction};
+            if (hitNormalLenSq > 1e-6f) {
+                constexpr float epsilon = 0.001f;
+                if (-epsilon < hitNormal.x && hitNormal.x < epsilon)
+                    hitNormal.x = 0.f;
+                if (-epsilon < hitNormal.z && hitNormal.z < epsilon)
+                    hitNormal.z = 0.f;
+                if (-epsilon < hitNormal.y && hitNormal.y < epsilon)
+                    hitNormal.y = 0.f;
+
+                hitNormal = glm::normalize(hitNormal);
+            }
+
+            return CollisionInfo{hitNormal, hitFraction};
         }
 
+        TMT_INFO << "기타 비충돌 종료";
         return std::nullopt;
     }
 

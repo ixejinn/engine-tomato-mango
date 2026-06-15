@@ -1,23 +1,23 @@
 #ifndef MANGO_COLLISIONEVENT_H
 #define MANGO_COLLISIONEVENT_H
 
+#include <glm/vec3.hpp>
 #include <entt/entt.hpp>
+#include "Collision/CollisionInfo.h"
 
 namespace tomato {
     struct CollisionEnterEvent {
         entt::entity e1, e2;
         entt::registry* reg;
 
-        glm::vec3 normal;
-        float depth;
+        CollisionInfo info;
     };
 
     struct CollisionStayEvent {
         entt::entity e1, e2;
         entt::registry* reg;
 
-        glm::vec3 normal;
-        float depth;
+        CollisionInfo info;
     };
 
     struct CollisionExitEvent {

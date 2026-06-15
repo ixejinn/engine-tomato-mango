@@ -23,9 +23,11 @@ namespace tomato {
 
     private:
         void DetectBroad(entt::registry& reg);
-        void DetectNarrow(entt::registry& reg);
+        void DetectNarrow(SimContext& simCtx);
 
-        static void SetAABB(entt::registry& reg, const entt::entity e);
+        static void SetAABB(entt::registry& reg, entt::entity e);
+
+        static void SolveCollision(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info);
 
         static void OnCollisionEnter(const CollisionEnterEvent& e);
         static void OnCollisionStay(const CollisionStayEvent& e);

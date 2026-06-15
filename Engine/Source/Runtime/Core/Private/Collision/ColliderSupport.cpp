@@ -14,9 +14,17 @@ namespace tomato::support {
 
     glm::vec3 Sphere(const glm::vec3 &dir, const TransformComponent &trf) {
         float dirLenSq = glm::length2(dir);
-        if (dirLenSq < 1e-4)
-            return glm::vec3{0.f};
-        return (trf.GetWorldScale().x * 0.5f) * (dir / std::sqrt(dirLenSq));
+        glm::vec3 offset;
+        if (dirLenSq < 1e-4) {
+            offset = glm::vec3{
+                dir.x >= 0.f ? 1.f : -1.f,
+                dir.y >= 0.f ? 1.f : -1.f,
+                dir.z >= 0.f ? 1.f : -1.f
+            };
+        }
+        else
+            offset = (dir / std::sqrt(dirLenSq));
+        return (trf.GetWorldScale().x * 0.5f) * offset;
     }
 
     glm::vec3 Capsule(const glm::vec3 &dir, const TransformComponent &trf) {

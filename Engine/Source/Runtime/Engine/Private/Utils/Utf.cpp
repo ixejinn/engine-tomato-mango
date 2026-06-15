@@ -1,4 +1,5 @@
 ﻿#include "Utils/Utf.h"
+#include <cstdint>
 
 /**
 * @brief Convert UTF-8 string to UTF-32 (codepoints)

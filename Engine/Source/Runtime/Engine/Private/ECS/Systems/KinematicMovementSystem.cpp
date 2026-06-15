@@ -43,13 +43,13 @@ namespace tomato {
             // Rotation (!!!!TEST!!!!)
             x = 0; y = 0;
             if (HasFlag(keypress, InputIntent::TurnLeft))
-                x += 5;
-            if (HasFlag(keypress, InputIntent::TurnRight))
-                x -= 5;
-            if (HasFlag(keypress, InputIntent::TurnUp))
                 y += 5;
-            if (HasFlag(keypress, InputIntent::TurnDown))
+            if (HasFlag(keypress, InputIntent::TurnRight))
                 y -= 5;
+//            if (HasFlag(keypress, InputIntent::TurnUp))
+//                x += 5;
+//            if (HasFlag(keypress, InputIntent::TurnDown))
+//                x -= 5;
             glm::vec3 newDegree = trf.GetLocalEulerDegree() + glm::vec3{x, y, 0.f};
             trf.SetEulerDegree(newDegree);
 
@@ -59,10 +59,9 @@ namespace tomato {
                 // Start move
                 move.jumpCnt++;
                 velocity.velocity.y = std::max(velocity.velocity.y, 0.f) + JUMP_SPEED;
-            }
 
-            if (move.jumpCnt > 0)
-                velocity.velocity.y += GRAVITY;
+                move.mode = MovementMode::Falling;
+            }
         }
     }
 }

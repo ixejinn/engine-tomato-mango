@@ -1,6 +1,7 @@
 #include "Collision/Broad/BroadPhase.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Collision.h"
+#include "ECS/Components/Rigidbody.h"
 
 namespace tomato {
     bool BroadPhase::CheckAABBAxisX(ColliderComponent& col1, ColliderComponent& col2) {
@@ -16,7 +17,10 @@ namespace tomato {
     bool BroadPhase::CanCollide(
             entt::registry& reg, entt::entity e1, entt::entity e2,
             ColliderComponent& col1, ColliderComponent& col2) {
-        return (GetRootEntity(reg, e1) != GetRootEntity(reg, e2)
-            || layerMatrix_.CanCollide(col1.layer, col2.layer));
+        entt::entity root1 = GetRootEntity(reg, e1);
+        entt::entity root2 = GetRootEntity(reg, e2);
+        return root1 != root2 &&
+            layerMatrix_.CanCollide(col1.layer, col2.layer) &&
+                (reg.try_get<VelocityComponent>(root1) || reg.try_get<VelocityComponent>(root2));
     }
 }
