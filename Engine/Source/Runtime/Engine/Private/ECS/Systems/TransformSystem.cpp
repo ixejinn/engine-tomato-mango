@@ -19,8 +19,11 @@ namespace tomato {
         static constexpr glm::vec3 rootScale = glm::vec3{1.f};
         static constexpr glm::mat4 rootMat = glm::mat4{1.f};
 
-        for (auto [e, trf] : rootView.each())
+        for (auto [e, trf] : rootView.each()) {
             UpdateFrom(simCtx.registry, e, rootQuat, rootScale, rootMat, false);
+            // auto pos = trf.GetWorldPosition();
+            // TMT_INFO << (int)e << " world pos: " << pos.x << " " << pos.y << " " << pos.z;
+        }
 
         UpdateScreenUI(simCtx);
     }

@@ -1,5 +1,6 @@
 #include <entt/entt.hpp>
 #include "Prefab/Prefab.h"
+#include "Prefab/Character/CharacterMovement.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Collision.h"
@@ -11,6 +12,7 @@
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
+#include "Utils/Logger.h"
 
 namespace tomato {
     entt::entity Prefab::CreateStaticObject(entt::registry& reg,
@@ -27,6 +29,7 @@ namespace tomato {
 
         const entt::entity col = AttachCollider(reg, obj, mesh == Cube ? ColliderType::Cube : ColliderType::Sphere);
 
+        TMT_INFO << "Create static object: " << (int)obj;
         return obj;
     }
 
@@ -48,6 +51,7 @@ namespace tomato {
         reg.emplace<InputChannelComponent>(obj);    //////////////////// 수정
         reg.emplace<MovementComponent>(obj);
 
+        TMT_INFO << "Create character: " << (int)obj;
         return obj;
     }
 
@@ -63,6 +67,7 @@ namespace tomato {
         if (isMain)
             reg.emplace<MainCameraTag>(obj);
 
+        TMT_INFO << "Create camera: " << (int)obj;
         return obj;
     }
 
@@ -79,6 +84,7 @@ namespace tomato {
                                      GetAssetID(Shader::PrimitiveName),
                                      GetAssetID(Texture::PrimitiveName));
 
+        TMT_INFO << "Create collider: " << (int)col;
         return col;
     }
 
@@ -94,6 +100,11 @@ namespace tomato {
 
         reg.get<ColliderComponent>(ground).isTrigger = true;
 
+        auto& trg = reg.emplace<OnTriggerComponent>(ground);
+        trg.enter = CharacterMovement::AfterLanding;
+        trg.exit = CharacterMovement::StartFalling;
+
+        TMT_INFO << "Create character collider, ground: " << (int)col << ", " << (int)ground;
         return col;
     }
 }

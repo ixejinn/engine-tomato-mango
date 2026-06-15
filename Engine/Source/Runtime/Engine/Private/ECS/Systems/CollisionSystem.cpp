@@ -5,6 +5,7 @@
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/Movement.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "Collision/CollisionEvent.h"
 #include "Collision/Broad/SAP.h"
@@ -34,7 +35,12 @@ namespace tomato {
         candidates_.clear();
 
         DetectBroad(simCtx.registry);
-        DetectNarrow(simCtx.registry);
+        DetectNarrow(simCtx);
+
+        EventDispatcher::GetInstance().Update<CollisionEnterEvent>();   // TODO: 보정용으로 수정
+        EventDispatcher::GetInstance().Update<CollisionStayEvent>();   // 보정용으로 수정
+        EventDispatcher::GetInstance().Update<TriggerEnterEvent>();   // 보정용으로 수정
+        EventDispatcher::GetInstance().Update<TriggerExitEvent>();   // 보정용으로 수정
     }
 
     void CollisionSystem::DetectBroad(entt::registry &reg) {
@@ -50,51 +56,26 @@ namespace tomato {
         broadPhase_->DetectCollision(reg, candidates_);
     }
 
-    void CollisionSystem::DetectNarrow(entt::registry& reg) {
+    void CollisionSystem::DetectNarrow(SimContext& simCtx) {
         for (const auto& candidate : candidates_) {
-            auto& col1 = reg.get<ColliderComponent>(candidate.a);
-            auto& col2 = reg.get<ColliderComponent>(candidate.b);
+            auto& col1 = simCtx.registry.get<ColliderComponent>(candidate.a);
+            auto& col2 = simCtx.registry.get<ColliderComponent>(candidate.b);
 
-            // auto& trf1 = reg.get<TransformComponent>(candidate.a);
-            // auto& trf2 = reg.get<TransformComponent>(candidate.b);
-
-            if (auto result = narrowPhase_->DetectCollision(reg, candidate.a, candidate.b)) {
-                if (!col1.isTrigger && !col2.isTrigger) {
-                    entt::entity rootA = GetRootEntity(reg, candidate.a);
-                    entt::entity rootB = GetRootEntity(reg, candidate.b);
-
-                    auto& trfRootA = reg.get<TransformComponent>(rootA);
-                    auto& trfRootB = reg.get<TransformComponent>(rootB);
-
-                    if (auto* velPtr = reg.try_get<VelocityComponent>(rootA)) {
-                        glm::vec3 remainingMove = (1 - result->depth) * velPtr->velocity;
-
-                        trfRootA.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth - result->normal * COLLISION_SKIN);
-                        velPtr->velocity = remainingMove - glm::dot(remainingMove, result->normal) * result->normal;
-                    }
-
-                    if (auto* velPtr = reg.try_get<VelocityComponent>(rootB)) {
-                        glm::vec3 remainingMove = (1 - result->depth) * velPtr->velocity;
-
-                        trfRootB.AddPosition(velPtr->velocity * FIXED_DELTA_TIME * result->depth + result->normal * COLLISION_SKIN);
-                        velPtr->velocity = remainingMove + glm::dot(remainingMove, -result->normal) * result->normal;
-                    }
-                }
-
+            if (auto result = narrowPhase_->DetectCollision(simCtx.registry, candidate.a, candidate.b)) {
                 // Collision detected
                 if (!collisionPairs_.contains(candidate)) {
                     // Enter
                     if (col1.isTrigger || col2.isTrigger)
-                        EventDispatcher::GetInstance().Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &reg});
+                        EventDispatcher::GetInstance().Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &simCtx.registry});
                     else
-                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &reg, result->normal, result->depth});
+                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &simCtx.registry, result.value()});
                 }
                 else {
                     // Stay
                     if (col1.isTrigger || col2.isTrigger)
-                        EventDispatcher::GetInstance().Enqueue(TriggerStayEvent{candidate.a, candidate.b, &reg});
+                        EventDispatcher::GetInstance().Enqueue(TriggerStayEvent{candidate.a, candidate.b, &simCtx.registry});
                     else
-                        EventDispatcher::GetInstance().Enqueue(CollisionStayEvent{candidate.a, candidate.b, &reg, result->normal, result->depth});
+                        EventDispatcher::GetInstance().Enqueue(CollisionStayEvent{candidate.a, candidate.b, &simCtx.registry, result.value()});
                 }
 
                 collisionPairs_[candidate] = true;
@@ -104,13 +85,13 @@ namespace tomato {
         for (auto it = collisionPairs_.begin(); it != collisionPairs_.end(); ) {
             if (!it->second) {
                 // Exit
-                auto& col1 = reg.get<ColliderComponent>(it->first.a);
-                auto& col2 = reg.get<ColliderComponent>(it->first.b);
+                auto& col1 = simCtx.registry.get<ColliderComponent>(it->first.a);
+                auto& col2 = simCtx.registry.get<ColliderComponent>(it->first.b);
 
                 if (col1.isTrigger || col2.isTrigger)
-                    EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{it->first.a, it->first.b, &reg});
+                    EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{it->first.a, it->first.b, &simCtx.registry});
                 else
-                    EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{it->first.a, it->first.b, &reg});
+                    EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{it->first.a, it->first.b, &simCtx.registry});
 
                 it = collisionPairs_.erase(it);
             }
@@ -152,10 +133,67 @@ namespace tomato {
         }
     }
 
-    void CollisionSystem::OnCollisionEnter(const CollisionEnterEvent &e) {
-        TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2 <<
-            " (" << e.depth << " : " << e.normal.x << "," << e.normal.y << "," << e.normal.z << ")";
+    void CollisionSystem::SolveCollision(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info) {
+        TMT_INFO << "Solve collision " << (int)e1 << " " << (int)e2;
+        // 보정
+        entt::entity root1 = GetRootEntity(reg, e1);
+        entt::entity root2 = GetRootEntity(reg, e2);
 
+        auto& trfRoot1 = reg.get<TransformComponent>(root1);
+        auto& trfRoot2 = reg.get<TransformComponent>(root2);
+
+        TMT_INFO << (int)e1 << " & " << (int)e2 << " normal: " << info.normal.x << " " << info.normal.y << " " << info.normal.z;
+        if (auto* vel = reg.try_get<VelocityComponent>(root1)) {
+            TMT_INFO << (int)root1 << " 전 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+            auto pos = vel->velocity * FIXED_DELTA_TIME * info.depth;
+            TMT_INFO << (int)root1 << " 위치 델타: " << pos.x << " " << pos.y << " " << pos.z;
+
+            glm::vec3 remainingMove = (1 - info.depth) * vel->velocity;
+
+            trfRoot1.AddPosition(vel->velocity * FIXED_DELTA_TIME * info.depth - info.normal * COLLISION_SKIN);
+            // trfRoot1.AddPosition(vel->velocity * FIXED_DELTA_TIME * e.depth - glm::normalize(vel->velocity) * COLLISION_SKIN);
+            vel->velocity = remainingMove - glm::dot(remainingMove, info.normal) * info.normal;
+
+            constexpr float epsilon = 0.001f;
+            if (-epsilon < vel->velocity.x && vel->velocity.x < epsilon)
+                vel->velocity.x = 0.f;
+            if (-epsilon < vel->velocity.y && vel->velocity.y < epsilon)
+                vel->velocity.y = 0.f;
+            if (-epsilon < vel->velocity.z && vel->velocity.z < epsilon)
+                vel->velocity.z = 0.f;
+
+            TMT_INFO << (int)root1 << " 후 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+            pos = trfRoot1.GetLocalPosition();
+            TMT_INFO << (int)root1 << " 후 위치: " << pos.x << " " << pos.y << " " << pos.z;
+        }
+
+        if (auto* vel = reg.try_get<VelocityComponent>(root2)) {
+            TMT_INFO << (int)root2 << " 전 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+
+            glm::vec3 remainingMove = (1 - info.depth) * vel->velocity;
+
+            trfRoot2.AddPosition(vel->velocity * FIXED_DELTA_TIME * info.depth + info.normal * COLLISION_SKIN);
+            // trfRoot2.AddPosition(vel->velocity * FIXED_DELTA_TIME * info.depth + vel->velocity * COLLISION_SKIN);
+            vel->velocity = remainingMove + glm::dot(remainingMove, -info.normal) * info.normal;
+
+            constexpr float epsilon = 0.001f;
+            if (-epsilon < vel->velocity.x && vel->velocity.x < epsilon)
+                vel->velocity.x = 0.f;
+            if (-epsilon < vel->velocity.y && vel->velocity.y < epsilon)
+                vel->velocity.y = 0.f;
+            if (-epsilon < vel->velocity.z && vel->velocity.z < epsilon)
+                vel->velocity.z = 0.f;
+
+            TMT_INFO << (int)root2 << " 후 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+        }
+    }
+
+    void CollisionSystem::OnCollisionEnter(const CollisionEnterEvent &e) {
+        TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+
+        SolveCollision(*e.reg, e.e1, e.e2, e.info);
+
+        // 콜백 함수 호출
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->enter)
             callback->enter(e, e.e1);
@@ -166,7 +204,9 @@ namespace tomato {
     }
 
     void CollisionSystem::OnCollisionStay(const CollisionStayEvent& e) {
-//        TMT_INFO << "Collision Stay";
+        TMT_INFO << "Collision Stay " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+
+        SolveCollision(*e.reg, e.e1, e.e2, e.info);
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->stay)
@@ -202,7 +242,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnTriggerStay(const TriggerStayEvent& e) {
-        //        TMT_INFO << "Trigger Stay";
+        // TMT_INFO << "Trigger Stay : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnTriggerComponent>(e.e1);
         if (callback && callback->stay)
