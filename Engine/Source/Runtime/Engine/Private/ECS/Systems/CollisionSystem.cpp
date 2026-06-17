@@ -149,10 +149,9 @@ namespace tomato {
             auto pos = trfRoot1.GetLocalPosition();
             TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
 
-            glm::vec3 remainingMove = (1 - info.depth) * vel->velocity;
+            glm::vec3 remainingMove = (1 - info.depth * info.weight) * vel->velocity;
 
-            trfRoot1.AddPosition(vel->velocity * FIXED_DELTA_TIME * info.depth - info.normal * COLLISION_SKIN);
-            // trfRoot1.AddPosition(vel->velocity * FIXED_DELTA_TIME * e.depth - glm::normalize(vel->velocity) * COLLISION_SKIN);
+            trfRoot1.AddPosition((vel->velocity * FIXED_DELTA_TIME * info.depth - info.normal * COLLISION_SKIN) * info.weight);
             vel->velocity = remainingMove - glm::dot(remainingMove, info.normal) * info.normal;
 
             constexpr float epsilon = 0.001f;
@@ -174,9 +173,10 @@ namespace tomato {
             auto pos = trfRoot2.GetLocalPosition();
             TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
 
-            glm::vec3 remainingMove = (1 - info.depth) * vel->velocity;
+            float weight = 1 - info.weight;
+            glm::vec3 remainingMove = (1 - info.depth * weight) * vel->velocity;
 
-            trfRoot2.AddPosition(vel->velocity * FIXED_DELTA_TIME * info.depth + info.normal * COLLISION_SKIN);
+            trfRoot2.AddPosition((vel->velocity * FIXED_DELTA_TIME * info.depth + info.normal * COLLISION_SKIN) * weight);
             // trfRoot2.AddPosition(vel->velocity * FIXED_DELTA_TIME * info.depth + vel->velocity * COLLISION_SKIN);
             vel->velocity = remainingMove + glm::dot(remainingMove, -info.normal) * info.normal;
 

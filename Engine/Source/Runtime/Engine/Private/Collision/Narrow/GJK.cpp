@@ -120,12 +120,24 @@ namespace tomato {
         auto& trf1 = reg.get<TransformComponent>(e1);
         auto& trf2 = reg.get<TransformComponent>(e2);
 
-        auto vel1 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e1));
-        auto vel2 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e2));
+        glm::vec3 v1{0.f};
+        glm::vec3 v2{0.f};
 
-        glm::vec3 relVel = ((vel1 ? vel1->velocity : glm::vec3{0.f}) - (vel2 ? vel2->velocity : glm::vec3{0.f}));
+        if (auto vel1 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e1)))
+            v1 = vel1->velocity;
+        if (auto vel2 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e2)))
+            v2 = vel2->velocity;
+
+        float lenV1 = glm::length(v1);
+        float lenV2 = glm::length(v2);
+        float sumV = lenV1 + lenV2;
+        if (sumV < 1e-6f)
+            return std::nullopt;
+        float weight = lenV1 / sumV;
+
+        glm::vec3 relVel = v1 - v2;
         if (glm::length2(relVel) < 1e-6f) {
-            return GJKDistance(reg, e1, e2);
+//            return GJKDistance(reg, e1, e2);
             return std::nullopt;
         }
         glm::vec3 ray = -relVel * FIXED_DELTA_TIME;
@@ -211,7 +223,7 @@ namespace tomato {
                 hitNormal = glm::normalize(hitNormal);
             }
 
-            return CollisionInfo{hitNormal, hitFraction};
+            return CollisionInfo{hitNormal, hitFraction, weight};
         }
 
         TMT_INFO << "기타 비충돌 종료";
