@@ -12,7 +12,7 @@ namespace tomato::CharacterMovement {
         auto& move = event.reg->get<MovementComponent>(root);
         if (--move.gndStayCnt == 0) {
             move.mode = MovementMode::Falling;
-            TMT_INFO << "Falling";
+            TMT_INFO << "Falling " << (int)e;
         }
     }
 
@@ -29,6 +29,6 @@ namespace tomato::CharacterMovement {
         auto& velocity = event.reg->get<VelocityComponent>(root);
         velocity.velocity.y = 0;
 
-        TMT_INFO << "Walking";
+        TMT_INFO << "Walking " << (int)e;
     }
 }

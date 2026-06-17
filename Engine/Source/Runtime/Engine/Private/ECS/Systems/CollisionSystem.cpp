@@ -134,7 +134,7 @@ namespace tomato {
     }
 
     void CollisionSystem::SolveCollision(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info) {
-        TMT_INFO << "Solve collision " << (int)e1 << " " << (int)e2;
+        TMT_INFO << "=========== Solve collision " << (int)e1 << " " << (int)e2;
         // 보정
         entt::entity root1 = GetRootEntity(reg, e1);
         entt::entity root2 = GetRootEntity(reg, e2);
@@ -142,11 +142,12 @@ namespace tomato {
         auto& trfRoot1 = reg.get<TransformComponent>(root1);
         auto& trfRoot2 = reg.get<TransformComponent>(root2);
 
-        TMT_INFO << (int)e1 << " & " << (int)e2 << " normal: " << info.normal.x << " " << info.normal.y << " " << info.normal.z;
+        TMT_INFO << " normal: " << info.normal.x << " " << info.normal.y << " " << info.normal.z;
         if (auto* vel = reg.try_get<VelocityComponent>(root1)) {
-            TMT_INFO << (int)root1 << " 전 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
-            auto pos = vel->velocity * FIXED_DELTA_TIME * info.depth;
-            TMT_INFO << (int)root1 << " 위치 델타: " << pos.x << " " << pos.y << " " << pos.z;
+            TMT_INFO << "========== " << (int)root1 << "의 " << (int)e1 << " collider ==========";
+            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+            auto pos = trfRoot1.GetLocalPosition();
+            TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
 
             glm::vec3 remainingMove = (1 - info.depth) * vel->velocity;
 
@@ -162,13 +163,16 @@ namespace tomato {
             if (-epsilon < vel->velocity.z && vel->velocity.z < epsilon)
                 vel->velocity.z = 0.f;
 
-            TMT_INFO << (int)root1 << " 후 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
             pos = trfRoot1.GetLocalPosition();
-            TMT_INFO << (int)root1 << " 후 위치: " << pos.x << " " << pos.y << " " << pos.z;
+            TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
         }
 
         if (auto* vel = reg.try_get<VelocityComponent>(root2)) {
-            TMT_INFO << (int)root2 << " 전 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+            TMT_INFO << "========== " << (int)root2 << "의 " << (int)e2 << " collider ==========";
+            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+            auto pos = trfRoot2.GetLocalPosition();
+            TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
 
             glm::vec3 remainingMove = (1 - info.depth) * vel->velocity;
 
@@ -184,7 +188,9 @@ namespace tomato {
             if (-epsilon < vel->velocity.z && vel->velocity.z < epsilon)
                 vel->velocity.z = 0.f;
 
-            TMT_INFO << (int)root2 << " 후 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+            pos = trfRoot2.GetLocalPosition();
+            TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
         }
     }
 

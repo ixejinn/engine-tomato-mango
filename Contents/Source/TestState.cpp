@@ -45,19 +45,27 @@ void TestState::Init() {
                          // glm::vec3(-90.f, 0.f, 0.f),
                          true);
 
-    // Player character
-    entt::entity center = Prefab::CreateCharacter(registry_, Prefab::Primitive::Sphere, {0, 2, 0});
+    // Player1 character
+    entt::entity player1 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Sphere, {-1.5, 2, 0});
     // entt::entity center = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, {0, 0, 0});
-    auto& renderCe = registry_.get<RenderComponent>(center);
-    renderCe.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    renderCe.color = {1.f, 1.f, 0.f, 1.f};
+    auto& renderP1 = registry_.get<RenderComponent>(player1);
+    renderP1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    renderP1.color = {1.f, 1.f, 0.f, 1.f};
 
      // NPC west
-     entt::entity west = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, {0, -2.45, 0});
-     // entt::entity west = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, {-2, 0, 0});
-     auto& renderW = registry_.get<RenderComponent>(west);
-     renderW.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-     renderW.color = {1.f, 0.f, 0.f, 1.f};
+     // entt::entity west = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, {0, -2.45, 0});
+     // // entt::entity west = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, {-2, 0, 0});
+     // auto& renderW = registry_.get<RenderComponent>(west);
+     // renderW.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+     // renderW.color = {1.f, 0.f, 0.f, 1.f};
+
+    // Player2 character
+    entt::entity player2 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Sphere, {1.5, 2, 0});
+    auto& renderP2 = registry_.get<RenderComponent>(player2);
+    renderP2.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    renderP2.color = {0.f, 1.f, 1.f, 1.f};
+    auto& inputP2 = registry_.get<InputChannelComponent>(player2);
+    inputP2.is1P = false;
 
     // Ground
     entt::entity ground = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, {0, -3, 0});
@@ -100,14 +108,21 @@ void TestState::Init() {
     // registry_.emplace<tomato::HierarchyComponent>(buttonText);
     // SetHierarchy(registry_, button, buttonText);
 
-    const auto TargetLabel = registry_.create();
-    registry_.emplace<tomato::UIComponent>(TargetLabel, canvas, 2);
-    registry_.emplace<tomato::TextComponent>(TargetLabel, "player1", glm::vec4{ 1.f, 1.f, 0.5f, 1.0f }, 24.f);
-    registry_.emplace<tomato::RectTransformComponent>(TargetLabel, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
-    registry_.emplace<tomato::HierarchyComponent>(TargetLabel);
-    registry_.emplace<tomato::TargetComponent>(TargetLabel, center);
-    SetHierarchy(registry_, canvas, TargetLabel);
+    const auto labelP1 = registry_.create();
+    registry_.emplace<tomato::UIComponent>(labelP1, canvas, 2);
+    registry_.emplace<tomato::TextComponent>(labelP1, "player1", glm::vec4{ 1.f, 1.f, 0.5f, 1.0f }, 24.f);
+    registry_.emplace<tomato::RectTransformComponent>(labelP1, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    registry_.emplace<tomato::HierarchyComponent>(labelP1);
+    registry_.emplace<tomato::TargetComponent>(labelP1, player1);
+    SetHierarchy(registry_, canvas, labelP1);
 
+    const auto labelP2 = registry_.create();
+    registry_.emplace<tomato::UIComponent>(labelP2, canvas, 2);
+    registry_.emplace<tomato::TextComponent>(labelP2, "player2", glm::vec4{ 0.5f, 1.f, 1.f, 1.0f }, 24.f);
+    registry_.emplace<tomato::RectTransformComponent>(labelP2, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    registry_.emplace<tomato::HierarchyComponent>(labelP2);
+    registry_.emplace<tomato::TargetComponent>(labelP2, player2);
+    SetHierarchy(registry_, canvas, labelP2);
 }
 
 void TestState::Update() {

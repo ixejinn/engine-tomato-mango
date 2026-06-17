@@ -71,9 +71,9 @@ namespace tomato {
         return true;
     }
 
-    // TODO: 무한루프
-    CollisionInfo GJK::GJKDistance(
+    std::optional<CollisionInfo> GJK::GJKDistance(
             entt::registry& reg, entt::entity e1, entt::entity e2) {
+        TMT_INFO << "========== GJK distance " << (int)e1 << " " << (int)e2;
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
         auto& trf1 = reg.get<TransformComponent>(e1);
@@ -95,8 +95,10 @@ namespace tomato {
 
             if (auto result = FindClosestPointOnSimplex(simplex))
                 closestP = *result;
-            else
-                return CollisionInfo{glm::vec3{0.f}, 0.f};
+            else {
+                return EPA::GetNormalDepth(simplex, col1, col2, trf1, trf2);
+                // return CollisionInfo{glm::vec3{0.f}, 0.f};
+            }
 
             supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
 
@@ -107,7 +109,8 @@ namespace tomato {
         auto length = glm::length(closestP);
         if (length > 1e-4f)
             return CollisionInfo{closestP, length};
-        return CollisionInfo{glm::vec3{0.f}, 0.f};
+        return EPA::GetNormalDepth(simplex, col1, col2, trf1, trf2);
+        // return CollisionInfo{glm::vec3{0.f}, 0.f};
     }
 
     std::optional<CollisionInfo> GJK::GJKRaycast(
@@ -121,8 +124,10 @@ namespace tomato {
         auto vel2 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e2));
 
         glm::vec3 relVel = ((vel1 ? vel1->velocity : glm::vec3{0.f}) - (vel2 ? vel2->velocity : glm::vec3{0.f}));
-        if (glm::length2(relVel) < 1e-6f)
+        if (glm::length2(relVel) < 1e-6f) {
+            return GJKDistance(reg, e1, e2);
             return std::nullopt;
+        }
         glm::vec3 ray = -relVel * FIXED_DELTA_TIME;
         // TMT_INFO << "GJK raycast " << (int)e1 << " " << (int)e2 << " relVel: " << relVel.x << " " << relVel.y << " " << relVel.z;
 

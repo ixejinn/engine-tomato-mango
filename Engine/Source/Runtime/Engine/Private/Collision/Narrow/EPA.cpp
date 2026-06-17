@@ -37,6 +37,7 @@ namespace tomato {
     std::optional<CollisionInfo> EPA::GetNormalDepth(std::vector<glm::vec3>& simplex,
                  const ColliderComponent& col1, const ColliderComponent& col2,
                  TransformComponent& trf1, TransformComponent& trf2) {
+        TMT_INFO << "EPA";
         std::list<EPAPlain> plains;
         plains.emplace_back(simplex, 0, 1, 2);
         plains.emplace_back(simplex, 0, 1, 3);

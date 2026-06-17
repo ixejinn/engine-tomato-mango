@@ -22,7 +22,7 @@ namespace tomato {
         static bool GJKBool(
                 entt::registry& reg, entt::entity e1, entt::entity e2);
 
-        static CollisionInfo GJKDistance(
+        static std::optional<CollisionInfo> GJKDistance(
                 entt::registry& reg, entt::entity e1, entt::entity e2);
 
         static std::optional<CollisionInfo> GJKRaycast(
