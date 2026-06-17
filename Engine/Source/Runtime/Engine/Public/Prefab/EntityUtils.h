@@ -1,4 +1,4 @@
-#ifndef MANGO_ENTITYUTILS_H
+﻿#ifndef MANGO_ENTITYUTILS_H
 #define MANGO_ENTITYUTILS_H
 
 #include <string>
@@ -10,6 +10,6 @@ namespace tomato
 {
 	bool ContainsUUID(entt::registry& reg, UUID id);
 	bool ContainsName(entt::registry& reg, std::string_view name);
-	std::string GenerateEntityName(entt::registry& reg);
+	std::string GenerateEntityName(entt::registry& reg, std::string_view baseName = "Entity");
 }
 #endif // !MANGO_ENTITYUTILS_H

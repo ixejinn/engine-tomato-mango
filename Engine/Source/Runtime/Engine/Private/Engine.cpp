@@ -3,13 +3,15 @@
 #include "Tick/TickClock.h"
 #include "State/DefaultState.h"
 #include "ECS/SystemUpdateContexts.h"
+#include "Serialization/ComponentRegistry.h"
+
 #include "Utils/Logger.h"
 
 namespace tomato {
     Engine::Engine(const int width, const int height, const char* title, NetMode netMode)
         : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), netMode_(netMode), network_(nullptr), gameNet_(nullptr)
     {
-        
+        Serialization::ComponentRegistry::GetInstance().Init();
     }
 
     Engine::~Engine() = default;

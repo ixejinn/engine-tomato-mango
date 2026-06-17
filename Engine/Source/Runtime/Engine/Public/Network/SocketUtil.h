@@ -1,4 +1,4 @@
-#ifndef MANGO_SOCKET_UTIL_H
+ï»¿#ifndef MANGO_SOCKET_UTIL_H
 #define MANGO_SOCKET_UTIL_H
 
 #include <vector>
@@ -10,15 +10,15 @@ namespace tomato
 	{
 	public:
 		/**
-		 * WinSock ÃÊ±âÈ­
-		 * ÇÁ·Î±×·¥ ½ÃÀÛ ½Ã ´Ü ÇÑ ¹ø¸¸ È£ÃâµÇ¾î¾ß ÇÏ¸ç,
-		 * CreateSocket ÀÌÀü¿¡ ¹İµå½Ã ¼±Çà
+		 * WinSock ì´ˆê¸°í™”
+		 * í”„ë¡œê·¸ë¨ ì‹œì‘ ì‹œ ë‹¨ í•œ ë²ˆë§Œ í˜¸ì¶œë˜ì–´ì•¼ í•˜ë©°,
+		 * CreateSocket ì´ì „ì— ë°˜ë“œì‹œ ì„ í–‰
 		 */
 		static bool InitWinsock();
 
 		/**
-		 * Winsock Á¾·á Ã³¸®
-		 * ÇÁ·Î±×·¥ Á¾·á ½Ã È£Ãâ
+		 * Winsock ì¢…ë£Œ ì²˜ë¦¬
+		 * í”„ë¡œê·¸ë¨ ì¢…ë£Œ ì‹œ í˜¸ì¶œ
 		 */
 		static void CleanUp();
 

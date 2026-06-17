@@ -1,5 +1,6 @@
 ﻿#include <entt/entt.hpp>
 #include "Prefab/UIPrefab.h"
+#include "ECS/Components/Nametag.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/Text.h"
 #include "ECS/Components/Hierarchy.h"
@@ -11,6 +12,7 @@
 #include "Resource/Render/Texture.h"
 #include "Resource/AssetRegistry.h"
 
+#include "Prefab/EntityUtils.h"
 
 namespace tomato
 {
@@ -18,6 +20,7 @@ namespace tomato
 	{
 		const entt::entity canvas = reg.create();
 
+        reg.emplace<NametagComponent>(canvas, GenerateUUID(), GenerateEntityName(reg, "Canvas"));
         reg.emplace<tomato::CanvasComponent>(canvas);
         reg.emplace<tomato::UIComponent>(canvas, canvas, 0, UIType::Canvas);
         reg.emplace<tomato::RectTransformComponent>(canvas);
@@ -37,6 +40,7 @@ namespace tomato
 
         const auto button = reg.create();
 
+        reg.emplace<NametagComponent>(button, GenerateUUID(), GenerateEntityName(reg, "Button"));
         reg.emplace<UIComponent>(button, canvas, 0);
         reg.emplace<RectTransformComponent>(button, pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(100.f, 100.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
         auto& selectable = reg.emplace<SelectableComponent>(button);
@@ -50,6 +54,7 @@ namespace tomato
             GetAssetID(Texture::PrimitiveName));
 
         const auto buttonText = reg.create();
+        reg.emplace<NametagComponent>(buttonText, GenerateUUID(), GenerateEntityName(reg, "Text"));
         reg.emplace<UIComponent>(buttonText, canvas, 0, UIType::Text);
         reg.emplace<TextComponent>(buttonText, "Button", glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f }, 30.f);
         reg.emplace<RectTransformComponent>(buttonText, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
@@ -65,6 +70,7 @@ namespace tomato
 
         const auto text = reg.create();
 
+        reg.emplace<NametagComponent>(text, GenerateUUID(), GenerateEntityName(reg, "Text"));
         reg.emplace<UIComponent>(text, canvas, 0, UIType::Text);
         reg.emplace<TextComponent>(text, inText, color, size, GetAssetID(fontName));
         reg.emplace<RectTransformComponent>(text, pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
@@ -79,7 +85,8 @@ namespace tomato
         entt::entity canvas = GetCanvas(reg);
         
         const auto img = reg.create();
-        
+
+        reg.emplace<NametagComponent>(img, GenerateUUID(), GenerateEntityName(reg, "Image"));
         reg.emplace<UIComponent>(img, canvas, 0);
 
         auto texture = AssetRegistry<Texture>::GetInstance().Get(GetAssetID(textureName));

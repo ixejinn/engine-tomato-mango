@@ -11,6 +11,7 @@
 #include "Input/KeyConstants.h"
 #include "Utils/Logger.h"
 
+#include "ECS/Components/Nametag.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Rigidbody.h"
@@ -27,6 +28,10 @@
 
 #include "Prefab/Prefab.h"
 #include "Prefab/UIPrefab.h"
+#include "Prefab/EntityUtils.h"
+
+#include "Serialization/ComponentSerializer.h"
+#include <fstream>
 using namespace tomato;
 
 void TestState::Init() {
@@ -42,6 +47,7 @@ void TestState::Init() {
 
     // Camera
     const auto cam = registry_.create();
+    registry_.emplace<NametagComponent>(cam, GenerateUUID(), GenerateEntityName(registry_));
     registry_.emplace<TransformComponent>(cam,
                                           glm::vec3(0.f, 1.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
                                            //glm::vec3(0.f, 5.f, 0.f), glm::vec3(-90.f, 0.f, 0.f));
@@ -54,6 +60,7 @@ void TestState::Init() {
 
     // Player character
     const auto me = registry_.create();
+    registry_.emplace<NametagComponent>(me, GenerateUUID(), GenerateEntityName(registry_));
     auto& trfCompMe = registry_.emplace<TransformComponent>(me);
 
     registry_.emplace<VelocityComponent>(me);
@@ -69,6 +76,7 @@ void TestState::Init() {
 
     // Player collider
     const auto colP = registry_.create();
+    registry_.emplace<NametagComponent>(colP, GenerateUUID(), GenerateEntityName(registry_));
     SetHierarchy(registry_, me, colP);
 
     auto& trfColP = registry_.emplace<TransformComponent>(colP);
@@ -85,6 +93,7 @@ void TestState::Init() {
 
     // You
     const auto you = registry_.create();
+    registry_.emplace<NametagComponent>(you, GenerateUUID(), GenerateEntityName(registry_));
     auto& trfCompW = registry_.emplace<TransformComponent>(you, glm::vec3(-3, 0, 0), glm::vec3(0, 0, 0));
 
     registry_.emplace<VelocityComponent>(you);
@@ -99,6 +108,7 @@ void TestState::Init() {
 
     // collider
     const auto colW = registry_.create();
+    registry_.emplace<NametagComponent>(colW, GenerateUUID(), GenerateEntityName(registry_));
     SetHierarchy(registry_, you, colW);
 
     auto& trfColW = registry_.emplace<TransformComponent>(colW);
@@ -164,8 +174,23 @@ void TestState::Init() {
     auto& uiCmp = registry_.get<UIComponent>(targetLabel);
     uiCmp.sortOrder = 1;
     CreateImage(registry_, "Resources/Contents/WATER_GAME_LOGO.png", {200.f, 300.f});
-#endif
+    //auto& nametag = registry_.emplace<NametagComponent>(btn, GenerateUUID(), GenerateEntityName(registry_));
+    //auto& nametag1 = registry_.emplace<NametagComponent>(targetLabel, GenerateUUID(), GenerateEntityName(registry_, "Label"));
 
+    //std::cout << nametag.id << ", " << nametag.name << std::endl;
+    //std::cout << nametag1.id << ", " << nametag1.name << std::endl;
+#endif
+    /*nlohmann::json testData = Serialization::LoadJsonData("Resources/Engine/Assets/test.data");
+    Serialization::Save(testData, nametag);
+    Serialization::Save(testData, trfCompMe);
+
+    std::ofstream ofs("Resources/Engine/Assets/test.data");
+    if (!ofs.is_open())
+        return;
+
+    ofs << testData.dump(4);
+    ofs.close();*/
+    Serialization::SaveScene(registry_, "Resources/Engine/Assets/test.data");
 }
 
 void TestState::Update() {
