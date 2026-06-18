@@ -96,7 +96,8 @@ namespace tomato {
             if (auto result = FindClosestPointOnSimplex(simplex))
                 closestP = *result;
             else {
-                return EPA::GetNormalDepth(simplex, col1, col2, trf1, trf2);
+
+                return EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2);
                 // return CollisionInfo{glm::vec3{0.f}, 0.f};
             }
 
@@ -109,7 +110,7 @@ namespace tomato {
         auto length = glm::length(closestP);
         if (length > 1e-4f)
             return CollisionInfo{closestP, length};
-        return EPA::GetNormalDepth(simplex, col1, col2, trf1, trf2);
+        return EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2);
         // return CollisionInfo{glm::vec3{0.f}, 0.f};
     }
 
@@ -197,8 +198,14 @@ namespace tomato {
             if (auto result = FindClosestPointOnSimplex(simplex))
                 searchDir = result.value();
             else {
-                if (!col1.isTrigger && !col2.isTrigger)
+                if (!col1.isTrigger && !col2.isTrigger) {
                     TMT_WARN << "Simplex already encloses origin. " << (int)e1 << " " << (int)e2;
+
+                    if (auto info = EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2)) {
+                        TMT_INFO << "Penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
+                        TMT_INFO << "Penetration depth : " << info->depth;
+                    }
+                }
                 break;
             }
 
