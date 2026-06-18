@@ -76,14 +76,14 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Resource/Audio/Audio.h
         Source/Runtime/Engine/Public/TomatoFwd.h
         Source/Runtime/Core/Public/Containers/UnorderedPair.h
-        Source/Runtime/Engine/Public/Collision/Narrow/GJK.h
-        Source/Runtime/Engine/Public/Collision/Narrow/EPA.h
-        Source/Runtime/Engine/Public/Collision/Broad/BroadPhase.h
+        Source/Runtime/Engine/Private/Collision/Narrow/GJK.h
+        Source/Runtime/Engine/Private/Collision/Narrow/EPA.h
+        Source/Runtime/Engine/Public/Collision/BroadPhase.h
         Source/Runtime/Engine/Public/Collision/CollisionFwd.h
-        Source/Runtime/Engine/Public/Collision/Broad/SAP.h
-        Source/Runtime/Engine/Public/Collision/Narrow/NarrowPhase.h
-        Source/Runtime/Engine/Public/Collision/CollisionInfo.h
-        Source/Runtime/Engine/Public/Math/Normal.h
+        Source/Runtime/Engine/Private/Collision/Broad/SAP.h
+        Source/Runtime/Engine/Public/Collision/NarrowPhase.h
+        Source/Runtime/Engine/Public/Collision/CollisionResult.h
+        Source/Runtime/Core/Public/Math/Normal.h
         Source/Runtime/Engine/Public/Network/NetworkFwd.h
         Source/Runtime/Engine/Public/Network/NetConnection.h
         Source/Runtime/Core/Public/Network/SocketAddress.h
@@ -107,6 +107,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Prefab/Prefab.h
         Source/Runtime/Engine/Public/ECS/Systems/GravitySystem.h
         Source/Runtime/Engine/Private/Prefab/Character/CharacterMovement.h
+        Source/Runtime/Engine/Public/Collision/CollisionPair.h
+        Source/Runtime/Core/Public/Math/GeometryTests.h
 )
 
 set(ENGINE_SOURCES
@@ -136,7 +138,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Resource/Audio/Audio.cpp
         Source/Runtime/Engine/Private/Collision/Narrow/GJK.cpp
         Source/Runtime/Engine/Private/Collision/Narrow/EPA.cpp
-        Source/Runtime/Engine/Private/Math/Normal.cpp
+        Source/Runtime/Core/Private/Math/Normal.cpp
         Source/Runtime/Engine/Private/Collision/Broad/SAP.cpp
         Source/Runtime/Engine/Private/Utils/Utf.cpp
         Source/Runtime/Engine/Private/Input/InputUI.cpp

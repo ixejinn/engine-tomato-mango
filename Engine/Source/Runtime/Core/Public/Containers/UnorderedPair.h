@@ -24,15 +24,6 @@ namespace tomato {
 
 namespace std {
     template<>
-    struct hash<tomato::UnorderedPair<entt::entity>> {
-        size_t operator()(const tomato::UnorderedPair<entt::entity>& p) const {
-            uint64_t pack =
-                    (static_cast<uint64_t>(p.a) << 32) | static_cast<uint64_t>(p.b);
-            return std::hash<uint64_t>{}(pack);
-        }
-    };
-
-    template<>
     struct hash<tomato::UnorderedPair<uint32_t>> {
         size_t operator()(const tomato::UnorderedPair<uint32_t>& p) const {
             uint64_t pack =

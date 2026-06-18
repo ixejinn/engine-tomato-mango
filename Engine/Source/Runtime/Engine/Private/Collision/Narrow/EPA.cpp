@@ -21,7 +21,7 @@ namespace tomato {
         distance = glm::dot(normal, points[idx0]);
     }
 
-    std::optional<CollisionInfo> EPA::GetPenetrationInfo(
+    std::optional<CollisionResult> EPA::GetPenetrationInfo(
         std::vector<glm::vec3>& points, const ColliderComponent& col1, const ColliderComponent& col2, TransformComponent& trf1, TransformComponent& trf2) {
         if (points.size() != 4) {
             TMT_ERR << "Invalid simplex size: " << points.size();
@@ -52,8 +52,8 @@ namespace tomato {
             // Check termination condition
             float dist = glm::dot(nearest->normal, points.back());
             float diff = dist - nearest->distance;
-            if (dist < 0 || (diff < 1e-3f && diff > -1e-3f) || ++iteration >= 20)
-                return CollisionInfo{nearest->normal, nearest->distance};
+            if (dist < 0 || (diff < 1e-3f && diff > -1e-3f) || ++iteration >= 32)
+                return CollisionResult{nearest->normal, nearest->distance};
 
             // Expand polytope
             std::unordered_set<UnorderedPair<uint32_t>> edgesToExpand;

@@ -1,37 +1,32 @@
 #include "Collision/Narrow/GJK.h"
+#include "Collision/Narrow/EPA.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
 #include "Collision/ColliderSupport.h"
 #include "Collision/CollisionEvent.h"
-#include "Collision/Narrow/EPA.h"
 #include "ECS/Components/Rigidbody.h"
-#include "Math/Normal.h"
 #include "Utils/Logger.h"
 #include "SimulationConfig.h"
 #include "Event/EventDispatcher.h"
 
 namespace tomato {
-    // Registry support function per collider
+    // Registry support function for collider type
     EnumArray<ColliderType, GJK::SupportFunc> GJK::supportFunctions_ = {
         {ColliderType::Cube, support::Cube},
         {ColliderType::Sphere, support::Sphere},
 //        {ColliderType::Capsule, support::Capsule}
     };
 
-    std::optional<CollisionInfo> GJK::DetectCollision(
-        entt::registry& reg, entt::entity e1, entt::entity e2) {
-        auto& col1 = reg.get<ColliderComponent>(e1);
-        auto& col2 = reg.get<ColliderComponent>(e2);
+    std::optional<CollisionResult> GJK::CheckIntersection(entt::registry& reg, const CollisionPair& pair) {
+        if (pair.isTrigger) {
+            if (GJKBool(reg, pair.entities.a, pair.entities.b))
+                return CollisionResult{};
 
-        if (col1.isTrigger || col2.isTrigger) {
-            if (GJKBool(reg, e1, e2))
-                return CollisionInfo{};
-            else
-                return std::nullopt;
+            return std::nullopt;
         }
-        else
-            return GJKRaycast(reg, e1, e2);
+
+        return GJKRaycast(reg, pair.entities.a, pair.entities.b);
     }
 
     glm::vec3 GJK::GetSupportPoint(
@@ -58,7 +53,7 @@ namespace tomato {
         simplex.push_back(supportP);
 
         int iteration = 0;
-        while (++iteration < 20) {
+        while (++iteration < 32) {
             if (auto result = FindClosestPointOnSimplex(simplex))
                 closestP = *result;
             else
@@ -72,7 +67,7 @@ namespace tomato {
         return true;
     }
 
-    std::optional<CollisionInfo> GJK::GJKDistance(
+    std::optional<CollisionResult> GJK::GJKDistance(
             entt::registry& reg, entt::entity e1, entt::entity e2) {
         TMT_INFO << "========== GJK distance " << (int)e1 << " " << (int)e2;
         auto& col1 = reg.get<ColliderComponent>(e1);
@@ -110,12 +105,12 @@ namespace tomato {
 
         auto length = glm::length(closestP);
         if (length > 1e-4f)
-            return CollisionInfo{closestP, length};
+            return CollisionResult{closestP, length};
         return EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2);
         // return CollisionInfo{glm::vec3{0.f}, 0.f};
     }
 
-    std::optional<CollisionInfo> GJK::GJKRaycast(
+    std::optional<CollisionResult> GJK::GJKRaycast(
             entt::registry& reg, entt::entity e1, entt::entity e2) {
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
@@ -203,8 +198,8 @@ namespace tomato {
 //                    TMT_WARN << "Simplex already encloses origin. " << (int)e1 << " " << (int)e2;
 
                     if (auto info = EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2)) {
-                        TMT_INFO << " penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
-                        TMT_INFO << " penetration depth : " << info->depth << ", weight: " << weight;
+                        // TMT_INFO << " penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
+                        // TMT_INFO << " penetration depth : " << info->toi << ", weight: " << weight;
                         info->weight = weight;
                         EventDispatcher::GetInstance().Enqueue(PenetrationEvent{e1, e2, &reg, info.value()});
                     }
@@ -233,7 +228,7 @@ namespace tomato {
                 hitNormal = glm::normalize(hitNormal);
             }
 
-            return CollisionInfo{hitNormal, hitFraction, weight};
+            return CollisionResult{hitNormal, hitFraction, weight};
         }
 
 //        TMT_INFO << "기타 비충돌 종료";
@@ -478,12 +473,6 @@ namespace tomato {
         float v = vb * denom;
         float w = vc * denom;
         return a + ab * v + ac * w;
-    }
-
-    int GJK::PointOutsideOfPlane(
-            const glm::vec3& p,
-            const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
-        return glm::dot(p - a, glm::cross(b - a, c - a)) >= 0.f;
     }
 
     int GJK::PointOutsideOfPlane(

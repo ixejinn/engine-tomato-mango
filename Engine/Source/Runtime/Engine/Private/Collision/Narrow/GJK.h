@@ -2,16 +2,17 @@
 #define MANGO_GJK_H
 
 #include <glm/vec3.hpp>
-#include "Collision/Narrow/NarrowPhase.h"
+#include "Collision/NarrowPhase.h"
 #include "Collision/CollisionConstants.h"
+#include "ECS/PhysCompFwd.h"
 #include "Containers/EnumArray.h"
 #include "Event/EventSignal.h"
 
 namespace tomato {
     class GJK : public NarrowPhase {
     public:
-        std::optional<CollisionInfo> DetectCollision(
-            entt::registry& reg, entt::entity e1, entt::entity e2) override;
+        std::optional<CollisionResult> CheckIntersection(
+            entt::registry& reg, const CollisionPair& pair) override;
 
         static glm::vec3 GetSupportPoint(
             const glm::vec3& worldDir,
@@ -22,10 +23,10 @@ namespace tomato {
         static bool GJKBool(
                 entt::registry& reg, entt::entity e1, entt::entity e2);
 
-        static std::optional<CollisionInfo> GJKDistance(
+        static std::optional<CollisionResult> GJKDistance(
                 entt::registry& reg, entt::entity e1, entt::entity e2);
 
-        static std::optional<CollisionInfo> GJKRaycast(
+        static std::optional<CollisionResult> GJKRaycast(
                 entt::registry& reg, entt::entity e1, entt::entity e2);
 
         static glm::vec3 Support(
@@ -36,9 +37,6 @@ namespace tomato {
         static glm::vec3 FindClosestPointOnTriangle(std::vector<glm::vec3>& simplex);
 
         static glm::vec3 ClosestPtPointTriangle(
-            const glm::vec3& p,
-            const glm::vec3& a, const glm::vec3& b, const glm::vec3& c);
-        static int PointOutsideOfPlane(
             const glm::vec3& p,
             const glm::vec3& a, const glm::vec3& b, const glm::vec3& c);
         static int PointOutsideOfPlane(

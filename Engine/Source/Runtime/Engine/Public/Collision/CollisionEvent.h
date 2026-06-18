@@ -3,28 +3,28 @@
 
 #include <glm/vec3.hpp>
 #include <entt/entt.hpp>
-#include "Collision/CollisionInfo.h"
+#include "Collision/CollisionResult.h"
 
 namespace tomato {
     struct PenetrationEvent {
         entt::entity e1, e2;
         entt::registry* reg;
 
-        CollisionInfo info;
+        CollisionResult info;
     };
 
     struct CollisionEnterEvent {
         entt::entity e1, e2;
         entt::registry* reg;
 
-        CollisionInfo info;
+        CollisionResult info;
     };
 
     struct CollisionStayEvent {
         entt::entity e1, e2;
         entt::registry* reg;
 
-        CollisionInfo info;
+        CollisionResult info;
     };
 
     struct CollisionExitEvent {

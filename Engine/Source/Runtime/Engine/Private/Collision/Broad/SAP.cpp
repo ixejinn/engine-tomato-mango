@@ -1,12 +1,12 @@
 #include <list>
 #include <entt/entt.hpp>
 #include "Collision/Broad/SAP.h"
+#include "Collision/CollisionPair.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Hierarchy.h"
-#include "ECS/Systems/CollisionSystem.h"
 
 namespace tomato {
-    void SAP::DetectCollision(entt::registry &reg, std::vector<CollisionPair> &candidates) {
+    void SAP::FindCollisionCandidates(entt::registry &reg, std::vector<CollisionPair> &candidates) {
         auto group = reg.group<ColliderComponent>();
 
         // Sort by AABB.min.x for x-axis SAP
@@ -46,35 +46,13 @@ namespace tomato {
                         continue;
                     }
 
-                    // // Check parent
-                    // if (GetRootEntity(reg, e) == GetRootEntity(reg, *it))
-                    //     continue;
-                    //
-                    // // Check collision layer
-                    // if (!layerMatrix_.CanCollide(col.layer, colAct.layer))
-                    // {
-                    //     ++it;
-                    //     continue;
-                    // }
-
                     // Check AABB
                     if (!CheckAABBAxisY(col, colAct) || !CheckAABBAxisZ(col, colAct)) {
                         ++it;
                         continue;
                     }
 
-                    // if (colAct.max.y < col.min.y || col.max.y < colAct.min.y)
-                    // {
-                    //     ++it;
-                    //     continue;
-                    // }
-                    // if (colAct.max.z < col.min.z || col.max.z < colAct.min.z)
-                    // {
-                    //     ++it;
-                    //     continue;
-                    // }
-
-                    candidates.emplace_back(e, *it);
+                    candidates.emplace_back(e, *it, (col.isTrigger || colAct.isTrigger));
                     ++it;
                 }
 

@@ -2,15 +2,13 @@
 #define MANGO_COLLISIONSYSTEM_H
 
 #include <entt/fwd.hpp>
-#include <glm/vec3.hpp>
 #include <vector>
-#include <functional>
 #include <unordered_map>
 #include <memory>
 #include "ECS/Systems/System.h"
-#include "ECS/PhysCompFwd.h"
 #include "Collision/CollisionEventFwd.h"
 #include "Collision/CollisionFwd.h"
+#include "Collision/CollisionPair.h"
 #include "Collision/Narrow/GJK.h"
 
 namespace tomato {
@@ -22,12 +20,12 @@ namespace tomato {
         void Update(SimContext& simCtx) override;
 
     private:
-        void DetectBroad(entt::registry& reg);
+        void DetectBroad(SimContext& simCtx);
         void DetectNarrow(SimContext& simCtx);
 
         static void SetAABB(entt::registry& reg, entt::entity e);
 
-        static void SolveCollision(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info);
+        static void ResolveCollision(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionResult& info);
 
         static void OnPenetration(const PenetrationEvent& e);
 
@@ -42,8 +40,11 @@ namespace tomato {
         std::unique_ptr<BroadPhase> broadPhase_;
         std::unique_ptr<NarrowPhase> narrowPhase_;
 
+        /// Broad-phase collision candidates for narrow-phase check.
         std::vector<CollisionPair> candidates_;
-        std::unordered_map<CollisionPair, bool> collisionPairs_;
+
+        /// Active collision pairs to determine ENTER/STAY/EXIT states.
+        std::unordered_map<CollisionPair, bool> activePairs_;
     };
 }
 

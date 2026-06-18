@@ -6,7 +6,7 @@
 #include <optional>
 #include "Containers/UnorderedPair.h"
 #include "ECS/Components/Collision.h"
-#include "Collision/CollisionInfo.h"
+#include "Collision/CollisionResult.h"
 
 namespace tomato {
     class EPA {
@@ -19,7 +19,7 @@ namespace tomato {
             float distance;                     /// from origin.
         };
 
-        static std::optional<CollisionInfo> GetPenetrationInfo(std::vector<glm::vec3>& simplex,
+        static std::optional<CollisionResult> GetPenetrationInfo(std::vector<glm::vec3>& simplex,
                  const ColliderComponent& col1, const ColliderComponent& col2,
                  TransformComponent& trf1, TransformComponent& trf2);
     };
