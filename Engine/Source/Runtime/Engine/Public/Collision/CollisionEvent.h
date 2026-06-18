@@ -6,6 +6,13 @@
 #include "Collision/CollisionInfo.h"
 
 namespace tomato {
+    struct PenetrationEvent {
+        entt::entity e1, e2;
+        entt::registry* reg;
+
+        CollisionInfo info;
+    };
+
     struct CollisionEnterEvent {
         entt::entity e1, e2;
         entt::registry* reg;

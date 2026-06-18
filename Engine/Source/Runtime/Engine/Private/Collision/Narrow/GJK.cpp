@@ -9,6 +9,7 @@
 #include "Math/Normal.h"
 #include "Utils/Logger.h"
 #include "SimulationConfig.h"
+#include "Event/EventDispatcher.h"
 
 namespace tomato {
     // Registry support function per collider
@@ -71,9 +72,9 @@ namespace tomato {
         return true;
     }
 
-    // TODO: 무한루프
-    CollisionInfo GJK::GJKDistance(
+    std::optional<CollisionInfo> GJK::GJKDistance(
             entt::registry& reg, entt::entity e1, entt::entity e2) {
+        TMT_INFO << "========== GJK distance " << (int)e1 << " " << (int)e2;
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
         auto& trf1 = reg.get<TransformComponent>(e1);
@@ -95,8 +96,11 @@ namespace tomato {
 
             if (auto result = FindClosestPointOnSimplex(simplex))
                 closestP = *result;
-            else
-                return CollisionInfo{glm::vec3{0.f}, 0.f};
+            else {
+
+                return EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2);
+                // return CollisionInfo{glm::vec3{0.f}, 0.f};
+            }
 
             supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
 
@@ -107,7 +111,8 @@ namespace tomato {
         auto length = glm::length(closestP);
         if (length > 1e-4f)
             return CollisionInfo{closestP, length};
-        return CollisionInfo{glm::vec3{0.f}, 0.f};
+        return EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2);
+        // return CollisionInfo{glm::vec3{0.f}, 0.f};
     }
 
     std::optional<CollisionInfo> GJK::GJKRaycast(
@@ -117,12 +122,26 @@ namespace tomato {
         auto& trf1 = reg.get<TransformComponent>(e1);
         auto& trf2 = reg.get<TransformComponent>(e2);
 
-        auto vel1 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e1));
-        auto vel2 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e2));
+        glm::vec3 v1{0.f};
+        glm::vec3 v2{0.f};
 
-        glm::vec3 relVel = ((vel1 ? vel1->velocity : glm::vec3{0.f}) - (vel2 ? vel2->velocity : glm::vec3{0.f}));
-        if (glm::length2(relVel) < 1e-6f)
+        if (auto vel1 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e1)))
+            v1 = vel1->velocity;
+        if (auto vel2 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e2)))
+            v2 = vel2->velocity;
+
+        float lenV1 = glm::length(v1);
+        float lenV2 = glm::length(v2);
+        float sumV = lenV1 + lenV2;
+        if (sumV < 1e-6f)
             return std::nullopt;
+        float weight = lenV1 / sumV;
+
+        glm::vec3 relVel = v1 - v2;
+        if (glm::length2(relVel) < 1e-6f) {
+//            return GJKDistance(reg, e1, e2);
+            return std::nullopt;
+        }
         glm::vec3 ray = -relVel * FIXED_DELTA_TIME;
         // TMT_INFO << "GJK raycast " << (int)e1 << " " << (int)e2 << " relVel: " << relVel.x << " " << relVel.y << " " << relVel.z;
 
@@ -152,7 +171,7 @@ namespace tomato {
                 float dotVR = glm::dot(searchDir, ray);
                 // TMT_INFO << "(" << iteration << ") dotVR: " << dotVR;
                 if (dotVR >= -1e-5f) {
-                    TMT_INFO << "Ray가 닿을 수 없음 " << dotVR << " | relative velocity: " << relVel.x << " " << relVel.y << " " << relVel.z;
+//                    TMT_INFO << "Ray가 닿을 수 없음 " << dotVR << " | relative velocity: " << relVel.x << " " << relVel.y << " " << relVel.z;
                     // Ray와 CSO가 같은 방향(평행) 또는 수직으로 멀어짐
                     // Ray를 계속 전진시켜도 CSO에 닿을 수 없음
                     return std::nullopt;
@@ -161,7 +180,7 @@ namespace tomato {
                 // Ray가 CSO를 향하므로 ray를 전진
                 hitFraction -= dotVW / dotVR;
                 if (hitFraction > 1) {
-                    TMT_INFO << "비충돌 종료";
+//                    TMT_INFO << "비충돌 종료";
                     // 이번 틱에서 충돌하지 않음 (비충돌 종료)
                     return std::nullopt;
                 }
@@ -180,8 +199,16 @@ namespace tomato {
             if (auto result = FindClosestPointOnSimplex(simplex))
                 searchDir = result.value();
             else {
-                if (!col1.isTrigger && !col2.isTrigger)
-                    TMT_WARN << "Simplex already encloses origin. " << (int)e1 << " " << (int)e2;
+                if (!col1.isTrigger && !col2.isTrigger) {
+//                    TMT_WARN << "Simplex already encloses origin. " << (int)e1 << " " << (int)e2;
+
+                    if (auto info = EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2)) {
+                        TMT_INFO << " penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
+                        TMT_INFO << " penetration depth : " << info->depth << ", weight: " << weight;
+                        info->weight = weight;
+                        EventDispatcher::GetInstance().Enqueue(PenetrationEvent{e1, e2, &reg, info.value()});
+                    }
+                }
                 break;
             }
 
@@ -206,10 +233,10 @@ namespace tomato {
                 hitNormal = glm::normalize(hitNormal);
             }
 
-            return CollisionInfo{hitNormal, hitFraction};
+            return CollisionInfo{hitNormal, hitFraction, weight};
         }
 
-        TMT_INFO << "기타 비충돌 종료";
+//        TMT_INFO << "기타 비충돌 종료";
         return std::nullopt;
     }
 

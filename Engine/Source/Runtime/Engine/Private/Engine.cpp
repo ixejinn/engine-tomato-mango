@@ -28,7 +28,7 @@ namespace tomato {
             if (nextState_)
                 ChangeState(tickClock);
 
-            TMT_INFO << " ---------- " << tickClock.GetTick() << " ---------- ";
+            // TMT_INFO << " ---------- " << tickClock.GetTick() << " ---------- ";
 
             ProcessInputEvents(tickClock.GetTick());
             EventDispatcher::GetInstance().Update();
