@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include <entt/entt.hpp>
 
 #include "Serialization/ComponentInfo.h"
@@ -30,14 +31,17 @@ namespace tomato::Serialization
 		template<typename T>
 		void RegisterComponent(const std::string& name);
 
-		const auto& GetInfo() const
+		const auto& GetComponentInfo() const
 		{
 			return componentInfo_;
 		}
 
+		const ComponentInfo* FindComponentInfo(const std::string& name) const;
+
 	private:
 		bool initialized = false;
 		std::vector<ComponentInfo> componentInfo_;
+		std::unordered_map<std::string, size_t> nameToIndex_;
 	};
 
 	template<typename T>
@@ -68,7 +72,8 @@ namespace tomato::Serialization
 				reg.emplace<T>(e, std::move(component));
 			};
 
-		componentInfo_.push_back(info);
+		nameToIndex_[name] = componentInfo_.size();
+		componentInfo_.push_back(std::move(info));
 	}
 }
 

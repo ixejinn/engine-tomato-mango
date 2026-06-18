@@ -1,12 +1,14 @@
-set(CONTENTS_HEADERS
+﻿set(CONTENTS_HEADERS
         Source/TestState.h
+        Source/LoadState.h
 )
 
 set(CONTENTS_SOURCES
         Source/Main.cpp
         Source/TestState.cpp
+        Source/LoadState.cpp
         Source/CollisionTestComponent.h
-)
+ "Source/LoadState.cpp")
 
 add_executable(contents
         ${CONTENTS_SOURCES}

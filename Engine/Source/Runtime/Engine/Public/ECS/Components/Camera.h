@@ -1,7 +1,8 @@
-#ifndef MANGO_CAMERA_H
+﻿#ifndef MANGO_CAMERA_H
 #define MANGO_CAMERA_H
 
 #include <glm/mat4x4.hpp>
+#include "Serialization/Json.h"
 
 namespace tomato {
     enum ProjectionMode {
@@ -28,6 +29,14 @@ namespace tomato {
     };
 
     struct MainCameraTag {};
+
+    NLOHMANN_JSON_SERIALIZE_ENUM(
+        ProjectionMode,
+        {
+            { ProjectionMode::Perspective, "Perspective"},
+            { ProjectionMode::Orthogonal, "Orthogonal"}
+        }
+    )
 }
 
 #endif //MANGO_CAMERA_H

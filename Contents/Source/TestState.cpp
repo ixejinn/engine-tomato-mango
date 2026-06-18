@@ -47,7 +47,7 @@ void TestState::Init() {
 
     // Camera
     const auto cam = registry_.create();
-    registry_.emplace<NametagComponent>(cam, GenerateUUID(), GenerateEntityName(registry_));
+    registry_.emplace<NametagComponent>(cam, GenerateUUID(), GenerateEntityName(registry_, "Camera"));
     registry_.emplace<TransformComponent>(cam,
                                           glm::vec3(0.f, 1.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
                                            //glm::vec3(0.f, 5.f, 0.f), glm::vec3(-90.f, 0.f, 0.f));
@@ -180,8 +180,8 @@ void TestState::Init() {
     //std::cout << nametag.id << ", " << nametag.name << std::endl;
     //std::cout << nametag1.id << ", " << nametag1.name << std::endl;
 #endif
-    /*nlohmann::json testData = Serialization::LoadJsonData("Resources/Engine/Assets/test.data");
-    Serialization::Save(testData, nametag);
+    //json testData = Serialization::LoadJsonData("Resources/Engine/Assets/test.data");
+    /*Serialization::Save(testData, nametag);
     Serialization::Save(testData, trfCompMe);
 
     std::ofstream ofs("Resources/Engine/Assets/test.data");
@@ -191,6 +191,7 @@ void TestState::Init() {
     ofs << testData.dump(4);
     ofs.close();*/
     Serialization::SaveScene(registry_, "Resources/Engine/Assets/test.data");
+    //Serialization::LoadScene(registry_, "Resources/Engine/Assets/test.data");
 }
 
 void TestState::Update() {

@@ -1,14 +1,26 @@
 ﻿#ifndef MANGO_COMPONENTSERIALIZER_H
 #define MANGO_COMPONENTSERIALIZER_H
 
+#include <map>
 #include <entt/fwd.hpp>
 #include "Serialization/Json.h"
+#include "../../Core/Public/UUID.h"
 
 namespace tomato
 {
+	struct CameraComponent;
 	struct TransformComponent;
+	struct InputChannelComponent;
+	struct MovementComponent;
+	struct VelocityComponent;
 	struct RenderComponent;
-	struct NametagComponent;
+
+	struct UIComponent;
+	struct CanvasComponent;
+	struct RectTransformComponent;
+	struct TargetComponent;
+	struct SelectableComponent;
+	struct TextComponent;
 }
 
 namespace tomato::Serialization
@@ -17,17 +29,51 @@ namespace tomato::Serialization
 	json LoadJsonData(const char*);
 
 	void SaveScene(entt::registry&, const char*);
+	void LoadScene(entt::registry&, const char*);
 
 	void SaveEntity(json&, entt::registry&, entt::entity);
 
-	void Save(json&, const NametagComponent&);
-	void Load(const json&, NametagComponent&);
+	void CreateEntity(const json&, entt::registry&, std::map<UUID, entt::entity>&);
+	void LoadComponents(const json&, entt::registry&, std::map<UUID, entt::entity>&);
+	void LoadEntityComponents(const json&, entt::registry&, entt::entity);
+
+	//Component Save & Load Func
+
+	void Save(json&, const CameraComponent&);
+	void Load(const json&, CameraComponent&);
+
+	void Load(const json&, InputChannelComponent&);
+	void Save(json&, const InputChannelComponent&);
 
 	void Save(json&, const TransformComponent&);
 	void Load(const json&, TransformComponent&);
 
+	void Save(json&, const MovementComponent&);
+	void Load(const json&, MovementComponent&);
+
+	void Save(json&, const VelocityComponent&);
+	void Load(const json&, VelocityComponent&);
+
 	void Save(json&, const RenderComponent&);
 	void Load(const json&, RenderComponent&);
+
+	void Save(json&, const UIComponent&);
+	void Load(const json&, UIComponent&);
+
+	void Save(json&, const CanvasComponent&);
+	void Load(const json&, CanvasComponent&);
+
+	void Save(json&, const RectTransformComponent&);
+	void Load(const json&, RectTransformComponent&);
+
+	void Save(json&, const TargetComponent&);
+	void Load(const json&, TargetComponent&);
+
+	void Save(json&, const SelectableComponent&);
+	void Load(const json&, SelectableComponent&);
+
+	void Save(json&, const TextComponent&);
+	void Load(const json&, TextComponent&);
 }
 
 #endif // !MANGO_COMPONENTSERIALIZER_H

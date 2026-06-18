@@ -5,8 +5,13 @@
 #include "Serialization/ComponentRegistry.h"
 
 #include "ECS/Components/Nametag.h"
+#include "ECS/Components/Camera.h"
 #include "ECS/Components/Transform.h"
+#include "ECS/Components/Movement.h"
+#include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Render.h"
+#include "ECS/Components/UI.h"
+#include "ECS/Components/Text.h"
 
 #include "Utils/Logger.h"
 
@@ -63,23 +68,68 @@ namespace tomato::Serialization
 		ofs << root.dump(4);
 	}
 
+	void LoadScene(entt::registry& reg, const char* path)
+	{
+		json root = LoadJsonData(path);
+		if (root == nullptr)
+			return;
+
+		//Temporary map
+		std::map<UUID, entt::entity> entityMap_;
+
+		CreateEntity(root, reg, entityMap_);
+
+		LoadComponents(root, reg, entityMap_);
+
+		//ResolveHierarchy;
+
+	}
+
+	void CreateEntity(const json& root, entt::registry& reg, std::map<UUID, entt::entity>& entityMap_)
+	{
+		for (auto& entityData : root["Entities"])
+		{
+			UUID id = entityData["ID"];
+			std::string name = entityData["Name"];
+
+			entt::entity e = reg.create();
+
+			reg.emplace<NametagComponent>(e, id, name);
+
+			entityMap_[id] = e;
+		}
+	}
+
+	void LoadComponents(const json& root, entt::registry& reg, std::map<UUID, entt::entity>& entityMap_)
+	{
+		for (auto& entityData : root["Entities"])
+		{
+			UUID id = entityData["ID"];
+			entt::entity e = entityMap_[id];
+
+			LoadEntityComponents(entityData["Components"], reg, e);
+		}
+	}
+
+	void LoadEntityComponents(const json& componentData, entt::registry& reg, entt::entity entity)
+	{
+		for (auto& [key, value] : componentData.items())
+		{
+			std::cout << "key : " << key << ", value : " << value << '\n';
+			if (auto* info = ComponentRegistry::GetInstance().FindComponentInfo(key))
+				info->Load(value, reg, entity);
+		}
+	}
+
 	void SaveEntity(json& data, entt::registry& reg, entt::entity entity)
 	{
 		auto& tag = reg.get<NametagComponent>(entity);
 		data["ID"] = tag.id;
 		data["Name"] = tag.name;
 
-		json components = json::object();
-#if 0
-		if (reg.any_of<TransformComponent>(entity))
-		{
-			json transform;
-			Save(transform, reg.get<TransformComponent>(entity));
+		auto& componentInfo = ComponentRegistry::GetInstance().GetComponentInfo();
 
-			components["Transform"] = transform;
-		}
-#elif 1
-		auto& componentInfo = ComponentRegistry::GetInstance().GetInfo();
+		json components = json::object();
 		for (auto& info : componentInfo)
 		{
 			if (!info.Has(reg, entity))
@@ -90,100 +140,242 @@ namespace tomato::Serialization
 
 			components[info.name] = componentJson;
 		}
-#endif
+
 		data["Components"] = components;
-	}
-
-	void Save(json& data, const NametagComponent& nametag)
-	{
-		//TMT_DEBUG << "Save NametagComponent to Json";
-
-		json nametag_;
-		nametag_["id"] = nametag.id;
-		nametag_["name"] = nametag.name;
-
-		data.push_back(nametag_);
-	}
-
-	void Load(const json& data, NametagComponent& nametag)
-	{
-		auto idData = data.find("Nametag");
-		if (idData == data.end())
-			return;
-
-		nametag.id = idData.value().find("id").value();
-		nametag.name = idData.value().find("name").value();
 	}
 
 	void Save(json& data, const TransformComponent& transform)
 	{
 		//TMT_DEBUG << "Save TransformComponent to Json";
 
-		json transform_;
-		transform_["position"]	= { transform.GetLocalPosition().x, transform.GetLocalPosition().y, transform.GetLocalPosition().z };
-		transform_["degree"] = { transform.GetLocalEulerDegree().x, transform.GetLocalEulerDegree().y, transform.GetLocalEulerDegree().z };
-		transform_["scale"] = { transform.GetLocalScale().x, transform.GetLocalScale().y, transform.GetLocalScale().z };
+		data["position"] = {
+			transform.GetLocalPosition().x, transform.GetLocalPosition().y, transform.GetLocalPosition().z
+		};
+		
+		data["degree"] = {
+			transform.GetLocalEulerDegree().x, transform.GetLocalEulerDegree().y, transform.GetLocalEulerDegree().z
+		};
+		
+		data["scale"] = {
+			transform.GetLocalScale().x, transform.GetLocalScale().y, transform.GetLocalScale().z
+		};
 
-		data.push_back(transform_);
+	}
+
+	void Save(json& data, const CameraComponent& camera)
+	{
+		data["mode"] = camera.mode;
+		data["degree"] = camera.degree;
+		data["zNear"] = camera.zNear;
+		data["zFar"] = camera.zFar;
+	}
+
+	void Load(const json& data, CameraComponent& camera)
+	{
+		camera.mode = data["mode"];
+		camera.degree = data["degree"];
+		camera.zNear = data["zNear"];
+		camera.zFar = data["zFar"];
+	}
+
+	void Save(json& data, const InputChannelComponent& channel)
+	{
+		data["channel"] = channel.channel;
+	}
+
+	void Load(const json& data, InputChannelComponent& channel)
+	{
+		channel.channel = data["channel"];
 	}
 
 	void Load(const json& data, TransformComponent& transform)
 	{
 		//TMT_DEBUG << "Load TransformComponent to Json";
 
-		auto transformData = data.find("Transform");
-		if (transformData == data.end())
-			return;
-		
-		glm::vec3 newValue;
+		transform.SetPosition(
+			glm::vec3(data["position"][0], data["position"][1], data["position"][2])
+		);
 
-		newValue.x = transformData.value().find("position").value().at(0);
-		newValue.y = transformData.value().find("position").value().at(1);
-		newValue.z = transformData.value().find("position").value().at(2);
-		transform.SetPosition(newValue);
+		transform.SetEulerDegree(
+			glm::vec3(data["degree"][0], data["degree"][1], data["degree"][2])
+		);
 
-		newValue.x = transformData.value().find("degree").value().at(0);
-		newValue.y = transformData.value().find("degree").value().at(1);
-		newValue.z = transformData.value().find("degree").value().at(2);
-		transform.SetEulerDegree(newValue);
+		transform.SetScale(
+			glm::vec3(data["scale"][0], data["scale"][1], data["scale"][2])
+		);
+	}
 
-		newValue.x = transformData.value().find("scale").value().at(0);
-		newValue.y = transformData.value().find("scale").value().at(1);
-		newValue.z = transformData.value().find("scale").value().at(2);
-		transform.SetScale(newValue);
+	void Save(json& data, const MovementComponent& movement)
+	{
+		data["speed"] = movement.horizontalSpeed;
+	}
+
+	void Load(const json& data, MovementComponent& movement)
+	{
+		movement.horizontalSpeed = data["speed"];
 	}
 
 	void Save(json& data, const RenderComponent& render)
 	{
 		//TMT_DEBUG << "Save RenderComponent to Json";
 
-		json render_;
-		render_["color"] = { render.color.x, render.color.y, render.color.z, render.color.w };
-		render_["mesh"] = render.mesh;
-		render_["shader"] = render.shader;
-		render_["texture"] = render.texture;
-		
-		data.push_back(render_);
+		data["color"] = { render.color.x, render.color.y, render.color.z, render.color.w };
+		data["mesh"] = render.mesh;
+		data["shader"] = render.shader;
+		data["texture"] = render.texture;
 	}
 
 	void Load(const json& data, RenderComponent& render)
 	{
 		//TMT_DEBUG << "Load RenderComponent to Json";
 
-		auto renderData = data.find("Render");
-		if (renderData == data.end())
-			return;
+		render.color = {
+			data["color"][0],
+			data["color"][1],
+			data["color"][2],
+			data["color"][3]
+		};
 
-		glm::vec4 inColor;
-		inColor.x = renderData.value().find("color").value().at(0);
-		inColor.y = renderData.value().find("color").value().at(1);
-		inColor.z = renderData.value().find("color").value().at(2);
-		inColor.w = renderData.value().find("color").value().at(3);
+		render.mesh = data["mesh"];
+		render.shader = data["shader"];
+		render.texture = data["texture"];
+	}
 
-		render.color = inColor;
+	void Save(json& data, const VelocityComponent& velocity)
+	{
+		data["velocity"] = { velocity.velocity.x, velocity.velocity.y, velocity.velocity.z };
+	}
 
-		render.mesh = renderData.value().find("mesh").value();
-		render.shader = renderData.value().find("shader").value();
-		render.texture = renderData.value().find("texture").value();
+	void Load(const json& data, VelocityComponent& velocity)
+	{
+		velocity.velocity =
+		{
+			data["velocity"][0],
+			data["velocity"][1],
+			data["velocity"][2],
+		};
+	}
+
+	void Save(json& data, const UIComponent& ui)
+	{
+		//data["canvas"] = ui.canvas;
+		data["sortOrder"] = ui.sortOrder;
+		data["type"] = ui.type;
+	}
+
+	void Load(const json& data, UIComponent& ui)
+	{
+		//ui.canvas = data["canvas"];
+		ui.sortOrder = data["sortOrder"];
+		ui.type = data["type"];
+	}
+
+	void Save(json& data, const CanvasComponent& canvas)
+	{
+		data["refSize"] = { canvas.referenceSize.x, canvas.referenceSize.y };
+		data["actSize"] = { canvas.actualSize.x, canvas.actualSize.y };
+		data["sortOrder"] = canvas.sortOrder;
+	}
+
+	void Load(const json& data, CanvasComponent& canvas)
+	{
+		canvas.referenceSize = { data["refSize"][0], data["refSize"][1] };
+		canvas.actualSize = { data["actSize"][0], data["actSize"][1] };
+		canvas.sortOrder = data["sortOrder"];
+	}
+
+	void Save(json& data, const RectTransformComponent& rectTransform)
+	{
+		data["anchorPos"] = { rectTransform.anchoredPosition.x, rectTransform.anchoredPosition.y };
+		data["offsetMin"] = { rectTransform.offsetMin.x, rectTransform.offsetMin.y };
+		data["offsetMax"] = { rectTransform.offsetMax.x, rectTransform.offsetMax.y };
+		data["sizeDelta"] = { rectTransform.sizeDelta.x, rectTransform.sizeDelta.y };
+		data["anchorMin"] = { rectTransform.anchorMin.x, rectTransform.anchorMin.y };
+		data["anchorMax"] = { rectTransform.anchorMax.x, rectTransform.anchorMax.y };
+		data["pivot"] = { rectTransform.pivot.x, rectTransform.pivot.y };
+	}
+
+	void Load(const json& data, RectTransformComponent& rectTransform)
+	{
+		rectTransform.anchoredPosition = { data["anchorPos"][0], data["anchorPos"][1] };
+		rectTransform.offsetMin = { data["offsetMin"][0], data["offsetMin"][1] };
+		rectTransform.offsetMax = { data["offsetMax"][0], data["offsetMax"][1] };
+		rectTransform.sizeDelta = { data["sizeDelta"][0], data["sizeDelta"][1] };
+		rectTransform.anchorMin = { data["anchorMin"][0], data["anchorMin"][1] };
+		rectTransform.anchorMax = { data["anchorMax"][0], data["anchorMax"][1] };
+		rectTransform.pivot = { data["pivot"][0], data["pivot"][1] };
+	}
+
+	void Save(json& data, const TargetComponent& target)
+	{
+		//data["taget"] = target.target;
+		data["offset"] = { target.headOffset.x, target.headOffset.y, target.headOffset.z };
+	}
+
+	void Load(const json& data, TargetComponent& target)
+	{
+		//target.target = data["taget"];
+		target.headOffset = {
+			data["offset"][0],
+			data["offset"][1],
+			data["offset"][2]
+		};
+	}
+
+	void Save(json& data, const SelectableComponent& selectable)
+	{
+		data["interactable"] = selectable.interactable;
+
+		data["normal"] = { selectable.normalColor.x, selectable.normalColor.y, selectable.normalColor.z, selectable.normalColor.w };
+		data["highlight"] = { selectable.highlightedColor.x, selectable.highlightedColor.y, selectable.highlightedColor.z, selectable.highlightedColor.w };
+		data["pressed"] = { selectable.pressedColor.x, selectable.pressedColor.y, selectable.pressedColor.z, selectable.pressedColor.w };
+	}
+
+	void Load(const json& data, SelectableComponent& selectable)
+	{
+		selectable.interactable = data["interactable"];
+
+		selectable.normalColor = {
+			data["normal"][0],
+			data["normal"][1],
+			data["normal"][2],
+			data["normal"][3]
+		};
+
+		selectable.highlightedColor = {
+			data["highlight"][0],
+			data["highlight"][1],
+			data["highlight"][2],
+			data["highlight"][3]
+		};
+
+		selectable.pressedColor = {
+			data["pressed"][0],
+			data["pressed"][1],
+			data["pressed"][2],
+			data["pressed"][3]
+		};
+	}
+	
+	void Save(json& data, const TextComponent& text)
+	{
+		data["text"] = text.text;
+		data["color"] = { text.color.x, text.color.y, text.color.z, text.color.w };
+		data["fontSize"] = text.fontSize;
+		data["font"] = text.font;
+
+	}
+
+	void Load(const json& data, TextComponent& text)
+	{
+		text.text = data["text"];
+		text.color = {
+			data["color"][0],
+			data["color"][1],
+			data["color"][2],
+			data["color"][3],
+		};
+		text.fontSize = data["fontSize"];
+		text.font = data["font"];
 	}
 }

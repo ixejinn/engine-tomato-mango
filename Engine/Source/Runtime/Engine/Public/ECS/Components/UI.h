@@ -5,6 +5,7 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <entt/entt.hpp>
+#include "Serialization/Json.h"
 
 namespace tomato {
 	enum class RenderMode
@@ -33,6 +34,15 @@ namespace tomato {
 
 		COUNT
 	};
+
+	NLOHMANN_JSON_SERIALIZE_ENUM(
+		UIType,
+		{
+			{ UIType::Canvas, "Canvas" },
+			{ UIType::Default, "Default" },
+			{ UIType::Text,  "Text" }
+		}
+	)
 
 	struct UIComponent
 	{

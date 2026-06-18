@@ -2,6 +2,7 @@
 #include <memory>
 #include "Engine.h"
 #include "TestState.h"
+#include "LoadState.h"
 using namespace tomato;
 
 int main() {
