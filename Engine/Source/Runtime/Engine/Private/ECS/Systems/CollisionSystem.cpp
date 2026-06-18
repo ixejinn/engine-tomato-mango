@@ -27,6 +27,8 @@ namespace tomato {
         EventDispatcher::GetInstance().Connect<TriggerEnterEvent, &CollisionSystem::OnTriggerEnter>();
         EventDispatcher::GetInstance().Connect<TriggerStayEvent, &CollisionSystem::OnTriggerStay>();
         EventDispatcher::GetInstance().Connect<TriggerExitEvent, &CollisionSystem::OnTriggerExit>();
+
+        EventDispatcher::GetInstance().Connect<PenetrationEvent, &CollisionSystem::OnPenetration>();
     }
 
     CollisionSystem::~CollisionSystem() = default;
@@ -41,6 +43,8 @@ namespace tomato {
         EventDispatcher::GetInstance().Update<CollisionStayEvent>();   // 보정용으로 수정
         EventDispatcher::GetInstance().Update<TriggerEnterEvent>();   // 보정용으로 수정
         EventDispatcher::GetInstance().Update<TriggerExitEvent>();   // 보정용으로 수정
+
+        EventDispatcher::GetInstance().Update<PenetrationEvent>();
     }
 
     void CollisionSystem::DetectBroad(entt::registry &reg) {
@@ -134,20 +138,19 @@ namespace tomato {
     }
 
     void CollisionSystem::SolveCollision(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info) {
-        TMT_INFO << "=========== Solve collision " << (int)e1 << " " << (int)e2;
-        // 보정
+//        TMT_INFO << "=========== Solve collision " << (int)e1 << " " << (int)e2;
         entt::entity root1 = GetRootEntity(reg, e1);
         entt::entity root2 = GetRootEntity(reg, e2);
 
         auto& trfRoot1 = reg.get<TransformComponent>(root1);
         auto& trfRoot2 = reg.get<TransformComponent>(root2);
 
-        TMT_INFO << " normal: " << info.normal.x << " " << info.normal.y << " " << info.normal.z;
+//        TMT_INFO << " normal: " << info.normal.x << " " << info.normal.y << " " << info.normal.z;
         if (auto* vel = reg.try_get<VelocityComponent>(root1)) {
-            TMT_INFO << "========== " << (int)root1 << "의 " << (int)e1 << " collider ==========";
-            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
-            auto pos = trfRoot1.GetLocalPosition();
-            TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
+//            TMT_INFO << "========== " << (int)root1 << "의 " << (int)e1 << " collider ==========";
+//            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+//            auto pos = trfRoot1.GetLocalPosition();
+//            TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
 
             glm::vec3 remainingMove = (1 - info.depth * info.weight) * vel->velocity;
 
@@ -162,16 +165,16 @@ namespace tomato {
             if (-epsilon < vel->velocity.z && vel->velocity.z < epsilon)
                 vel->velocity.z = 0.f;
 
-            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
-            pos = trfRoot1.GetLocalPosition();
-            TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
+//            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+//            pos = trfRoot1.GetLocalPosition();
+//            TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
         }
 
         if (auto* vel = reg.try_get<VelocityComponent>(root2)) {
-            TMT_INFO << "========== " << (int)root2 << "의 " << (int)e2 << " collider ==========";
-            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
-            auto pos = trfRoot2.GetLocalPosition();
-            TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
+//            TMT_INFO << "========== " << (int)root2 << "의 " << (int)e2 << " collider ==========";
+//            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+//            auto pos = trfRoot2.GetLocalPosition();
+//            TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
 
             float weight = 1 - info.weight;
             glm::vec3 remainingMove = (1 - info.depth * weight) * vel->velocity;
@@ -188,14 +191,37 @@ namespace tomato {
             if (-epsilon < vel->velocity.z && vel->velocity.z < epsilon)
                 vel->velocity.z = 0.f;
 
-            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
-            pos = trfRoot2.GetLocalPosition();
-            TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
+//            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+//            pos = trfRoot2.GetLocalPosition();
+//            TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
         }
     }
 
+    void CollisionSystem::OnPenetration(const PenetrationEvent& e) {
+        TMT_INFO << "=========== Solve penetration " << (int)e.e1 << " " << (int)e.e2;
+        entt::entity root1 = GetRootEntity(*e.reg, e.e1);
+        entt::entity root2 = GetRootEntity(*e.reg, e.e2);
+
+        auto& trfRoot1 = e.reg->get<TransformComponent>(root1);
+        auto& trfRoot2 = e.reg->get<TransformComponent>(root2);
+
+        constexpr float CORRECTION_SPEED = 3.5f;
+
+        auto bef = trfRoot1.GetLocalPosition();
+        trfRoot1.AddPosition(-e.info.normal * e.info.depth * e.info.weight * FIXED_DELTA_TIME * CORRECTION_SPEED);
+        auto aft = trfRoot1.GetLocalPosition();
+        TMT_INFO << (int)root1 << " bef: " << bef.x << " " << bef.y << " " << bef.z;
+        TMT_INFO << (int)root1 << " aft: " << aft.x << " " << aft.y << " " << aft.z;
+
+        bef = trfRoot2.GetLocalPosition();
+        trfRoot2.AddPosition(e.info.normal * e.info.depth * (1 - e.info.weight) * FIXED_DELTA_TIME * CORRECTION_SPEED);
+        aft = trfRoot2.GetLocalPosition();
+        TMT_INFO << (int)root2 << " bef: " << bef.x << " " << bef.y << " " << bef.z;
+        TMT_INFO << (int)root2 << " aft: " << aft.x << " " << aft.y << " " << aft.z;
+    }
+
     void CollisionSystem::OnCollisionEnter(const CollisionEnterEvent &e) {
-        TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+//        TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         SolveCollision(*e.reg, e.e1, e.e2, e.info);
 
@@ -210,7 +236,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnCollisionStay(const CollisionStayEvent& e) {
-        TMT_INFO << "Collision Stay " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+//        TMT_INFO << "Collision Stay " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         SolveCollision(*e.reg, e.e1, e.e2, e.info);
 
@@ -224,7 +250,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnCollisionExit(const CollisionExitEvent& e) {
-        TMT_INFO << "Collision Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+//        TMT_INFO << "Collision Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->exit)
@@ -236,7 +262,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnTriggerEnter(const TriggerEnterEvent& e) {
-        TMT_INFO << "Trigger Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+//        TMT_INFO << "Trigger Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnTriggerComponent>(e.e1);
         if (callback && callback->enter)
@@ -260,7 +286,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnTriggerExit(const TriggerExitEvent& e) {
-        TMT_INFO << "Trigger Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+//        TMT_INFO << "Trigger Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnTriggerComponent>(e.e1);
         if (callback && callback->exit)

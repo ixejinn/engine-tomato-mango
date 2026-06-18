@@ -7,7 +7,10 @@ namespace tomato {
             const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2) {
         const glm::vec3 vec01 = p1 - p0;
         const glm::vec3 vec02 = p2 - p0;
-        const glm::vec3 normal = glm::normalize(glm::cross(vec01, vec02));
+        glm::vec3 normal = glm::cross(vec01, vec02);
+        float lenN = glm::length(normal);
+        if (lenN > 1e-6f)
+            normal /= lenN;
         return (glm::dot(normal, (refP - p0)) >= 0 ? normal : -normal);
     }
 }

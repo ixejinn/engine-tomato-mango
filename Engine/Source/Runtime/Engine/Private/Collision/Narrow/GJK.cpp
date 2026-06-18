@@ -9,6 +9,7 @@
 #include "Math/Normal.h"
 #include "Utils/Logger.h"
 #include "SimulationConfig.h"
+#include "Event/EventDispatcher.h"
 
 namespace tomato {
     // Registry support function per collider
@@ -170,7 +171,7 @@ namespace tomato {
                 float dotVR = glm::dot(searchDir, ray);
                 // TMT_INFO << "(" << iteration << ") dotVR: " << dotVR;
                 if (dotVR >= -1e-5f) {
-                    TMT_INFO << "Ray가 닿을 수 없음 " << dotVR << " | relative velocity: " << relVel.x << " " << relVel.y << " " << relVel.z;
+//                    TMT_INFO << "Ray가 닿을 수 없음 " << dotVR << " | relative velocity: " << relVel.x << " " << relVel.y << " " << relVel.z;
                     // Ray와 CSO가 같은 방향(평행) 또는 수직으로 멀어짐
                     // Ray를 계속 전진시켜도 CSO에 닿을 수 없음
                     return std::nullopt;
@@ -179,7 +180,7 @@ namespace tomato {
                 // Ray가 CSO를 향하므로 ray를 전진
                 hitFraction -= dotVW / dotVR;
                 if (hitFraction > 1) {
-                    TMT_INFO << "비충돌 종료";
+//                    TMT_INFO << "비충돌 종료";
                     // 이번 틱에서 충돌하지 않음 (비충돌 종료)
                     return std::nullopt;
                 }
@@ -199,11 +200,13 @@ namespace tomato {
                 searchDir = result.value();
             else {
                 if (!col1.isTrigger && !col2.isTrigger) {
-                    TMT_WARN << "Simplex already encloses origin. " << (int)e1 << " " << (int)e2;
+//                    TMT_WARN << "Simplex already encloses origin. " << (int)e1 << " " << (int)e2;
 
                     if (auto info = EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2)) {
-                        TMT_INFO << "Penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
-                        TMT_INFO << "Penetration depth : " << info->depth;
+                        TMT_INFO << " penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
+                        TMT_INFO << " penetration depth : " << info->depth << ", weight: " << weight;
+                        info->weight = weight;
+                        EventDispatcher::GetInstance().Enqueue(PenetrationEvent{e1, e2, &reg, info.value()});
                     }
                 }
                 break;
@@ -233,7 +236,7 @@ namespace tomato {
             return CollisionInfo{hitNormal, hitFraction, weight};
         }
 
-        TMT_INFO << "기타 비충돌 종료";
+//        TMT_INFO << "기타 비충돌 종료";
         return std::nullopt;
     }
 

@@ -33,14 +33,18 @@ namespace tomato {
         polytope.emplace_back(points, 0, 1, 3);
         polytope.emplace_back(points, 0, 2, 3);
         polytope.emplace_back(points, 1, 2, 3);
-        Plain* nearest = &polytope[0];
 
         int iteration = 0;
-        while (iteration < 20) {
-            ++iteration;
+        while (true) {
+            Plain* nearest{nullptr};
             for (auto& plain : polytope) {
-                if (nearest->distance > plain.distance)
+                if (!nearest || nearest->distance > plain.distance)
                     nearest = &plain;
+            }
+
+            if (!nearest) {
+                TMT_ERR << "Incorrect polytope";
+                return std::nullopt;
             }
 
             points.push_back(GJK::GetSupportPoint(nearest->normal, col1, trf1, col2, trf2));
@@ -48,7 +52,7 @@ namespace tomato {
             // Check termination condition
             float dist = glm::dot(nearest->normal, points.back());
             float diff = dist - nearest->distance;
-            if (dist < 0 || (diff < 1e-3f && diff > -1e-3f))
+            if (dist < 0 || (diff < 1e-3f && diff > -1e-3f) || ++iteration >= 20)
                 return CollisionInfo{nearest->normal, nearest->distance};
 
             // Expand polytope
@@ -71,8 +75,5 @@ namespace tomato {
             for (const auto& edge : edgesToExpand)
                 polytope.emplace_back(points, edge.a, edge.b, lastIdx);
         }
-
-        TMT_INFO << "----- over iteration -----";
-        return CollisionInfo{nearest->normal, nearest->distance};
     }
 }

@@ -29,6 +29,8 @@ namespace tomato {
 
         static void SolveCollision(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info);
 
+        static void OnPenetration(const PenetrationEvent& e);
+
         static void OnCollisionEnter(const CollisionEnterEvent& e);
         static void OnCollisionStay(const CollisionStayEvent& e);
         static void OnCollisionExit(const CollisionExitEvent& e);
