@@ -10,6 +10,7 @@
 #include "Ecs/Components/Camera.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Font.h"
+#include "Prefab/EntityUtils.h"
 #include "Utils/Utf.h"
 #include "Utils/Logger.h"
 
@@ -159,7 +160,7 @@ namespace tomato
 			// children
 			auto& rect = ctx.registry.get<RectTransformComponent>(entity);
 			auto& parentRect = ctx.registry.get<RectTransformComponent>(hierarchy.parent);
-			auto& ui = ctx.registry.get<UIComponent>(entity);
+			//auto& ui = ctx.registry.get<UIComponent>(entity);
 
 			glm::vec2 scaleFactor = currentCanvas->actualSize / currentCanvas->referenceSize;
 			glm::vec2 parentSize = parentRect.computedSize;
@@ -174,7 +175,7 @@ namespace tomato
 				if (ctx.registry.all_of<TargetComponent>(entity))
 				{
 					auto& target = ctx.registry.get<TargetComponent>(entity);
-					auto& targetTransform = ctx.registry.get<TransformComponent>(target.target);
+					auto& targetTransform = ctx.registry.get<TransformComponent>(GetEntityByUUID(ctx.registry, target.target));
 
 					auto renderCtx = ctx.registry.ctx().get<RenderContext*>();
 					if (renderCtx->mainCam == entt::null)

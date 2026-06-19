@@ -1,13 +1,19 @@
-#ifndef MANGO_HIERARCHY_H
+﻿#ifndef MANGO_HIERARCHY_H
 #define MANGO_HIERARCHY_H
 
 #include <entt/entt.hpp>
 #include <vector>
+#include "UUID.h"
+#include "Prefab/EntityUtils.h"
 
 namespace tomato {
     struct RootEntityTag {};
 
     struct HierarchyComponent {
+        UUID parentID{ 0 };
+        std::vector<UUID> childrenID;
+
+        //cache
         entt::entity parent{ entt::null };
         std::vector<entt::entity> children;
     };
@@ -29,12 +35,15 @@ namespace tomato {
         if (!cHierarchy)
             cHierarchy = &(reg.emplace<HierarchyComponent>(child));
 
-        if (cHierarchy->parent != entt::null) {
-            auto& oldPHierarchy = reg.get<HierarchyComponent>(cHierarchy->parent);
+        if (cHierarchy->parentID != 0) {
+            auto& oldPHierarchy = reg.get<HierarchyComponent>(GetEntityByUUID(reg, cHierarchy->parentID));
+            auto& siblingsID = oldPHierarchy.childrenID;
             auto& siblings = oldPHierarchy.children;
             // siblings.erase(std::remove(siblings.begin(), siblings.end(), child), siblings.end());
+            std::erase(siblingsID, GetUUID(reg, child));
             std::erase(siblings, child);
         }
+        cHierarchy->parentID = GetUUID(reg, parent);
         cHierarchy->parent = parent;
 
         if (parent != entt::null) {
@@ -42,6 +51,7 @@ namespace tomato {
             if (!newPHierarchy)
                 newPHierarchy = &(reg.emplace<HierarchyComponent>(parent));
 
+            newPHierarchy->childrenID.push_back(GetUUID(reg, child));
             newPHierarchy->children.push_back(child);
 
             auto root = GetRootEntity(reg, parent);

@@ -6,6 +6,7 @@
 
 #include "ECS/Components/Camera.h"
 #include "ECS/SystemUpdateContexts.h"
+#include "Prefab/EntityUtils.h"
 
 #include "Utils/RegistryEntry.h"
 REGISTER_SYSTEM(tomato::SystemPhase::UITransformation, UITransformSystem)
@@ -41,7 +42,7 @@ namespace tomato
 
             rect.local_matrix = T * R * S;
 
-            if (ui.canvas == e)
+            if (GetEntityByUUID(r, ui.canvas) == e)
                 rect.world_matrix = rect.local_matrix;
 
             else if (hierarchy.parent != entt::null)

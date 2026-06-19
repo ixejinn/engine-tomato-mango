@@ -168,7 +168,7 @@ void TestState::Init() {
     CreateText(registry_, { 100.f, 0.f });
 
     auto targetLabel = CreateText(registry_, { 0.f, 0.f }, "player1", {1.0f, 1.0f, 0.f, 1.f}, 20.f);
-    registry_.emplace<TargetComponent>(targetLabel, me);
+    registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, me));
     SetHierarchy(registry_, GetCanvas(registry_), targetLabel);
 
     auto& uiCmp = registry_.get<UIComponent>(targetLabel);
@@ -190,7 +190,7 @@ void TestState::Init() {
 
     ofs << testData.dump(4);
     ofs.close();*/
-    Serialization::SaveScene(registry_, "Resources/Engine/Assets/test.data");
+    //Serialization::SaveScene(registry_, "Resources/Engine/Assets/test.data");
     //Serialization::LoadScene(registry_, "Resources/Engine/Assets/test.data");
 }
 

@@ -12,6 +12,7 @@
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/Text.h"
+#include "ECS/Components/Hierarchy.h"
 
 #include "Utils/Logger.h"
 
@@ -81,8 +82,7 @@ namespace tomato::Serialization
 
 		LoadComponents(root, reg, entityMap_);
 
-		//ResolveHierarchy;
-
+		ResolveHierarchy(reg, entityMap_);
 	}
 
 	void CreateEntity(const json& root, entt::registry& reg, std::map<UUID, entt::entity>& entityMap_)
@@ -118,6 +118,18 @@ namespace tomato::Serialization
 			std::cout << "key : " << key << ", value : " << value << '\n';
 			if (auto* info = ComponentRegistry::GetInstance().FindComponentInfo(key))
 				info->Load(value, reg, entity);
+		}
+	}
+
+	void ResolveHierarchy(entt::registry& reg, std::map<UUID, entt::entity>& entityMap_)
+	{
+		auto view = reg.view<HierarchyComponent>();
+		for (auto [e, hierarchy] : view.each())
+		{
+			hierarchy.parent =
+				hierarchy.parentID == 0 ? entt::null : entityMap_[hierarchy.parentID];
+			for (auto child : hierarchy.childrenID)
+				hierarchy.children.push_back(entityMap_[child]);
 		}
 	}
 
@@ -258,14 +270,14 @@ namespace tomato::Serialization
 
 	void Save(json& data, const UIComponent& ui)
 	{
-		//data["canvas"] = ui.canvas;
+		data["canvas"] = ui.canvas;
 		data["sortOrder"] = ui.sortOrder;
 		data["type"] = ui.type;
 	}
 
 	void Load(const json& data, UIComponent& ui)
 	{
-		//ui.canvas = data["canvas"];
+		ui.canvas = data["canvas"];
 		ui.sortOrder = data["sortOrder"];
 		ui.type = data["type"];
 	}
@@ -308,13 +320,13 @@ namespace tomato::Serialization
 
 	void Save(json& data, const TargetComponent& target)
 	{
-		//data["taget"] = target.target;
+		data["taget"] = target.target;
 		data["offset"] = { target.headOffset.x, target.headOffset.y, target.headOffset.z };
 	}
 
 	void Load(const json& data, TargetComponent& target)
 	{
-		//target.target = data["taget"];
+		target.target = data["taget"];
 		target.headOffset = {
 			data["offset"][0],
 			data["offset"][1],
@@ -363,7 +375,6 @@ namespace tomato::Serialization
 		data["color"] = { text.color.x, text.color.y, text.color.z, text.color.w };
 		data["fontSize"] = text.fontSize;
 		data["font"] = text.font;
-
 	}
 
 	void Load(const json& data, TextComponent& text)
@@ -378,4 +389,24 @@ namespace tomato::Serialization
 		text.fontSize = data["fontSize"];
 		text.font = data["font"];
 	}
+
+	void Save(json& data, const HierarchyComponent& hierarchy)
+	{
+		data["parent"] = hierarchy.parentID;
+		data["children"] = hierarchy.childrenID;
+	}
+
+	void Load(const json& data, HierarchyComponent& hierarchy)
+	{
+		hierarchy.childrenID.clear();
+
+		hierarchy.parentID = data["parent"];
+		hierarchy.childrenID = data["children"].get<std::vector<UUID>>();
+	}
+
+	void Save(json& data, const RootEntityTag& rootTag) {}
+	void Load(const json& data, RootEntityTag& rootTag) {}
+
+	void Save(json& data, const MainCameraTag& camTag) {}
+	void Load(const json& data, MainCameraTag& camTag) {}
 }

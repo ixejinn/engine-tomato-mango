@@ -7,6 +7,7 @@
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/Text.h"
+#include "ECS/Components/Hierarchy.h"
 
 namespace tomato::Serialization
 {
@@ -27,6 +28,10 @@ namespace tomato::Serialization
 		RegisterComponent<TargetComponent>("Target");
 		RegisterComponent<SelectableComponent>("Selectable");
 		RegisterComponent<TextComponent>("Text");
+		RegisterComponent<HierarchyComponent>("Hierarchy");
+		RegisterComponent<RootEntityTag>("TagRoot");
+		RegisterComponent<MainCameraTag>("TagMainCam");
+
 
 		initialized = true;
 	}

@@ -57,20 +57,36 @@ namespace tomato::Serialization
 				return reg.any_of<T>(e);
 			};
 
-		info.Save =
-			[](json& j, entt::registry& reg, entt::entity e)
-			{
-				Serialization::Save(j, reg.get<T>(e));
-			};
+		if constexpr (std::is_empty_v<T>)
+		{
+			info.Save =
+				[](json&, entt::registry&, entt::entity)
+				{
+				};
 
-		info.Load =
-			[](const json& j, entt::registry& reg, entt::entity e)
-			{
-				T component;
+			info.Load =
+				[](const json&, entt::registry& reg, entt::entity e)
+				{
+					reg.emplace<T>(e);
+				};
+		}
+		else
+		{
+			info.Save =
+				[](json& j, entt::registry& reg, entt::entity e)
+				{
+					Serialization::Save(j, reg.get<T>(e));
+				};
 
-				Serialization::Load(j, component);
-				reg.emplace<T>(e, std::move(component));
-			};
+			info.Load =
+				[](const json& j, entt::registry& reg, entt::entity e)
+				{
+					T component;
+
+					Serialization::Load(j, component);
+					reg.emplace<T>(e, std::move(component));
+				};
+		}
 
 		nameToIndex_[name] = componentInfo_.size();
 		componentInfo_.push_back(std::move(info));

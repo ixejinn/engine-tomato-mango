@@ -49,4 +49,20 @@ namespace tomato
 			++index;
 		}
 	}
+
+	entt::entity GetEntityByUUID(entt::registry& reg, UUID id)
+	{
+		const auto view = reg.view<NametagComponent>();
+		for (auto [e, tag] : view.each())
+		{
+			if (tag.id == id)
+				return e;
+		}
+	}
+
+	UUID GetUUID(entt::registry& reg, entt::entity e)
+	{
+		auto& tag = reg.get<NametagComponent>(e);
+		return tag.id;
+	}
 }

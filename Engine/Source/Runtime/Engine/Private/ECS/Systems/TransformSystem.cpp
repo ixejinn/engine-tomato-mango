@@ -2,7 +2,6 @@
 
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
-#include "ECS/Components/UI.h"
 
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Camera.h"

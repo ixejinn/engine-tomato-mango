@@ -6,6 +6,7 @@
 #include <glm/mat4x4.hpp>
 #include <entt/entt.hpp>
 #include "Serialization/Json.h"
+#include "UUID.h"
 
 namespace tomato {
 	enum class RenderMode
@@ -46,7 +47,8 @@ namespace tomato {
 
 	struct UIComponent
 	{
-		entt::entity canvas{ entt::null };
+		//entt::entity canvas{ entt::null };
+		UUID canvas{ 0 };
 		int sortOrder{ 0 };
 
 		UIType type{ UIType::Default };
@@ -91,7 +93,7 @@ namespace tomato {
 
 	struct TargetComponent
 	{
-		entt::entity target{ entt::null };
+		UUID target{ 0 };
 		glm::vec3 headOffset{ 0.f, 100.f, 0.f };
 	};
 

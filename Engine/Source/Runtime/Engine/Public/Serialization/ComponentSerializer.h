@@ -21,6 +21,10 @@ namespace tomato
 	struct TargetComponent;
 	struct SelectableComponent;
 	struct TextComponent;
+
+	struct HierarchyComponent;
+	struct RootEntityTag;
+	struct MainCameraTag;
 }
 
 namespace tomato::Serialization
@@ -36,9 +40,9 @@ namespace tomato::Serialization
 	void CreateEntity(const json&, entt::registry&, std::map<UUID, entt::entity>&);
 	void LoadComponents(const json&, entt::registry&, std::map<UUID, entt::entity>&);
 	void LoadEntityComponents(const json&, entt::registry&, entt::entity);
-
+	void ResolveHierarchy(entt::registry&, std::map<UUID, entt::entity>&);
+	
 	//Component Save & Load Func
-
 	void Save(json&, const CameraComponent&);
 	void Load(const json&, CameraComponent&);
 
@@ -74,6 +78,16 @@ namespace tomato::Serialization
 
 	void Save(json&, const TextComponent&);
 	void Load(const json&, TextComponent&);
+
+	void Save(json&, const HierarchyComponent&);
+	void Load(const json&, HierarchyComponent&);
+
+	// For Tag
+	void Save(json&, const RootEntityTag&);
+	void Load(const json&, RootEntityTag&);
+
+	void Save(json&, const MainCameraTag&);
+	void Load(const json&, MainCameraTag&);
 }
 
 #endif // !MANGO_COMPONENTSERIALIZER_H
