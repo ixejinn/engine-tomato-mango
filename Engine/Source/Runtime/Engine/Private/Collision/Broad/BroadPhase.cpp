@@ -2,6 +2,7 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Rigidbody.h"
+#include "ECS/Entity/Hierarchy.h"
 
 namespace tomato {
     bool BroadPhase::CheckAABBAxisX(ColliderComponent& col1, ColliderComponent& col2) {

@@ -107,12 +107,16 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Prefab/Prefab.h
         Source/Runtime/Engine/Public/ECS/Systems/GravitySystem.h
         Source/Runtime/Engine/Private/Prefab/Character/CharacterMovement.h
+        Source/Runtime/Engine/Public/ECS/Components/Lifetime.h
+        Source/Runtime/Engine/Private/ECS/Systems/GarbageEntityCollectionSystem.h
+        Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackConfig.h
+        Source/Runtime/Engine/Public/ECS/Entity/Lifetime.h
+        Source/Runtime/Engine/Public/ECS/Entity/Hierarchy.h
 )
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
         Source/Runtime/Core/Private/Collision/ColliderSupport.cpp
-        Source/Runtime/Engine/Public/Containers/Timeline.cpp
         Source/Runtime/Engine/Private/ECS/Systems/CameraSystem.cpp
         Source/Runtime/Engine/Private/Engine.cpp
         Source/Runtime/Engine/Private/Services/Window.cpp
@@ -160,6 +164,9 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Prefab/Prefab.cpp
         Source/Runtime/Engine/Private/ECS/Systems/GravitySystem.cpp
         Source/Runtime/Engine/Private/Prefab/Character/CharacterMovement.cpp
+        Source/Runtime/Engine/Private/ECS/Systems/GarbageEntityCollectionSystem.cpp
+        Source/Runtime/Engine/Private/ECS/Entity/Hierarchy.cpp
+        Source/Runtime/Engine/Private/ECS/Entity/Lifetime.cpp
 )
 
 add_library(engine STATIC

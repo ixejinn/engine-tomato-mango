@@ -2,6 +2,7 @@
 #include "Event/EventDispatcher.h"
 #include "Tick/TickClock.h"
 #include "State/DefaultState.h"
+#include "ECS/Systems/GarbageEntityCollectionSystem.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "Utils/Logger.h"
 
@@ -9,7 +10,7 @@ namespace tomato {
     Engine::Engine(const int width, const int height, const char* title, const bool isSingle)
         : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), isSingle_(isSingle), network_(nullptr), gameNet_(nullptr)
     {
-        
+
     }
 
     Engine::~Engine() = default;
@@ -21,6 +22,8 @@ namespace tomato {
     void Engine::SingleRun() {
         TickClock tickClock;
         window_.SetWindowUserPointer(&window_, &input_, &tickClock);
+
+        GarbageEntityCollectionSystem garbageCollectionSystem;
 
         ChangeState(tickClock);
 
@@ -35,6 +38,9 @@ namespace tomato {
 
             SimContext simCtx{currState_->GetRegistry(), tickClock.GetTick()};
             InputContext inputCtx{currState_->GetPlayerInputTimelines()};
+
+            garbageCollectionSystem.Update(simCtx);
+
             Simulate(tickClock, simCtx, inputCtx);
 
             RenderContext renderCtx{window_.GetWidth(), window_.GetHeight()};
@@ -68,6 +74,9 @@ namespace tomato {
 
             SimContext simCtx{ currState_->GetRegistry(), tickClock.GetTick() };
             InputContext inputCtx{ currState_->GetPlayerInputTimelines() };
+
+            // TODO: Add Garbage entity collection system update
+
             Simulate(tickClock, simCtx, inputCtx);
 
             RenderContext renderCtx{ window_.GetWidth(), window_.GetHeight() };

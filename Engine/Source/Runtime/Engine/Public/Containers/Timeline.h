@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include "RingArray.h"
-#include "Network/NetworkConfig.h"
+#include "GameNetwork/Rollback/RollbackConfig.h"
 
 namespace tomato {
     /**

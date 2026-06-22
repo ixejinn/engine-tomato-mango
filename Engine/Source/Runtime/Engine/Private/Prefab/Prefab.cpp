@@ -8,6 +8,7 @@
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Camera.h"
+#include "ECS/Entity/Hierarchy.h"
 #include "Resource/AssetHash.h"
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"

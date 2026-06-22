@@ -21,6 +21,7 @@
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
 #include "ECS/Components/Hierarchy.h"
+#include "ECS/Entity/Hierarchy.h"
 
 #include "Collision/CollisionEvent.h"
 #include "CollisionTestComponent.h"

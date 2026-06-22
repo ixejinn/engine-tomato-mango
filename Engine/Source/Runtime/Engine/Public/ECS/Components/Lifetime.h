@@ -1,0 +1,15 @@
+#ifndef MANGO_LIFETIME_H
+#define MANGO_LIFETIME_H
+
+#include <optional>
+#include <cstdint>
+
+namespace tomato {
+    struct Lifetime {
+        std::optional<uint32_t> constructed{std::nullopt};
+        std::optional<uint32_t> destructed{std::nullopt};
+        bool isActive{true};
+    };
+}
+
+#endif //MANGO_LIFETIME_H

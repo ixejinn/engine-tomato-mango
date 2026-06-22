@@ -2,6 +2,7 @@
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
+#include "ECS/Entity/Hierarchy.h"
 #include "Collision/ColliderSupport.h"
 #include "Collision/CollisionEvent.h"
 #include "Collision/Narrow/EPA.h"

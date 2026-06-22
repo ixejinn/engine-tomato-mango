@@ -13,7 +13,6 @@ namespace tomato {
     private:
         void UpdateScreenUI(SimContext& simCtx);
 
-    private:
         static void UpdateFrom(
             entt::registry& reg, entt::entity cur,
             const glm::quat& pQuat, const glm::vec3& pScale,

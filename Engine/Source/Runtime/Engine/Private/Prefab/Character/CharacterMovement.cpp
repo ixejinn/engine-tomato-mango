@@ -3,6 +3,7 @@
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Rigidbody.h"
+#include "ECS/Entity/Hierarchy.h"
 #include "Utils/Logger.h"
 
 namespace tomato::CharacterMovement {
