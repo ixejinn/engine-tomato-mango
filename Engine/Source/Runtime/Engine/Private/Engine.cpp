@@ -70,26 +70,36 @@ namespace tomato {
         while (!window_.ShouldClose() && isRunning_) {
             if (nextState_)
                 ChangeState(tickClock);
+            InputContext inputCtx{ currState_->GetPlayerInputTimelines() };
 
-            auto currTick = tickClock.GetTick();
-            gameNet_->ResetLatestTick(currTick);
+            TMT_INFO << " ---------- " << tickClock.GetTick() << " ---------- ";
+
+            gameNet_->ResetLatestTick(tickClock.GetTick());
             network_->ProcessQueuedUDPPacket();
 
-            InputContext inputCtx{ currState_->GetPlayerInputTimelines() };
-            auto rollbackTick = gameNet_->GetLatestTick();
-            if (rollbackTick < currTick) {
-                rollbackManager_->Rollback(currState_->GetRegistry(), rollbackTick);
+            // TODO: Rollback
+            auto currT = tickClock.GetTick();
+            auto lateT = gameNet_->GetLatestTick();
+            if (currT != lateT && currT - lateT <= ROLLBACK_WINDOW) {
+                rollbackManager_->Rollback(currState_->GetRegistry(), lateT);
+                TMT_INFO << "Rollback to " << lateT;
 
-                SimContext rollbackCtx{currState_->GetRegistry(), rollbackTick};
-                while (rollbackCtx.tick < currTick)
-                    Simulate(currTick - rollbackTick, rollbackCtx, inputCtx);
+                SimContext rbSimCtx{currState_->GetRegistry(), lateT};
+                while (rbSimCtx.tick < currT) {
+                    systemManager_.Simulate(rbSimCtx, inputCtx);
+                    currState_->Update();
+                    ++rbSimCtx.tick;
+
+                    rollbackManager_->Capture(rbSimCtx);
+                }
             }
+            // Rollback
 
             ProcessInputEvents(tickClock.GetTick());
             EventDispatcher::GetInstance().Update();
 
             SimContext simCtx{ currState_->GetRegistry(), tickClock.GetTick() };
-//            InputContext inputCtx{ currState_->GetPlayerInputTimelines() };
+            // InputContext inputCtx{ currState_->GetPlayerInputTimelines() };
 
             // TODO: Add Garbage entity collection system update
 
@@ -134,16 +144,6 @@ namespace tomato {
         }
     }
 
-    void Engine::Simulate(int cnt, SimContext& simCtx, InputContext& inputCtx) {
-        while (cnt--) {
-            systemManager_.Simulate(simCtx, inputCtx);
-            currState_->Update();
-
-            ++simCtx.tick;
-            rollbackManager_->Capture(simCtx);
-        }
-    }
-
     void Engine::Render(SimContext& simCtx, RenderContext& renderCtx) {
         systemManager_.Render(simCtx, renderCtx);
         window_.SwapBuffers();
@@ -167,12 +167,19 @@ namespace tomato {
         currState_->Init();
 
         inputUI_.SetState(currState_.get());
-        if (!isSingle_) // !!!!!!!!!! temporary !!!!!!!!!!!
-            gameNet_->SetState(currState_.get());
+        // if (!isSingle_) // !!!!!!!!!! temporary !!!!!!!!!!!
+        //     gameNet_->SetState(currState_.get());
+
         tc.ResetTick();
 
         SimContext simCtx{currState_->GetRegistry(), tc.GetTick()};
         systemManager_.InitializeTransform(simCtx);
+
+        if (!isSingle_) // !!!!!!!!!! temporary !!!!!!!!!!!
+        {
+            gameNet_->SetState(currState_.get());
+            rollbackManager_->Capture(simCtx);
+        }
     }
 
     void Engine::TryStartGame(std::unique_ptr<State>&& newState)

@@ -28,6 +28,7 @@ void TestState::Init() {
 
     // Set rollback
     engine_.SetRollbackComponent<MovementComponent>();
+    engine_.SetRollbackComponent<VelocityComponent>();
 
     // Create game object
 

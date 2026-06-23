@@ -198,7 +198,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnPenetration(const PenetrationEvent& e) {
-        TMT_INFO << "=========== Solve penetration " << (int)e.e1 << " " << (int)e.e2;
+        // TMT_INFO << "=========== Solve penetration " << (int)e.e1 << " " << (int)e.e2;
         entt::entity root1 = GetRootEntity(*e.reg, e.e1);
         entt::entity root2 = GetRootEntity(*e.reg, e.e2);
 
@@ -210,14 +210,14 @@ namespace tomato {
         auto bef = trfRoot1.GetLocalPosition();
         trfRoot1.AddPosition(-e.info.normal * e.info.depth * e.info.weight * FIXED_DELTA_TIME * CORRECTION_SPEED);
         auto aft = trfRoot1.GetLocalPosition();
-        TMT_INFO << (int)root1 << " bef: " << bef.x << " " << bef.y << " " << bef.z;
-        TMT_INFO << (int)root1 << " aft: " << aft.x << " " << aft.y << " " << aft.z;
+        // TMT_INFO << (int)root1 << " bef: " << bef.x << " " << bef.y << " " << bef.z;
+        // TMT_INFO << (int)root1 << " aft: " << aft.x << " " << aft.y << " " << aft.z;
 
         bef = trfRoot2.GetLocalPosition();
         trfRoot2.AddPosition(e.info.normal * e.info.depth * (1 - e.info.weight) * FIXED_DELTA_TIME * CORRECTION_SPEED);
         aft = trfRoot2.GetLocalPosition();
-        TMT_INFO << (int)root2 << " bef: " << bef.x << " " << bef.y << " " << bef.z;
-        TMT_INFO << (int)root2 << " aft: " << aft.x << " " << aft.y << " " << aft.z;
+        // TMT_INFO << (int)root2 << " bef: " << bef.x << " " << bef.y << " " << bef.z;
+        // TMT_INFO << (int)root2 << " aft: " << aft.x << " " << aft.y << " " << aft.z;
     }
 
     void CollisionSystem::OnCollisionEnter(const CollisionEnterEvent &e) {

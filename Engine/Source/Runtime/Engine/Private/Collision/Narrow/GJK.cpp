@@ -75,7 +75,7 @@ namespace tomato {
 
     std::optional<CollisionInfo> GJK::GJKDistance(
             entt::registry& reg, entt::entity e1, entt::entity e2) {
-        TMT_INFO << "========== GJK distance " << (int)e1 << " " << (int)e2;
+        // TMT_INFO << "========== GJK distance " << (int)e1 << " " << (int)e2;
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
         auto& trf1 = reg.get<TransformComponent>(e1);
@@ -204,8 +204,8 @@ namespace tomato {
 //                    TMT_WARN << "Simplex already encloses origin. " << (int)e1 << " " << (int)e2;
 
                     if (auto info = EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2)) {
-                        TMT_INFO << " penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
-                        TMT_INFO << " penetration depth : " << info->depth << ", weight: " << weight;
+                        // TMT_INFO << " penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
+                        // TMT_INFO << " penetration depth : " << info->depth << ", weight: " << weight;
                         info->weight = weight;
                         EventDispatcher::GetInstance().Enqueue(PenetrationEvent{e1, e2, &reg, info.value()});
                     }

@@ -26,7 +26,6 @@ namespace tomato
         void Write(NetBitWriter& writer);
 
         PlayerId id;
-        uint32_t tick{ 0 };
         InputRecord inputRecord;
     };
 }
