@@ -165,6 +165,12 @@ void TestState::Init() {
     auto btn = CreateButton(registry_, {0.f, -10.f});
     auto& btnuiCmp = registry_.get<UIComponent>(btn);
     btnuiCmp.sortOrder = 100;
+    auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
+    mouseEvt.onClick =
+        [this](const MouseClickEvent& e)
+        {
+            uiController_.onClick(e);
+        };
     CreateText(registry_, { 100.f, 0.f });
 
     auto targetLabel = CreateText(registry_, { 0.f, 0.f }, "player1", {1.0f, 1.0f, 0.f, 1.f}, 20.f);

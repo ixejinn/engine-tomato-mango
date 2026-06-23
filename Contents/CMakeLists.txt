@@ -1,6 +1,7 @@
 ﻿set(CONTENTS_HEADERS
         Source/TestState.h
         Source/LoadState.h
+        Source/UIController.h
 )
 
 set(CONTENTS_SOURCES
@@ -8,6 +9,7 @@ set(CONTENTS_SOURCES
         Source/TestState.cpp
         Source/LoadState.cpp
         Source/CollisionTestComponent.h
+        Source/UIController.cpp
  "Source/LoadState.cpp")
 
 add_executable(contents

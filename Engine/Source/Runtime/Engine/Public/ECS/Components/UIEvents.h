@@ -5,17 +5,17 @@
 
 namespace tomato
 {
-	struct MouseEnterEvent
+	struct MouseClickEvent
 	{
 		entt::entity e;
 		entt::registry* reg;
 	};
 
-	using UIEventCallBack = std::function<void(const MouseEnterEvent&)>;
+	using UIMouseEventCallBack = std::function<void(const MouseClickEvent&)>;
 
 	struct MouseEventComponent
 	{
-		UIEventCallBack onClick{ nullptr };
+		UIMouseEventCallBack onClick{ nullptr };
 	};
 }
 

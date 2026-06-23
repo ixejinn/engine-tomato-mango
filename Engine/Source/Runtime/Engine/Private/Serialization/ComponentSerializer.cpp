@@ -11,6 +11,7 @@
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UI.h"
+#include "ECS/Components/UIEvents.h"
 #include "ECS/Components/Text.h"
 #include "ECS/Components/Hierarchy.h"
 
@@ -318,6 +319,27 @@ namespace tomato::Serialization
 		rectTransform.pivot = { data["pivot"][0], data["pivot"][1] };
 	}
 
+	void Save(json& data, const TextComponent& text)
+	{
+		data["text"] = text.text;
+		data["color"] = { text.color.x, text.color.y, text.color.z, text.color.w };
+		data["fontSize"] = text.fontSize;
+		data["font"] = text.font;
+	}
+
+	void Load(const json& data, TextComponent& text)
+	{
+		text.text = data["text"];
+		text.color = {
+			data["color"][0],
+			data["color"][1],
+			data["color"][2],
+			data["color"][3],
+		};
+		text.fontSize = data["fontSize"];
+		text.font = data["font"];
+	}
+
 	void Save(json& data, const TargetComponent& target)
 	{
 		data["taget"] = target.target;
@@ -333,6 +355,9 @@ namespace tomato::Serialization
 			data["offset"][2]
 		};
 	}
+
+	void Save(json& data, const MouseEventComponent& mouseEvt) {}
+	void Load(const json& data, MouseEventComponent& mouseEvt) {}
 
 	void Save(json& data, const SelectableComponent& selectable)
 	{
@@ -367,27 +392,6 @@ namespace tomato::Serialization
 			data["pressed"][2],
 			data["pressed"][3]
 		};
-	}
-	
-	void Save(json& data, const TextComponent& text)
-	{
-		data["text"] = text.text;
-		data["color"] = { text.color.x, text.color.y, text.color.z, text.color.w };
-		data["fontSize"] = text.fontSize;
-		data["font"] = text.font;
-	}
-
-	void Load(const json& data, TextComponent& text)
-	{
-		text.text = data["text"];
-		text.color = {
-			data["color"][0],
-			data["color"][1],
-			data["color"][2],
-			data["color"][3],
-		};
-		text.fontSize = data["fontSize"];
-		text.font = data["font"];
 	}
 
 	void Save(json& data, const HierarchyComponent& hierarchy)

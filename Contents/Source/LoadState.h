@@ -5,6 +5,7 @@
 #include "State/State.h"
 #include "Resource/ResourceFwd.h"
 #include "Collision/CollisionEventFwd.h"
+#include "UIController.h"
 
 class LoadState : public tomato::State {
 public:
@@ -22,6 +23,8 @@ private:
     static void TEST_TriggerExit(const tomato::TriggerExitEvent& event, entt::entity e);
 
     tomato::Audio* audioPtr_{ nullptr };
+
+    UIController uiController_;
 };
 
 #endif //MANGO_LOADSTATE_H

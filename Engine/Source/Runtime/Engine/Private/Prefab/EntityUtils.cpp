@@ -9,6 +9,8 @@ namespace tomato
 		auto view = reg.view<NametagComponent>();
 		for (auto [e, tag] : view.each())
 			return tag.id == id;
+
+		return false;
 	}
 
 	bool ContainsName(entt::registry& reg, std::string_view name)
@@ -16,6 +18,8 @@ namespace tomato
 		auto view = reg.view<NametagComponent>();
 		for (auto [e, tag] : view.each())
 			return tag.name == name;
+
+		return false;
 	}
 
 	std::string GenerateEntityName(entt::registry& reg, std::string_view baseName)
@@ -58,6 +62,8 @@ namespace tomato
 			if (tag.id == id)
 				return e;
 		}
+
+		return entt::null;
 	}
 
 	UUID GetUUID(entt::registry& reg, entt::entity e)

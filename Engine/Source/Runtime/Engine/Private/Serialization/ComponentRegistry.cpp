@@ -6,6 +6,7 @@
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UI.h"
+#include "ECS/Components/UIEvents.h"
 #include "ECS/Components/Text.h"
 #include "ECS/Components/Hierarchy.h"
 
@@ -25,9 +26,10 @@ namespace tomato::Serialization
 		RegisterComponent<UIComponent>("UI");
 		RegisterComponent<CanvasComponent>("Canvas");
 		RegisterComponent<RectTransformComponent>("RectTransform");
+		RegisterComponent<TextComponent>("Text");
 		RegisterComponent<TargetComponent>("Target");
 		RegisterComponent<SelectableComponent>("Selectable");
-		RegisterComponent<TextComponent>("Text");
+		RegisterComponent<MouseEventComponent>("MouseEvent");
 		RegisterComponent<HierarchyComponent>("Hierarchy");
 		RegisterComponent<RootEntityTag>("TagRoot");
 		RegisterComponent<MainCameraTag>("TagMainCam");

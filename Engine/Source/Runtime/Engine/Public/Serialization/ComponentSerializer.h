@@ -4,7 +4,7 @@
 #include <map>
 #include <entt/fwd.hpp>
 #include "Serialization/Json.h"
-#include "../../Core/Public/UUID.h"
+#include "UUID.h"
 
 namespace tomato
 {
@@ -18,9 +18,10 @@ namespace tomato
 	struct UIComponent;
 	struct CanvasComponent;
 	struct RectTransformComponent;
-	struct TargetComponent;
-	struct SelectableComponent;
 	struct TextComponent;
+	struct TargetComponent;
+	struct MouseEventComponent;
+	struct SelectableComponent;
 
 	struct HierarchyComponent;
 	struct RootEntityTag;
@@ -70,14 +71,17 @@ namespace tomato::Serialization
 	void Save(json&, const RectTransformComponent&);
 	void Load(const json&, RectTransformComponent&);
 
+	void Save(json&, const TextComponent&);
+	void Load(const json&, TextComponent&);
+
 	void Save(json&, const TargetComponent&);
 	void Load(const json&, TargetComponent&);
 
 	void Save(json&, const SelectableComponent&);
 	void Load(const json&, SelectableComponent&);
 
-	void Save(json&, const TextComponent&);
-	void Load(const json&, TextComponent&);
+	void Save(json&, const MouseEventComponent&);
+	void Load(const json&, MouseEventComponent&);
 
 	void Save(json&, const HierarchyComponent&);
 	void Load(const json&, HierarchyComponent&);
