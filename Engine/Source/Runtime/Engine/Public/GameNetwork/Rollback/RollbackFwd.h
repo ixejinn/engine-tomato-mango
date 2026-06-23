@@ -3,6 +3,7 @@
 
 namespace tomato {
     class ComponentTimelineBase;
+    class RollbackManager;
 }
 
 #endif //MANGO_ROLLBACKFWD_H

@@ -11,16 +11,7 @@
 #include "Input/KeyConstants.h"
 #include "Utils/Logger.h"
 
-#include "ECS/Components/Transform.h"
-#include "ECS/Components/Camera.h"
-#include "ECS/Components/Rigidbody.h"
-#include "ECS/Components/Movement.h"
-#include "ECS/Components/Collision.h"
-#include "ECS/Components/Render.h"
-#include "ECS/Components/Text.h"
-#include "ECS/Components/UI.h"
-#include "ECS/Components/UIEvents.h"
-#include "ECS/Components/Hierarchy.h"
+#include "ECS/Components.h"
 #include "ECS/Entity/Hierarchy.h"
 
 #include "Collision/CollisionEvent.h"
@@ -34,6 +25,9 @@ void TestState::Init() {
     audioPtr_ = AssetRegistry<Audio>::GetInstance().Get(id);
 
     engine_.GetInputRecorder().BindInputIntent(Key::J, InputIntent::Test_1);
+
+    // Set rollback
+    engine_.SetRollbackComponent<MovementComponent>();
 
     // Create game object
 

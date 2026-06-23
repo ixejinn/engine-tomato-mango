@@ -116,6 +116,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Entity/Lifetime.h
         Source/Runtime/Engine/Public/ECS/Entity/Hierarchy.h
         Source/Runtime/Engine/Public/ECS/Components/Rollback.h
+        Source/Runtime/Engine/Public/ECS/EntityCompFwd.h
+        Source/Runtime/Engine/Public/ECS/Components.h
 )
 
 set(ENGINE_SOURCES

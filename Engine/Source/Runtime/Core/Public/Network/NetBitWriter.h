@@ -43,9 +43,9 @@ namespace tomato
          */
         template<typename T>
             requires std::same_as<T, uint8_t>
-        || std::same_as<T, uint16_t>
+            || std::same_as<T, uint16_t>
             || std::same_as<T, uint32_t>
-            void WriteInt(const T inValue, uint32_t maxValue)
+        void WriteInt(const T inValue, uint32_t maxValue)
         {
             SerializeInt(inValue, maxValue);
         }

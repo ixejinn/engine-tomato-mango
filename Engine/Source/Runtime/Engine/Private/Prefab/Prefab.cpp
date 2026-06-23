@@ -8,6 +8,7 @@
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Camera.h"
+#include "ECS/Components/Rollback.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "Resource/AssetHash.h"
 #include "Resource/Render/Mesh.h"
@@ -51,6 +52,7 @@ namespace tomato {
         reg.emplace<VelocityComponent>(obj);
         reg.emplace<InputChannelComponent>(obj);    //////////////////// 수정
         reg.emplace<MovementComponent>(obj);
+        reg.emplace<RollbackEntityTag>(obj);
 
         TMT_INFO << "Create character: " << (int)obj;
         return obj;
@@ -64,6 +66,7 @@ namespace tomato {
         reg.emplace<TransformComponent>(obj, pos, rot);
         reg.emplace<CameraComponent>(obj);
         reg.emplace<RootEntityTag>(obj);
+        reg.emplace<RollbackEntityTag>(obj);
 
         if (isMain)
             reg.emplace<MainCameraTag>(obj);

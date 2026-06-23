@@ -17,6 +17,8 @@ namespace tomato
 	void GamePlayNetSystem::HandleInput(const InputCommand& inputCmd)
 	{
 		currentStatePtr_->SetPlayerInput(inputCmd.inputRecord.tick, inputCmd.inputRecord, inputCmd.id);
+        latestTick_ = std::min(latestTick_, inputCmd.inputRecord.tick);
+
 		//std::cout << inputCmd.inputRecord.tick << " " << (int)inputCmd.inputRecord.down << " " << (int)inputCmd.inputRecord.held << '\n';
 		//currentStatePtr_->GetPlayerInputTimelines()[inputCmd.id][inputCmd.inputRecord.tick] = inputCmd.inputRecord;
 		//std::cout << "[ INPUT ] " << inputCmd.inputRecord.tick << " " << (int)inputCmd.inputRecord.down << " " << (int)inputCmd.inputRecord.held << '\n';

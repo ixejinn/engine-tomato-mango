@@ -3,9 +3,12 @@
 
 #include <vector>
 #include <memory>
+#include <unordered_set>
+#include <typeindex>
 #include <entt/fwd.hpp>
-#include "GameNetwork/Rollback/RollbackFwd.h"
+#include "GameNetwork/Rollback/ComponentTimeline.h"
 #include "ECS/SystemFwd.h"
+#include "ECS/EntityCompFwd.h"
 
 namespace tomato {
     class RollbackManager {
@@ -14,8 +17,13 @@ namespace tomato {
         ~RollbackManager();
 
         template<typename Component>
+        requires (!std::same_as<Component, LifetimeComponent>)
         void Register() {
-            timelines_.emplace_back(std::make_unique<Component>());
+            if (registered_.contains(typeid(Component)))
+                return;
+
+            timelines_.emplace_back(std::make_unique<ComponentTimeline<Component>>());
+            registered_.insert(typeid(Component));
         }
 
         void Rollback(entt::registry& reg, uint32_t tick);
@@ -23,6 +31,8 @@ namespace tomato {
 
     private:
         std::vector<std::unique_ptr<ComponentTimelineBase>> timelines_;
+
+        std::unordered_set<std::type_index> registered_;
     };
 }
 

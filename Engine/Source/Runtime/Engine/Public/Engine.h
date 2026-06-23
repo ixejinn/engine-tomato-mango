@@ -10,6 +10,7 @@
 #include "State/StateFwd.h"
 #include "Network/ClientNetwork.h"
 #include "GameNetwork/GamePlayNetSystem.h"
+#include "GameNetwork/Rollback/RollbackManager.h"
 
 namespace tomato {
     class Engine {
@@ -29,10 +30,22 @@ namespace tomato {
 
         InputRecorder& GetInputRecorder() { return inputRecorder_; }
 
+        template<typename Component>
+        void SetRollbackComponent() {
+            if (isSingle_)
+                return;
+
+            if (!rollbackManager_)
+                rollbackManager_ = std::make_unique<RollbackManager>();
+
+            rollbackManager_->Register<Component>();
+        }
+
     private:
         Window window_;
         std::unique_ptr<ClientNetwork> network_{ nullptr };
         std::unique_ptr<GamePlayNetSystem> gameNet_{ nullptr };
+        std::unique_ptr<RollbackManager> rollbackManager_{ nullptr };
 
         void SingleRun();
         void MultiRun();
@@ -44,6 +57,8 @@ namespace tomato {
         InputUI inputUI_;
 
         void Simulate(TickClock& tc, SimContext& simCtx, InputContext& inputCtx);
+        void Simulate(int cnt, SimContext& simCtx, InputContext& inputCtx);
+
         void Render(SimContext& simCtx, RenderContext& renderCtx);
         SystemManager systemManager_;
 
