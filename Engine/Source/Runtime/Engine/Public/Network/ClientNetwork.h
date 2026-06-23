@@ -92,7 +92,7 @@ namespace tomato
 
         ClientNetworkState netState_;
         std::string name_ = "testing";
-        PlayerId playerID_{ 1 };
+        PlayerId playerID_;
         MatchId matchID_{ 0 };
 
         ServerTimeMs sendTime{ 0 }, recvTime{ 0 };

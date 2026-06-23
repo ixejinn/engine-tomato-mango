@@ -107,11 +107,15 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Prefab/Prefab.h
         Source/Runtime/Engine/Public/ECS/Systems/GravitySystem.h
         Source/Runtime/Engine/Private/Prefab/Character/CharacterMovement.h
+        Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackManager.h
+        Source/Runtime/Engine/Public/GameNetwork/Rollback/ComponentTimeline.h
+        Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackFwd.h
         Source/Runtime/Engine/Public/ECS/Components/Lifetime.h
         Source/Runtime/Engine/Private/ECS/Systems/GarbageEntityCollectionSystem.h
         Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackConfig.h
         Source/Runtime/Engine/Public/ECS/Entity/Lifetime.h
         Source/Runtime/Engine/Public/ECS/Entity/Hierarchy.h
+        Source/Runtime/Engine/Public/ECS/Components/Rollback.h
 )
 
 set(ENGINE_SOURCES
@@ -167,6 +171,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Systems/GarbageEntityCollectionSystem.cpp
         Source/Runtime/Engine/Private/ECS/Entity/Hierarchy.cpp
         Source/Runtime/Engine/Private/ECS/Entity/Lifetime.cpp
+        Source/Runtime/Engine/Private/GameNetwork/Rollback/RollbackManager.cpp
 )
 
 add_library(engine STATIC

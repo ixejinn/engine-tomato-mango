@@ -5,9 +5,11 @@
 #include <cstdint>
 
 namespace tomato {
-    struct Lifetime {
+    struct LifetimeComponent {
         std::optional<uint32_t> constructed{std::nullopt};
         std::optional<uint32_t> destructed{std::nullopt};
+
+        std::optional<uint32_t> inactivated{std::nullopt};
         bool isActive{true};
     };
 }

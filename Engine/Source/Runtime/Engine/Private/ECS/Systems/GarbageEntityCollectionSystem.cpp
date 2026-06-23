@@ -7,7 +7,7 @@
 
 namespace tomato {
     void GarbageEntityCollectionSystem::Update(SimContext &simCtx) {
-        auto view = simCtx.registry.view<Lifetime>();
+        auto view = simCtx.registry.view<LifetimeComponent>();
 
         for (auto [e, life] : view.each()) {
             if (life.isActive || life.destructed == std::nullopt)
