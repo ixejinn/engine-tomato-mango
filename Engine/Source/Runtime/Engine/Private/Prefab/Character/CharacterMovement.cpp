@@ -30,6 +30,6 @@ namespace tomato::CharacterMovement {
         auto& velocity = event.reg->get<VelocityComponent>(root);
         velocity.velocity.y = 0;
 
-        TMT_INFO << "Walking " << (int)e;
+        TMT_INFO << "Walking " << (int)e << " " << event.tick;
     }
 }

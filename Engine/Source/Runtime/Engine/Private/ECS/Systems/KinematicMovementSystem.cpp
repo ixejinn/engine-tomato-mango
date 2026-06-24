@@ -16,6 +16,9 @@ namespace tomato {
         auto view = simCtx.registry.view<TransformComponent, VelocityComponent, InputChannelComponent, MovementComponent>();
 
         for (auto [e, trf, velocity, ch, move] : view.each()) {
+            velocity.velocity.x = 0;
+            velocity.velocity.z = 0;
+
             const auto& inputRec = input->timelines[ch.channel][simCtx.tick];
             if (inputRec.tick != simCtx.tick)
                 continue;
@@ -26,13 +29,24 @@ namespace tomato {
             // Move
             int x = 0, y = 0;
             if (HasFlag(keypress, ch.is1P ? InputIntent::Up : InputIntent::Up2))
-                y++;
+                ++y;
             if (HasFlag(keypress, ch.is1P ? InputIntent::Down : InputIntent::Down2))
-                y--;
+                --y;
             if (HasFlag(keypress, ch.is1P ? InputIntent::Left : InputIntent::Left2))
-                x--;
+                --x;
             if (HasFlag(keypress, ch.is1P ? InputIntent::Right : InputIntent::Right2))
-                x++;
+                ++x;
+
+            if (x > 0)
+                std::cout << (int)e << " →\n";
+            else if (x < 0)
+                std::cout << (int)e << " ←\n";
+
+            if (y > 0)
+                std::cout << (int)e << " ↑\n";
+            else if (y < 0)
+                std::cout << (int)e << " ↓\n";
+
             glm::vec2 dir = glm::vec2{x, -y};
             if (glm::length(dir) > 1)
                 dir = glm::normalize(dir);
@@ -56,12 +70,15 @@ namespace tomato {
             // Jump
             if (HasFlag(keydown, ch.is1P ? InputIntent::Jump : InputIntent::Jump2) && move.jumpCnt < JUMP_COUNT_MAX)
             {
+                std::cout << (int)e << " J\n";
                 // Start move
                 move.jumpCnt++;
                 velocity.velocity.y = std::max(velocity.velocity.y, 0.f) + JUMP_SPEED;
 
                 move.mode = MovementMode::Falling;
             }
+
+            // std::cout << (int)e << " kine velocity: " << velocity.velocity.x << " " << velocity.velocity.y << " " << velocity.velocity.z << "\n";
         }
     }
 }

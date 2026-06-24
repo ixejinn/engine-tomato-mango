@@ -66,7 +66,7 @@ namespace tomato {
         reg.emplace<TransformComponent>(obj, pos, rot);
         reg.emplace<CameraComponent>(obj);
         reg.emplace<RootEntityTag>(obj);
-        reg.emplace<RollbackEntityTag>(obj);
+        // reg.emplace<RollbackEntityTag>(obj);
 
         if (isMain)
             reg.emplace<MainCameraTag>(obj);

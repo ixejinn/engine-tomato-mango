@@ -4,6 +4,7 @@
 #include "State/DefaultState.h"
 #include "ECS/Systems/GarbageEntityCollectionSystem.h"
 #include "ECS/SystemUpdateContexts.h"
+#include "ECS/Components/Hierarchy.h"
 #include "GameNetwork/Rollback/RollbackManager.h"
 #include "Utils/Logger.h"
 
@@ -60,19 +61,18 @@ namespace tomato {
         if (!rollbackManager_)
             rollbackManager_ = std::make_unique<RollbackManager>();
 
-        network_->ThreadStart();
-
         TickClock tickClock;
         window_.SetWindowUserPointer(&window_, &input_, &tickClock);
 
         ChangeState(tickClock);
 
+        network_->ThreadStart();
         while (!window_.ShouldClose() && isRunning_) {
             if (nextState_)
                 ChangeState(tickClock);
             InputContext inputCtx{ currState_->GetPlayerInputTimelines() };
 
-            TMT_INFO << " ---------- " << tickClock.GetTick() << " ---------- ";
+            TMT_INFO << " ========== " << tickClock.GetTick() << " ========== ";
 
             gameNet_->ResetLatestTick(tickClock.GetTick());
             network_->ProcessQueuedUDPPacket();
@@ -86,12 +86,14 @@ namespace tomato {
 
                 SimContext rbSimCtx{currState_->GetRegistry(), lateT};
                 while (rbSimCtx.tick < currT) {
+                    // std::cout << " ----- " << rbSimCtx.tick << " ----- \n";
                     systemManager_.Simulate(rbSimCtx, inputCtx);
                     currState_->Update();
                     ++rbSimCtx.tick;
 
                     rollbackManager_->Capture(rbSimCtx);
                 }
+                TMT_INFO << "Rollback finish";
             }
             // Rollback
 
@@ -104,6 +106,12 @@ namespace tomato {
             // TODO: Add Garbage entity collection system update
 
             Simulate(tickClock, simCtx, inputCtx);
+
+            auto view = currState_->GetRegistry().view<TransformComponent, RootEntityTag>();
+            for (auto [e, trs] : view.each()) {
+                auto pos = trs.GetWorldPosition();
+                std::cout << (int)e << ": " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+            }
 
             RenderContext renderCtx{ window_.GetWidth(), window_.GetHeight() };
             Render(simCtx, renderCtx);

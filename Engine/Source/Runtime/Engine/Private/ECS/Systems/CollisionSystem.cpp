@@ -15,7 +15,7 @@
 #include "Event/EventDispatcher.h"
 #include "Utils/Logger.h"
 #include "Utils/RegistryEntry.h"
-REGISTER_SYSTEM(tomato::SystemPhase::Collision, CollisionSystem)
+// REGISTER_SYSTEM(tomato::SystemPhase::Collision, CollisionSystem)
 
 namespace tomato {
     CollisionSystem::CollisionSystem()
@@ -70,7 +70,7 @@ namespace tomato {
                 if (!collisionPairs_.contains(candidate)) {
                     // Enter
                     if (col1.isTrigger || col2.isTrigger)
-                        EventDispatcher::GetInstance().Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &simCtx.registry});
+                        EventDispatcher::GetInstance().Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &simCtx.registry, simCtx.tick});
                     else
                         EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &simCtx.registry, result.value()});
                 }

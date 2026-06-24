@@ -35,6 +35,7 @@ namespace tomato {
     struct TriggerEnterEvent {
         entt::entity e1, e2;
         entt::registry* reg;
+        uint32_t tick;
     };
 
     struct TriggerStayEvent {

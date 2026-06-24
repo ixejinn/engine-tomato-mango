@@ -59,11 +59,11 @@ void TestState::Init() {
     channelp1.channel = 1;
 
     // Ground
-    entt::entity ground = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, -3, 0 });
-    auto& trfGnd = registry_.get<TransformComponent>(ground);
-    trfGnd.SetScale(10, 0.1, 10);
-    auto& renderGnd = registry_.get<RenderComponent>(ground);
-    renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
+    // entt::entity ground = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, -3, 0 });
+    // auto& trfGnd = registry_.get<TransformComponent>(ground);
+    // trfGnd.SetScale(10, 0.1, 10);
+    // auto& renderGnd = registry_.get<RenderComponent>(ground);
+    // renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
 
 
     //UI
