@@ -44,6 +44,15 @@ namespace tomato {
     private:
         Window window_;
 
+        void ProcessInputEvents(uint32_t tick);
+        Input input_;
+        InputRecorder inputRecorder_;
+        InputUI inputUI_;
+
+        void ChangeState(TickClock& tc);
+        std::unique_ptr<State> currState_{nullptr};
+        std::unique_ptr<State> nextState_{nullptr};
+
         std::unique_ptr<ClientNetwork> network_{ nullptr };
         std::unique_ptr<GamePlayNetSystem> gameNet_{ nullptr };
         std::unique_ptr<RollbackManager> rollbackManager_{ nullptr };
@@ -52,19 +61,10 @@ namespace tomato {
         void MultiRun();
         bool isSingle_;
 
-        void ProcessInputEvents(uint32_t tick);
-        Input input_;
-        InputRecorder inputRecorder_;
-        InputUI inputUI_;
-
         void Simulate(TickClock& tc, SimContext& simCtx, InputContext& inputCtx);
 
         void Render(SimContext& simCtx, RenderContext& renderCtx);
         SystemManager systemManager_;
-
-        void ChangeState(TickClock& tc);
-        std::unique_ptr<State> currState_{nullptr};
-        std::unique_ptr<State> nextState_{nullptr};
 
         bool isRunning_{true};
     };

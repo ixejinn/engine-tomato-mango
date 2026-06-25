@@ -8,7 +8,7 @@
 namespace tomato {
     Window::Window(const int width, const int height, const char* title)
         : width_(width), height_(height) {
-        // [GLFW] initialize and configure
+        // [GLFW] Initialize and configure
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);

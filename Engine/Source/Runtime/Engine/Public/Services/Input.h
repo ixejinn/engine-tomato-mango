@@ -24,7 +24,6 @@ namespace tomato {
         static void OnMouseButtonEvent(GLFWwindow* window, int button, int action, int mods);
         static void OnMouseMoveEvent(GLFWwindow* window, double xpos, double ypos);
 
-    private:
         static inline EnumArray<Key, KeyAction> latestKeyAction_;
 
         EventSignal<KeyEvent> keySignal_;

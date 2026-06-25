@@ -24,14 +24,14 @@ namespace tomato
 		void SetState(State* newState) { currentStatePtr_ = newState; }
 		void SetNetwork(ClientNetwork* network) { network_ = network; }
 
-        void ResetLatestTick(uint32_t t) { latestTick_ = t; }
-        uint32_t GetLatestTick() const { return latestTick_; }
+        void InitializeConfirmedTick(uint32_t t) { confirmedTick = t; }
+        uint32_t GetConfirmedTick() const { return confirmedTick; }
 
 	private:
 		State* currentStatePtr_{ nullptr };
 		ClientNetwork* network_;
 
-        uint32_t latestTick_{0};
+        uint32_t confirmedTick{0};
 	};
 }
 #endif // !MANGO_GAMEPLAYNETSYSTEM_H
