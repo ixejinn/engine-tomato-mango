@@ -15,7 +15,7 @@
 #include "Event/EventDispatcher.h"
 #include "Utils/Logger.h"
 #include "Utils/RegistryEntry.h"
-// REGISTER_SYSTEM(tomato::SystemPhase::Collision, CollisionSystem)
+REGISTER_SYSTEM(tomato::SystemPhase::Collision, CollisionSystem)
 
 namespace tomato {
     CollisionSystem::CollisionSystem()
@@ -61,18 +61,20 @@ namespace tomato {
     }
 
     void CollisionSystem::DetectNarrow(SimContext& simCtx) {
+        auto& collisionPairs = simCtx.registry.ctx().get<CollisionContext>().collisionPairs;
+
         for (const auto& candidate : candidates_) {
             auto& col1 = simCtx.registry.get<ColliderComponent>(candidate.a);
             auto& col2 = simCtx.registry.get<ColliderComponent>(candidate.b);
 
             if (auto result = narrowPhase_->DetectCollision(simCtx.registry, candidate.a, candidate.b)) {
                 // Collision detected
-                if (!collisionPairs_.contains(candidate)) {
+                if (!collisionPairs.contains(candidate)) {
                     // Enter
                     if (col1.isTrigger || col2.isTrigger)
                         EventDispatcher::GetInstance().Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &simCtx.registry, simCtx.tick});
                     else
-                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &simCtx.registry, result.value()});
+                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &simCtx.registry, result.value(), simCtx.tick});
                 }
                 else {
                     // Stay
@@ -82,22 +84,22 @@ namespace tomato {
                         EventDispatcher::GetInstance().Enqueue(CollisionStayEvent{candidate.a, candidate.b, &simCtx.registry, result.value()});
                 }
 
-                collisionPairs_[candidate] = true;
+                collisionPairs[candidate] = true;
             }
         }
 
-        for (auto it = collisionPairs_.begin(); it != collisionPairs_.end(); ) {
+        for (auto it = collisionPairs.begin(); it != collisionPairs.end(); ) {
             if (!it->second) {
                 // Exit
                 auto& col1 = simCtx.registry.get<ColliderComponent>(it->first.a);
                 auto& col2 = simCtx.registry.get<ColliderComponent>(it->first.b);
 
                 if (col1.isTrigger || col2.isTrigger)
-                    EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{it->first.a, it->first.b, &simCtx.registry});
+                    EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{it->first.a, it->first.b, &simCtx.registry, simCtx.tick});
                 else
-                    EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{it->first.a, it->first.b, &simCtx.registry});
+                    EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{it->first.a, it->first.b, &simCtx.registry, simCtx.tick});
 
-                it = collisionPairs_.erase(it);
+                it = collisionPairs.erase(it);
             }
             else {
                 it->second = false;
@@ -138,14 +140,14 @@ namespace tomato {
     }
 
     void CollisionSystem::SolveCollision(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info) {
-//        TMT_INFO << "=========== Solve collision " << (int)e1 << " " << (int)e2;
+        TMT_INFO << "=========== Solve collision " << (int)e1 << " " << (int)e2;
         entt::entity root1 = GetRootEntity(reg, e1);
         entt::entity root2 = GetRootEntity(reg, e2);
 
         auto& trfRoot1 = reg.get<TransformComponent>(root1);
         auto& trfRoot2 = reg.get<TransformComponent>(root2);
 
-//        TMT_INFO << " normal: " << info.normal.x << " " << info.normal.y << " " << info.normal.z;
+        TMT_INFO << " normal: " << info.normal.x << " " << info.normal.y << " " << info.normal.z;
         if (auto* vel = reg.try_get<VelocityComponent>(root1)) {
 //            TMT_INFO << "========== " << (int)root1 << "의 " << (int)e1 << " collider ==========";
 //            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
@@ -221,7 +223,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnCollisionEnter(const CollisionEnterEvent &e) {
-//        TMT_INFO << "Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        TMT_INFO << "(" << e.tick << ")Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         SolveCollision(*e.reg, e.e1, e.e2, e.info);
 
@@ -250,7 +252,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnCollisionExit(const CollisionExitEvent& e) {
-//        TMT_INFO << "Collision Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        TMT_INFO << "(" << e.tick << ")Collision Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnCollisionComponent>(e.e1);
         if (callback && callback->exit)
@@ -262,7 +264,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnTriggerEnter(const TriggerEnterEvent& e) {
-//        TMT_INFO << "Trigger Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        TMT_INFO << "(" << e.tick << ")Trigger Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnTriggerComponent>(e.e1);
         if (callback && callback->enter)
@@ -286,7 +288,7 @@ namespace tomato {
     }
 
     void CollisionSystem::OnTriggerExit(const TriggerExitEvent& e) {
-//        TMT_INFO << "Trigger Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        TMT_INFO << "(" << e.tick << ")Trigger Exit : " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
 
         auto callback = e.reg->try_get<OnTriggerComponent>(e.e1);
         if (callback && callback->exit)

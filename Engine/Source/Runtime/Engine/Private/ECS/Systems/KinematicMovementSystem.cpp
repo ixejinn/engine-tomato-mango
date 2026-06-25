@@ -37,15 +37,15 @@ namespace tomato {
             if (HasFlag(keypress, ch.is1P ? InputIntent::Right : InputIntent::Right2))
                 ++x;
 
-            if (x > 0)
-                std::cout << (int)e << " →\n";
-            else if (x < 0)
-                std::cout << (int)e << " ←\n";
-
-            if (y > 0)
-                std::cout << (int)e << " ↑\n";
-            else if (y < 0)
-                std::cout << (int)e << " ↓\n";
+            // if (x > 0)
+            //     std::cout << (int)e << " →\n";
+            // else if (x < 0)
+            //     std::cout << (int)e << " ←\n";
+            //
+            // if (y > 0)
+            //     std::cout << (int)e << " ↑\n";
+            // else if (y < 0)
+            //     std::cout << (int)e << " ↓\n";
 
             glm::vec2 dir = glm::vec2{x, -y};
             if (glm::length(dir) > 1)
@@ -70,7 +70,7 @@ namespace tomato {
             // Jump
             if (HasFlag(keydown, ch.is1P ? InputIntent::Jump : InputIntent::Jump2) && move.jumpCnt < JUMP_COUNT_MAX)
             {
-                std::cout << (int)e << " J\n";
+                // std::cout << (int)e << " J\n";
                 // Start move
                 move.jumpCnt++;
                 velocity.velocity.y = std::max(velocity.velocity.y, 0.f) + JUMP_SPEED;

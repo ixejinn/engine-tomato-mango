@@ -72,7 +72,7 @@ namespace tomato {
                 ChangeState(tickClock);
             InputContext inputCtx{ currState_->GetPlayerInputTimelines() };
 
-            TMT_INFO << " ========== " << tickClock.GetTick() << " ========== ";
+            TMT_INFO << "       ========== " << tickClock.GetTick() << " ========== ";
 
             gameNet_->ResetLatestTick(tickClock.GetTick());
             network_->ProcessQueuedUDPPacket();
@@ -82,18 +82,18 @@ namespace tomato {
             auto lateT = gameNet_->GetLatestTick();
             if (currT != lateT && currT - lateT <= ROLLBACK_WINDOW) {
                 rollbackManager_->Rollback(currState_->GetRegistry(), lateT);
-                TMT_INFO << "Rollback to " << lateT;
+                TMT_INFO << "      Rollback to " << lateT;
 
                 SimContext rbSimCtx{currState_->GetRegistry(), lateT};
                 while (rbSimCtx.tick < currT) {
-                    // std::cout << " ----- " << rbSimCtx.tick << " ----- \n";
+                    std::cout << "           ----- " << rbSimCtx.tick << " ----- \n";
                     systemManager_.Simulate(rbSimCtx, inputCtx);
                     currState_->Update();
                     ++rbSimCtx.tick;
 
                     rollbackManager_->Capture(rbSimCtx);
                 }
-                TMT_INFO << "Rollback finish";
+                TMT_INFO << "      Rollback finish";
             }
             // Rollback
 
@@ -107,11 +107,11 @@ namespace tomato {
 
             Simulate(tickClock, simCtx, inputCtx);
 
-            auto view = currState_->GetRegistry().view<TransformComponent, RootEntityTag>();
-            for (auto [e, trs] : view.each()) {
-                auto pos = trs.GetWorldPosition();
-                std::cout << (int)e << ": " << pos.x << " " << pos.y << " " << pos.z << std::endl;
-            }
+            // auto view = currState_->GetRegistry().view<TransformComponent, RootEntityTag>();
+            // for (auto [e, trs] : view.each()) {
+            //     auto pos = trs.GetWorldPosition();
+            //     std::cout << (int)e << ": " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+            // }
 
             RenderContext renderCtx{ window_.GetWidth(), window_.GetHeight() };
             Render(simCtx, renderCtx);
@@ -180,6 +180,7 @@ namespace tomato {
 
         tc.ResetTick();
 
+        currState_->GetRegistry().ctx().emplace<CollisionContext>();
         SimContext simCtx{currState_->GetRegistry(), tc.GetTick()};
         systemManager_.InitializeTransform(simCtx);
 

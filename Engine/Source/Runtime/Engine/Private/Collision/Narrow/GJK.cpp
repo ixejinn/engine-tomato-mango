@@ -44,6 +44,7 @@ namespace tomato {
 
     bool GJK::GJKBool(
             entt::registry& reg, entt::entity e1, entt::entity e2) {
+        TMT_INFO << "GJK bool " << (int)e1 << " " << (int)e2;
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
         auto& trf1 = reg.get<TransformComponent>(e1);
@@ -67,8 +68,10 @@ namespace tomato {
 
             supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
             simplex.push_back(supportP);
-            if (glm::dot(-closestP, supportP) < 1e-6f)
+            if (glm::dot(-closestP, supportP) < 1e-6f) {
+                TMT_INFO << "     FALSE: " << glm::dot(-closestP, supportP);
                 return false;   // 거의 가깝게 가는데 원점을 포함은 못하는 상황
+            }
         }
         return true;
     }
@@ -118,6 +121,7 @@ namespace tomato {
 
     std::optional<CollisionInfo> GJK::GJKRaycast(
             entt::registry& reg, entt::entity e1, entt::entity e2) {
+        TMT_INFO << "GJK raycast " << (int)e1 << " " << (int)e2;
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
         auto& trf1 = reg.get<TransformComponent>(e1);
@@ -223,7 +227,9 @@ namespace tomato {
         if (hitFraction <= 1) {
             float hitNormalLenSq = glm::length2(hitNormal);
             if (hitNormalLenSq > 1e-6f) {
-                constexpr float epsilon = 0.001f;
+                // std::cout << " before normalize: " << hitNormal.x << " " << hitNormal.y << " " << hitNormal.z;
+
+                constexpr float epsilon = 0.0001f;
                 if (-epsilon < hitNormal.x && hitNormal.x < epsilon)
                     hitNormal.x = 0.f;
                 if (-epsilon < hitNormal.z && hitNormal.z < epsilon)
@@ -231,7 +237,9 @@ namespace tomato {
                 if (-epsilon < hitNormal.y && hitNormal.y < epsilon)
                     hitNormal.y = 0.f;
 
+                // std::cout << " handle normalize: " << hitNormal.x << " " << hitNormal.y << " " << hitNormal.z;
                 hitNormal = glm::normalize(hitNormal);
+                // std::cout << "  after normalize: " << hitNormal.x << " " << hitNormal.y << " " << hitNormal.z;
             }
 
             return CollisionInfo{hitNormal, hitFraction, weight};

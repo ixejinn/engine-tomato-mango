@@ -43,7 +43,7 @@ namespace tomato {
         std::unique_ptr<NarrowPhase> narrowPhase_;
 
         std::vector<CollisionPair> candidates_;
-        std::unordered_map<CollisionPair, bool> collisionPairs_;
+        // std::unordered_map<CollisionPair, bool> collisionPairs_;
     };
 }
 

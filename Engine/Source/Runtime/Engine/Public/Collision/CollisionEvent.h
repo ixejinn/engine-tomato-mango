@@ -18,6 +18,7 @@ namespace tomato {
         entt::registry* reg;
 
         CollisionInfo info;
+        uint32_t tick;
     };
 
     struct CollisionStayEvent {
@@ -30,6 +31,7 @@ namespace tomato {
     struct CollisionExitEvent {
         entt::entity e1, e2;
         entt::registry* reg;
+        uint32_t tick;
     };
 
     struct TriggerEnterEvent {
@@ -46,6 +48,7 @@ namespace tomato {
     struct TriggerExitEvent {
         entt::entity e1, e2;
         entt::registry* reg;
+        uint32_t tick;
     };
 }
 
