@@ -1,6 +1,15 @@
 ﻿set(THIRD_PARTY_SOURCES
         Source/ThirdParty/glad/src/glad.c
         Source/ThirdParty/miniaudio/miniaudio.c
+		
+		Source/ThirdParty/imgui/imgui.cpp
+		Source/ThirdParty/imgui/imgui_demo.cpp
+		Source/ThirdParty/imgui/imgui_draw.cpp
+		Source/ThirdParty/imgui/imgui_tables.cpp
+		Source/ThirdParty/imgui/imgui_widgets.cpp
+		
+		Source/ThirdParty/imgui/backends/imgui_impl_glfw.cpp
+		Source/ThirdParty/imgui/backends/imgui_impl_opengl3.cpp
 )
 
 set(ENGINE_HEADERS
@@ -113,7 +122,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Core/Public/UUID.h
         Source/Runtime/Engine/Public/Prefab/EntityUtils.h
         Source/Runtime/Engine/Public/Serialization/ComponentRegistry.h
- "Source/Runtime/Engine/Public/Serialization/Json.h")
+ "Source/Runtime/Engine/Public/Serialization/Json.h" "Source/Runtime/Editor/Public/Editor.h" "Source/Runtime/Editor/Public/EditorPanel.h" "Source/Runtime/Editor/Public/EntityPanel.h" "Source/Runtime/Editor/Public/EditorFwd.h")
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -169,7 +178,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Serialization/ComponentSerializer.cpp
         Source/Runtime/Core/Private/UUID.cpp
         Source/Runtime/Engine/Private/Prefab/EntityUtils.cpp
- "Source/Runtime/Engine/Private/Serialization/ComponentRegistry.cpp")
+ "Source/Runtime/Engine/Private/Serialization/ComponentRegistry.cpp" "Source/Runtime/Editor/Private/Editor.cpp" "Source/Runtime/Editor/Private/EntityPanel.cpp")
 
 add_library(engine STATIC
         ${ENGINE_HEADERS}
@@ -180,10 +189,14 @@ add_library(engine STATIC
 target_include_directories(engine
         PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/Source/Runtime/Core/Public
+        ${CMAKE_CURRENT_LIST_DIR}/Source/Runtime/Editor/Public
         ${CMAKE_CURRENT_LIST_DIR}/Source/Runtime/Engine/Public
 
         ${CMAKE_CURRENT_LIST_DIR}/Source/ThirdParty
         ${CMAKE_CURRENT_LIST_DIR}/Source/ThirdParty/glad/include
+        ${CMAKE_CURRENT_LIST_DIR}/Source/ThirdParty/imgui
+        ${CMAKE_CURRENT_LIST_DIR}/Source/ThirdParty/imgui/backends
+		
         ${freetype_SOURCE_DIR}/include
 
         PRIVATE

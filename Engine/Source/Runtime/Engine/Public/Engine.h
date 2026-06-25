@@ -10,6 +10,7 @@
 #include "State/StateFwd.h"
 #include "Network/ClientNetwork.h"
 #include "GameNetwork/GamePlayNetSystem.h"
+#include "Editor.h"
 
 namespace tomato {
     class Engine {
@@ -37,6 +38,8 @@ namespace tomato {
 
     private:
         Window window_;
+        Editor editor_;
+
         std::unique_ptr<ClientNetwork> network_{ nullptr };
         std::unique_ptr<GamePlayNetSystem> gameNet_{ nullptr };
 

@@ -1,7 +1,7 @@
 ﻿#ifndef MANGO_COMPONENTSERIALIZER_H
 #define MANGO_COMPONENTSERIALIZER_H
 
-#include <map>
+#include <unordered_map>
 #include <entt/fwd.hpp>
 #include "Serialization/Json.h"
 #include "UUID.h"
@@ -34,14 +34,14 @@ namespace tomato::Serialization
 	json LoadJsonData(const char*);
 
 	void SaveScene(entt::registry&, const char*);
-	void LoadScene(entt::registry&, const char*);
+	void LoadScene(entt::registry&, const char*, std::unordered_map<UUID, entt::entity>&);
 
 	void SaveEntity(json&, entt::registry&, entt::entity);
 
-	void CreateEntity(const json&, entt::registry&, std::map<UUID, entt::entity>&);
-	void LoadComponents(const json&, entt::registry&, std::map<UUID, entt::entity>&);
+	void CreateEntity(const json&, entt::registry&, std::unordered_map<UUID, entt::entity>&);
+	void LoadComponents(const json&, entt::registry&, std::unordered_map<UUID, entt::entity>&);
 	void LoadEntityComponents(const json&, entt::registry&, entt::entity);
-	void ResolveHierarchy(entt::registry&, std::map<UUID, entt::entity>&);
+	void ResolveHierarchy(entt::registry&, std::unordered_map<UUID, entt::entity>&);
 	
 	//Component Save & Load Func
 	void Save(json&, const CameraComponent&);

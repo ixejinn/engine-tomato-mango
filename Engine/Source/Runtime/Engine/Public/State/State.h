@@ -2,7 +2,9 @@
 #define MANGO_STATE_H
 
 #include <array>
+#include <unordered_map>
 #include <entt/entity/registry.hpp>
+#include "UUID.h"
 #include "State/StateFwd.h"
 #include "TomatoFwd.h"
 
@@ -25,6 +27,7 @@ namespace tomato {
     protected:
         Engine& engine_;
         entt::registry registry_;
+        std::unordered_map<UUID, entt::entity> entityMap_;
 
         PlayerInputTimelines playerInputs_;
     };

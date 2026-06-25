@@ -9,9 +9,9 @@ using namespace tomato;
 void LoadState::Init()
 {
 	Texture::Create("Resources/Contents/WATER_GAME_LOGO.png");
-	Serialization::LoadScene(registry_, "Resources/Engine/Assets/test.data");
+	Serialization::LoadScene(registry_, "Resources/Engine/Assets/test.data", entityMap_);
 
-	entt::entity btn;
+	entt::entity btn;// = entityMap_[11560345711817135869];
 	auto btnView = registry_.view<NametagComponent>();
 	for (auto [e, tag] : btnView.each())
 	{

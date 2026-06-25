@@ -5,6 +5,7 @@
 #include "ECS/SystemUpdateContexts.h"
 #include "Serialization/ComponentRegistry.h"
 
+#include "Editor.h"
 #include "Utils/Logger.h"
 
 namespace tomato {
@@ -23,6 +24,7 @@ namespace tomato {
     void Engine::SingleRun() {
         TickClock tickClock;
         window_.SetWindowUserPointer(&window_, &input_, &tickClock);
+        editor_.InitImGui(window_.GetHandle());
 
         ChangeState(tickClock);
 
@@ -42,6 +44,8 @@ namespace tomato {
 
             inputRecorder_.UpdateCurrInputRecord(tickClock.GetTick());
         }
+
+        editor_.ShutdownImGui();
     }
 
     void Engine::MultiRun() {
@@ -56,6 +60,7 @@ namespace tomato {
         window_.SetWindowUserPointer(&window_, &input_, &tickClock);
 
         ChangeState(tickClock);
+        editor_.InitImGui(window_.GetHandle());
 
         while (!window_.ShouldClose() && isRunning_) {
             if (nextState_)
@@ -109,7 +114,13 @@ namespace tomato {
     }
 
     void Engine::Render(SimContext& simCtx, RenderContext& renderCtx) {
+        editor_.BeginFrame();
+
         systemManager_.Render(simCtx, renderCtx);
+
+        editor_.Draw(currState_.get());
+        editor_.EndFrame();
+
         window_.SwapBuffers();
     }
 

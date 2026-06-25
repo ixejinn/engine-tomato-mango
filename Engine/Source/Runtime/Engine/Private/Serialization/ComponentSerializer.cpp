@@ -70,23 +70,22 @@ namespace tomato::Serialization
 		ofs << root.dump(4);
 	}
 
-	void LoadScene(entt::registry& reg, const char* path)
+	void LoadScene(entt::registry& reg, const char* path, std::unordered_map<UUID, entt::entity>& entityMap)
 	{
 		json root = LoadJsonData(path);
 		if (root == nullptr)
 			return;
 
 		//Temporary map
-		std::map<UUID, entt::entity> entityMap_;
 
-		CreateEntity(root, reg, entityMap_);
+		CreateEntity(root, reg, entityMap);
 
-		LoadComponents(root, reg, entityMap_);
+		LoadComponents(root, reg, entityMap);
 
-		ResolveHierarchy(reg, entityMap_);
+		ResolveHierarchy(reg, entityMap);
 	}
 
-	void CreateEntity(const json& root, entt::registry& reg, std::map<UUID, entt::entity>& entityMap_)
+	void CreateEntity(const json& root, entt::registry& reg, std::unordered_map<UUID, entt::entity>& entityMap)
 	{
 		for (auto& entityData : root["Entities"])
 		{
@@ -97,16 +96,16 @@ namespace tomato::Serialization
 
 			reg.emplace<NametagComponent>(e, id, name);
 
-			entityMap_[id] = e;
+			entityMap[id] = e;
 		}
 	}
 
-	void LoadComponents(const json& root, entt::registry& reg, std::map<UUID, entt::entity>& entityMap_)
+	void LoadComponents(const json& root, entt::registry& reg, std::unordered_map<UUID, entt::entity>& entityMap)
 	{
 		for (auto& entityData : root["Entities"])
 		{
 			UUID id = entityData["ID"];
-			entt::entity e = entityMap_[id];
+			entt::entity e = entityMap[id];
 
 			LoadEntityComponents(entityData["Components"], reg, e);
 		}
@@ -122,15 +121,15 @@ namespace tomato::Serialization
 		}
 	}
 
-	void ResolveHierarchy(entt::registry& reg, std::map<UUID, entt::entity>& entityMap_)
+	void ResolveHierarchy(entt::registry& reg, std::unordered_map<UUID, entt::entity>& entityMap)
 	{
 		auto view = reg.view<HierarchyComponent>();
 		for (auto [e, hierarchy] : view.each())
 		{
 			hierarchy.parent =
-				hierarchy.parentID == 0 ? entt::null : entityMap_[hierarchy.parentID];
+				hierarchy.parentID == 0 ? entt::null : entityMap[hierarchy.parentID];
 			for (auto child : hierarchy.childrenID)
-				hierarchy.children.push_back(entityMap_[child]);
+				hierarchy.children.push_back(entityMap[child]);
 		}
 	}
 
