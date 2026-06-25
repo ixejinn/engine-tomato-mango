@@ -72,6 +72,7 @@ namespace tomato {
             }
 
             auto& collisionPairs = reg.ctx().get<CollisionContext>().collisionPairs;
+            // TMT_INFO << "     Restore collision pair " << collisionPairs.size() << " -> " << data_[tick].data.size();
             collisionPairs.clear();
 
             for (auto& pb : data_[tick].data)
@@ -82,9 +83,11 @@ namespace tomato {
             auto& slice = data_[tick];
 
             slice.tick = tick;
+            slice.data.clear();
 
             auto& collisionPairs = reg.ctx().get<CollisionContext>().collisionPairs;
             slice.data.reserve(collisionPairs.size());
+            // TMT_INFO << "     Back up collision pair size: " << collisionPairs.size();
             for (auto it = collisionPairs.begin(); it != collisionPairs.end(); ++it)
                 slice.data.emplace_back(*it);
         }
@@ -98,26 +101,26 @@ namespace tomato {
         Timeline<TimelineSlice> data_;
     };
 
-    //
-    // template<>
-    // inline void ComponentTimeline<TransformComponent>::Record(entt::registry& reg, uint32_t tick) {
-    //     auto& slice = data_[tick];
-    //
-    //     slice.tick = tick;
-    //
-    //     auto view = reg.view<TransformComponent, RollbackEntityTag>();
-    //     slice.data.clear();
-    //     slice.data.reserve(view.size_hint());
-    //
-    //     for (auto [e, component] : view.each()) {
-    //         component.AddPosition(glm::vec3{0.f, 0.f, 0.f});
-    //         slice.data.emplace_back(e, component);
-    //
-    //         auto pos = component.GetLocalPosition();
-    //         // TMT_INFO << " rec " << (int)e << " transform pos(" << tick << "): " << pos.x << " " << pos.y << " " << pos.z;
-    //     }
-    //     // TMT_INFO << "size: " << slice.data.size();
-    // }
+
+    template<>
+    inline void ComponentTimeline<TransformComponent>::Record(entt::registry& reg, uint32_t tick) {
+        auto& slice = data_[tick];
+
+        slice.tick = tick;
+
+        auto view = reg.view<TransformComponent, RollbackEntityTag>();
+        slice.data.clear();
+        slice.data.reserve(view.size_hint());
+
+        for (auto [e, component] : view.each()) {
+            component.AddPosition(glm::vec3{0.f, 0.f, 0.f});
+            slice.data.emplace_back(e, component);
+
+            auto pos = component.GetLocalPosition();
+            // TMT_INFO << " rec " << (int)e << " transform pos(" << tick << "): " << pos.x << " " << pos.y << " " << pos.z;
+        }
+        // TMT_INFO << "size: " << slice.data.size();
+    }
 
     // template<>
     // inline void ComponentTimeline<VelocityComponent>::Record(entt::registry& reg, uint32_t tick) {

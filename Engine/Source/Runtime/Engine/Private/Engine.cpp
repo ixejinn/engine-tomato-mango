@@ -82,18 +82,20 @@ namespace tomato {
             auto lateT = gameNet_->GetLatestTick();
             if (currT != lateT && currT - lateT <= ROLLBACK_WINDOW) {
                 rollbackManager_->Rollback(currState_->GetRegistry(), lateT);
+
                 TMT_INFO << "      Rollback to " << lateT;
 
                 SimContext rbSimCtx{currState_->GetRegistry(), lateT};
+                systemManager_.InitializeTransform(rbSimCtx);
                 while (rbSimCtx.tick < currT) {
-                    std::cout << "           ----- " << rbSimCtx.tick << " ----- \n";
+                    // std::cout << "           ----- " << rbSimCtx.tick << " ----- \n";
                     systemManager_.Simulate(rbSimCtx, inputCtx);
                     currState_->Update();
                     ++rbSimCtx.tick;
 
                     rollbackManager_->Capture(rbSimCtx);
                 }
-                TMT_INFO << "      Rollback finish";
+                // TMT_INFO << "      Rollback finish";
             }
             // Rollback
 

@@ -44,7 +44,7 @@ namespace tomato {
 
     bool GJK::GJKBool(
             entt::registry& reg, entt::entity e1, entt::entity e2) {
-        TMT_INFO << "GJK bool " << (int)e1 << " " << (int)e2;
+        // TMT_INFO << "GJK bool " << (int)e1 << " " << (int)e2;
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
         auto& trf1 = reg.get<TransformComponent>(e1);
@@ -69,7 +69,7 @@ namespace tomato {
             supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
             simplex.push_back(supportP);
             if (glm::dot(-closestP, supportP) < 1e-6f) {
-                TMT_INFO << "     FALSE: " << glm::dot(-closestP, supportP);
+                // TMT_INFO << "     FALSE: " << glm::dot(-closestP, supportP);
                 return false;   // 거의 가깝게 가는데 원점을 포함은 못하는 상황
             }
         }
@@ -121,7 +121,7 @@ namespace tomato {
 
     std::optional<CollisionInfo> GJK::GJKRaycast(
             entt::registry& reg, entt::entity e1, entt::entity e2) {
-        TMT_INFO << "GJK raycast " << (int)e1 << " " << (int)e2;
+        // TMT_INFO << "GJK raycast " << (int)e1 << " " << (int)e2;
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
         auto& trf1 = reg.get<TransformComponent>(e1);

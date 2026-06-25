@@ -41,6 +41,7 @@ namespace tomato {
 
         EventDispatcher::GetInstance().Update<CollisionEnterEvent>();   // TODO: 보정용으로 수정
         EventDispatcher::GetInstance().Update<CollisionStayEvent>();   // 보정용으로 수정
+        EventDispatcher::GetInstance().Update<CollisionExitEvent>();   // 보정용으로 수정
         EventDispatcher::GetInstance().Update<TriggerEnterEvent>();   // 보정용으로 수정
         EventDispatcher::GetInstance().Update<TriggerExitEvent>();   // 보정용으로 수정
 
@@ -140,14 +141,14 @@ namespace tomato {
     }
 
     void CollisionSystem::SolveCollision(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info) {
-        TMT_INFO << "=========== Solve collision " << (int)e1 << " " << (int)e2;
+        // TMT_INFO << "=========== Solve collision " << (int)e1 << " " << (int)e2;
         entt::entity root1 = GetRootEntity(reg, e1);
         entt::entity root2 = GetRootEntity(reg, e2);
 
         auto& trfRoot1 = reg.get<TransformComponent>(root1);
         auto& trfRoot2 = reg.get<TransformComponent>(root2);
 
-        TMT_INFO << " normal: " << info.normal.x << " " << info.normal.y << " " << info.normal.z;
+        // TMT_INFO << " normal: " << info.normal.x << " " << info.normal.y << " " << info.normal.z;
         if (auto* vel = reg.try_get<VelocityComponent>(root1)) {
 //            TMT_INFO << "========== " << (int)root1 << "의 " << (int)e1 << " collider ==========";
 //            TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
@@ -224,6 +225,14 @@ namespace tomato {
 
     void CollisionSystem::OnCollisionEnter(const CollisionEnterEvent &e) {
         TMT_INFO << "(" << e.tick << ")Collision Enter: " << (uint32_t)e.e1 << ", " << (uint32_t)e.e2;
+        // auto posCol1 = e.reg->get<TransformComponent>(e.e1).GetWorldPosition();
+        // auto posCol2 = e.reg->get<TransformComponent>(e.e2).GetWorldPosition();
+        // auto posRoot1 = e.reg->get<TransformComponent>(GetRootEntity(e.reg, e.e1)).GetWorldPosition();
+        // auto posRoot2 = e.reg->get<TransformComponent>(GetRootEntity(e.reg, e.e2)).GetWorldPosition();
+        // std::cout << "     pos root1: " << posRoot1.x << " " << posRoot1.y << " " << posRoot1.z << std::endl;
+        // std::cout << "     pos  col1: " << posCol1.x << " " << posCol1.y << " " << posCol1.z << std::endl;
+        // std::cout << "     pos root2: " << posRoot2.x << " " << posRoot2.y << " " << posRoot2.z << std::endl;
+        // std::cout << "     pos  col2: " << posCol2.x << " " << posCol2.y << " " << posCol2.z << std::endl;
 
         SolveCollision(*e.reg, e.e1, e.e2, e.info);
 
