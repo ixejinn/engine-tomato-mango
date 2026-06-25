@@ -3,6 +3,7 @@
 
 namespace tomato {
     struct LifetimeComponent;
+    struct HierarchyComponent;
 }
 
 #endif //MANGO_ENTITYCOMPFWD_H

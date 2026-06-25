@@ -3,7 +3,7 @@
 
 #include "Collision/CollisionFwd.h"
 #include "Collision/CollisionLayerMatrix.h"
-#include "ECS/PhysCompFwd.h"
+#include "ECS/Forward/PhysCompFwd.h"
 
 namespace tomato {
     class BroadPhase {

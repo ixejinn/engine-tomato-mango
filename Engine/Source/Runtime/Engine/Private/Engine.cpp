@@ -10,10 +10,7 @@
 
 namespace tomato {
     Engine::Engine(const int width, const int height, const char* title, const bool isSingle)
-        : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), isSingle_(isSingle), network_(nullptr), gameNet_(nullptr)
-    {
-
-    }
+    : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), isSingle_(isSingle) {}
 
     Engine::~Engine() = default;
 
@@ -77,7 +74,6 @@ namespace tomato {
             gameNet_->ResetLatestTick(tickClock.GetTick());
             network_->ProcessQueuedUDPPacket();
 
-            // TODO: Rollback
             auto currT = tickClock.GetTick();
             auto lateT = gameNet_->GetLatestTick();
             if (currT != lateT && currT - lateT <= ROLLBACK_WINDOW) {
@@ -108,12 +104,6 @@ namespace tomato {
             // TODO: Add Garbage entity collection system update
 
             Simulate(tickClock, simCtx, inputCtx);
-
-            // auto view = currState_->GetRegistry().view<TransformComponent, RootEntityTag>();
-            // for (auto [e, trs] : view.each()) {
-            //     auto pos = trs.GetWorldPosition();
-            //     std::cout << (int)e << ": " << pos.x << " " << pos.y << " " << pos.z << std::endl;
-            // }
 
             RenderContext renderCtx{ window_.GetWidth(), window_.GetHeight() };
             Render(simCtx, renderCtx);
@@ -177,8 +167,6 @@ namespace tomato {
         currState_->Init();
 
         inputUI_.SetState(currState_.get());
-        // if (!isSingle_) // !!!!!!!!!! temporary !!!!!!!!!!!
-        //     gameNet_->SetState(currState_.get());
 
         tc.ResetTick();
 

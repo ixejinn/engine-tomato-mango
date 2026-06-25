@@ -11,7 +11,7 @@
 #include "Input/KeyConstants.h"
 #include "Utils/Logger.h"
 
-#include "ECS/Components.h"
+#include "ECS/Components/Components.h"
 #include "ECS/Entity/Hierarchy.h"
 
 #include "Collision/CollisionEvent.h"

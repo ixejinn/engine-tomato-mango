@@ -12,23 +12,20 @@ namespace tomato::CharacterMovement {
 
         auto& move = event.reg->get<MovementComponent>(root);
         if (--move.gndStayCnt == 0) {
-            move.mode = MovementMode::Falling;
+            move.mode = Falling;
             TMT_INFO << "Falling " << (int)e;
         }
     }
 
     void AfterLanding(const TriggerEnterEvent& event, entt::entity e) {
-        entt::entity other = event.e1 == e ? event.e2 : event.e1;
         entt::entity root = GetRootEntity(event.reg, e);
 
         auto& move = event.reg->get<MovementComponent>(root);
         ++move.gndStayCnt;
 
-        move.mode = MovementMode::Walking;
+        move.mode = Walking;
         move.jumpCnt = 0;
-
-        auto& velocity = event.reg->get<VelocityComponent>(root);
-        velocity.velocity.y = 0;
+        event.reg->get<VelocityComponent>(root).velocity.y = 0;
 
         TMT_INFO << "Walking " << (int)e << " " << event.tick;
     }

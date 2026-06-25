@@ -1,12 +1,9 @@
+#include <glm/vec3.hpp>
 #include <entt/entt.hpp>
 #include "ECS/Systems/CollisionSystem.h"
-
 #include "SimulationConfig.h"
-#include "ECS/Components/Collision.h"
-#include "ECS/Components/Transform.h"
-#include "ECS/Components/Hierarchy.h"
-#include "ECS/Components/Movement.h"
-#include "ECS/Components/Rigidbody.h"
+#include "ECS/Components/PhysComponents.h"
+#include "ECS/Components/CharComponents.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "Collision/CollisionEvent.h"

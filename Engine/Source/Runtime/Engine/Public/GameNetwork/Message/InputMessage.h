@@ -1,7 +1,6 @@
 ﻿#ifndef MANGO_INPUT_MESSAGE_H
 #define MAGNO_INPUT_MESSAGE_H
 
-#include "ECS/SystemFwd.h"
 #include "Network/NetworkFwd.h"
 #include "Network/NetTypes.h"
 #include "GameNetwork/Message/NetMessage.h"

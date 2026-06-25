@@ -1,7 +1,7 @@
 ﻿#ifndef MANGO_GAMEPLAYNETSYSTEM_H
 #define MANGO_GAMEPLAYNETSYSTEM_H
 
-#include "../../Core/Private/Containers/SPSCQueue.h"
+#include "../../../Core/Public/Containers/SPSCQueue.h"
 #include "Network/NetworkFwd.h"
 #include "State/StateFwd.h"
 

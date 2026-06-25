@@ -7,7 +7,7 @@
 #include <typeindex>
 #include <entt/fwd.hpp>
 #include "GameNetwork/Rollback/ComponentTimeline.h"
-#include "ECS/SystemFwd.h"
+#include "ECS/Forward/SystemFwd.h"
 
 namespace tomato {
     class RollbackManager {
