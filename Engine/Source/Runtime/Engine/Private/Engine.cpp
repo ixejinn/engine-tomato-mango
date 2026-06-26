@@ -78,7 +78,6 @@ namespace tomato {
                 ChangeState(tickClock);
 
             // std::cout << "       ========== " << tickClock.GetTick() << " ==========\n";
-            SimContext simCtx{ currState_->GetRegistry(), tickClock.GetTick() };
             InputContext inputCtx{ currState_->GetPlayerInputTimelines() };
 
             gameNet_->InitializeConfirmedTick(tickClock.GetTick()); // for rollback
@@ -111,6 +110,7 @@ namespace tomato {
             ProcessInputEvents(tickClock.GetTick());
             EventDispatcher::GetInstance().Update();
 
+            SimContext simCtx{ currState_->GetRegistry(), tickClock.GetTick() };
             garbageCollectionSystem.Update(simCtx);
 
             // *---------- Simulate

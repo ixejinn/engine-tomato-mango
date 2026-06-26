@@ -29,8 +29,8 @@ void TestState::Init() {
     engine_.GetInputRecorder().BindInputIntent(Key::J, InputIntent::Test_1);
 
     //// Set rollback
-    //engine_.SetRollbackComponent<MovementComponent>();
-    //engine_.SetRollbackComponent<VelocityComponent>();
+    engine_.SetRollbackComponent<MovementComponent>();
+    engine_.SetRollbackComponent<VelocityComponent>();
 
     //// Create game object
 
