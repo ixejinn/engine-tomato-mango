@@ -141,7 +141,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Serialization/Json.h
         Source/Runtime/Editor/Public/Editor.h
         Source/Runtime/Editor/Public/EditorPanel.h
-        Source/Runtime/Editor/Public/EntityPanel.h
+        Source/Runtime/Editor/Public/HierarchyPanel.h
         Source/Runtime/Editor/Public/EditorFwd.h
 )
 
@@ -206,7 +206,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Prefab/EntityUtils.cpp
         Source/Runtime/Engine/Private/Serialization/ComponentRegistry.cpp
         Source/Runtime/Editor/Private/Editor.cpp
-        Source/Runtime/Editor/Private/EntityPanel.cpp
+        Source/Runtime/Editor/Private/HierarchyPanel.cpp
 )
 
 add_library(engine STATIC

@@ -25,7 +25,8 @@ namespace tomato
 
 	private:
 		std::vector<std::unique_ptr<EditorPanel>> panels;
-
+		
+		EditorContext eCtx;
 		entt::entity selectedEntity;
 	};
 }

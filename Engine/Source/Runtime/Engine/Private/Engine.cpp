@@ -70,6 +70,7 @@ namespace tomato {
 
         GarbageEntityCollectionSystem garbageCollectionSystem;
         ChangeState(tickClock);
+        editor_.InitImGui(window_.GetHandle());
 
         network_->ThreadStart();
 
@@ -135,6 +136,7 @@ namespace tomato {
 
             inputRecorder_.UpdateCurrInputRecord(tickClock.GetTick());
         }
+        editor_.ShutdownImGui();
 
         network_->ThreadStop();
     }
@@ -161,8 +163,15 @@ namespace tomato {
         }
     }
 
-    void Engine::Render(SimContext& simCtx, RenderContext& renderCtx) {
+    void Engine::Render(SimContext& simCtx, RenderContext& renderCtx)
+    {
+        editor_.BeginFrame();
+
         systemManager_.Render(simCtx, renderCtx);
+
+        editor_.Draw(currState_.get());
+        editor_.EndFrame();
+
         window_.SwapBuffers();
     }
 

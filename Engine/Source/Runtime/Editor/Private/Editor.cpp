@@ -6,8 +6,9 @@
 #include "imgui_impl_opengl3.h"
 
 #include "Services/Input.h"
+
 #include "EditorPanel.h"
-#include "EntityPanel.h"
+#include "HierarchyPanel.h"
 
 namespace tomato
 {
@@ -40,7 +41,7 @@ namespace tomato
 			&config,
 			io.Fonts->GetGlyphRangesKorean());
 
-		panels.push_back(std::make_unique<EntityPanel>());
+		panels.push_back(std::make_unique<HierarchyPanel>());
 	}
 
 	void Editor::ShutdownImGui()
@@ -62,7 +63,7 @@ namespace tomato
 #if 0
 		ImGui::ShowDemoWindow();
 #elif 1
-		EditorContext eCtx{ state, entt::null };
+		eCtx.currentState = state;
 		for (auto& panel : panels)
 			panel->Draw(eCtx);
 #endif
