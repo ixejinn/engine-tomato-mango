@@ -5,7 +5,7 @@
 #include <glm/fwd.hpp>
 #include <entt/fwd.hpp>
 #include "ECS/Systems/System.h"
-#include "ECS/SystemFwd.h"
+#include "ECS/Forward/SystemFwd.h"
 
 namespace tomato
 {

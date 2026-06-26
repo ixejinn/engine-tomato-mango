@@ -2,7 +2,7 @@
 #define MANGO_NETMESSAGE_H
 
 #include "Network/NetworkFwd.h"
-#include "ECS/SystemFwd.h"
+#include "ECS/Forward/SystemFwd.h"
 
 namespace tomato
 {

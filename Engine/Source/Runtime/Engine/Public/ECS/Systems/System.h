@@ -1,7 +1,7 @@
 #ifndef MANGO_SYSTEM_H
 #define MANGO_SYSTEM_H
 
-#include "ECS/SystemFwd.h"
+#include "ECS/Forward/SystemFwd.h"
 
 namespace tomato {
     class System {

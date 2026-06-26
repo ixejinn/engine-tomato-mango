@@ -7,17 +7,17 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/State/State.h
         Source/Runtime/Core/Public/Containers/EnumArray.h
         Source/Runtime/Core/Private/Collision/ColliderSupport.h
-        Source/Runtime/Engine/Public/ECS/PhysCompFwd.h
+        Source/Runtime/Engine/Public/ECS/Forward/PhysCompFwd.h
         Source/Runtime/Core/Public/Collision/CollisionConstants.h
         Source/Runtime/Engine/Public/Collision/CollisionEvent.h
         Source/Runtime/Engine/Public/Collision/CollisionLayerMatrix.h
         Source/Runtime/Engine/Public/Utils/BitmaskOperators.h
         Source/Runtime/Core/Public/BitmaskFwd.h
         Source/Runtime/Engine/Public/ECS/Components/Collision.h
-        Source/Runtime/Core/Private/Containers/MemoryPool.h
+        Source/Runtime/Core/Public/Containers/MemoryPool.h
         Source/Runtime/Core/Public/Utils/Logger.h
         Source/Runtime/Engine/Public/Containers/RingArray.h
-        Source/Runtime/Core/Private/Containers/SPSCQueue.h
+        Source/Runtime/Core/Public/Containers/SPSCQueue.h
         Source/Runtime/Engine/Public/Containers/Timeline.h
         Source/Runtime/Engine/Public/Network/NetworkConfig.h
         Source/Runtime/Engine/Public/ECS/Components/Camera.h
@@ -68,7 +68,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Systems/TransformSystem.h
         Source/Runtime/Engine/Public/ECS/Systems/UISystem.h
         Source/Runtime/Engine/Public/ECS/SystemRegistry.h
-        Source/Runtime/Engine/Public/ECS/SystemFwd.h
+        Source/Runtime/Engine/Public/ECS/Forward/SystemFwd.h
         Source/Runtime/Engine/Public/ECS/SystemConstants.h
         Source/Runtime/Engine/Public/ECS/SystemManager.h
         Source/Runtime/Engine/Public/Utils/RegistryEntry.h
@@ -116,8 +116,11 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Entity/Lifetime.h
         Source/Runtime/Engine/Public/ECS/Entity/Hierarchy.h
         Source/Runtime/Engine/Public/ECS/Components/Rollback.h
-        Source/Runtime/Engine/Public/ECS/EntityCompFwd.h
-        Source/Runtime/Engine/Public/ECS/Components.h
+        Source/Runtime/Engine/Public/ECS/Forward/EntityCompFwd.h
+        Source/Runtime/Engine/Public/ECS/Components/Components.h
+        Source/Runtime/Engine/Public/ECS/Components/PhysComponents.h
+        Source/Runtime/Engine/Public/ECS/Components/EntityComponents.h
+        Source/Runtime/Engine/Public/ECS/Components/CharComponents.h
 )
 
 set(ENGINE_SOURCES

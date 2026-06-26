@@ -6,6 +6,7 @@ namespace tomato {
 
     struct SimContext;
     struct InputContext;
+    struct CollisionContext;
     struct RenderContext;
     struct UIContext;
     struct NetworkContext;

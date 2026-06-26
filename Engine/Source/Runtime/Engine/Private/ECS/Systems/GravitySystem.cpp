@@ -2,6 +2,7 @@
 #include "ECS/SystemUpdateContexts.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Rigidbody.h"
+#include "Utils/Logger.h"
 #include "Utils/RegistryEntry.h"
 REGISTER_SYSTEM(tomato::SystemPhase::Physics, GravitySystem)
 
@@ -14,6 +15,7 @@ namespace tomato {
                 continue;
 
             velocity.velocity.y += GRAVITY;
+            // TMT_INFO << (int)e << " add gravity: " << velocity.velocity.y;
         }
     }
 }

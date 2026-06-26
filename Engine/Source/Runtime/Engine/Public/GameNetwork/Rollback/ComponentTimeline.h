@@ -6,6 +6,11 @@
 #include "Containers/Timeline.h"
 #include "GameNetwork/Rollback/RollbackConfig.h"
 #include "ECS/Components/Rollback.h"
+#include "ECS/Components/Transform.h"
+#include "ECS/Components/Rigidbody.h"
+#include "ECS/SystemUpdateContexts.h"
+#include "Collision/CollisionFwd.h"
+#include "Utils/Logger.h"
 
 namespace tomato {
     class ComponentTimelineBase {
@@ -20,7 +25,13 @@ namespace tomato {
     class ComponentTimeline : public ComponentTimelineBase{
     public:
         void Restore(entt::registry& reg, uint32_t tick) override {
-            for (auto& [e, component] : data_[tick]) {
+            const uint32_t storedTick = data_[tick].tick;
+            if (storedTick != tick) {
+                TMT_WARN << "Rollback tick mismatch (requested: " << tick << ", stored: " << storedTick << ")";
+                return;
+            }
+
+            for (auto& [e, component] : data_[tick].data) {
                 if (reg.all_of<Component>(e))
                     reg.get<Component>(e) = component;
                 else
@@ -29,19 +40,83 @@ namespace tomato {
         }
 
         void Record(entt::registry& reg, uint32_t tick) override {
-            auto& rollbackSlice = data_[tick];
+            auto& slice = data_[tick];
+
+            slice.tick = tick;
 
             auto view = reg.view<Component, RollbackEntityTag>();
-            data_[tick].clear();
-            data_[tick].resize(view.size_hint());
+            slice.data.clear();
+            slice.data.reserve(view.size_hint());
 
             for (auto [e, component] : view.each())
-                rollbackSlice.emplace_back(e, component);
+                slice.data.emplace_back(e, component);
         }
 
     private:
-        Timeline<std::vector<std::pair<entt::entity, Component>>, ROLLBACK_WINDOW> data_;
+        struct TimelineSlice {
+            uint32_t tick;
+            std::vector<std::pair<entt::entity, Component>> data;
+        };
+
+        Timeline<TimelineSlice> data_;
     };
+
+    template<>
+    class ComponentTimeline<CollisionPair> : public ComponentTimelineBase {
+    public:
+        void Restore(entt::registry& reg, uint32_t tick) override {
+            const uint32_t storedTick = data_[tick].tick;
+            if (storedTick != tick) {
+                TMT_WARN << "Rollback tick mismatch (requested: " << tick << ", stored: " << storedTick << ")";
+                return;
+            }
+
+            auto& collisionPairs = reg.ctx().get<CollisionContext>().collisionPairs;
+            // TMT_INFO << "     Restore collision pair " << collisionPairs.size() << " -> " << data_[tick].data.size();
+            collisionPairs.clear();
+
+            for (auto& pb : data_[tick].data)
+                collisionPairs[pb.first] = false;
+        }
+
+        void Record(entt::registry& reg, uint32_t tick) override {
+            auto& slice = data_[tick];
+
+            slice.tick = tick;
+            slice.data.clear();
+
+            auto& collisionPairs = reg.ctx().get<CollisionContext>().collisionPairs;
+            slice.data.reserve(collisionPairs.size());
+            // TMT_INFO << "     Back up collision pair size: " << collisionPairs.size();
+            for (auto it = collisionPairs.begin(); it != collisionPairs.end(); ++it)
+                slice.data.emplace_back(*it);
+        }
+
+    private:
+        struct TimelineSlice {
+            uint32_t tick;
+            std::vector<std::pair<CollisionPair, bool>> data;
+        };
+
+        Timeline<TimelineSlice> data_;
+    };
+
+
+    template<>
+    inline void ComponentTimeline<TransformComponent>::Record(entt::registry& reg, uint32_t tick) {
+        auto& slice = data_[tick];
+
+        slice.tick = tick;
+
+        auto view = reg.view<TransformComponent, RollbackEntityTag>();
+        slice.data.clear();
+        slice.data.reserve(view.size_hint());
+
+        for (auto [e, component] : view.each()) {
+            component.AddPosition(glm::vec3{0.f, 0.f, 0.f});
+            slice.data.emplace_back(e, component);
+        }
+    }
 }
 
 #endif //MANGO_COMPONENTTIMELINE_H

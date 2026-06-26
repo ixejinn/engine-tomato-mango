@@ -8,10 +8,10 @@
 #include <atomic>
 #include <thread>
 
-#include "../../Core/Private/Containers/MemoryPool.h"
-#include "../../Core/Private/Containers/SPSCQueue.h"
+#include "Containers/MemoryPool.h"
+#include "Containers/SPSCQueue.h"
 
-#include "ECS/SystemFwd.h"
+#include "ECS/Forward/SystemFwd.h"
 #include "Network/NetTypes.h"
 #include "Network/NetworkFwd.h"
 #include "Network/WinsockInitializer.h"

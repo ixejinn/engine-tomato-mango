@@ -1,7 +1,6 @@
 #ifndef MANGO_COLLISIONEVENT_H
 #define MANGO_COLLISIONEVENT_H
 
-#include <glm/vec3.hpp>
 #include <entt/entt.hpp>
 #include "Collision/CollisionInfo.h"
 
@@ -18,6 +17,7 @@ namespace tomato {
         entt::registry* reg;
 
         CollisionInfo info;
+        uint32_t tick;
     };
 
     struct CollisionStayEvent {
@@ -30,11 +30,13 @@ namespace tomato {
     struct CollisionExitEvent {
         entt::entity e1, e2;
         entt::registry* reg;
+        uint32_t tick;
     };
 
     struct TriggerEnterEvent {
         entt::entity e1, e2;
         entt::registry* reg;
+        uint32_t tick;
     };
 
     struct TriggerStayEvent {
@@ -45,6 +47,7 @@ namespace tomato {
     struct TriggerExitEvent {
         entt::entity e1, e2;
         entt::registry* reg;
+        uint32_t tick;
     };
 }
 

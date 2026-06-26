@@ -2,7 +2,7 @@
 #define MANGO_COLLIDERSUPPORT_H
 
 #include <glm/fwd.hpp>
-#include "ECS/PhysCompFwd.h"
+#include "ECS/Forward/PhysCompFwd.h"
 
 namespace tomato::support {
     glm::vec3 Cube(const glm::vec3& dir, const TransformComponent& trf);

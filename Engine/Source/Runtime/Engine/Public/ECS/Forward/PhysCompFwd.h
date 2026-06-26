@@ -3,11 +3,7 @@
 
 namespace tomato {
     struct TransformComponent;
-
-    // Rigid body
-    struct SpeedComponent;
-
-    // Collision
+    struct VelocityComponent;
     struct ColliderComponent;
 }
 

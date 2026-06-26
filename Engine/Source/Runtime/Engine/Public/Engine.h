@@ -43,6 +43,7 @@ namespace tomato {
 
     private:
         Window window_;
+
         std::unique_ptr<ClientNetwork> network_{ nullptr };
         std::unique_ptr<GamePlayNetSystem> gameNet_{ nullptr };
         std::unique_ptr<RollbackManager> rollbackManager_{ nullptr };
@@ -57,7 +58,6 @@ namespace tomato {
         InputUI inputUI_;
 
         void Simulate(TickClock& tc, SimContext& simCtx, InputContext& inputCtx);
-        void Simulate(int cnt, SimContext& simCtx, InputContext& inputCtx);
 
         void Render(SimContext& simCtx, RenderContext& renderCtx);
         SystemManager systemManager_;

@@ -1,12 +1,9 @@
 #include <entt/entt.hpp>
 #include "Prefab/Prefab.h"
 #include "Prefab/Character/CharacterMovement.h"
-#include "ECS/Components/Transform.h"
-#include "ECS/Components/Hierarchy.h"
-#include "ECS/Components/Collision.h"
+#include "ECS/Components/CharComponents.h"
+#include "ECS/Components/PhysComponents.h"
 #include "ECS/Components/Render.h"
-#include "ECS/Components/Rigidbody.h"
-#include "ECS/Components/Movement.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Rollback.h"
 #include "ECS/Entity/Hierarchy.h"
@@ -66,7 +63,7 @@ namespace tomato {
         reg.emplace<TransformComponent>(obj, pos, rot);
         reg.emplace<CameraComponent>(obj);
         reg.emplace<RootEntityTag>(obj);
-        reg.emplace<RollbackEntityTag>(obj);
+        // reg.emplace<RollbackEntityTag>(obj);
 
         if (isMain)
             reg.emplace<MainCameraTag>(obj);

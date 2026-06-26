@@ -1,10 +1,12 @@
 ﻿#ifndef MANGO_SYSTEMUPDATECONTEXTS_H
 #define MANGO_SYSTEMUPDATECONTEXTS_H
 
+#include <unordered_map>
 #include <entt/entt.hpp>
 #include "State/StateFwd.h"
 #include "Network/NetTypes.h"
 #include "Network/ClientNetwork.h"
+#include "Collision/CollisionFwd.h"
 
 namespace tomato {
     struct SimContext {
@@ -18,6 +20,10 @@ namespace tomato {
         InputContext(std::array<Timeline<InputRecord>, MAX_PLAYER_NUM>& tl) : timelines(tl) {}
 
         std::array<Timeline<InputRecord>, MAX_PLAYER_NUM>& timelines;
+    };
+
+    struct CollisionContext {
+        std::unordered_map<CollisionPair, bool> collisionPairs;
     };
 
     struct RenderContext {

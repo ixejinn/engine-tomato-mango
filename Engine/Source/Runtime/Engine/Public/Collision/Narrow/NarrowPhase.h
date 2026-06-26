@@ -3,7 +3,7 @@
 
 #include <optional>
 #include <entt/fwd.hpp>
-#include "ECS/PhysCompFwd.h"
+#include "ECS/Forward/PhysCompFwd.h"
 #include "Collision/CollisionInfo.h"
 
 namespace tomato {

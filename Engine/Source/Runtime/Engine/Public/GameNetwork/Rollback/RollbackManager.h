@@ -7,8 +7,7 @@
 #include <typeindex>
 #include <entt/fwd.hpp>
 #include "GameNetwork/Rollback/ComponentTimeline.h"
-#include "ECS/SystemFwd.h"
-#include "ECS/EntityCompFwd.h"
+#include "ECS/Forward/SystemFwd.h"
 
 namespace tomato {
     class RollbackManager {
@@ -17,7 +16,6 @@ namespace tomato {
         ~RollbackManager();
 
         template<typename Component>
-        requires (!std::same_as<Component, LifetimeComponent>)
         void Register() {
             if (registered_.contains(typeid(Component)))
                 return;

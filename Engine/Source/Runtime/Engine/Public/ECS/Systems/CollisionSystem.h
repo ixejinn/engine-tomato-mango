@@ -2,13 +2,9 @@
 #define MANGO_COLLISIONSYSTEM_H
 
 #include <entt/fwd.hpp>
-#include <glm/vec3.hpp>
 #include <vector>
-#include <functional>
-#include <unordered_map>
 #include <memory>
 #include "ECS/Systems/System.h"
-#include "ECS/PhysCompFwd.h"
 #include "Collision/CollisionEventFwd.h"
 #include "Collision/CollisionFwd.h"
 #include "Collision/Narrow/GJK.h"
@@ -43,7 +39,6 @@ namespace tomato {
         std::unique_ptr<NarrowPhase> narrowPhase_;
 
         std::vector<CollisionPair> candidates_;
-        std::unordered_map<CollisionPair, bool> collisionPairs_;
     };
 }
 

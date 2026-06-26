@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 #include <vector>
-#include "ECS/SystemFwd.h"
+#include "Forward/SystemFwd.h"
 #include "ECS/SystemConstants.h"
 #include "Containers/EnumArray.h"
 
