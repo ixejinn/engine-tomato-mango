@@ -17,20 +17,22 @@
 #include "Collision/CollisionEvent.h"
 #include "CollisionTestComponent.h"
 #include "Prefab/Prefab.h"
+#include "Prefab/UIPrefab.h"
+
 using namespace tomato;
 
 void TestState::Init() {
-    // Audio test
+    //// Audio test
     auto id = Audio::Create("Resources/Contents/sfx_get_heart.mp3", 8);
     audioPtr_ = AssetRegistry<Audio>::GetInstance().Get(id);
 
     engine_.GetInputRecorder().BindInputIntent(Key::J, InputIntent::Test_1);
 
-    // Set rollback
-    engine_.SetRollbackComponent<MovementComponent>();
-    engine_.SetRollbackComponent<VelocityComponent>();
+    //// Set rollback
+    //engine_.SetRollbackComponent<MovementComponent>();
+    //engine_.SetRollbackComponent<VelocityComponent>();
 
-    // Create game object
+    //// Create game object
 
     // Camera
     Prefab::CreateCamera(registry_,
@@ -40,18 +42,16 @@ void TestState::Init() {
         // glm::vec3(-90.f, 0.f, 0.f),
         true);
 
-    // Player0 character
+    //// Player0 character
     entt::entity player0 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, 2, 0 });
-    // entt::entity center = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, {0, 0, 0});
     auto& renderp0 = registry_.get<RenderComponent>(player0);
     renderp0.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
     renderp0.color = { 1.f, 1.f, 0.f, 1.f };
     auto& channelp0 = registry_.get<InputChannelComponent>(player0);
     channelp0.channel = 0;
 
-    // Player1 character
+    //// Player1 character
     entt::entity player1 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { -1, 2, 0 });
-    // entt::entity center = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, {0, 0, 0});
     auto& renderp1 = registry_.get<RenderComponent>(player1);
     renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
     renderp1.color = { 0.f, 1.f, 1.f, 1.f };
@@ -66,54 +66,66 @@ void TestState::Init() {
     renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
 
 
-    //UI
-    const auto canvas = registry_.create();
-    registry_.emplace<tomato::CanvasComponent>(canvas);
-    registry_.emplace<tomato::UIComponent>(canvas, canvas);
-    registry_.emplace<tomato::RectTransformComponent>(canvas);
-    registry_.emplace<tomato::HierarchyComponent>(canvas);
-    registry_.emplace<tomato::RenderComponent>(canvas,
-        glm::vec4{ 1.f, 1.f, 1.f, 0.f },
-        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
-        GetAssetID("UIShader"),
-        GetAssetID(Texture::PrimitiveName));
-    //
-    //
-    // const auto button = registry_.create();
-    // registry_.emplace<tomato::UIComponent>(button, canvas, 1);
-    // registry_.emplace<tomato::RectTransformComponent>(button, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(200.f, 200.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
-    // registry_.emplace<tomato::SelectableComponent>(button);
-    // registry_.emplace<tomato::MouseEventComponent>(button);
-    // registry_.emplace<tomato::HierarchyComponent>(button);
-    // SetHierarchy(registry_, canvas, button);
-    // registry_.emplace<tomato::RenderComponent>(button,
-    //     glm::vec4{ 0.2f, 0.75f, 0.4f, 1.0f },
-    //     GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
-    //     GetAssetID("UIShader"),
-    //     GetAssetID(Texture::PrimitiveName));
-    //
-    // const auto buttonText = registry_.create();
-    // registry_.emplace<tomato::UIComponent>(buttonText, canvas, 2);
-    // registry_.emplace<tomato::TextComponent>(buttonText, "Button1임", glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f }, 30.f);
-    // registry_.emplace<tomato::RectTransformComponent>(buttonText, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
-    // registry_.emplace<tomato::HierarchyComponent>(buttonText);
-    // SetHierarchy(registry_, button, buttonText);
+    ////UI
+    auto targetLabel = UIPrefab::CreateText(registry_, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 20.f);
+    registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0));
+    SetHierarchy(registry_, UIPrefab::GetCanvas(registry_), targetLabel);
+    auto& uiCmp = registry_.get<UIComponent>(targetLabel);
+    uiCmp.sortOrder = 1;
 
-    const auto TargetLabel0 = registry_.create();
-    registry_.emplace<tomato::UIComponent>(TargetLabel0, canvas, 2);
-    registry_.emplace<tomato::TextComponent>(TargetLabel0, "player0", glm::vec4{ 1.f, 1.f, 0.5f, 1.0f }, 24.f);
-    registry_.emplace<tomato::RectTransformComponent>(TargetLabel0, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
-    registry_.emplace<tomato::HierarchyComponent>(TargetLabel0);
-    registry_.emplace<tomato::TargetComponent>(TargetLabel0, player0);
-    SetHierarchy(registry_, canvas, TargetLabel0);
+    auto targetLabel1 = UIPrefab::CreateText(registry_, { 0.f, 0.f }, "player1", {1.0f, 1.0f, 0.f, 1.f}, 20.f);
+    registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1));
+    SetHierarchy(registry_, UIPrefab::GetCanvas(registry_), targetLabel1);
+    auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
+    uiCmp1.sortOrder = 1;
 
-    const auto TargetLabel1 = registry_.create();
-    registry_.emplace<tomato::UIComponent>(TargetLabel1, canvas, 2);
-    registry_.emplace<tomato::TextComponent>(TargetLabel1, "player1", glm::vec4{ 1.f, 1.f, 0.5f, 1.0f }, 24.f);
-    registry_.emplace<tomato::RectTransformComponent>(TargetLabel1, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
-    registry_.emplace<tomato::HierarchyComponent>(TargetLabel1);
-    registry_.emplace<tomato::TargetComponent>(TargetLabel1, player1);
-    SetHierarchy(registry_, canvas, TargetLabel1);
+    //const auto canvas = registry_.create();
+    //registry_.emplace<tomato::CanvasComponent>(canvas);
+    //registry_.emplace<tomato::UIComponent>(canvas, canvas);
+    //registry_.emplace<tomato::RectTransformComponent>(canvas);
+    //registry_.emplace<tomato::HierarchyComponent>(canvas);
+    //registry_.emplace<tomato::RenderComponent>(canvas,
+    //    glm::vec4{ 1.f, 1.f, 1.f, 0.f },
+    //    GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
+    //    GetAssetID("UIShader"),
+    //    GetAssetID(Texture::PrimitiveName));
+    ////
+    ////
+    //// const auto button = registry_.create();
+    //// registry_.emplace<tomato::UIComponent>(button, canvas, 1);
+    //// registry_.emplace<tomato::RectTransformComponent>(button, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(200.f, 200.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    //// registry_.emplace<tomato::SelectableComponent>(button);
+    //// registry_.emplace<tomato::MouseEventComponent>(button);
+    //// registry_.emplace<tomato::HierarchyComponent>(button);
+    //// SetHierarchy(registry_, canvas, button);
+    //// registry_.emplace<tomato::RenderComponent>(button,
+    ////     glm::vec4{ 0.2f, 0.75f, 0.4f, 1.0f },
+    ////     GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
+    ////     GetAssetID("UIShader"),
+    ////     GetAssetID(Texture::PrimitiveName));
+    ////
+    //// const auto buttonText = registry_.create();
+    //// registry_.emplace<tomato::UIComponent>(buttonText, canvas, 2);
+    //// registry_.emplace<tomato::TextComponent>(buttonText, "Button1임", glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f }, 30.f);
+    //// registry_.emplace<tomato::RectTransformComponent>(buttonText, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    //// registry_.emplace<tomato::HierarchyComponent>(buttonText);
+    //// SetHierarchy(registry_, button, buttonText);
+
+    //const auto TargetLabel0 = registry_.create();
+    //registry_.emplace<tomato::UIComponent>(TargetLabel0, canvas, 2);
+    //registry_.emplace<tomato::TextComponent>(TargetLabel0, "player0", glm::vec4{ 1.f, 1.f, 0.5f, 1.0f }, 24.f);
+    //registry_.emplace<tomato::RectTransformComponent>(TargetLabel0, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    //registry_.emplace<tomato::HierarchyComponent>(TargetLabel0);
+    //registry_.emplace<tomato::TargetComponent>(TargetLabel0, player0);
+    //SetHierarchy(registry_, canvas, TargetLabel0);
+
+    //const auto TargetLabel1 = registry_.create();
+    //registry_.emplace<tomato::UIComponent>(TargetLabel1, canvas, 2);
+    //registry_.emplace<tomato::TextComponent>(TargetLabel1, "player1", glm::vec4{ 1.f, 1.f, 0.5f, 1.0f }, 24.f);
+    //registry_.emplace<tomato::RectTransformComponent>(TargetLabel1, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+    //registry_.emplace<tomato::HierarchyComponent>(TargetLabel1);
+    //registry_.emplace<tomato::TargetComponent>(TargetLabel1, player1);
+    //SetHierarchy(registry_, canvas, TargetLabel1);
 }
 
 void TestState::Update() {

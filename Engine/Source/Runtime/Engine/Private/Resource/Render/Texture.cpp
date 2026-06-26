@@ -1,4 +1,4 @@
-#define STB_IMAGE_IMPLEMENTATION
+﻿#define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 #include "Resource/Render/Texture.h"
 #include "Resource/AssetRegistry.h"
@@ -30,7 +30,7 @@ namespace tomato {
         glTextureParameteri(textureID_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTextureParameteri(textureID_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        int width, height, actualCh;
+        int actualCh;
         if (unsigned char* image = stbi_load(filename, &width, &height, &actualCh, format_.channels))
         {
             if (format_.channels != 0 && actualCh > format_.channels)

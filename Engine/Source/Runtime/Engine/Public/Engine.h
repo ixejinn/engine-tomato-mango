@@ -11,28 +11,35 @@
 #include "Network/ClientNetwork.h"
 #include "GameNetwork/GamePlayNetSystem.h"
 #include "GameNetwork/Rollback/RollbackManager.h"
+#include "Editor.h"
 
 namespace tomato {
     class Engine {
     public:
-        Engine(int width, int height, const char* title, bool isSingle = true);
+        Engine(int width, int height, const char* title, NetMode netMode = NetMode::NM_Alone);
         ~Engine();
 
         void SetNextState(std::unique_ptr<State>&& newState);
         void TryStartGame(std::unique_ptr<State>&& newState);
 
         void Run() {
-            if (isSingle_)
+            switch (netMode_)
+            {
+            case NetMode::NM_Alone:
                 SingleRun();
-            else
+                break;
+
+            case NetMode::NM_Client:
                 MultiRun();
+                break;
+            }
         }
 
         InputRecorder& GetInputRecorder() { return inputRecorder_; }
 
         template<typename Component>
         void SetRollbackComponent() {
-            if (isSingle_)
+            if (netMode_ == NetMode::NM_Alone)
                 return;
 
             if (!rollbackManager_)
@@ -53,13 +60,16 @@ namespace tomato {
         std::unique_ptr<State> currState_{nullptr};
         std::unique_ptr<State> nextState_{nullptr};
 
+        Editor editor_;
+
         std::unique_ptr<ClientNetwork> network_{ nullptr };
         std::unique_ptr<GamePlayNetSystem> gameNet_{ nullptr };
         std::unique_ptr<RollbackManager> rollbackManager_{ nullptr };
 
         void SingleRun();
         void MultiRun();
-        bool isSingle_;
+
+        NetMode netMode_;
 
         void Simulate(TickClock& tc, SimContext& simCtx, InputContext& inputCtx);
 

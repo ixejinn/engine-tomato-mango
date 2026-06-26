@@ -1,4 +1,4 @@
-#ifndef MANGO_COLLISION_H
+﻿#ifndef MANGO_COLLISION_H
 #define MANGO_COLLISION_H
 
 #include <glm/vec3.hpp>

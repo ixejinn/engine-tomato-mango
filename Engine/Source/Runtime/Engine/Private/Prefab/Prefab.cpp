@@ -1,4 +1,4 @@
-#include <entt/entt.hpp>
+﻿#include <entt/entt.hpp>
 #include "Prefab/Prefab.h"
 #include "Prefab/Character/CharacterMovement.h"
 #include "ECS/Components/CharComponents.h"
@@ -6,18 +6,22 @@
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Rollback.h"
+#include "ECS/Components/Nametag.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "Resource/AssetHash.h"
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
+#include "Prefab/EntityUtils.h"
 #include "Utils/Logger.h"
 
-namespace tomato {
-    entt::entity Prefab::CreateStaticObject(entt::registry& reg,
+namespace tomato::Prefab
+{
+    entt::entity CreateStaticObject(entt::registry& reg,
                                             Primitive mesh, glm::vec3 pos) {
         const entt::entity obj = reg.create();
 
+        reg.emplace<NametagComponent>(obj, GenerateUUID(), GenerateEntityName(reg, "Object"));
         reg.emplace<TransformComponent>(obj, pos);
         reg.emplace<RenderComponent>(obj,
                                      glm::vec4(1.f),
@@ -32,10 +36,11 @@ namespace tomato {
         return obj;
     }
 
-    entt::entity Prefab::CreateCharacter(entt::registry& reg,
+    entt::entity CreateCharacter(entt::registry& reg,
                                          Primitive mesh, glm::vec3 pos) {
         const entt::entity obj = reg.create();
 
+        reg.emplace<NametagComponent>(obj, GenerateUUID(), GenerateEntityName(reg, "Character"));
         reg.emplace<TransformComponent>(obj, pos);
         reg.emplace<RenderComponent>(obj,
                                      glm::vec4(1.f),
@@ -55,11 +60,12 @@ namespace tomato {
         return obj;
     }
 
-    entt::entity Prefab::CreateCamera(entt::registry& reg,
+    entt::entity CreateCamera(entt::registry& reg,
                                       glm::vec3 pos, glm::vec3 rot,
                                       bool isMain) {
         const entt::entity obj = reg.create();
 
+        reg.emplace<NametagComponent>(obj, GenerateUUID(), GenerateEntityName(reg, "Camera"));
         reg.emplace<TransformComponent>(obj, pos, rot);
         reg.emplace<CameraComponent>(obj);
         reg.emplace<RootEntityTag>(obj);
@@ -72,8 +78,10 @@ namespace tomato {
         return obj;
     }
 
-    entt::entity Prefab::AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
+    entt::entity AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
         const entt::entity col = reg.create();
+        reg.emplace<NametagComponent>(col, GenerateUUID(), GenerateEntityName(reg, "Collider"));
+
         SetHierarchy(reg, parent, col);
 
         reg.emplace<TransformComponent>(col);
@@ -89,7 +97,7 @@ namespace tomato {
         return col;
     }
 
-    entt::entity Prefab::AttachCharacterCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
+    entt::entity AttachCharacterCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
         const entt::entity col = AttachCollider(reg, parent, type);
         const entt::entity ground = AttachCollider(reg, col, type);
 

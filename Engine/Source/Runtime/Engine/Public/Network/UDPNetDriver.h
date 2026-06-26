@@ -18,7 +18,7 @@ namespace tomato
 	class UDPNetDriver
 	{
 	public:
-		UDPNetDriver(NetMode mode);
+		UDPNetDriver();
 		~UDPNetDriver();
 
 		bool InitSocket();
@@ -28,7 +28,6 @@ namespace tomato
 
 		const uint16_t& GetPort() const { return port; }
 	private:
-		NetMode mode_;
 
 		uint16_t port{ 9000 };
 		UDPSocketPtr socket_;

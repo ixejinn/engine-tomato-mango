@@ -10,7 +10,7 @@ namespace tomato
 	class TCPNetDriver
 	{
 	public:
-		explicit TCPNetDriver(NetMode mode);
+		explicit TCPNetDriver();
 		~TCPNetDriver();
 
 		bool InitListenServerMode();
@@ -22,9 +22,8 @@ namespace tomato
 		const TCPSocketPtr GetSocket() const { return socket_; }
 
 		bool IsConnectedToServer() const { return connectedToServer; }
-	private:
 
-		NetMode mode_;
+	private:
 		TCPSocketPtr socket_;
 
 		bool connectedToServer = false;

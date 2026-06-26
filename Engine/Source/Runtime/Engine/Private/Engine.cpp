@@ -5,11 +5,17 @@
 #include "ECS/Systems/GarbageEntityCollectionSystem.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "GameNetwork/Rollback/RollbackManager.h"
+#include "Serialization/ComponentRegistry.h"
+
+#include "Editor.h"
 #include "Utils/Logger.h"
 
 namespace tomato {
-    Engine::Engine(const int width, const int height, const char* title, const bool isSingle)
-    : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), isSingle_(isSingle) {}
+    Engine::Engine(const int width, const int height, const char* title, NetMode netMode)
+        : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), netMode_(netMode), network_(nullptr), gameNet_(nullptr)
+    {
+        Serialization::ComponentRegistry::GetInstance().Init();
+    }
 
     Engine::~Engine() = default;
 
@@ -33,7 +39,6 @@ namespace tomato {
             // TMT_INFO << " ---------- " << tickClock.GetTick() << " ---------- ";
             SimContext simCtx{currState_->GetRegistry(), tickClock.GetTick()};
             InputContext inputCtx{currState_->GetPlayerInputTimelines()};
-            RenderContext renderCtx{window_.GetWidth(), window_.GetHeight()};
             // currState_->GetRegistry().ctx().insert_or_assign<InputContext*>(&inputCtx);
             // currState_->GetRegistry().ctx().insert_or_assign<RenderContext*>(&renderCtx);
 
@@ -43,15 +48,16 @@ namespace tomato {
             garbageCollectionSystem.Update(simCtx);
 
             Simulate(tickClock, simCtx, inputCtx);
+
+            RenderContext renderCtx{window_.GetWidth(), window_.GetHeight()};
             Render(simCtx, renderCtx);
 
             inputRecorder_.UpdateCurrInputRecord(tickClock.GetTick());
         }
     }
 
-    void Engine::MultiRun()
-    {
-        network_ = std::make_unique<ClientNetwork>(NetMode::NM_Client);
+    void Engine::MultiRun() {
+        network_ = std::make_unique<ClientNetwork>();
         gameNet_ = std::make_unique<GamePlayNetSystem>(currState_.get());
         network_->SetGameplaySystem(gameNet_.get());
         gameNet_->SetNetwork(network_.get());
@@ -185,7 +191,7 @@ namespace tomato {
         SimContext simCtx{currState_->GetRegistry(), tc.GetTick()};
         systemManager_.InitializeTransform(simCtx);
 
-        if (!isSingle_) // !!!!!!!!!! temporary !!!!!!!!!!!
+        if (netMode_ == NetMode::NM_Client) // !!!!!!!!!! temporary !!!!!!!!!!!
         {
             gameNet_->SetState(currState_.get());
             rollbackManager_->Capture(simCtx);
