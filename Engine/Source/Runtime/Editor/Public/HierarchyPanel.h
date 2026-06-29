@@ -1,5 +1,5 @@
-﻿#ifndef MANGO_ENTITYPANEL_H
-#define MANGO_ENTITYPANEL_H
+﻿#ifndef MANGO_HIERARCHYPANEL_H
+#define MANGO_HIERARCHYPANEL_H
 
 #include "EditorPanel.h"
 
@@ -10,7 +10,7 @@ namespace tomato
 	public:
 		void Draw(EditorContext&) override;
 
-		const char* GetName() const { return "EntityPanel"; }
+		const char* GetName() const { return "HierarchyPanel"; }
 
 		bool isOpened() const { return open; }
 
@@ -21,4 +21,4 @@ namespace tomato
 	};
 }
 
-#endif // !MANGO_ENTITYPANEL_H
+#endif // !MANGO_HIERARCHYPANEL_H

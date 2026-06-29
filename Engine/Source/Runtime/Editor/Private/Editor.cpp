@@ -9,6 +9,7 @@
 
 #include "EditorPanel.h"
 #include "HierarchyPanel.h"
+#include "InspectorPanel.h"
 
 namespace tomato
 {
@@ -42,6 +43,7 @@ namespace tomato
 			io.Fonts->GetGlyphRangesKorean());
 
 		panels.push_back(std::make_unique<HierarchyPanel>());
+		panels.push_back(std::make_unique<InspectorPanel>());
 	}
 
 	void Editor::ShutdownImGui()

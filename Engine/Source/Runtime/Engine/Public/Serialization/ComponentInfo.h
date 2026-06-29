@@ -14,6 +14,8 @@ namespace tomato::Serialization
 		bool (*Has)(entt::registry&, entt::entity);
 		void (*Save)(json&, entt::registry&, entt::entity);
 		void (*Load)(const json&, entt::registry&, entt::entity);
+
+		void (*DrawInspector)(entt::registry&, entt::entity);
 	};
 }
 #endif // !MANGO_COMPONENTINFO_H

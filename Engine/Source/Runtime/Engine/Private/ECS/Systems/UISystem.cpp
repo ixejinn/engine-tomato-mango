@@ -177,8 +177,8 @@ namespace tomato
 					auto& target = ctx.registry.get<TargetComponent>(entity);
 					auto& targetTransform = ctx.registry.get<TransformComponent>(GetEntityByUUID(ctx.registry, target.target));
 
-					// if (!ctx.registry.ctx().get<RenderContext*>())
-					// 	return;
+					 if (!ctx.registry.ctx().find<RenderContext*>())
+					 	continue;
 					auto renderCtx = ctx.registry.ctx().get<RenderContext*>();
 					if (renderCtx->mainCam == entt::null)
 					{
