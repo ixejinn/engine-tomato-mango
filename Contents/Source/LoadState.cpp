@@ -5,6 +5,7 @@
 #include "Serialization/ComponentSerializer.h"
 
 #include "Engine.h"
+#include "Prefab/Prefab.h"
 #include "Prefab/UIPrefab.h"
 #include "TestState.h"
 
@@ -29,7 +30,7 @@ void LoadState::Init()
 	//	{
 	//		uiController_.onClick(e);
 	//	};
-
+	Prefab::CreateCamera(registry_);
 	auto btn = UIPrefab::CreateButton(registry_);
 	auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
 	mouseEvt.onClick =

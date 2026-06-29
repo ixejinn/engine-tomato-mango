@@ -83,6 +83,7 @@ namespace tomato {
 
             gameNet_->InitializeConfirmedTick(tickClock.GetTick()); // for rollback
             network_->ProcessQueuedUDPPacket();
+            network_->ProcessQueuedTCPPacket();
 
             // *---------- Rollback and resimulate
             auto currT = tickClock.GetTick();
