@@ -28,11 +28,14 @@ namespace tomato
 	{
 		PlayerId myId = network_->GetMyPlayerID();
 
+		auto currInput = currentStatePtr_->GetPlayerInputTimelines()[myId][tick];
+
 		InputCommand inputCmd{
 			myId,
-			currentStatePtr_->GetPlayerInputTimelines()[myId][tick]
+			currInput
 		};
 		//std::cout << inputCmd.inputRecord.tick << " " << (int)inputCmd.inputRecord.down << " " << (int)inputCmd.inputRecord.held << '\n';
-		network_->SendUDPInputPacket(inputCmd);
+		if(currInput.tick == tick)
+			network_->SendUDPInputPacket(inputCmd);
 	}
 }

@@ -89,7 +89,7 @@ namespace tomato {
             auto currT = tickClock.GetTick();
             auto lateT = gameNet_->GetConfirmedTick();
             if (currT > lateT && currT - lateT <= ROLLBACK_WINDOW) {
-                // std::cout << "     Rollback start from " << lateT << "\n;
+                 std::cout << "     Rollback " << lateT << "~" << currT << "\n";
                 SimContext rbSimCtx{currState_->GetRegistry(), lateT};
 
                 // Rollback
@@ -123,7 +123,8 @@ namespace tomato {
                 systemManager_.Simulate(simCtx, inputCtx);
                 currState_->Update();   // !!!!!! temporary !!!!!!
 
-                gameNet_->ProcessOutgoingMessages(simCtx.tick);
+                if(network_->GetNetState() == ClientNetworkState::NSS_Playing)
+                    gameNet_->ProcessOutgoingMessages(simCtx.tick);
 
                 ++simCtx.tick;
                 rollbackManager_->Capture(simCtx);
