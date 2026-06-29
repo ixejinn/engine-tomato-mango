@@ -6,13 +6,13 @@
 
 namespace tomato
 {
-	TCPNetDriver::TCPNetDriver(NetMode mode) : mode_(mode)
+	TCPNetDriver::TCPNetDriver()
 	{
-		if (mode_ == NetMode::NM_ListenServer)
-			InitListenServerMode();
+		//if (mode_ == NetMode::NM_ListenServer)
+		//	InitListenServerMode();
 
 		//else if (mode_ == NetMode::NM_Client)
-		//	InitClientMode();
+		//InitClientMode();
 	}
 
 	TCPNetDriver::~TCPNetDriver() {}

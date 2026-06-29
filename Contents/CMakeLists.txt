@@ -1,12 +1,16 @@
-set(CONTENTS_HEADERS
+﻿set(CONTENTS_HEADERS
         Source/TestState.h
+        Source/LoadState.h
+        Source/UIController.h
 )
 
 set(CONTENTS_SOURCES
         Source/Main.cpp
         Source/TestState.cpp
+        Source/LoadState.cpp
         Source/CollisionTestComponent.h
-)
+        Source/UIController.cpp
+ "Source/LoadState.cpp")
 
 add_executable(contents
         ${CONTENTS_SOURCES}

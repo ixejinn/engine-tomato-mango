@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <entt/entt.hpp>
 #include "State/StateFwd.h"
-#include "Network/NetTypes.h"
 #include "Network/ClientNetwork.h"
 #include "Collision/CollisionFwd.h"
 

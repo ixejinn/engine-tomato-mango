@@ -5,6 +5,8 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <entt/entt.hpp>
+#include "Serialization/Json.h"
+#include "UUID.h"
 
 namespace tomato {
 	enum class RenderMode
@@ -25,10 +27,31 @@ namespace tomato {
 		int sortOrder{ 0 };
 	};
 
+	enum class UIType
+	{
+		Canvas,
+		Default,
+		Text,
+
+		COUNT
+	};
+
+	NLOHMANN_JSON_SERIALIZE_ENUM(
+		UIType,
+		{
+			{ UIType::Canvas, "Canvas" },
+			{ UIType::Default, "Default" },
+			{ UIType::Text,  "Text" }
+		}
+	)
+
 	struct UIComponent
 	{
-		entt::entity canvas{ entt::null };
-		int type{ 0 };
+		//entt::entity canvas{ entt::null };
+		UUID canvas{ 0 };
+		int sortOrder{ 0 };
+
+		UIType type{ UIType::Default };
 	}; // Tag
 
 	struct UIRect
@@ -70,7 +93,7 @@ namespace tomato {
 
 	struct TargetComponent
 	{
-		entt::entity target{ entt::null };
+		UUID target{ 0 };
 		glm::vec3 headOffset{ 0.f, 100.f, 0.f };
 	};
 

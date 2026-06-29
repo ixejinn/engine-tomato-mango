@@ -7,6 +7,8 @@
 #include <GLFW/glfw3.h>
 
 namespace tomato {
+    InputCallbacks Input::externalCallbacks_;
+
     Key Input::ConvertKeyGLFW(int glfwKey)
     {
         switch (glfwKey)
@@ -158,6 +160,8 @@ namespace tomato {
         glfwSetKeyCallback(window.GetHandle(), OnKeyEvent);
         glfwSetMouseButtonCallback(window.GetHandle(), OnMouseButtonEvent);
         glfwSetCursorPosCallback(window.GetHandle(), OnMouseMoveEvent);
+        glfwSetScrollCallback(window.GetHandle(), OnScrollEvent);
+        glfwSetCharCallback(window.GetHandle(), OnCharacterEvent);
 
         keySignal_.Connect<&InputRecorder::UpdateInputKey>(recorder);
         moveSignal_.Connect<&InputUI::OnHover>(inputUI);
@@ -165,7 +169,17 @@ namespace tomato {
         mouseSignal_.Connect<&InputUI::OnClick>(inputUI);
     }
 
+    void Input::SetExternalInputCallbacks(InputCallbacks cb)
+    {
+        externalCallbacks_ = cb;
+    }
+
     void Input::OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {
+        if (externalCallbacks_.key)
+        {
+            externalCallbacks_.key(window, key, scancode, action, mods);
+            //return; @TODO : if editor mode
+        }
         Key k = ConvertKeyGLFW(key);
         KeyAction a = ConvertActionGLFW(action);
 
@@ -181,6 +195,7 @@ namespace tomato {
         auto tickClock = winData->tickClock;
         input->keySignal_.Collect(input->collector_,
                                KeyEvent{k, a, a == KeyAction::Release ? 0.f : 1.f, tickClock->GetTick()});
+
     }
 
     void Input::OnMouseButtonEvent(GLFWwindow* window, int button, int action, int mods) {
@@ -204,6 +219,9 @@ namespace tomato {
 
         input->mouseSignal_.Collect(input->collector_,
                                    MouseEvent{k, a, a == KeyAction::Release ? 0.f : 1.f, tickClock->GetTick(), static_cast<float>(xPos), static_cast<float>(yPos)});
+    
+        if (externalCallbacks_.mouseButton)
+            externalCallbacks_.mouseButton(window, button, action, mods);
     }
 
     void Input::OnMouseMoveEvent(GLFWwindow* window, double xpos, double ypos)
@@ -214,5 +232,20 @@ namespace tomato {
 
         input->moveSignal_.Collect(input->collector_,
             MouseMoveEvent{ tickClock->GetTick(), static_cast<float>(xpos), static_cast<float>(ypos) });
+
+        if (externalCallbacks_.mouseMove)
+            externalCallbacks_.mouseMove(window, xpos, ypos);
+    }
+    
+    void Input::OnScrollEvent(GLFWwindow* window, double xoffset, double yoffset)
+    {
+        if (externalCallbacks_.scroll)
+            externalCallbacks_.scroll(window, xoffset, yoffset);
+    }
+
+    void Input::OnCharacterEvent(GLFWwindow* window, unsigned int codepoint)
+    {
+        if (externalCallbacks_.character)
+            externalCallbacks_.character(window, codepoint);
     }
 }

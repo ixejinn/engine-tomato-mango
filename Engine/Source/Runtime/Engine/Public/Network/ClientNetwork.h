@@ -37,7 +37,7 @@ namespace tomato
     class ClientNetwork
     {
     public:
-        explicit ClientNetwork(NetMode mode);
+        explicit ClientNetwork();
         ~ClientNetwork();
 
         void SetNetState(ClientNetworkState state) { netState_ = state; }

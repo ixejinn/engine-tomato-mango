@@ -10,6 +10,7 @@
 #include "Ecs/Components/Camera.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Font.h"
+#include "Prefab/EntityUtils.h"
 #include "Utils/Utf.h"
 #include "Utils/Logger.h"
 
@@ -25,6 +26,7 @@ namespace tomato
 	{
 		BuildDrawList(ctx);
 
+		UpdateTextContentSize(ctx);
 		UpdateRectTransform(ctx);
 
 		BulidSelectableList(ctx);
@@ -67,6 +69,18 @@ namespace tomato
 		for (auto canvas : canvases)
 			Traverse(ctx, canvas, drawList);
 
+		std::stable_sort(
+			drawList.begin(),
+			drawList.end(),
+			[&](entt::entity a, entt::entity b)
+			{
+				auto& uiA = ctx.registry.get<UIComponent>(a);
+				auto& uiB = ctx.registry.get<UIComponent>(b);
+
+				return uiA.sortOrder < uiB.sortOrder;
+			}
+		);
+
 		uiCtx->drawList.clear();
 		uiCtx->drawList = std::move(drawList);
 	}
@@ -87,6 +101,26 @@ namespace tomato
 		}
 
 		uiCtx->selectableDirty = false;
+	}
+
+	void UISystem::UpdateTextContentSize(SimContext& ctx)
+	{
+		auto textView = ctx.registry.view<UIComponent, RectTransformComponent, TextComponent>();
+		for (auto [e, ui, rect, text] : textView.each())
+		{
+			if (ui.type == UIType::Text)
+			{
+				auto& text = ctx.registry.get<TextComponent>(e);
+				if (text.dirty)
+				{
+					text.codepoints = UTF8ToUTF32(text.text);
+					Font* font = AssetRegistry<Font>::GetInstance().Get(text.font);
+
+					rect.sizeDelta = font->MeasureText(text.codepoints, text.fontSize / 64.f);
+					text.dirty = false;
+				}
+			}
+		}
 	}
 
 	void UISystem::UpdateRectTransform(SimContext& ctx)
@@ -126,7 +160,7 @@ namespace tomato
 			// children
 			auto& rect = ctx.registry.get<RectTransformComponent>(entity);
 			auto& parentRect = ctx.registry.get<RectTransformComponent>(hierarchy.parent);
-			auto& ui = ctx.registry.get<UIComponent>(entity);
+			//auto& ui = ctx.registry.get<UIComponent>(entity);
 
 			glm::vec2 scaleFactor = currentCanvas->actualSize / currentCanvas->referenceSize;
 			glm::vec2 parentSize = parentRect.computedSize;
@@ -137,25 +171,14 @@ namespace tomato
 				glm::vec2 anchorPos = parentSize * rect.anchorMin;
 				glm::vec2 localPos = (anchorPos - parentPivotPos) + rect.anchoredPosition;
 
-				if (ui.type == 2)
-				{
-					auto& text = ctx.registry.get<TextComponent>(entity);
-					if (text.dirty)
-					{
-						text.codepoints = UTF8ToUTF32(text.text);
-						Font* font = AssetRegistry<Font>::GetInstance().Get(text.font);
-
-						rect.sizeDelta = font->MeasureText(text.codepoints, text.fontSize / 64.f);
-						text.dirty = false;
-					}
-				}
-
 				// World Name Label
 				if (ctx.registry.all_of<TargetComponent>(entity))
 				{
 					auto& target = ctx.registry.get<TargetComponent>(entity);
-					auto& targetTransform = ctx.registry.get<TransformComponent>(target.target);
+					auto& targetTransform = ctx.registry.get<TransformComponent>(GetEntityByUUID(ctx.registry, target.target));
 
+					// if (!ctx.registry.ctx().get<RenderContext*>())
+					// 	return;
 					auto renderCtx = ctx.registry.ctx().get<RenderContext*>();
 					if (renderCtx->mainCam == entt::null)
 					{
