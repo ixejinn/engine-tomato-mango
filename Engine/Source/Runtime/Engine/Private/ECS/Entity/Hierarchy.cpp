@@ -52,7 +52,11 @@ namespace tomato {
 
             auto root = GetRootEntity(reg, parent);
             if (!reg.all_of<RootEntityTag>(root))
+            {
                 reg.emplace<RootEntityTag>(root);
+                auto& rootHierarchy = reg.get<HierarchyComponent>(root);
+                rootHierarchy.parentID = 0;
+            }
 
             if (reg.all_of<RootEntityTag>(child))
                 reg.remove<RootEntityTag>(child);

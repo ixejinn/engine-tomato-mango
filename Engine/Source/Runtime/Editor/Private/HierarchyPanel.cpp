@@ -10,6 +10,7 @@
 
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/Camera.h"
 
 namespace tomato
 {
@@ -33,7 +34,7 @@ namespace tomato
 		}
 		ImGui::End();
 
-#elif 1
+#elif 0
 		if (ImGui::Begin("Hierarchy", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize))
 		{
 			ImGuiTreeNodeFlags tFlags = ImGuiTreeNodeFlags_DefaultOpen;
@@ -67,6 +68,63 @@ namespace tomato
 			}
 		}
 		ImGui::End();
+#elif 1
+		if (ImGui::Begin("Hierarchy", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize))
+		{
+			ImGuiTreeNodeFlags tFlags = ImGuiTreeNodeFlags_DefaultOpen;
+			if (ImGui::CollapsingHeader("Scene", tFlags))
+			{
+				int node_n = 0;
+
+				auto view = editorCtx.currentState->GetRegistry().view<RootEntityTag, NametagComponent>();
+				for (auto [e, tag] : view.each())
+				{
+					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+
+					if (editorCtx.selectedEntity == e)
+						flags |= ImGuiTreeNodeFlags_Selected;
+
+					bool is_open = ImGui::TreeNodeEx((void*)(intptr_t)node_n, flags, tag.name.c_str(), node_n);
+
+					if (ImGui::IsItemClicked())
+						editorCtx.selectedEntity = e;
+
+					if (is_open)
+					{
+						//ImGui::BulletText("<Node contents here>");
+						//if(ImGui::TreeNodeEx("Test"))
+						Traverse(editorCtx, e);
+						ImGui::TreePop();
+					}
+
+					node_n++;
+				}
+			}
+		}
+		ImGui::End();
 #endif
+	}
+	void HierarchyPanel::Traverse(EditorContext& editorCtx, entt::entity e)
+	{
+		auto& reg = editorCtx.currentState->GetRegistry();
+
+		if (reg.all_of<MainCameraTag>(e))
+			return;
+
+		auto& hierarchy = reg.get<HierarchyComponent>(e);
+		if (hierarchy.children.empty())
+			return;
+
+		for (auto& child : hierarchy.children)
+		{
+			auto& nameTag = reg.get<NametagComponent>(child);
+
+			bool is_open = ImGui::TreeNodeEx(nameTag.name.c_str());
+			if (is_open)
+			{
+				Traverse(editorCtx, child);
+				ImGui::TreePop();
+			}
+		}
 	}
 }

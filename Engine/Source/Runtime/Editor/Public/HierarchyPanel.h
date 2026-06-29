@@ -15,6 +15,8 @@ namespace tomato
 		bool isOpened() const { return open; }
 
 	private:
+
+		void Traverse(EditorContext& editorCtx, entt::entity e);
 		bool open{ true };
 	};
 }
