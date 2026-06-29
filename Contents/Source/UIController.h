@@ -7,6 +7,7 @@ class UIController
 {
 public:
 	void onClick(const tomato::MouseClickEvent& mouseEvt);
+	void onMatchRequest(const tomato::MouseClickEvent& mouseEvt);
 };
 
 #endif // !MANGO_UICONTROLLER_H

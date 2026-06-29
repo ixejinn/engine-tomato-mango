@@ -10,7 +10,7 @@ set(CONTENTS_SOURCES
         Source/LoadState.cpp
         Source/CollisionTestComponent.h
         Source/UIController.cpp
- "Source/LoadState.cpp")
+)
 
 add_executable(contents
         ${CONTENTS_SOURCES}

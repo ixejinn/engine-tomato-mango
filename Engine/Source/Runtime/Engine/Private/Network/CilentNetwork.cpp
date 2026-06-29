@@ -19,7 +19,21 @@ namespace tomato
 
     void ClientNetwork::ConnectToServer()
     {
+        if (server_.IsConnectedToServer())
+            return;
+
         server_.InitClientMode();
+    }
+
+    void ClientNetwork::RequestMatch()
+    {
+        if (!server_.IsConnectedToServer())
+        {
+            TMT_INFO << "NOT CONNECT TO SERVER";
+            return;
+        }
+        
+        SendTCPPacket(TCPPacketType::MATCH_REQUEST);
     }
 
     // use network thread

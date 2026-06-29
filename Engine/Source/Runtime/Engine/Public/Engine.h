@@ -48,6 +48,8 @@ namespace tomato {
             rollbackManager_->Register<Component>();
         }
 
+        void RequestMatchToServer();
+
     private:
         Window window_;
 

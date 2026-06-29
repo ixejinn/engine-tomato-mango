@@ -163,6 +163,12 @@ namespace tomato {
         }
     }
 
+    void Engine::RequestMatchToServer()
+    {
+        network_->ConnectToServer();
+        network_->RequestMatch();
+    }
+
     void Engine::Render(SimContext& simCtx, RenderContext& renderCtx)
     {
         editor_.BeginFrame();
@@ -220,7 +226,7 @@ namespace tomato {
             if (static_cast<int32_t>(now - startTime) >= 0)
             {
                 network_->SetNetState(ClientNetworkState::NSS_Playing);
-                //SetNextState(newState);
+                SetNextState(std::move(newState));
                 std::cout << now << "\n##### Game Start #####\n\n";
             }
         }

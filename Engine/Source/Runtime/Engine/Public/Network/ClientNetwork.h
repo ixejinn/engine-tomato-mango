@@ -41,6 +41,7 @@ namespace tomato
         ~ClientNetwork();
 
         void ConnectToServer();
+        void RequestMatch();
 
         void SetNetState(ClientNetworkState state) { netState_ = state; }
 

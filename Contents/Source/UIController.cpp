@@ -7,3 +7,8 @@ void UIController::onClick(const tomato::MouseClickEvent& mouseEvt)
 	std::cout << "successfully exit\n";
 	//std::exit(0);
 }
+
+void UIController::onMatchRequest(const tomato::MouseClickEvent& mouseEvt)
+{
+	std::cout << "Match Request\n";
+}
