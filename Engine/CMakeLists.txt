@@ -143,7 +143,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Editor/Public/EditorPanel.h
         Source/Runtime/Editor/Public/HierarchyPanel.h
         Source/Runtime/Editor/Public/EditorFwd.h
-)
+ "Source/Runtime/Engine/Public/Server/MatchServerNetwork.h" "Source/Runtime/Engine/Public/Server/MatchTypes.h"  "Source/Runtime/Engine/Public/Server/Session.h" "Source/Runtime/Engine/Public/Server/SessionManager.h" "Source/Runtime/Engine/Public/Server/Match.h" "Source/Runtime/Engine/Public/Server/MatchManager.h" "Source/Runtime/Engine/Public/Server/MatchServer.h")
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -207,13 +207,13 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Serialization/ComponentRegistry.cpp
         Source/Runtime/Editor/Private/Editor.cpp
         Source/Runtime/Editor/Private/HierarchyPanel.cpp
-)
+ "Source/Runtime/Engine/Private/Server/MatchServerNetwork.cpp" "Source/Runtime/Engine/Private/Server/Session.cpp" "Source/Runtime/Engine/Private/Server/SessionManager.cpp" "Source/Runtime/Engine/Private/Server/Match.cpp" "Source/Runtime/Engine/Private/Server/MatchManager.cpp" "Source/Runtime/Engine/Private/Server/MatchServer.cpp")
 
 add_library(engine STATIC
         ${ENGINE_HEADERS}
         ${ENGINE_SOURCES}
         ${THIRD_PARTY_SOURCES}
-)
+ "Source/Runtime/Engine/Public/Server/Session.h")
 
 target_include_directories(engine
         PUBLIC

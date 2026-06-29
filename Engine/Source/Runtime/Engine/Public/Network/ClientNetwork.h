@@ -40,6 +40,8 @@ namespace tomato
         explicit ClientNetwork();
         ~ClientNetwork();
 
+        void ConnectToServer();
+
         void SetNetState(ClientNetworkState state) { netState_ = state; }
 
         void NetThreadLoop();

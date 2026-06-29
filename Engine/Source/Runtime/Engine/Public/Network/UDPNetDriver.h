@@ -29,7 +29,7 @@ namespace tomato
 		const uint16_t& GetPort() const { return port; }
 	private:
 
-		uint16_t port{ 9000 };
+		uint16_t port;
 		UDPSocketPtr socket_;
 	};
 

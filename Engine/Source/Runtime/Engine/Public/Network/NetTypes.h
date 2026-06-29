@@ -15,8 +15,8 @@ namespace tomato
 	enum class NetMode
 	{
 		NM_Alone,
-		NM_ListenServer,
-		NM_Client
+		NM_Client,
+		NM_DedicatedServer
 	};
 
 	/// Maximum payload byte size.

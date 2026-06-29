@@ -13,7 +13,7 @@ namespace tomato
 		explicit TCPNetDriver();
 		~TCPNetDriver();
 
-		bool InitListenServerMode();
+		bool InitDedicatedServerMode();
 		bool InitClientMode();
 
 		int SendPacket(uint8_t* buffer, int size);

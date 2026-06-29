@@ -8,16 +8,16 @@ namespace tomato
 {
 	TCPNetDriver::TCPNetDriver()
 	{
-		//if (mode_ == NetMode::NM_ListenServer)
-		//	InitListenServerMode();
+		//if (mode_ == NetMode::NM_DedicatedServer)
+		//	InitDedicatedServerMode();
 
 		//else if (mode_ == NetMode::NM_Client)
-		//InitClientMode();
+		//	InitClientMode();
 	}
 
 	TCPNetDriver::~TCPNetDriver() {}
 
-	bool TCPNetDriver::InitListenServerMode()
+	bool TCPNetDriver::InitDedicatedServerMode()
 	{
 		socket_ = TCPSocket::CreateTCPSocket();
 

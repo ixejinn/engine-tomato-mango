@@ -17,6 +17,11 @@ namespace tomato
 
     ClientNetwork::~ClientNetwork() {}
 
+    void ClientNetwork::ConnectToServer()
+    {
+        server_.InitClientMode();
+    }
+
     // use network thread
     void ClientNetwork::NetThreadLoop()
     {

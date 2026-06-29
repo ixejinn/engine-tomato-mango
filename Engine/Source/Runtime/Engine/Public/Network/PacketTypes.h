@@ -57,6 +57,7 @@ namespace tomato
 
 		size_t size() const { return buffer.size(); }
 	};
+	using TCPPacketPtr = std::unique_ptr<TCPPacket>;
 
 	enum class TCPPacketType : uint16_t
 	{
