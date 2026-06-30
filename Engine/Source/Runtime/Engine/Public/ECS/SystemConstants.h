@@ -10,13 +10,17 @@ namespace tomato
         Input = 0,
         Physics,
         Collision,
+        OnTrigger,
+        OnCollision,
         Integration,
         Transformation,
+        Camera,
         UI,
         UITransformation,
         Rendering,
-        Camera,
         ScreenUI,
+
+        GameLogic,
         COUNT
     };
 
@@ -25,6 +29,8 @@ namespace tomato
         SystemPhase::Input,
         SystemPhase::Physics,
         SystemPhase::Collision,
+        SystemPhase::OnTrigger,
+        SystemPhase::OnCollision,
         SystemPhase::Integration,
         SystemPhase::Transformation,
     };

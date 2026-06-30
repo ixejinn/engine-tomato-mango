@@ -25,25 +25,25 @@ namespace tomato {
     };
 
     // Component for callback function
-    using CollisionEnterCallback = std::function<void(const CollisionEnterEvent&, entt::entity)>;
-    using CollisionStayCallback = std::function<void(const CollisionStayEvent&, entt::entity)>;
-    using CollisionExitCallback = std::function<void(const CollisionExitEvent&, entt::entity)>;
-    struct OnCollisionComponent
-    {
-        CollisionEnterCallback enter{nullptr};
-        CollisionStayCallback stay{nullptr};
-        CollisionExitCallback exit{nullptr};
-    };
-
-    using TriggerEnterCallback = std::function<void(const TriggerEnterEvent&, entt::entity)>;
-    using TriggerStayCallback = std::function<void(const TriggerStayEvent&, entt::entity)>;
-    using TriggerExitCallback = std::function<void(const TriggerExitEvent&, entt::entity)>;
-    struct OnTriggerComponent
-    {
-        TriggerEnterCallback enter{nullptr};
-        TriggerStayCallback stay{nullptr};
-        TriggerExitCallback exit{nullptr};
-    };
+//    using CollisionEnterCallback = std::function<void(const CollisionEnterEvent&, entt::entity)>;
+//    using CollisionStayCallback = std::function<void(const CollisionStayEvent&, entt::entity)>;
+//    using CollisionExitCallback = std::function<void(const CollisionExitEvent&, entt::entity)>;
+//    struct OnCollisionComponent
+//    {
+//        CollisionEnterCallback enter{nullptr};
+//        CollisionStayCallback stay{nullptr};
+//        CollisionExitCallback exit{nullptr};
+//    };
+//
+//    using TriggerEnterCallback = std::function<void(const TriggerEnterEvent&, entt::entity)>;
+//    using TriggerStayCallback = std::function<void(const TriggerStayEvent&, entt::entity)>;
+//    using TriggerExitCallback = std::function<void(const TriggerExitEvent&, entt::entity)>;
+//    struct OnTriggerComponent
+//    {
+//        TriggerEnterCallback enter{nullptr};
+//        TriggerStayCallback stay{nullptr};
+//        TriggerExitCallback exit{nullptr};
+//    };
 }
 
 #endif //MANGO_COLLISION_H
