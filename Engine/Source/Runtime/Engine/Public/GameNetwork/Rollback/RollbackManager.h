@@ -24,8 +24,8 @@ namespace tomato {
             registered_.insert(typeid(Component));
         }
 
-        void Rollback(entt::registry& reg, uint32_t tick);
-        void Capture(SimContext& ctx);
+        void Rollback(const SimContext& ctx);
+        void Capture(const SimContext& ctx);
 
     private:
         std::vector<std::unique_ptr<ComponentTimelineBase>> timelines_;

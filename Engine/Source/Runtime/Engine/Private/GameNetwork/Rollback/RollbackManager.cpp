@@ -18,13 +18,13 @@ namespace tomato {
 
     RollbackManager::~RollbackManager() = default;
 
-    void RollbackManager::Rollback(entt::registry& reg, uint32_t tick) {
+    void RollbackManager::Rollback(const SimContext& ctx) {
         for (auto& timeline : timelines_)
-            timeline->Restore(reg, tick);
+            timeline->Restore(ctx.state->GetRegistry(), ctx.tick);
     }
 
-    void RollbackManager::Capture(SimContext& ctx) {
+    void RollbackManager::Capture(const SimContext& ctx) {
         for (auto& timeline : timelines_)
-            timeline->Record(ctx.registry, ctx.tick);
+            timeline->Record(ctx.state->GetRegistry(), ctx.tick);
     }
 }

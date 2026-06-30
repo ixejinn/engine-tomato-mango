@@ -5,16 +5,19 @@
 #include "ECS/SystemUpdateContexts.h"
 #include "GameNetwork/Rollback/RollbackConfig.h"
 
-namespace tomato {
-    void GarbageEntityCollectionSystem::Update(SimContext &simCtx) {
-        auto view = simCtx.registry.view<LifetimeComponent>();
-
-        for (auto [e, life] : view.each()) {
+namespace tomato
+{
+    void GarbageEntityCollectionSystem::Update(SimContext &simCtx)
+    {
+        auto& registry = simCtx.state->GetRegistry();
+        auto view = registry.view<LifetimeComponent>();
+        for (auto [e, life] : view.each())
+        {
             if (life.isActive || life.destructed == std::nullopt)
                 continue;
 
             if (simCtx.tick - life.destructed.value() > ROLLBACK_WINDOW)
-                DestroyEntity(simCtx.registry, e);
+                DestroyEntity(registry, e);
         }
     }
 }

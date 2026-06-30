@@ -13,8 +13,10 @@
 #include "GameNetwork/Rollback/RollbackManager.h"
 #include "Editor.h"
 
-namespace tomato {
-    class Engine {
+namespace tomato
+{
+    class Engine
+    {
     public:
         Engine(int width, int height, const char* title, NetMode netMode = NetMode::NM_Alone);
         ~Engine();
@@ -22,18 +24,7 @@ namespace tomato {
         void SetNextState(std::unique_ptr<State>&& newState);
         void TryStartGame(std::unique_ptr<State>&& newState);
 
-        void Run() {
-            switch (netMode_)
-            {
-            case NetMode::NM_Alone:
-                SingleRun();
-                break;
-
-            case NetMode::NM_Client:
-                MultiRun();
-                break;
-            }
-        }
+        void Run();
 
         InputRecorder& GetInputRecorder() { return inputRecorder_; }
 
@@ -51,6 +42,9 @@ namespace tomato {
         void RequestMatchToServer();
 
     private:
+        void SingleRun();
+        void MultiRun();
+
         Window window_;
 
         void ProcessInputEvents(uint32_t tick);
@@ -68,14 +62,11 @@ namespace tomato {
         std::unique_ptr<GamePlayNetSystem> gameNet_{ nullptr };
         std::unique_ptr<RollbackManager> rollbackManager_{ nullptr };
 
-        void SingleRun();
-        void MultiRun();
-
         NetMode netMode_;
 
-        void Simulate(TickClock& tc, SimContext& simCtx, InputContext& inputCtx);
+        void Simulate(TickClock& tc, SimContext& simCtx);
 
-        void Render(SimContext& simCtx, RenderContext& renderCtx);
+        void Render(SimContext& simCtx);
         SystemManager systemManager_;
 
         bool isRunning_{true};

@@ -20,7 +20,7 @@ namespace tomato
 
     void UITransformSystem::UpdateScreenUI(SimContext& simCtx)
     {
-        auto& r = simCtx.registry;
+        auto& r = simCtx.state->GetRegistry();
         auto* uiCtx = r.ctx().find<UIContext>();
         if (uiCtx == nullptr)
         {

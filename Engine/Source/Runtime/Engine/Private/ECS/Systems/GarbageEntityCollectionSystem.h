@@ -3,8 +3,10 @@
 
 #include "ECS/Systems/System.h"
 
-namespace tomato {
-    class GarbageEntityCollectionSystem : public System {
+namespace tomato
+{
+    class GarbageEntityCollectionSystem : public System
+    {
     public:
         void Update(SimContext &simCtx) override;
     };

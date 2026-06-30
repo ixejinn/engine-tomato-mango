@@ -3,8 +3,10 @@
 
 #include "ECS/Systems/System.h"
 
-namespace tomato {
-    class CameraSystem : public System {
+namespace tomato
+{
+    class CameraSystem : public System
+    {
     public:
         void Update(SimContext& simCtx) override;
     };

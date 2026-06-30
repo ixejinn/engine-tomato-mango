@@ -7,42 +7,40 @@
 
 struct GLFWwindow;
 
-namespace tomato {
-    struct WindowData {
-        Window* window;
+namespace tomato
+{
+    struct WindowData
+    {
         Input* input;
         TickClock* tickClock;
 
-        WindowData(Window* w, Input* i, TickClock* tc)
-        : window(w), input(i), tickClock(tc) {}
+        WindowData(Input& i, TickClock& tc)
+        : input(&i), tickClock(&tc) {}
     };
 
     /**
-     * @brief Service responsible for window creation and OS-level event handling.
-     *
-     * OS 및 플랫폼(GLFW)과 직접 맞닿는 계층.
+     * @brief Responsible for window creation and OS-level event handling.
      */
-    class Window {
+    class Window
+    {
     public:
+        static int GetWidth() { return width_; }
+        static int GetHeight() { return height_; }
+
         Window(int width, int height, const char* title);
         ~Window();
 
         /**
          * @brief Polls window and input events from the OS.
-         *
-         * 키보드/마우스 콜백 등의 이벤트가 처리된다.
          */
         static void PollEvents();
 
         GLFWwindow* GetHandle() { return handle_; }
 
-        int GetWidth() const { return width_; }
-        int GetHeight() const { return height_; }
-
         [[nodiscard]] bool ShouldClose() const;
         void RequestClose() const;
 
-        void SetWindowUserPointer(Window* w, Input* i, TickClock* tc);
+        void SetWindowUserPointer(Input& i, TickClock& tc);
 
         /**
          * @brief Swaps the front and back buffers.
@@ -62,12 +60,12 @@ namespace tomato {
     private:
         static void OnFramebufferSizeChanged(GLFWwindow* window, int width, int height);
 
+        static int width_;
+        static int height_;
+
         GLFWwindow* handle_{nullptr};
 
         std::unique_ptr<WindowData> data_{nullptr};
-
-        int width_;
-        int height_;
     };
 }
 

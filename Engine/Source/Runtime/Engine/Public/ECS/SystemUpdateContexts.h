@@ -3,33 +3,28 @@
 
 #include <unordered_map>
 #include <entt/entt.hpp>
-#include "State/StateFwd.h"
+#include "State/State.h"
 #include "Network/ClientNetwork.h"
 #include "Collision/CollisionFwd.h"
 
-namespace tomato {
-    struct SimContext {
-        SimContext(entt::registry& reg, uint32_t t) : registry(reg), tick(t) {}
+namespace tomato
+{
+    struct SimContext
+    {
+        SimContext(State* s, uint32_t t) : state(s), tick(t) {}
 
-        entt::registry& registry;
+        State* state;
         uint32_t tick;
     };
 
-    struct InputContext {
-        InputContext(std::array<Timeline<InputRecord>, MAX_PLAYER_NUM>& tl) : timelines(tl) {}
-
-        std::array<Timeline<InputRecord>, MAX_PLAYER_NUM>& timelines;
-    };
-
-    struct CollisionContext {
+    struct CollisionContext
+    {
         std::unordered_map<CollisionPair, bool> collisionPairs;
     };
 
-    struct RenderContext {
-        RenderContext(int w, int h) : width(w), height(h), mainCam(entt::null) {}
-
-        int width, height;
-        entt::entity mainCam;
+    struct RenderContext
+    {
+        entt::entity mainCam{entt::null};
     };
 
     struct UIContext

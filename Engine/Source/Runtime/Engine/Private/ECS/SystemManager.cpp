@@ -3,16 +3,20 @@
 #include "ECS/SystemUpdateContexts.h"
 #include "ECS/Systems/System.h"
 
-namespace tomato {
-    SystemManager::SystemManager() {
+namespace tomato
+{
+    SystemManager::SystemManager()
+    {
         auto& sysRegistry = SystemRegistry::GetInstance();
 
-        for (const SystemPhase phase : simOrder_) {
+        for (const SystemPhase phase : SIMULATION_ORDER)
+        {
             for (const auto& factory : sysRegistry.GetSimFactory(phase))
                 systems_[phase].emplace_back(factory());
         }
 
-        for (const SystemPhase phase : renderOrder_) {
+        for (const SystemPhase phase : RENDERING_ORDER)
+        {
             for (const auto& factory : sysRegistry.GetSimFactory(phase))
                 systems_[phase].emplace_back(factory());
         }
@@ -20,25 +24,26 @@ namespace tomato {
 
     SystemManager::~SystemManager() = default;
 
-    void SystemManager::Simulate(SimContext& sim, InputContext& input) {
-        sim.registry.ctx().insert_or_assign<InputContext*>(&input);
-
-        for (const SystemPhase phase : simOrder_) {
+    void SystemManager::Simulate(SimContext& sim)
+    {
+        for (const SystemPhase phase : SIMULATION_ORDER)
+        {
             for (const auto& system : systems_[phase])
                 system->Update(sim);
         }
     }
 
-    void SystemManager::Render(SimContext& sim, RenderContext& render) {
-        sim.registry.ctx().insert_or_assign<RenderContext*>(&render);
-
-        for (const SystemPhase phase : renderOrder_) {
+    void SystemManager::Render(SimContext& sim)
+    {
+        for (const SystemPhase phase : RENDERING_ORDER)
+        {
             for (const auto& system : systems_[phase])
                 system->Update(sim);
         }
     }
 
-    void SystemManager::InitializeTransform(SimContext& sim) {
+    void SystemManager::InitializeTransform(SimContext& sim)
+    {
         for (const auto& system : systems_[SystemPhase::Transformation])
             system->Update(sim);
     }

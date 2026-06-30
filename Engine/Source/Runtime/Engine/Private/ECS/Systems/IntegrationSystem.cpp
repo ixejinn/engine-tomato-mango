@@ -7,11 +7,13 @@
 #include "Utils/RegistryEntry.h"
 REGISTER_SYSTEM(tomato::SystemPhase::Integration, IntegrationSystem)
 
-namespace tomato {
-    void IntegrationSystem::Update(SimContext& simCtx) {
-        auto view = simCtx.registry.view<TransformComponent, VelocityComponent>();
-
-        for (auto [e, trf, vel] : view.each()) {
+namespace tomato
+{
+    void IntegrationSystem::Update(SimContext& simCtx)
+    {
+        auto view = simCtx.state->GetRegistry().view<TransformComponent, VelocityComponent>();
+        for (auto [e, trf, vel] : view.each())
+        {
             // TMT_INFO << (int)e << " velocity: " << vel.velocity.x << ", " << vel.velocity.y << ", " << vel.velocity.z;
             trf.AddPosition(vel.velocity * FIXED_DELTA_TIME);
 

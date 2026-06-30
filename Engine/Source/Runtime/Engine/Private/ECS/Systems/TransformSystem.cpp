@@ -10,16 +10,19 @@
 #include "Utils/RegistryEntry.h"
 REGISTER_SYSTEM(tomato::SystemPhase::Transformation, TransformSystem)
 
-namespace tomato {
-    void TransformSystem::Update(SimContext &simCtx) {
-        auto rootView = simCtx.registry.view<RootEntityTag, TransformComponent>();
+namespace tomato
+{
+    void TransformSystem::Update(SimContext &simCtx)
+    {
+        auto& registry = simCtx.state->GetRegistry();
+        auto rootView = registry.view<RootEntityTag, TransformComponent>();
 
-        static constexpr glm::quat rootQuat = glm::quat(1.f, 0.f, 0.f, 0.f);
-        static constexpr glm::vec3 rootScale = glm::vec3{1.f};
-        static constexpr glm::mat4 rootMat = glm::mat4{1.f};
+        static constexpr glm::quat ROOT_QUAT = glm::quat(1.f, 0.f, 0.f, 0.f);
+        static constexpr glm::vec3 ROOT_SCL = glm::vec3{1.f};
+        static constexpr glm::mat4 ROOT_MAT = glm::mat4{1.f};
 
         for (auto [e, trf] : rootView.each())
-            UpdateFrom(simCtx.registry, e, rootQuat, rootScale, rootMat, false);
+            UpdateFrom(registry, e, ROOT_QUAT, ROOT_SCL, ROOT_MAT, false);
     }
 
     void TransformSystem::UpdateFrom(
@@ -30,7 +33,8 @@ namespace tomato {
         auto& trf = reg.get<TransformComponent>(cur);
 
         bool bUpdated = trf.dirty || pDirty;
-        if (bUpdated) {
+        if (bUpdated)
+        {
             // Scale → Rotate → Translate
             auto T = glm::translate(glm::mat4(1.f), trf.position);
             auto R = glm::toMat4(trf.lRotation);
@@ -45,7 +49,8 @@ namespace tomato {
                 cam->dirty = true;
         }
 
-        if (auto* hierarchy = reg.try_get<HierarchyComponent>(cur)) {
+        if (auto* hierarchy = reg.try_get<HierarchyComponent>(cur))
+        {
             for (const auto child : hierarchy->children)
                 UpdateFrom(reg, child, trf.wRotation, trf.wScale, trf.transformMatrix, bUpdated);
         }

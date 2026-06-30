@@ -6,7 +6,8 @@
 #include "Utils/Logger.h"
 #include <GLFW/glfw3.h>
 
-namespace tomato {
+namespace tomato
+{
     InputCallbacks Input::externalCallbacks_;
 
     Key Input::ConvertKeyGLFW(int glfwKey)
@@ -190,15 +191,16 @@ namespace tomato {
         }
         latestKeyAction_[k] = a;
 
-        auto winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-        auto input = winData->input;
-        auto tickClock = winData->tickClock;
+        auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+        auto* input = winData->input;
+        auto* tickClock = winData->tickClock;
         input->keySignal_.Collect(input->collector_,
                                KeyEvent{k, a, a == KeyAction::Release ? 0.f : 1.f, tickClock->GetTick()});
 
     }
 
-    void Input::OnMouseButtonEvent(GLFWwindow* window, int button, int action, int mods) {
+    void Input::OnMouseButtonEvent(GLFWwindow* window, int button, int action, int mods)
+    {
         Key k = ConvertKeyGLFW(button);
         KeyAction a = ConvertActionGLFW(action);
 
@@ -210,9 +212,9 @@ namespace tomato {
 
         latestKeyAction_[k] = a;
 
-        auto winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-        auto input = winData->input;
-        auto tickClock = winData->tickClock;
+        auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+        auto* input = winData->input;
+        auto* tickClock = winData->tickClock;
 
         double xPos(0), yPos(0);
         glfwGetCursorPos(window, &xPos, &yPos);
@@ -226,9 +228,9 @@ namespace tomato {
 
     void Input::OnMouseMoveEvent(GLFWwindow* window, double xpos, double ypos)
     {
-        auto winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-        auto input = winData->input;
-        auto tickClock = winData->tickClock;
+        auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+        auto* input = winData->input;
+        auto* tickClock = winData->tickClock;
 
         input->moveSignal_.Collect(input->collector_,
             MouseMoveEvent{ tickClock->GetTick(), static_cast<float>(xpos), static_cast<float>(ypos) });

@@ -6,8 +6,14 @@
 #include "Tick/TickClock.h"
 
 namespace tomato {
+    int Window::width_ = 0;
+    int Window::height_ = 0;
+
     Window::Window(const int width, const int height, const char* title)
-        : width_(width), height_(height) {
+    {
+        width_ = width;
+        height_ = height;
+
         // [GLFW] Initialize and configure
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -44,42 +50,49 @@ namespace tomato {
             TMT_INFO << "Failed to get OpenGL version information";
     }
 
-    Window::~Window() {
+    Window::~Window()
+    {
         glfwDestroyWindow(handle_);
         glfwTerminate();
     }
 
-    void Window::PollEvents() {
+    void Window::PollEvents()
+    {
         glfwPollEvents();
     }
 
-    bool Window::ShouldClose() const {
+    bool Window::ShouldClose() const
+    {
         return glfwWindowShouldClose(handle_);
     }
 
-    void Window::RequestClose() const {
+    void Window::RequestClose() const
+    {
         glfwSetWindowShouldClose(handle_, GLFW_TRUE);
     }
 
-    void Window::SetWindowUserPointer(Window* w, Input* i, TickClock* tc) {
-        data_ = std::make_unique<WindowData>(w, i, tc);
+    void Window::SetWindowUserPointer(Input& i, TickClock& tc)
+    {
+        data_ = std::make_unique<WindowData>(i, tc);
         glfwSetWindowUserPointer(handle_, data_.get());
     }
 
-    void Window::SwapBuffers() const {
+    void Window::SwapBuffers() const
+    {
         glfwSwapBuffers(handle_);
     }
 
     // !!! TEMPORAL FUNCTION !!!
-    void Window::TMP_CheckEscapeKey() {
+    void Window::TMP_CheckEscapeKey()
+    {
         if (glfwGetKey(handle_, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(handle_, true);
     }
 
-    void Window::OnFramebufferSizeChanged(GLFWwindow* window, int width, int height) {
-        const auto self = static_cast<WindowData*>(glfwGetWindowUserPointer(window))->window;
-        self->width_ = width;
-        self->height_ = height;
+    void Window::OnFramebufferSizeChanged(GLFWwindow* window, int width, int height)
+    {
+        width_ = width;
+        height_ = height;
 
         glViewport(0, 0, width, height);
     }

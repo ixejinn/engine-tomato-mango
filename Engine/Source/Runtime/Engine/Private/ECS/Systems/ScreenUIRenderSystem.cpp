@@ -16,15 +16,17 @@
 #include "Resource/Render/Texture.h"
 #include "Resource/Render/Font.h"
 
+#include "Services/Window.h"
+
 #include "Utils/RegistryEntry.h"
 REGISTER_SYSTEM(tomato::SystemPhase::ScreenUI, ScreenUIRenderSystem);
 
 namespace tomato
 {
 	ScreenUIRenderSystem::ScreenUIRenderSystem()
-    :   curMesh_(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain))),
-        curShader_(GetAssetID("UIShader")),
-        curTexture_(GetAssetID(Texture::PrimitiveName))
+    : curMesh_(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)))
+    , curShader_(GetAssetID("UIShader"))
+    , curTexture_(GetAssetID(Texture::PrimitiveName))
 	{
         AssetRegistry<Font>::GetInstance().CreatePrimitives();
         textRenderer_.Init(AssetRegistry<Shader>::GetInstance().Get(GetAssetID("FontShader")));
@@ -32,10 +34,10 @@ namespace tomato
 
 	void ScreenUIRenderSystem::Update(SimContext& simCtx)
 	{
-
         glDisable(GL_DEPTH_TEST);
 
-        auto* uiCtx = simCtx.registry.ctx().find<UIContext>();
+	    auto& registry = simCtx.state->GetRegistry();
+        auto* uiCtx = registry.ctx().find<UIContext>();
         if (uiCtx == nullptr)
             return;
 
@@ -45,7 +47,7 @@ namespace tomato
         Shader* shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
         shader->Use();
 
-        glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(1600), 0.0f, static_cast<float>(900), -1.0f, 1.0f);
+        glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(Window::GetWidth()), 0.0f, static_cast<float>(Window::GetHeight()), -1.0f, 1.0f);
         shader->SetUniformInt("tex", 0);
         shader->SetUniformMat4("projection", projection);
 
@@ -53,11 +55,12 @@ namespace tomato
 
         for (auto e : uiCtx->drawList)
         {
-            auto& ui = simCtx.registry.get<UIComponent>(e);
-            if (ui.type == UIType::Text) continue; //text
+            auto& ui = registry.get<UIComponent>(e);
+            if (ui.type == UIType::Text)
+                continue; //text
 
-            auto& rect = simCtx.registry.get<RectTransformComponent>(e);
-            auto& render = simCtx.registry.get<RenderComponent>(e);
+            auto& rect = registry.get<RectTransformComponent>(e);
+            auto& render = registry.get<RenderComponent>(e);
 
             if (curShader_ != render.shader)
             {
@@ -95,14 +98,16 @@ namespace tomato
 
         for (auto e : uiCtx->drawList)
         {
-            auto& ui = simCtx.registry.get<UIComponent>(e);
-            if (ui.type != UIType::Text) continue; //text
+            auto& ui = registry.get<UIComponent>(e);
+            if (ui.type != UIType::Text)
+                continue; //text
 
-            auto& text = simCtx.registry.get<TextComponent>(e);
-            auto& rect = simCtx.registry.get<RectTransformComponent>(e);
+            auto& text = registry.get<TextComponent>(e);
+            auto& rect = registry.get<RectTransformComponent>(e);
 
             Font* font = AssetRegistry<Font>::GetInstance().Get(text.font);
-            if (!font) continue;
+            if (!font)
+                continue;
             glm::vec2 pivotOffset = -(rect.computedSize * rect.pivot);
 
             textRenderer_.DrawString(
@@ -118,6 +123,5 @@ namespace tomato
 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
-
 	}
 }

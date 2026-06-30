@@ -89,9 +89,7 @@ namespace tomato
 			return entt::null;
 
 		auto& r = currentStatePtr_->GetRegistry();
-		GLFWwindow* w = glfwGetCurrentContext();
-		auto winData = static_cast<WindowData*>(glfwGetWindowUserPointer(w));
-		float windowHeight = (float)winData->window->GetHeight();
+		float windowHeight = Window::GetHeight();
 		
 		auto* uiCtx = r.ctx().find<UIContext>();
 		if (uiCtx == nullptr)

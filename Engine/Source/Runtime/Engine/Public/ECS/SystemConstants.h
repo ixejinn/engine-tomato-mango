@@ -3,8 +3,10 @@
 
 #include <cstdint>
 
-namespace tomato {
-    enum class SystemPhase : uint8_t {
+namespace tomato
+{
+    enum class SystemPhase : uint8_t
+    {
         Input = 0,
         Physics,
         Collision,
@@ -16,6 +18,24 @@ namespace tomato {
         Camera,
         ScreenUI,
         COUNT
+    };
+
+    constexpr SystemPhase SIMULATION_ORDER[]
+    {
+        SystemPhase::Input,
+        SystemPhase::Physics,
+        SystemPhase::Collision,
+        SystemPhase::Integration,
+        SystemPhase::Transformation,
+    };
+
+    constexpr SystemPhase RENDERING_ORDER[]
+    {
+        SystemPhase::Camera,
+        SystemPhase::UI,
+        SystemPhase::UITransformation,
+        SystemPhase::Rendering,
+        SystemPhase::ScreenUI
     };
 }
 

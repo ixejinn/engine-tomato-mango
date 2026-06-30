@@ -10,16 +10,17 @@
 REGISTER_SYSTEM(tomato::SystemPhase::Input, KinematicMovementSystem)
 
 namespace tomato {
-    void KinematicMovementSystem::Update(SimContext &simCtx) {
-        auto input = simCtx.registry.ctx().get<InputContext*>();
+    void KinematicMovementSystem::Update(SimContext &simCtx)
+    {
+        auto& registry = simCtx.state->GetRegistry();
 
-        auto view = simCtx.registry.view<TransformComponent, VelocityComponent, InputChannelComponent, MovementComponent>();
-
-        for (auto [e, trf, velocity, ch, move] : view.each()) {
+        auto view = registry.view<TransformComponent, VelocityComponent, InputChannelComponent, MovementComponent>();
+        for (auto [e, trf, velocity, ch, move] : view.each())
+        {
             velocity.velocity.x = 0;
             velocity.velocity.z = 0;
 
-            const auto& inputRec = input->timelines[ch.channel][simCtx.tick];
+            const auto& inputRec = simCtx.state->GetPlayerInputTimelines()[ch.channel][simCtx.tick];
             if (inputRec.tick != simCtx.tick)
                 continue;
             //std::cout << inputRec.tick << " " << (int)inputRec.held << " " << (int)inputRec.down << '\n';

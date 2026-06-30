@@ -1,3 +1,4 @@
+#include <cstring>
 #include "Server/Session.h"
 
 namespace tomato

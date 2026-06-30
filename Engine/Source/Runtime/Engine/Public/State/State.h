@@ -8,10 +8,12 @@
 #include "State/StateFwd.h"
 #include "TomatoFwd.h"
 
-namespace tomato {
-    class State {
+namespace tomato
+{
+    class State
+    {
     public:
-        explicit State(Engine& engine) : engine_(engine) {}
+        explicit State(Engine& engine);
         virtual ~State() = default;
 
         virtual void Init() = 0;
@@ -27,6 +29,7 @@ namespace tomato {
     protected:
         Engine& engine_;
         entt::registry registry_;
+
         std::unordered_map<UUID, entt::entity> entityMap_;
 
         PlayerInputTimelines playerInputs_;

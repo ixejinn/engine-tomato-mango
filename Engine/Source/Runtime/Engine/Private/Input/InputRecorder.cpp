@@ -2,8 +2,10 @@
 #include "Input/InputEvent.h"
 #include "Utils/BitmaskOperators.h"
 
-namespace tomato {
-    InputRecorder::InputRecorder() {
+namespace tomato
+{
+    InputRecorder::InputRecorder()
+    {
         InitKeyIntents();
     }
 
@@ -47,15 +49,18 @@ namespace tomato {
         return true;
     }
 
-    void InputRecorder::UpdateCurrInputRecord(uint32_t tick) {
-        if (curr_.tick != tick) {
+    void InputRecorder::UpdateCurrInputRecord(uint32_t tick)
+    {
+        if (curr_.tick != tick)
+        {
             prev_ = curr_;
             curr_.tick = tick;
             curr_.down = InputIntent::None;
         }
     }
 
-    bool InputRecorder::IsPress(InputIntent intent) const {
+    bool InputRecorder::IsPress(InputIntent intent) const
+    {
         return HasFlag(curr_.down, intent) ? true : false;
     }
 

@@ -1,13 +1,13 @@
-﻿#include "Ecs/Systems/UISystem.h"
+﻿#include "ECS/Systems/UISystem.h"
 #include "ECS/SystemUpdateContexts.h"
+#include "ECS/Components/Transform.h"
+#include "ECS/Components/UI.h"
+#include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/Text.h"
+#include "ECS/Components/Render.h"
+#include "ECS/Components/Camera.h"
 #include "Services/Window.h"
 #include "Services/Input.h"
-#include "Ecs/Components/Transform.h"
-#include "Ecs/Components/UI.h"
-#include "ECS/Components/Hierarchy.h"
-#include "Ecs/Components/Text.h"
-#include "Ecs/Components/Render.h"
-#include "Ecs/Components/Camera.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Font.h"
 #include "Prefab/EntityUtils.h"
@@ -19,9 +19,8 @@ REGISTER_SYSTEM(tomato::SystemPhase::UI, UISystem)
 
 namespace tomato
 {
-	UISystem::UISystem()
-	{
-	}
+	UISystem::UISystem() {}
+
 	void UISystem::Update(SimContext& ctx)
 	{
 		BuildDrawList(ctx);
@@ -34,36 +33,38 @@ namespace tomato
 
 	void UISystem::Traverse(SimContext& ctx, entt::entity e, std::vector<entt::entity>& drawList)
 	{
-		auto& ui = ctx.registry.get<UIComponent>(e);
+		auto& registry = ctx.state->GetRegistry();
+		auto& ui = registry.get<UIComponent>(e);
 		//std::cout << ui.type << " ";
 		drawList.push_back(e);
 
-		auto& hierarchy = ctx.registry.get<HierarchyComponent>(e);
+		auto& hierarchy = registry.get<HierarchyComponent>(e);
 		for (auto child : hierarchy.children)
 			Traverse(ctx, child, drawList);
 	}
 
 	void UISystem::BuildDrawList(SimContext& ctx)
 	{
-		auto* uiCtx = ctx.registry.ctx().find<UIContext>();
+		auto& registry = ctx.state->GetRegistry();
+		auto* uiCtx = registry.ctx().find<UIContext>();
 		if (uiCtx == nullptr)
 		{
 			std::cout << "NULL DRAWLIST\n";
-			ctx.registry.ctx().emplace<UIContext>();
-			uiCtx = ctx.registry.ctx().find<UIContext>();
+			registry.ctx().emplace<UIContext>();
+			uiCtx = registry.ctx().find<UIContext>();
 		}
 
 		std::vector<entt::entity> canvases, drawList;
 
-		auto canvasView = ctx.registry.view<CanvasComponent>();
+		auto canvasView = registry.view<CanvasComponent>();
 		for (auto canvas : canvasView)
 			canvases.push_back(canvas);
 
 		std::sort(canvases.begin(), canvases.end(),
 			[&](entt::entity a, entt::entity b)
 			{
-				return ctx.registry.get<CanvasComponent>(a).sortOrder <
-					ctx.registry.get<CanvasComponent>(b).sortOrder;
+				return registry.get<CanvasComponent>(a).sortOrder <
+					registry.get<CanvasComponent>(b).sortOrder;
 			});
 
 		for (auto canvas : canvases)
@@ -74,8 +75,8 @@ namespace tomato
 			drawList.end(),
 			[&](entt::entity a, entt::entity b)
 			{
-				auto& uiA = ctx.registry.get<UIComponent>(a);
-				auto& uiB = ctx.registry.get<UIComponent>(b);
+				auto& uiA = registry.get<UIComponent>(a);
+				auto& uiB = registry.get<UIComponent>(b);
 
 				return uiA.sortOrder < uiB.sortOrder;
 			}
@@ -87,7 +88,8 @@ namespace tomato
 
 	void UISystem::BulidSelectableList(SimContext& ctx)
 	{
-		auto* uiCtx = ctx.registry.ctx().find<UIContext>();
+		auto& registry = ctx.state->GetRegistry();
+		auto* uiCtx = registry.ctx().find<UIContext>();
 
 		if (uiCtx == nullptr)
 			return;
@@ -96,7 +98,7 @@ namespace tomato
 
 		for (auto it = uiCtx->drawList.rbegin(); it != uiCtx->drawList.rend(); ++it)
 		{
-			if (!ctx.registry.all_of<SelectableComponent>(*it)) continue;
+			if (!registry.all_of<SelectableComponent>(*it)) continue;
 			uiCtx->selectableList.emplace_back(*it);
 		}
 
@@ -105,12 +107,13 @@ namespace tomato
 
 	void UISystem::UpdateTextContentSize(SimContext& ctx)
 	{
-		auto textView = ctx.registry.view<UIComponent, RectTransformComponent, TextComponent>();
+		auto& registry = ctx.state->GetRegistry();
+		auto textView = registry.view<UIComponent, RectTransformComponent, TextComponent>();
 		for (auto [e, ui, rect, text] : textView.each())
 		{
 			if (ui.type == UIType::Text)
 			{
-				auto& text = ctx.registry.get<TextComponent>(e);
+				auto& text = registry.get<TextComponent>(e);
 				if (text.dirty)
 				{
 					text.codepoints = UTF8ToUTF32(text.text);
@@ -125,7 +128,8 @@ namespace tomato
 
 	void UISystem::UpdateRectTransform(SimContext& ctx)
 	{
-		auto& uiCtx = ctx.registry.ctx().get<UIContext>();
+		auto& registry = ctx.state->GetRegistry();
+		auto& uiCtx = registry.ctx().get<UIContext>();
 
 		if (uiCtx.drawList.empty())
 			return;
@@ -133,14 +137,14 @@ namespace tomato
 		CanvasComponent* currentCanvas = nullptr;
 		for (auto entity : uiCtx.drawList)
 		{
-			auto& hierarchy = ctx.registry.get<HierarchyComponent>(entity);
+			auto& hierarchy = registry.get<HierarchyComponent>(entity);
 
 			// entity is canvas(root).
 			if (hierarchy.parent == entt::null)
 			{
-				currentCanvas = &ctx.registry.get<CanvasComponent>(entity);
+				currentCanvas = &registry.get<CanvasComponent>(entity);
 
-				auto& rect = ctx.registry.get<RectTransformComponent>(entity);
+				auto& rect = registry.get<RectTransformComponent>(entity);
 				rect.computedSize = currentCanvas->actualSize;
 				rect.position = glm::vec3(rect.computedSize * rect.pivot, 0.f);
 				rect.scale = glm::vec3(1.f);
@@ -153,13 +157,13 @@ namespace tomato
 		if (!currentCanvas) return;
 		for (auto entity : uiCtx.drawList)
 		{
-			auto& hierarchy = ctx.registry.get<HierarchyComponent>(entity);
+			auto& hierarchy = registry.get<HierarchyComponent>(entity);
 			if (hierarchy.parent == entt::null)
 				continue;
 
 			// children
-			auto& rect = ctx.registry.get<RectTransformComponent>(entity);
-			auto& parentRect = ctx.registry.get<RectTransformComponent>(hierarchy.parent);
+			auto& rect = registry.get<RectTransformComponent>(entity);
+			auto& parentRect = registry.get<RectTransformComponent>(hierarchy.parent);
 			//auto& ui = ctx.registry.get<UIComponent>(entity);
 
 			glm::vec2 scaleFactor = currentCanvas->actualSize / currentCanvas->referenceSize;
@@ -172,22 +176,22 @@ namespace tomato
 				glm::vec2 localPos = (anchorPos - parentPivotPos) + rect.anchoredPosition;
 
 				// World Name Label
-				if (ctx.registry.all_of<TargetComponent>(entity))
+				if (registry.all_of<TargetComponent>(entity))
 				{
-					auto& target = ctx.registry.get<TargetComponent>(entity);
-					auto& targetTransform = ctx.registry.get<TransformComponent>(GetEntityByUUID(ctx.registry, target.target));
+					auto& target = registry.get<TargetComponent>(entity);
+					auto& targetTransform = registry.get<TransformComponent>(GetEntityByUUID(registry, target.target));
 
 					// if (!ctx.registry.ctx().get<RenderContext*>())
 					// 	return;
-					auto renderCtx = ctx.registry.ctx().get<RenderContext*>();
-					if (renderCtx->mainCam == entt::null)
+					auto& renderCtx = registry.ctx().get<RenderContext>();
+					if (renderCtx.mainCam == entt::null)
 					{
 						TMT_WARN << "Main camera not present";
 						continue;
 					}
-					auto viewProjMat = ctx.registry.try_get<CameraComponent>(renderCtx->mainCam)->viewProjMat;
+					auto viewProjMat = registry.try_get<CameraComponent>(renderCtx.mainCam)->viewProjMat;
 
-					glm::vec3 screenPos = WorldToScreen(targetTransform.GetWorldPosition(), viewProjMat, 1600.f, 900.f);
+					glm::vec3 screenPos = WorldToScreen(targetTransform.GetWorldPosition(), viewProjMat, Window::GetWidth(), Window::GetHeight());
 					rect.position = screenPos + target.headOffset;
 
 					rect.computedSize = rect.sizeDelta;
