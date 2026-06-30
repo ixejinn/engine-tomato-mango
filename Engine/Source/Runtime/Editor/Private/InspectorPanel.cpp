@@ -1,4 +1,4 @@
-#include "InspectorPanel.h"
+﻿#include "InspectorPanel.h"
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
@@ -23,7 +23,7 @@ namespace tomato
 
 		float width{ 300.f }, height{ 600.f };
 
-		ImGui::SetNextWindowPos(ImVec2(1200.f, height), ImGuiCond_Appearing, ImVec2(1.f, 1.f));
+		ImGui::SetNextWindowPos(ImVec2(1600.f, 300.f + height), ImGuiCond_Appearing, ImVec2(1.f, 1.f));
 		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
 		
 		if (ImGui::Begin("Inspector", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize))
@@ -35,8 +35,10 @@ namespace tomato
 					continue;
 
 				bool is_open = ImGui::CollapsingHeader(comp.name.c_str());
-				//if(is_open)
-				//	ImGui::TreePop();
+				if (is_open && comp.Draw)
+				{
+					comp.Draw(editorCtx, editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
+				}
 			}
 		}
 		ImGui::End();

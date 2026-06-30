@@ -1,4 +1,4 @@
-#include "Server/SessionManager.h"
+﻿#include "Server/SessionManager.h"
 
 namespace tomato
 {
@@ -83,5 +83,7 @@ namespace tomato
 		auto it = tcpSessions.find(id);
 		if (it != tcpSessions.end())
 			return it->second.addr;
+
+		throw std::runtime_error("session id not found");
 	}
 }

@@ -13,37 +13,37 @@ using namespace tomato;
 
 void LoadState::Init()
 {
-	//Texture::Create("Resources/Contents/WATER_GAME_LOGO.png");
-	//Serialization::LoadScene(registry_, "Resources/Engine/Assets/test.data", entityMap_);
+	Texture::Create("Resources/Contents/WATER_GAME_LOGO.png");
+	Serialization::LoadScene(registry_, "Resources/Engine/Assets/test.data", entityMap_);
 
-	//entt::entity btn;// = entityMap_[11560345711817135869];
-	//auto btnView = registry_.view<NametagComponent>();
-	//for (auto [e, tag] : btnView.each())
-	//{
-	//	if (tag.name == "Button")
-	//		btn = e;
-	//}
+	entt::entity btn;// = entityMap_[11560345711817135869];
+	auto btnView = registry_.view<NametagComponent>();
+	for (auto [e, tag] : btnView.each())
+	{
+		if (tag.name == "Button")
+			btn = e;
+	}
 
-	//auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
-	//mouseEvt.onClick =
-	//	[this](const MouseClickEvent& e)
-	//	{
-	//		uiController_.onClick(e);
-	//	};
-	Prefab::CreateCamera(registry_);
-	auto btn = UIPrefab::CreateButton(registry_);
 	auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
 	mouseEvt.onClick =
 		[this](const MouseClickEvent& e)
 		{
-			engine_.RequestMatchToServer();
-			uiController_.onMatchRequest(e);
+			uiController_.onClick(e);
 		};
+	//Prefab::CreateCamera(registry_);
+	//auto btn = UIPrefab::CreateButton(registry_);
+	//auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
+	//mouseEvt.onClick =
+	//	[this](const MouseClickEvent& e)
+	//	{
+	//		engine_.RequestMatchToServer();
+	//		uiController_.onMatchRequest(e);
+	//	};
 }
 
 void LoadState::Update()
 {
-	engine_.TryStartGame(std::make_unique<TestState>(engine_));
+	//engine_.TryStartGame(std::make_unique<TestState>(engine_));
 }
 
 void LoadState::Exit() {}

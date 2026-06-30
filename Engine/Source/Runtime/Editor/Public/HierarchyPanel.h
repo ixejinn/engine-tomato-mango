@@ -8,16 +8,14 @@ namespace tomato
 	class HierarchyPanel : public EditorPanel
 	{
 	public:
+		HierarchyPanel(bool open) : EditorPanel(open) {}
+
 		void Draw(EditorContext&) override;
 
 		const char* GetName() const { return "HierarchyPanel"; }
 
-		bool isOpened() const { return open; }
-
 	private:
-
 		void Traverse(EditorContext& editorCtx, entt::entity e);
-		bool open{ true };
 	};
 }
 

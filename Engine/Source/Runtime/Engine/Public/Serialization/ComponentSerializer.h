@@ -5,28 +5,7 @@
 #include <entt/fwd.hpp>
 #include "Serialization/Json.h"
 #include "UUID.h"
-
-namespace tomato
-{
-	struct CameraComponent;
-	struct TransformComponent;
-	struct InputChannelComponent;
-	struct MovementComponent;
-	struct VelocityComponent;
-	struct RenderComponent;
-
-	struct UIComponent;
-	struct CanvasComponent;
-	struct RectTransformComponent;
-	struct TextComponent;
-	struct TargetComponent;
-	struct MouseEventComponent;
-	struct SelectableComponent;
-
-	struct HierarchyComponent;
-	struct RootEntityTag;
-	struct MainCameraTag;
-}
+#include "ECS/Components/ComponentFwd.h"
 
 namespace tomato::Serialization
 {
@@ -58,6 +37,9 @@ namespace tomato::Serialization
 
 	void Save(json&, const VelocityComponent&);
 	void Load(const json&, VelocityComponent&);
+
+	void Save(json&, const ColliderComponent&);
+	void Load(const json&, ColliderComponent&);
 
 	void Save(json&, const RenderComponent&);
 	void Load(const json&, RenderComponent&);

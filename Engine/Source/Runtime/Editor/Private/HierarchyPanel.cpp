@@ -23,7 +23,7 @@ namespace tomato
 
 		if (ImGui::Begin("Hierarchy", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize))
 		{
-			ImGuiTreeNodeFlags tFlags = ImGuiTreeNodeFlags_DefaultOpen;
+			ImGuiTreeNodeFlags tFlags = ImGuiTreeNodeFlags_DrawLinesFull | ImGuiTreeNodeFlags_DefaultOpen;
 			if (ImGui::CollapsingHeader("Scene", tFlags))
 			{
 				int node_n = 0;

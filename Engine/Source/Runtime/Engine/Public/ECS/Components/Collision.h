@@ -9,6 +9,7 @@
 
 namespace tomato {
     struct ColliderComponent {
+        ColliderComponent() {}
         ColliderComponent(
             const ColliderType t,
             const bool trigger = false,

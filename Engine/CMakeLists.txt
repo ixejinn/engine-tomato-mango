@@ -130,6 +130,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Components/PhysComponents.h
         Source/Runtime/Engine/Public/ECS/Components/EntityComponents.h
         Source/Runtime/Engine/Public/ECS/Components/CharComponents.h
+        Source/Runtime/Engine/Public/ECS/Components/ComponentFwd.h
         Source/Runtime/Engine/Public/Prefab/UIPrefab.h
         Source/Runtime/Engine/Public/ECS/Systems/UITransformSystem.h
         Source/Runtime/Engine/Public/Serialization/ComponentSerializer.h
@@ -143,7 +144,16 @@ set(ENGINE_HEADERS
         Source/Runtime/Editor/Public/EditorPanel.h
         Source/Runtime/Editor/Public/HierarchyPanel.h
         Source/Runtime/Editor/Public/EditorFwd.h
- "Source/Runtime/Engine/Public/Server/MatchServerNetwork.h" "Source/Runtime/Engine/Public/Server/MatchTypes.h"  "Source/Runtime/Engine/Public/Server/Session.h" "Source/Runtime/Engine/Public/Server/SessionManager.h" "Source/Runtime/Engine/Public/Server/Match.h" "Source/Runtime/Engine/Public/Server/MatchManager.h" "Source/Runtime/Engine/Public/Server/MatchServer.h" "Source/Runtime/Editor/Public/InspectorPanel.h" "Source/Runtime/Editor/Public/InspectorDraw.h")
+        Source/Runtime/Engine/Public/Server/MatchServerNetwork.h
+        Source/Runtime/Engine/Public/Server/MatchTypes.h
+        Source/Runtime/Engine/Public/Server/Session.h
+        Source/Runtime/Engine/Public/Server/SessionManager.h
+        Source/Runtime/Engine/Public/Server/Match.h
+        Source/Runtime/Engine/Public/Server/MatchManager.h
+        Source/Runtime/Engine/Public/Server/MatchServer.h
+        Source/Runtime/Editor/Public/InspectorPanel.h
+        Source/Runtime/Editor/Public/InspectorDraw.h
+        )
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp

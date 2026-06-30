@@ -15,6 +15,7 @@ namespace tomato {
         : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), netMode_(netMode), network_(nullptr), gameNet_(nullptr)
     {
         Serialization::ComponentRegistry::GetInstance().Init();
+        Serialization::ComponentRegistry::GetInstance().InitInspector();
     }
 
     Engine::~Engine() = default;

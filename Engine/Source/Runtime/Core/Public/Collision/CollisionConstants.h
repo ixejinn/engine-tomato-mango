@@ -1,7 +1,8 @@
-#ifndef MANGO_COLLISIONCONSTANTS_H
+﻿#ifndef MANGO_COLLISIONCONSTANTS_H
 #define MANGO_COLLISIONCONSTANTS_H
 
 #include <cstdint>
+#include "Serialization/Json.h"
 
 namespace tomato {
     static constexpr float COLLISION_SKIN = 1e-2f;
@@ -19,6 +20,21 @@ namespace tomato {
 //        Capsule,
         COUNT
     };
+
+    NLOHMANN_JSON_SERIALIZE_ENUM(
+        CollisionLayer,
+        {
+            { CollisionLayer::Default, "Default" }
+        }
+    )
+
+    NLOHMANN_JSON_SERIALIZE_ENUM(
+        ColliderType,
+        {
+            { ColliderType::Cube, "Cube" },
+            { ColliderType::Sphere, "Sphere" }
+        }
+    )
 }
 
 #endif //MANGO_COLLISIONCONSTANTS_H
