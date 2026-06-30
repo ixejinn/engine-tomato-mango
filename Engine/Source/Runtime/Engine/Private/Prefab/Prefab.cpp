@@ -109,9 +109,9 @@ namespace tomato::Prefab
 
         reg.get<ColliderComponent>(ground).isTrigger = true;
 
-//        auto& trg = reg.emplace<OnTriggerComponent>(ground);
-//        trg.enter = CharacterMovement::AfterLanding;
-//        trg.exit = CharacterMovement::StartFalling;
+        auto& trg = reg.emplace<OnTriggerComponent>(ground);
+        trg.enter = CharacterMovement::AfterLanding;
+        trg.exit = CharacterMovement::StartFalling;
 
         TMT_INFO << "Create character collider, ground: " << (int)col << ", " << (int)ground;
         return col;

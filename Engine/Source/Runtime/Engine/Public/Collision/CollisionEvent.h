@@ -5,14 +5,6 @@
 #include "Collision/CollisionInfo.h"
 
 namespace tomato {
-    enum CollisionEventType
-    {
-        Enter = 0,
-        Stay,
-        Exit,
-        COUNT
-    };
-
     struct PenetrationEvent {
         entt::entity e1, e2;
         entt::registry* reg;

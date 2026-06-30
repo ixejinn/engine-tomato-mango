@@ -5,6 +5,7 @@ namespace tomato {
     class System;
 
     struct SimContext;
+    struct InputContext;
     struct CollisionContext;
     struct RenderContext;
     struct UIContext;
