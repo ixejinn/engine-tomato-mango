@@ -11,12 +11,21 @@
 
 namespace tomato {
     Engine::Engine(const int width, const int height, const char* title, NetMode netMode)
-        : window_(width, height, title), input_(window_, inputRecorder_, inputUI_), netMode_(netMode), network_(nullptr), gameNet_(nullptr)
+        : window_(width, height, title)
+        , input_(window_, inputRecorder_, inputUI_)
+        , netMode_(netMode)
     {
         Serialization::ComponentRegistry::GetInstance().Init();
+
+        InitializeNetwork();
+
+        editor_.InitImGui(window_.GetHandle());
     }
 
-    Engine::~Engine() = default;
+    Engine::~Engine()
+    {
+        editor_.ShutdownImGui();
+    }
 
     void Engine::SetNextState(std::unique_ptr<State>&& newState)
     {
@@ -44,149 +53,56 @@ namespace tomato {
 
     void Engine::Run()
     {
-        switch (netMode_)
-        {
-        case NetMode::NM_Alone:
-            // SingleRun();
-            // break;
-
-        case NetMode::NM_Client:
-            MultiRun();
-            break;
-
-        case NetMode::NM_DedicatedServer:
-            TMT_ERR << "Dedicated server not supported.";
-            break;
-        }
-    }
-
-    void Engine::RequestMatchToServer()
-    {
-        network_->ConnectToServer();
-        network_->RequestMatch();
-    }
-
-    void Engine::SingleRun()
-    {
-        // TickClock tickClock;
-        // window_.SetWindowUserPointer(&window_, &input_, &tickClock);
-        //
-        // GarbageEntityCollectionSystem garbageCollectionSystem;
-        // ChangeState(tickClock);
-        //
-        // while (!window_.ShouldClose() && isRunning_) {
-        //     if (nextState_)
-        //         ChangeState(tickClock);
-        //
-        //     // TMT_INFO << " ---------- " << tickClock.GetTick() << " ---------- ";
-        //     SimContext simCtx{currState_->GetRegistry(), tickClock.GetTick()};
-        //     InputContext inputCtx{currState_->GetPlayerInputTimelines()};
-        //     // currState_->GetRegistry().ctx().insert_or_assign<InputContext*>(&inputCtx);
-        //     // currState_->GetRegistry().ctx().insert_or_assign<RenderContext*>(&renderCtx);
-        //
-        //     ProcessInputEvents(tickClock.GetTick());
-        //     EventDispatcher::GetInstance().Update();
-        //
-        //     garbageCollectionSystem.Update(simCtx);
-        //
-        //     Simulate(tickClock, simCtx, inputCtx);
-        //
-        //     RenderContext renderCtx{window_.GetWidth(), window_.GetHeight()};
-        //     Render(simCtx, renderCtx);
-        //
-        //     inputRecorder_.UpdateCurrInputRecord(tickClock.GetTick());
-        // }
-    }
-
-    void Engine::MultiRun()
-    {
-        network_ = std::make_unique<ClientNetwork>();
-        gameNet_ = std::make_unique<GamePlayNetSystem>(currState_.get());
-        network_->SetGameplaySystem(gameNet_.get());
-        gameNet_->SetNetwork(network_.get());
-
-        if (!rollbackManager_)
-            rollbackManager_ = std::make_unique<RollbackManager>();
-
         TickClock tickClock;
         window_.SetWindowUserPointer(input_, tickClock);
-
         GarbageEntityCollectionSystem garbageCollectionSystem;
-
-        ChangeState(tickClock);
-        editor_.InitImGui(window_.GetHandle());
 
         network_->ThreadStart();
 
         while (!window_.ShouldClose() && isRunning_)
-            {
+        {
             if (nextState_)
                 ChangeState(tickClock);
 
-            // std::cout << "       ========== " << tickClock.GetTick() << " ==========\n";
-            gameNet_->InitializeConfirmedTick(tickClock.GetTick()); // for rollback
-
-            network_->ProcessQueuedUDPPacket();
-            network_->ProcessQueuedTCPPacket();
+            // std::cout << "       *--------- " << tickClock.GetTick() << " ---------*\n";
+            ProcessQueuedPackets(tickClock);
 
             // *---------- Rollback and resimulate
             auto currT = tickClock.GetTick();
             auto lateT = gameNet_->GetConfirmedTick();
-            if (currT > lateT && currT - lateT <= ROLLBACK_WINDOW)
+            if (currT > lateT &&
+                currT - lateT <= ROLLBACK_WINDOW)
             {
-                // std::cout << "     Rollback " << lateT << "~" << currT << "\n";
+                // std::cout << "       Rollback " << lateT << "~" << currT << "\n";
 
-                // Rollback
                 SimContext rbSimCtx{currState_.get(), lateT};
-
-                rollbackManager_->Rollback(rbSimCtx);
-                systemManager_.InitializeTransform(rbSimCtx);
-
-                // Resimulation
-                while (rbSimCtx.tick < currT)
-                {
-                    // std::cout << "       ---------- " << rbSimCtx.tick << " ----------\n";
-                    systemManager_.Simulate(rbSimCtx);
-                    currState_->Update();   // !!!!!! temporary !!!!!!
-
-                    ++rbSimCtx.tick;
-                    rollbackManager_->Capture(rbSimCtx);
-                }
-                // std::cout << "     Rollback finish\n";
+                Rollback(rbSimCtx);
+                Resimulate(rbSimCtx, currT);
+                // std::cout << "       Rollback finish\n";
             }
             // ----------* Rollback and resimulate
 
             ProcessInputEvents(tickClock.GetTick());
             EventDispatcher::GetInstance().Update();
 
+            // *---------- Simulate and render
             SimContext simCtx{currState_.get(), tickClock.GetTick()};
             garbageCollectionSystem.Update(simCtx);
 
-            // *---------- Simulate
-            int cnt = tickClock.GetSimulateNum();
-            while (cnt--)
-            {
-                simCtx.tick = tickClock.GetTick();
-
-                systemManager_.Simulate(simCtx);
-                currState_->Update();   // !!!!!! temporary !!!!!!
-
-                if (network_->GetNetState() == ClientNetworkState::NSS_Playing)
-                    gameNet_->ProcessOutgoingMessages(simCtx.tick);
-
-                ++simCtx.tick;
-                tickClock.AddTick();
-
-                rollbackManager_->Capture(simCtx);
-            }
-            // ----------* Simulate
+            Simulate(tickClock, simCtx);
             Render(simCtx);
+            // ----------* Simulate and render
 
             inputRecorder_.UpdateCurrInputRecord(tickClock.GetTick());
         }
-        editor_.ShutdownImGui();
 
         network_->ThreadStop();
+    }
+
+    void Engine::RequestMatchToServer()
+    {
+        network_->ConnectToServer();
+        network_->RequestMatch();
     }
 
     void Engine::ProcessInputEvents(const uint32_t tick)
@@ -199,16 +115,23 @@ namespace tomato {
             network_->GetMyPlayerID());
     }
 
-    void Engine::Simulate(TickClock& tc, SimContext& simCtx) {
-        int simulateNum = tc.GetSimulateNum();
-
-        while (simulateNum--) {
+    void Engine::Simulate(TickClock& tc, SimContext& simCtx)
+    {
+        int cnt = tc.GetSimulateNum();
+        while (cnt--)
+        {
             simCtx.tick = tc.GetTick();
 
             systemManager_.Simulate(simCtx);
             currState_->Update();   // !!!!!! temporary !!!!!!
 
+            if (network_->GetNetState() == ClientNetworkState::NSS_Playing)
+                gameNet_->ProcessOutgoingMessages(simCtx.tick);
+
+            ++simCtx.tick;
             tc.AddTick();
+
+            rollbackManager_->Capture(simCtx);
         }
     }
 
@@ -253,6 +176,44 @@ namespace tomato {
         if (netMode_ == NetMode::NM_Client)
         {
             gameNet_->SetState(currState_.get());
+            rollbackManager_->Capture(simCtx);
+        }
+    }
+
+    void Engine::InitializeNetwork()
+    {
+        network_ = std::make_unique<ClientNetwork>();
+        gameNet_ = std::make_unique<GamePlayNetSystem>(currState_.get());
+        network_->SetGameplaySystem(gameNet_.get());
+        gameNet_->SetNetwork(network_.get());
+
+        if (!rollbackManager_)
+            rollbackManager_ = std::make_unique<RollbackManager>();
+    }
+
+    void Engine::ProcessQueuedPackets(TickClock& tc)
+    {
+        gameNet_->InitializeConfirmedTick(tc.GetTick()); // for rollback
+
+        network_->ProcessQueuedUDPPacket();
+        network_->ProcessQueuedTCPPacket();
+    }
+
+    void Engine::Rollback(SimContext& simCtx)
+    {
+        rollbackManager_->Rollback(simCtx);
+        systemManager_.InitializeTransform(simCtx);
+    }
+
+    void Engine::Resimulate(SimContext& simCtx, const uint32_t currT)
+    {
+        while (simCtx.tick < currT)
+        {
+            // std::cout << "        --------- " << rbSimCtx.tick << " ---------\n";
+            systemManager_.Simulate(simCtx);
+            currState_->Update();   // !!!!!! temporary !!!!!!
+
+            ++simCtx.tick;
             rollbackManager_->Capture(simCtx);
         }
     }

@@ -11,6 +11,7 @@
 #include "Network/ClientNetwork.h"
 #include "GameNetwork/GamePlayNetSystem.h"
 #include "GameNetwork/Rollback/RollbackManager.h"
+#include "Tick/TickFwd.h"
 #include "Editor.h"
 
 namespace tomato
@@ -42,9 +43,6 @@ namespace tomato
         void RequestMatchToServer();
 
     private:
-        void SingleRun();
-        void MultiRun();
-
         Window window_;
 
         void ProcessInputEvents(uint32_t tick);
@@ -58,8 +56,13 @@ namespace tomato
 
         Editor editor_;
 
+        void InitializeNetwork();
+        void ProcessQueuedPackets(TickClock& tc);
         std::unique_ptr<ClientNetwork> network_{ nullptr };
         std::unique_ptr<GamePlayNetSystem> gameNet_{ nullptr };
+
+        void Rollback(SimContext& simCtx);
+        void Resimulate(SimContext& simCtx, uint32_t currT);
         std::unique_ptr<RollbackManager> rollbackManager_{ nullptr };
 
         NetMode netMode_;
