@@ -8,10 +8,13 @@
 #include "ECS/Components/Collision.h"
 #include "Collision/CollisionInfo.h"
 
-namespace tomato {
-    class EPA {
+namespace tomato
+{
+    class EPA
+    {
     public:
-        struct Plain {
+        struct Plain
+        {
             Plain(const std::vector<glm::vec3>& points, uint32_t idx0, uint32_t idx1, uint32_t idx2);
 
             UnorderedPair<uint32_t> edges[3]{}; /// saves points indices.
@@ -19,9 +22,10 @@ namespace tomato {
             float distance;                     /// from origin.
         };
 
-        static std::optional<CollisionInfo> GetPenetrationInfo(std::vector<glm::vec3>& simplex,
-                 const ColliderComponent& col1, const ColliderComponent& col2,
-                 TransformComponent& trf1, TransformComponent& trf2);
+        static std::optional<CollisionInfo> GetPenetrationInfo(
+            std::vector<glm::vec3>& simplex,
+            const ColliderComponent& col1, const ColliderComponent& col2,
+            TransformComponent& trf1, TransformComponent& trf2);
     };
 }
 

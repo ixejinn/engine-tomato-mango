@@ -7,10 +7,12 @@
 #include "ECS/Systems/System.h"
 #include "Collision/CollisionEventFwd.h"
 #include "Collision/CollisionFwd.h"
-#include "Collision/Narrow/GJK.h"
+#include "Collision/Narrow/GJK/GJK.h"
 
-namespace tomato {
-    class CollisionSystem : public System {
+namespace tomato
+{
+    class CollisionSystem : public System
+    {
     public:
         CollisionSystem();
         ~CollisionSystem() override;
@@ -18,27 +20,23 @@ namespace tomato {
         void Update(SimContext& simCtx) override;
 
     private:
-        void DetectBroad(entt::registry& reg);
-        void DetectNarrow(SimContext& simCtx);
-
-        static void SetAABB(entt::registry& reg, entt::entity e);
+        static void UpdateAABB(entt::registry& reg);
 
         static void SolveCollision(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info);
 
         static void OnPenetration(const PenetrationEvent& e);
 
-        static void OnCollisionEnter(const CollisionEnterEvent& e);
-        static void OnCollisionStay(const CollisionStayEvent& e);
-        static void OnCollisionExit(const CollisionExitEvent& e);
-
-        static void OnTriggerEnter(const TriggerEnterEvent& e);
-        static void OnTriggerStay(const TriggerStayEvent& e);
-        static void OnTriggerExit(const TriggerExitEvent& e);
+        void RunBroadPhase(SimContext& simCtx);
+        void RunNarrowPhase(SimContext& simCtx);
 
         std::unique_ptr<BroadPhase> broadPhase_;
         std::unique_ptr<NarrowPhase> narrowPhase_;
 
         std::vector<CollisionPair> candidates_;
+
+        void ResolveCollision(entt::registry& reg);
+
+        std::vector<CollisionEvent> events_;
     };
 }
 

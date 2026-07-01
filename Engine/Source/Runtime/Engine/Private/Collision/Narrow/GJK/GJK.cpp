@@ -1,31 +1,35 @@
-#include "Collision/Narrow/GJK.h"
+#include "../../../../Public/Collision/Narrow/GJK/GJK.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "Collision/ColliderSupport.h"
 #include "Collision/CollisionEvent.h"
-#include "Collision/Narrow/EPA.h"
+#include "../../../../Public/Collision/Narrow/GJK/EPA.h"
 #include "ECS/Components/Rigidbody.h"
 #include "Math/Normal.h"
 #include "Utils/Logger.h"
 #include "SimulationConfig.h"
 #include "Event/EventDispatcher.h"
 
-namespace tomato {
+namespace tomato
+{
     // Registry support function per collider
-    EnumArray<ColliderType, GJK::SupportFunc> GJK::supportFunctions_ = {
+    EnumArray<ColliderType, GJK::SupportFunc> GJK::supportFunctions_
+    {
         {ColliderType::Cube, support::Cube},
         {ColliderType::Sphere, support::Sphere},
 //        {ColliderType::Capsule, support::Capsule}
     };
 
-    std::optional<CollisionInfo> GJK::DetectCollision(
-        entt::registry& reg, entt::entity e1, entt::entity e2) {
+    std::optional<CollisionInfo> GJK::EvaluateCollision(
+        entt::registry& reg, entt::entity e1, entt::entity e2)
+    {
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
 
-        if (col1.isTrigger || col2.isTrigger) {
+        if (col1.isTrigger || col2.isTrigger)
+        {
             if (GJKBool(reg, e1, e2))
                 return CollisionInfo{};
             else
@@ -142,6 +146,8 @@ namespace tomato {
             return std::nullopt;
         float weight = lenV1 / sumV;
 
+        // TMT_INFO << "GJK raycast " << (int)e1 << " " << (int)e2 << " " << sumV;
+
         glm::vec3 relVel = v1 - v2;
         if (glm::length2(relVel) < 1e-6f) {
 //            return GJKDistance(reg, e1, e2);
@@ -158,6 +164,7 @@ namespace tomato {
         glm::vec3 hitNormal = searchDir;
         std::vector<glm::vec3> simplex;
 
+        bool penetrated = false;
         float maxDistSq = 1.f;
         int iteration = 0;
         while (glm::length2(searchDir) > 1e-6f * maxDistSq && iteration < 20) {
@@ -208,10 +215,14 @@ namespace tomato {
 //                    TMT_WARN << "Simplex already encloses origin. " << (int)e1 << " " << (int)e2;
 
                     if (auto info = EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2)) {
+                        penetrated = true;
                         // TMT_INFO << " penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
                         // TMT_INFO << " penetration depth : " << info->depth << ", weight: " << weight;
-                        info->weight = weight;
-                        EventDispatcher::GetInstance().Enqueue(PenetrationEvent{e1, e2, &reg, info.value()});
+                        if (info->depth > 0)
+                        {
+                            info->weight = weight;
+                            EventDispatcher::GetInstance().Enqueue(PenetrationEvent{e1, e2, &reg, info.value()});
+                        }
                     }
                 }
                 break;
@@ -221,13 +232,15 @@ namespace tomato {
             for (auto& p : simplex)
                 maxDistSq = std::max(maxDistSq, glm::length2(curRayPos - p));
 
+            // TMT_INFO << "(" << iteration << ") hitNormal: " << hitNormal.x << " " << hitNormal.y << " " << hitNormal.z;
             // TMT_INFO << "(" << iteration << ") searchDir: " << searchDir.x << " " << searchDir.y << " " << searchDir.z;
+            // TMT_INFO << "(" << iteration << ")   length2: " << glm::length2(searchDir);
         }
 
         if (hitFraction <= 1) {
             float hitNormalLenSq = glm::length2(hitNormal);
             if (hitNormalLenSq > 1e-6f) {
-                // std::cout << " before normalize: " << hitNormal.x << " " << hitNormal.y << " " << hitNormal.z;
+                // std::cout << " before normalize: " << hitNormal.x << " " << hitNormal.y << " " << hitNormal.z << "\n";
 
                 constexpr float epsilon = 0.0001f;
                 if (-epsilon < hitNormal.x && hitNormal.x < epsilon)
@@ -237,15 +250,14 @@ namespace tomato {
                 if (-epsilon < hitNormal.y && hitNormal.y < epsilon)
                     hitNormal.y = 0.f;
 
-                // std::cout << " handle normalize: " << hitNormal.x << " " << hitNormal.y << " " << hitNormal.z;
+                // std::cout << " handle normalize: " << hitNormal.x << " " << hitNormal.y << " " << hitNormal.z << "\n";
                 hitNormal = glm::normalize(hitNormal);
-                // std::cout << "  after normalize: " << hitNormal.x << " " << hitNormal.y << " " << hitNormal.z;
+                // std::cout << "  after normalize: " << hitNormal.x << " " << hitNormal.y << " " << hitNormal.z << "\n";
             }
 
             return CollisionInfo{hitNormal, hitFraction, weight};
         }
 
-//        TMT_INFO << "기타 비충돌 종료";
         return std::nullopt;
     }
 

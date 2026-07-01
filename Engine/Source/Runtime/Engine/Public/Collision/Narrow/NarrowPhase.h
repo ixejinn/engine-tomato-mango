@@ -6,12 +6,14 @@
 #include "ECS/Forward/PhysCompFwd.h"
 #include "Collision/CollisionInfo.h"
 
-namespace tomato {
-    class NarrowPhase {
+namespace tomato
+{
+    class NarrowPhase
+    {
     public:
         virtual ~NarrowPhase() = default;
 
-        virtual std::optional<CollisionInfo> DetectCollision(
+        virtual std::optional<CollisionInfo> EvaluateCollision(
             entt::registry& reg, entt::entity e1, entt::entity e2) = 0;
     };
 }

@@ -85,8 +85,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Resource/Audio/Audio.h
         Source/Runtime/Engine/Public/TomatoFwd.h
         Source/Runtime/Core/Public/Containers/UnorderedPair.h
-        Source/Runtime/Engine/Public/Collision/Narrow/GJK.h
-        Source/Runtime/Engine/Public/Collision/Narrow/EPA.h
+		Source/Runtime/Engine/Public/Collision/Narrow/GJK/GJK.h
+		Source/Runtime/Engine/Public/Collision/Narrow/GJK/EPA.h
         Source/Runtime/Engine/Public/Collision/Broad/BroadPhase.h
         Source/Runtime/Engine/Public/Collision/CollisionFwd.h
         Source/Runtime/Engine/Public/Collision/Broad/SAP.h
@@ -169,8 +169,8 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/SystemRegistry.cpp
         Source/Runtime/Engine/Private/ECS/SystemManager.cpp
         Source/Runtime/Engine/Private/Resource/Audio/Audio.cpp
-        Source/Runtime/Engine/Private/Collision/Narrow/GJK.cpp
-        Source/Runtime/Engine/Private/Collision/Narrow/EPA.cpp
+		Source/Runtime/Engine/Private/Collision/Narrow/GJK/GJK.cpp
+		Source/Runtime/Engine/Private/Collision/Narrow/GJK/EPA.cpp
         Source/Runtime/Engine/Private/Math/Normal.cpp
         Source/Runtime/Engine/Private/Collision/Broad/SAP.cpp
         Source/Runtime/Engine/Private/Utils/Utf.cpp

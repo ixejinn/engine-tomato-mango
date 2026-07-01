@@ -17,15 +17,15 @@ namespace tomato
             // TMT_INFO << (int)e << " velocity: " << vel.velocity.x << ", " << vel.velocity.y << ", " << vel.velocity.z;
             trf.AddPosition(vel.velocity * FIXED_DELTA_TIME);
 
-             //auto pos = trf.GetLocalPosition();
-             //if (pos.y < 0) {
-             //    trf.SetPosition(pos.x, 0, pos.z);
-             //    auto& move = simCtx.registry.get<MovementComponent>(e);
-             //    move.mode = Walking;
-             //    move.jumpCnt = 0;
-             //    vel.velocity.y = 0;
-             //    std::cout << "walking\n";
-             //}
+             // auto pos = trf.GetLocalPosition();
+             // if (pos.y < 0) {
+             //     trf.SetPosition(pos.x, 0, pos.z);
+             //     auto& move = simCtx.state->GetRegistry().get<MovementComponent>(e);
+             //     move.mode = Walking;
+             //     move.jumpCnt = 0;
+             //     vel.velocity.y = 0;
+             //     std::cout << "walking\n";
+             // }
 
             // pos = trf.GetLocalPosition();
             // TMT_INFO << (int)e << " position: " << pos.x << ", " << pos.y << ", " << pos.z;

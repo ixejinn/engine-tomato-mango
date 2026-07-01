@@ -5,12 +5,14 @@
 #include "Collision/CollisionLayerMatrix.h"
 #include "ECS/Forward/PhysCompFwd.h"
 
-namespace tomato {
-    class BroadPhase {
+namespace tomato
+{
+    class BroadPhase
+    {
     public:
         virtual ~BroadPhase() = default;
 
-        virtual void DetectCollision(entt::registry& reg, std::vector<CollisionPair>& candidates) = 0;
+        virtual void FindCollisionCandidates(entt::registry& reg, std::vector<CollisionPair>& candidates) = 0;
 
     protected:
         inline static CollisionLayerMatrix layerMatrix_;

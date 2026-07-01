@@ -5,8 +5,8 @@
 #include "Collision/CollisionEventFwd.h"
 
 namespace tomato::CharacterMovement {
-    void StartFalling(const TriggerExitEvent& event, entt::entity e);
-    void AfterLanding(const TriggerEnterEvent& event, entt::entity e);
+    void StartFalling(const TriggerExitEvent& event);
+    void AfterLanding(const TriggerEnterEvent& event);
 }
 
 #endif //MANGO_CHARACTERMOVEMENT_H

@@ -1,8 +1,8 @@
 #include <limits>
 #include <unordered_set>
 #include <glm/glm.hpp>
-#include "Collision/Narrow/EPA.h"
-#include "Collision/Narrow/GJK.h"
+#include "../../../../Public/Collision/Narrow/GJK/EPA.h"
+#include "../../../../Public/Collision/Narrow/GJK/GJK.h"
 #include "Collision/CollisionEvent.h"
 #include "Event/EventDispatcher.h"
 #include "Math/Normal.h"

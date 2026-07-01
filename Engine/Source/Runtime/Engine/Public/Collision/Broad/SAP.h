@@ -6,7 +6,7 @@
 namespace tomato {
     class SAP : public BroadPhase {
     public:
-        void DetectCollision(entt::registry &reg, std::vector<CollisionPair> &candidates) override;
+        void FindCollisionCandidates(entt::registry &reg, std::vector<CollisionPair> &candidates) override;
     };
 }
 

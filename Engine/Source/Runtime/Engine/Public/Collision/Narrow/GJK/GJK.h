@@ -7,10 +7,12 @@
 #include "Containers/EnumArray.h"
 #include "Event/EventSignal.h"
 
-namespace tomato {
-    class GJK : public NarrowPhase {
+namespace tomato
+{
+    class GJK : public NarrowPhase
+    {
     public:
-        std::optional<CollisionInfo> DetectCollision(
+        std::optional<CollisionInfo> EvaluateCollision(
             entt::registry& reg, entt::entity e1, entt::entity e2) override;
 
         static glm::vec3 GetSupportPoint(

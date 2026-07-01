@@ -4,7 +4,14 @@
 #include <entt/entt.hpp>
 #include "Collision/CollisionInfo.h"
 
-namespace tomato {
+namespace tomato
+{
+    struct CollisionEvent
+    {
+        entt::entity e1, e2;
+        CollisionInfo info;
+    };
+
     struct PenetrationEvent {
         entt::entity e1, e2;
         entt::registry* reg;

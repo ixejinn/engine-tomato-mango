@@ -83,13 +83,16 @@ namespace tomato {
             // ----------* Rollback and resimulate
 
             ProcessInputEvents(tickClock.GetTick());
-            EventDispatcher::GetInstance().Update();
+            // EventDispatcher::GetInstance().Update();
 
             // *---------- Simulate and render
             SimContext simCtx{currState_.get(), tickClock.GetTick()};
             garbageCollectionSystem.Update(simCtx);
 
             Simulate(tickClock, simCtx);
+
+            EventDispatcher::GetInstance().Update();
+
             Render(simCtx);
             // ----------* Simulate and render
 

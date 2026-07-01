@@ -2,6 +2,8 @@
 #define MANGO_COLLISIONEVENTFWD_H
 
 namespace tomato {
+    struct CollisionEvent;
+
     struct PenetrationEvent;
 
     struct CollisionEnterEvent;
