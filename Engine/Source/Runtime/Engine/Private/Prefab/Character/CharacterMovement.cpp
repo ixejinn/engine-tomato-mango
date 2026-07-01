@@ -10,48 +10,47 @@ namespace tomato::CharacterMovement
 {
     void StartFalling(const TriggerExitEvent& event)
     {
-        entt::entity root1 = GetRootEntity(event.reg, event.e1);
-        if (auto* move1 = event.reg->try_get<MovementComponent>(root1))
-        {
-            if (--move1->gndStayCnt == 0)
-            {
-                move1->mode = Falling;
-                TMT_INFO << "Falling " << (int)event.e1;
-            }
-        }
-
-        entt::entity root2 = GetRootEntity(event.reg, event.e2);
-        if (auto* move2 = event.reg->try_get<MovementComponent>(root2))
-        {
-            if (--move2->gndStayCnt == 0)
-            {
-                move2->mode = Falling;
-                TMT_INFO << "Falling " << (int)event.e2;
-            }
-        }
+        ChangeMovementMode(Falling, event.reg, event.e1);
+        ChangeMovementMode(Falling, event.reg, event.e2);
     }
 
     void AfterLanding(const TriggerEnterEvent& event) {
-        entt::entity root1 = GetRootEntity(event.reg, event.e1);
-        if (auto* move1 = event.reg->try_get<MovementComponent>(root1))
+        ChangeMovementMode(Walking, event.reg, event.e1);
+        ChangeMovementMode(Walking, event.reg, event.e2);
+    }
+
+    void ChangeMovementMode(MovementMode mode, entt::registry* reg, entt::entity e)
+    {
+        switch (mode)
         {
-            ++move1->gndStayCnt;
+        case Falling:
+            {
+                if (auto* move = reg->try_get<MovementComponent>(GetRootEntity(reg, e)))
+                {
+                    if (--move->gndStayCnt == 0)
+                    {
+                        move->mode = Falling;
+                        // TMT_INFO << "Falling " << (int)e;
+                    }
+                }
+            }
+            break;
+        case Walking:
+            {
+                entt::entity root = GetRootEntity(reg, e);
+                if (auto* move = reg->try_get<MovementComponent>(root))
+                {
+                    ++move->gndStayCnt;
 
-            move1->mode = Walking;
-            move1->jumpCnt = 0;
-            event.reg->get<VelocityComponent>(root1).velocity.y = 0;
-            TMT_INFO << "Walking " << (int)event.e1 << " " << event.tick;
-        }
+                    move->mode = Walking;
+                    move->jumpCnt = 0;
 
-        entt::entity root2 = GetRootEntity(event.reg, event.e2);
-        if (auto* move2 = event.reg->try_get<MovementComponent>(root2))
-        {
-            ++move2->gndStayCnt;
-
-            move2->mode = Walking;
-            move2->jumpCnt = 0;
-            event.reg->get<VelocityComponent>(root2).velocity.y = 0;
-            TMT_INFO << "Walking " << (int)event.e2 << " " << event.tick;
+                    if (auto* vel = reg->try_get<VelocityComponent>(root))
+                        vel->velocity.y = 0;
+                    // TMT_INFO << "Walking " << (int)e;
+                }
+            }
+            break;
         }
     }
 }

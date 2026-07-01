@@ -4,8 +4,10 @@
 #include "Containers/EnumArray.h"
 #include "Collision/CollisionConstants.h"
 
-namespace tomato {
-	struct CollisionLayerMatrix {
+namespace tomato
+{
+	struct CollisionLayerMatrix
+	{
 		CollisionLayerMatrix();
 
 		void SetCollisionLayer(CollisionLayer layer1, CollisionLayer layer2, bool enabled);

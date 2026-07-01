@@ -16,11 +16,8 @@ public:
     void Exit() override;
 
 private:
-    static void TEST_CollisionEnter(const tomato::CollisionEnterEvent& event, entt::entity e);
-    static void TEST_CollisionExit(const tomato::CollisionExitEvent& event, entt::entity e);
-
-    static void TEST_TriggerEnter(const tomato::TriggerEnterEvent& event, entt::entity e);
-    static void TEST_TriggerExit(const tomato::TriggerExitEvent& event, entt::entity e);
+    static void TEST_CollisionEnter(const tomato::CollisionEnterEvent& event);
+    static void TEST_CollisionExit(const tomato::CollisionExitEvent& event);
 
     tomato::Audio* audioPtr_{nullptr};
     UIController uiController_;

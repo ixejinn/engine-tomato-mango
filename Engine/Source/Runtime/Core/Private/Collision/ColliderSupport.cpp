@@ -1,9 +1,12 @@
 #include <glm/glm.hpp>
 #include "Collision/ColliderSupport.h"
 #include "ECS/Components/Collision.h"
+#include "ECS/Components/Transform.h"
 
-namespace tomato::support {
-    glm::vec3 Cube(const glm::vec3 &dir, const TransformComponent &trf) {
+namespace tomato::support
+{
+    glm::vec3 Cube(const glm::vec3 &dir, const TransformComponent &trf)
+    {
         auto halfExtents = trf.GetWorldScale() * 0.5f;
         return glm::vec3{
             dir.x >= 0.f ? halfExtents.x : -halfExtents.x,
@@ -12,11 +15,14 @@ namespace tomato::support {
         };
     }
 
-    glm::vec3 Sphere(const glm::vec3 &dir, const TransformComponent &trf) {
+    glm::vec3 Sphere(const glm::vec3 &dir, const TransformComponent &trf)
+    {
         float dirLenSq = glm::length2(dir);
         glm::vec3 offset;
-        if (dirLenSq < 1e-4) {
-            offset = glm::vec3{
+        if (dirLenSq < 1e-4)
+        {
+            offset = glm::vec3
+            {
                 dir.x >= 0.f ? 1.f : -1.f,
                 dir.y >= 0.f ? 1.f : -1.f,
                 dir.z >= 0.f ? 1.f : -1.f
@@ -27,7 +33,8 @@ namespace tomato::support {
         return (trf.GetWorldScale().x * 0.5f) * offset;
     }
 
-    glm::vec3 Capsule(const glm::vec3 &dir, const TransformComponent &trf) {
+    glm::vec3 Capsule(const glm::vec3 &dir, const TransformComponent &trf)
+    {
         float dirLenSq = glm::length2(dir);
         if (dirLenSq < 1e-4)
             return glm::vec3{0.f};

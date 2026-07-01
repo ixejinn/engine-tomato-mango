@@ -5,18 +5,15 @@
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
-
 #include "Input/InputRecorder.h"
 #include "Input/InputConstants.h"
 #include "Input/KeyConstants.h"
 #include "Utils/Logger.h"
-
 #include "ECS/Components/Components.h"
 #include "ECS/Entity/Hierarchy.h"
-
 #include "Collision/CollisionEvent.h"
 #include "CollisionTestComponent.h"
-
+#include "Event/EventDispatcher.h"
 #include "Prefab/Prefab.h"
 #include "Prefab/UIPrefab.h"
 #include "Serialization/ComponentSerializer.h"
@@ -52,6 +49,7 @@ void TestState::Init() {
     renderp0.color = { 1.f, 1.f, 0.f, 1.f };
     auto& channelp0 = registry_.get<InputChannelComponent>(player0);
     channelp0.channel = 0;
+    registry_.emplace<CollisionTestComponent>(player0);
 
     //// Player1 character
     entt::entity player1 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { -1, 2, 0 });
@@ -96,6 +94,9 @@ void TestState::Init() {
     UIPrefab::CreateImage(registry_, "Resources/Contents/WATER_GAME_LOGO.png", { 200.f, 300.f });
 
     //Serialization::SaveScene(registry_, "Resources/Engine/Assets/test.data");
+
+    EventDispatcher::GetInstance().Connect<CollisionEnterEvent, &TEST_CollisionEnter>();
+    EventDispatcher::GetInstance().Connect<CollisionExitEvent, &TEST_CollisionExit>();
 }
 
 void TestState::Update() {
@@ -103,37 +104,44 @@ void TestState::Update() {
         audioPtr_->Start();
 }
 
-void TestState::Exit() {
-}
+void TestState::Exit() {}
 
-void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event, entt::entity e) {
-    auto testComp = event.reg->try_get<CollisionTestComponent>(e);
-    auto& render = event.reg->get<RenderComponent>(e);
-    if (testComp) {
-        testComp->color = render.color;
-        render.color = CollisionTestComponent::COLLISION_COLOR;
+void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.e1);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+        {
+            if (!testComp->color.has_value())
+                testComp->color = render->color;
+            render->color = CollisionTestComponent::COLLISION_COLOR;
+        }
+    }
+
+    root = GetRootEntity(event.reg, event.e2);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+        {
+            if (!testComp->color.has_value())
+                testComp->color = render->color;
+            render->color = CollisionTestComponent::COLLISION_COLOR;
+        }
     }
 }
 
-void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event, entt::entity e) {
-    auto testComp = event.reg->try_get<CollisionTestComponent>(e);
-    auto& render = event.reg->get<RenderComponent>(e);
-    if (testComp)
-        render.color = testComp->color;
-}
-
-void TestState::TEST_TriggerEnter(const tomato::TriggerEnterEvent& event, entt::entity e) {
-    auto testComp = event.reg->try_get<CollisionTestComponent>(e);
-    auto& render = event.reg->get<RenderComponent>(e);
-    if (testComp) {
-        testComp->color = render.color;
-        render.color = CollisionTestComponent::COLLISION_COLOR;
+void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.e1);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+            render->color = testComp->color.value();
     }
-}
 
-void TestState::TEST_TriggerExit(const tomato::TriggerExitEvent& event, entt::entity e) {
-    auto testComp = event.reg->try_get<CollisionTestComponent>(e);
-    auto& render = event.reg->get<RenderComponent>(e);
-    if (testComp)
-        render.color = testComp->color;
+    root = GetRootEntity(event.reg, event.e2);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+            render->color = testComp->color.value();
+    }
 }

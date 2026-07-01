@@ -12,49 +12,52 @@ namespace tomato
         CollisionInfo info;
     };
 
-    struct PenetrationEvent {
+    struct PenetrationEvent
+    {
         entt::entity e1, e2;
         entt::registry* reg;
 
         CollisionInfo info;
     };
 
-    struct CollisionEnterEvent {
-        entt::entity e1, e2;
-        entt::registry* reg;
-
-        CollisionInfo info;
-        uint32_t tick;
-    };
-
-    struct CollisionStayEvent {
+    struct CollisionEnterEvent
+    {
         entt::entity e1, e2;
         entt::registry* reg;
 
         CollisionInfo info;
     };
 
-    struct CollisionExitEvent {
+    struct CollisionStayEvent
+    {
         entt::entity e1, e2;
         entt::registry* reg;
-        uint32_t tick;
+
+        CollisionInfo info;
     };
 
-    struct TriggerEnterEvent {
-        entt::entity e1, e2;
-        entt::registry* reg;
-        uint32_t tick;
-    };
-
-    struct TriggerStayEvent {
+    struct CollisionExitEvent
+    {
         entt::entity e1, e2;
         entt::registry* reg;
     };
 
-    struct TriggerExitEvent {
+    struct TriggerEnterEvent
+    {
         entt::entity e1, e2;
         entt::registry* reg;
-        uint32_t tick;
+    };
+
+    struct TriggerStayEvent
+    {
+        entt::entity e1, e2;
+        entt::registry* reg;
+    };
+
+    struct TriggerExitEvent
+    {
+        entt::entity e1, e2;
+        entt::registry* reg;
     };
 }
 

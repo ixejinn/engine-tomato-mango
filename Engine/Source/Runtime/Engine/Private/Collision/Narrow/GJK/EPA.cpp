@@ -1,17 +1,20 @@
-#include <limits>
 #include <unordered_set>
 #include <glm/glm.hpp>
-#include "../../../../Public/Collision/Narrow/GJK/EPA.h"
-#include "../../../../Public/Collision/Narrow/GJK/GJK.h"
+#include "ECS/Components/Transform.h"
+#include "ECS/Components/Collision.h"
+#include "Collision/Narrow/GJK/EPA.h"
+#include "Collision/Narrow/GJK/GJK.h"
 #include "Collision/CollisionEvent.h"
 #include "Event/EventDispatcher.h"
 #include "Math/Normal.h"
 #include "Utils/Logger.h"
 
-namespace tomato {
+namespace tomato
+{
     EPA::Plain::Plain(
         const std::vector<glm::vec3>& points,
-        uint32_t idx0, uint32_t idx1, uint32_t idx2) {
+        uint32_t idx0, uint32_t idx1, uint32_t idx2)
+    {
         edges[0] = {idx0, idx1};
         edges[1] = {idx1, idx2};
         edges[2] = {idx2, idx0};
@@ -22,8 +25,12 @@ namespace tomato {
     }
 
     std::optional<CollisionInfo> EPA::GetPenetrationInfo(
-        std::vector<glm::vec3>& points, const ColliderComponent& col1, const ColliderComponent& col2, TransformComponent& trf1, TransformComponent& trf2) {
-        if (points.size() != 4) {
+        std::vector<glm::vec3>& points,
+        const ColliderComponent& col1, const ColliderComponent& col2,
+        TransformComponent& trf1, TransformComponent& trf2)
+    {
+        if (points.size() != 4)
+        {
             TMT_ERR << "Invalid simplex size: " << points.size();
             return std::nullopt;
         }
@@ -35,14 +42,17 @@ namespace tomato {
         polytope.emplace_back(points, 1, 2, 3);
 
         int iteration = 0;
-        while (true) {
+        while (true)
+        {
             Plain* nearest{nullptr};
-            for (auto& plain : polytope) {
+            for (auto& plain : polytope)
+            {
                 if (!nearest || nearest->distance > plain.distance)
                     nearest = &plain;
             }
 
-            if (!nearest) {
+            if (!nearest)
+            {
                 TMT_ERR << "Incorrect polytope";
                 return std::nullopt;
             }
@@ -57,12 +67,15 @@ namespace tomato {
 
             // Expand polytope
             std::unordered_set<UnorderedPair<uint32_t>> edgesToExpand;
-            for (int i = polytope.size() - 1; i >= 0; --i) {
+            for (int i = polytope.size() - 1; i >= 0; --i)
+            {
                 if (glm::dot(polytope[i].normal, points.back()) > polytope[i].distance)
                     // 서포트 포인트에서 폴리토프를 봤을 때 면의 법선이 양수인 면들은 삭제
                     polytope.erase(polytope.begin() + i);
-                else {
-                    for (const auto& edge : polytope[i].edges) {
+                else
+                {
+                    for (const auto& edge : polytope[i].edges)
+                    {
                         if (edgesToExpand.contains(edge))
                             edgesToExpand.erase(edge);
                         else

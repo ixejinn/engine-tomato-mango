@@ -3,7 +3,8 @@
 
 #include <cstdint>
 
-namespace tomato {
+namespace tomato
+{
     static constexpr float COLLISION_SKIN = 1e-2f;
 
     enum class CollisionLayer : uint32_t

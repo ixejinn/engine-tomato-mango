@@ -5,7 +5,7 @@
 #include <vector>
 #include <optional>
 #include "Containers/UnorderedPair.h"
-#include "ECS/Components/Collision.h"
+#include "ECS/Forward/PhysCompFwd.h"
 #include "Collision/CollisionInfo.h"
 
 namespace tomato

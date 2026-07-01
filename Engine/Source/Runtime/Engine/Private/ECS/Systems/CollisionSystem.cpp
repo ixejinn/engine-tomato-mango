@@ -190,11 +190,11 @@ namespace tomato {
                 {
                     // Enter
                     if (col1.isTrigger || col2.isTrigger)
-                        EventDispatcher::GetInstance().Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry, simCtx.tick});
+                        EventDispatcher::GetInstance().Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
                     else
                     {
                         events_.emplace_back(candidate.a, candidate.b, result.value());
-                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &registry, result.value(), simCtx.tick});
+                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &registry, result.value()});
                     }
                 }
                 else
@@ -222,9 +222,9 @@ namespace tomato {
                 auto& col2 = registry.get<ColliderComponent>(it->first.b);
 
                 if (col1.isTrigger || col2.isTrigger)
-                    EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{it->first.a, it->first.b, &registry, simCtx.tick});
+                    EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{it->first.a, it->first.b, &registry});
                 else
-                    EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{it->first.a, it->first.b, &registry, simCtx.tick});
+                    EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{it->first.a, it->first.b, &registry});
 
                 it = collisionPairs.erase(it);
             }

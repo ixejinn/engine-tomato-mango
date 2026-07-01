@@ -4,7 +4,8 @@
 #include <entt/fwd.hpp>
 #include "Containers/UnorderedPair.h"
 
-namespace tomato {
+namespace tomato
+{
     using CollisionPair = UnorderedPair<entt::entity>;
 
     class BroadPhase;

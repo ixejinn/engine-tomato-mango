@@ -143,7 +143,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Editor/Public/EditorPanel.h
         Source/Runtime/Editor/Public/HierarchyPanel.h
         Source/Runtime/Editor/Public/EditorFwd.h
- "Source/Runtime/Engine/Public/Server/MatchServerNetwork.h" "Source/Runtime/Engine/Public/Server/MatchTypes.h"  "Source/Runtime/Engine/Public/Server/Session.h" "Source/Runtime/Engine/Public/Server/SessionManager.h" "Source/Runtime/Engine/Public/Server/Match.h" "Source/Runtime/Engine/Public/Server/MatchManager.h" "Source/Runtime/Engine/Public/Server/MatchServer.h")
+ "Source/Runtime/Engine/Public/Server/MatchServerNetwork.h" "Source/Runtime/Engine/Public/Server/MatchTypes.h"  "Source/Runtime/Engine/Public/Server/Session.h" "Source/Runtime/Engine/Public/Server/SessionManager.h" "Source/Runtime/Engine/Public/Server/Match.h" "Source/Runtime/Engine/Public/Server/MatchManager.h" "Source/Runtime/Engine/Public/Server/MatchServer.h"
+		Source/Runtime/Engine/Public/GameObjects/Character/MovementMode.h)
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp

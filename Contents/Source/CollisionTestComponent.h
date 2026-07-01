@@ -2,11 +2,12 @@
 #define MANGO_COLLISIONTESTCOMPONENT_H
 
 #include <glm/vec4.hpp>
+#include <optional>
 
 struct CollisionTestComponent {
-    glm::vec4 color;
+    std::optional<glm::vec4> color{std::nullopt};
 
-    constexpr static glm::vec4 COLLISION_COLOR{0.035f, 0.816f, 0.937f, 1.f};
+    constexpr static glm::vec4 COLLISION_COLOR{1.f, 0.f, 1.f, 1.f};
 };
 
 #endif //MANGO_COLLISIONTESTCOMPONENT_H
