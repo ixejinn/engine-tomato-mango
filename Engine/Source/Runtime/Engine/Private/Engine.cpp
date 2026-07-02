@@ -83,15 +83,12 @@ namespace tomato {
             // ----------* Rollback and resimulate
 
             ProcessInputEvents(tickClock.GetTick());
-            // EventDispatcher::GetInstance().Update();
 
             // *---------- Simulate and render
             SimContext simCtx{currState_.get(), tickClock.GetTick()};
             garbageCollectionSystem.Update(simCtx);
 
             Simulate(tickClock, simCtx);
-
-            EventDispatcher::GetInstance().Update();
 
             Render(simCtx);
             // ----------* Simulate and render
@@ -126,6 +123,8 @@ namespace tomato {
             simCtx.tick = tc.GetTick();
 
             systemManager_.Simulate(simCtx);
+
+            EventDispatcher::GetInstance().Update();
             currState_->Update();   // !!!!!! temporary !!!!!!
 
             if (network_->GetNetState() == ClientNetworkState::NSS_Playing)

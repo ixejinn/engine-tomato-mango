@@ -115,7 +115,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Systems/IntegrationSystem.h
         Source/Runtime/Engine/Public/Prefab/Prefab.h
         Source/Runtime/Engine/Public/ECS/Systems/GravitySystem.h
-        Source/Runtime/Engine/Private/Prefab/Character/CharacterMovement.h
+        Source/Runtime/Engine/Private/GameObject/Character/CharacterMovement.h
         Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackManager.h
         Source/Runtime/Engine/Public/GameNetwork/Rollback/ComponentTimeline.h
         Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackFwd.h
@@ -154,6 +154,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Server/MatchServer.h
         Source/Runtime/Editor/Public/InspectorPanel.h
         Source/Runtime/Editor/Public/InspectorDraw.h
+		Source/Runtime/Engine/Public/ECS/Components/Character.h
 )
 
 set(ENGINE_SOURCES
@@ -205,7 +206,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Components/Transform.cpp
         Source/Runtime/Engine/Private/Prefab/Prefab.cpp
         Source/Runtime/Engine/Private/ECS/Systems/GravitySystem.cpp
-        Source/Runtime/Engine/Private/Prefab/Character/CharacterMovement.cpp
+        Source/Runtime/Engine/Private/GameObject/Character/CharacterMovement.cpp
         Source/Runtime/Engine/Private/ECS/Systems/GarbageEntityCollectionSystem.cpp
         Source/Runtime/Engine/Private/ECS/Entity/Hierarchy.cpp
         Source/Runtime/Engine/Private/ECS/Entity/Lifetime.cpp

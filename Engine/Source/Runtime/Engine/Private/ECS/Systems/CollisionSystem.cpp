@@ -4,13 +4,14 @@
 #include "SimulationConfig.h"
 #include "ECS/Components/PhysComponents.h"
 #include "ECS/Components/CharComponents.h"
+#include "ECS/Components/Character.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "Collision/CollisionEvent.h"
 #include "Collision/Broad/SAP.h"
 #include "Collision/Narrow/GJK/GJK.h"
 #include "Event/EventDispatcher.h"
-#include "Prefab/Character/CharacterMovement.h"
+#include "GameObject/Character/CharacterMovement.h"
 #include "Utils/Logger.h"
 #include "Utils/RegistryEntry.h"
 REGISTER_SYSTEM(tomato::SystemPhase::Collision, CollisionSystem)
@@ -22,8 +23,7 @@ namespace tomato {
     {
         EventDispatcher::GetInstance().Connect<PenetrationEvent, &CollisionSystem::OnPenetration>();
 
-        EventDispatcher::GetInstance().Connect<TriggerEnterEvent, &CharacterMovement::AfterLanding>();
-        EventDispatcher::GetInstance().Connect<TriggerExitEvent, &CharacterMovement::StartFalling>();
+        EventDispatcher::GetInstance().Connect<ChangeMovementModeEvent, &CharacterMovement::ChangeMovementMode>();
     }
 
     CollisionSystem::~CollisionSystem() = default;
@@ -35,6 +35,8 @@ namespace tomato {
 
         EventDispatcher::GetInstance().Update<PenetrationEvent>();
         ResolveCollision(simCtx.state->GetRegistry());
+
+        EventDispatcher::GetInstance().Update<ChangeMovementModeEvent>();
     }
 
     void CollisionSystem::UpdateAABB(entt::registry& reg)
@@ -179,6 +181,8 @@ namespace tomato {
         auto& registry = simCtx.state->GetRegistry();
         auto& collisionPairs = registry.ctx().get<CollisionContext>().collisionPairs;
 
+        auto& eventDispatcher = EventDispatcher::GetInstance();
+
         for (const auto& candidate : candidates_)
         {
             auto& col1 = registry.get<ColliderComponent>(candidate.a);
@@ -190,22 +194,29 @@ namespace tomato {
                 {
                     // Enter
                     if (col1.isTrigger || col2.isTrigger)
-                        EventDispatcher::GetInstance().Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
+                    {
+                        eventDispatcher.Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
+
+                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, candidate.a)))
+                            eventDispatcher.Enqueue(ChangeMovementModeEvent{candidate.a, &registry, Walking});
+                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, candidate.b)))
+                            eventDispatcher.Enqueue(ChangeMovementModeEvent{candidate.b, &registry, Walking});
+                    }
                     else
                     {
                         events_.emplace_back(candidate.a, candidate.b, result.value());
-                        EventDispatcher::GetInstance().Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &registry, result.value()});
+                        eventDispatcher.Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &registry, result.value()});
                     }
                 }
                 else
                 {
                     // Stay
                     if (col1.isTrigger || col2.isTrigger)
-                        EventDispatcher::GetInstance().Enqueue(TriggerStayEvent{candidate.a, candidate.b, &registry});
+                        eventDispatcher.Enqueue(TriggerStayEvent{candidate.a, candidate.b, &registry});
                     else
                     {
                         events_.emplace_back(candidate.a, candidate.b, result.value());
-                        EventDispatcher::GetInstance().Enqueue(CollisionStayEvent{candidate.a, candidate.b, &registry, result.value()});
+                        eventDispatcher.Enqueue(CollisionStayEvent{candidate.a, candidate.b, &registry, result.value()});
                     }
                 }
 
@@ -222,7 +233,14 @@ namespace tomato {
                 auto& col2 = registry.get<ColliderComponent>(it->first.b);
 
                 if (col1.isTrigger || col2.isTrigger)
+                {
                     EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{it->first.a, it->first.b, &registry});
+
+                    if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.a)))
+                        eventDispatcher.Enqueue(ChangeMovementModeEvent{it->first.a, &registry, Falling});
+                    if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.b)))
+                        eventDispatcher.Enqueue(ChangeMovementModeEvent{it->first.b, &registry, Falling});
+                }
                 else
                     EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{it->first.a, it->first.b, &registry});
 

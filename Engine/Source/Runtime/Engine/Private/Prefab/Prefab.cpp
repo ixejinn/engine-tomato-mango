@@ -1,12 +1,13 @@
 ﻿#include <entt/entt.hpp>
 #include "Prefab/Prefab.h"
-#include "Prefab/Character/CharacterMovement.h"
+#include "GameObject/Character/CharacterMovement.h"
 #include "ECS/Components/CharComponents.h"
 #include "ECS/Components/PhysComponents.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Rollback.h"
 #include "ECS/Components/Nametag.h"
+#include "ECS/Components/Character.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "Resource/AssetHash.h"
 #include "Resource/Render/Mesh.h"
@@ -54,6 +55,7 @@ namespace tomato::Prefab
         reg.emplace<VelocityComponent>(obj);
         reg.emplace<InputChannelComponent>(obj);    //////////////////// 수정
         reg.emplace<MovementComponent>(obj);
+        reg.emplace<CharacterTag>(obj);
         reg.emplace<RollbackEntityTag>(obj);
 
         TMT_INFO << "Create character: " << (int)obj;
