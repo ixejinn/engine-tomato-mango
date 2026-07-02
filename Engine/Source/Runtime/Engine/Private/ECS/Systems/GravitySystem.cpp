@@ -4,7 +4,7 @@
 #include "ECS/Components/Rigidbody.h"
 #include "Utils/Logger.h"
 #include "Utils/RegistryEntry.h"
-REGISTER_SYSTEM(tomato::SystemPhase::Physics, GravitySystem)
+REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Physics, GravitySystem)
 
 namespace tomato
 {

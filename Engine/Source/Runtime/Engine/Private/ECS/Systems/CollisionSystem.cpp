@@ -1,7 +1,6 @@
 ﻿#include <glm/vec3.hpp>
 #include <entt/entt.hpp>
 #include "ECS/Systems/CollisionSystem.h"
-#include "SimulationConfig.h"
 #include "ECS/Components/PhysComponents.h"
 #include "ECS/Components/CharComponents.h"
 #include "ECS/Components/Character.h"
@@ -10,11 +9,12 @@
 #include "Collision/CollisionEvent.h"
 #include "Collision/Broad/SAP.h"
 #include "Collision/Narrow/GJK/GJK.h"
+#include "Simulation/SimulationConfig.h"
 #include "Event/EventDispatcher.h"
 #include "GameObject/Character/CharacterMovement.h"
 #include "Utils/Logger.h"
 #include "Utils/RegistryEntry.h"
-REGISTER_SYSTEM(tomato::SystemPhase::Collision, CollisionSystem)
+REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Collision, CollisionSystem)
 
 namespace tomato {
     CollisionSystem::CollisionSystem()

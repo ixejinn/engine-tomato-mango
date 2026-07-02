@@ -18,7 +18,10 @@ namespace tomato {
     };
 }
 
-#define REGISTER_SYSTEM(PHASE, CLASS)\
+#define REGISTER_BUILT_IN_SYSTEM(PHASE, CLASS)\
     namespace { static tomato::RegistryEntry CLASS##Entry{PHASE, []() { return std::make_unique<tomato::CLASS>(); }}; }
+
+#define REGISTER_SYSTEM(PHASE, CLASS)\
+namespace { static tomato::RegistryEntry CLASS##Entry{PHASE, []() { return std::make_unique<CLASS>(); }}; }
 
 #endif //MANGO_REGISTRYENTRY_H

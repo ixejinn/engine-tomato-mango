@@ -19,7 +19,7 @@
 #include "Services/Window.h"
 
 #include "Utils/RegistryEntry.h"
-REGISTER_SYSTEM(tomato::SystemPhase::ScreenUI, ScreenUIRenderSystem);
+REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::ScreenUI, ScreenUIRenderSystem);
 
 namespace tomato
 {

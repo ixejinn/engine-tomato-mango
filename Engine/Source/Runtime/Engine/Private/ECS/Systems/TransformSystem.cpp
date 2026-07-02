@@ -8,7 +8,7 @@
 #include "ECS/SystemUpdateContexts.h"
 
 #include "Utils/RegistryEntry.h"
-REGISTER_SYSTEM(tomato::SystemPhase::Transformation, TransformSystem)
+REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Transformation, TransformSystem)
 
 namespace tomato
 {

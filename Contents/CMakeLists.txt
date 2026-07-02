@@ -10,6 +10,7 @@ set(CONTENTS_SOURCES
         Source/LoadState.cpp
         Source/CollisionTestComponent.h
         Source/UIController.cpp
+        Source/TimerTestSystem.cpp
 )
 
 add_executable(contents

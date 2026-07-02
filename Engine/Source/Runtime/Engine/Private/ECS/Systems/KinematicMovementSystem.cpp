@@ -7,7 +7,7 @@
 #include "ECS/SystemUpdateContexts.h"
 #include "Utils/BitmaskOperators.h"
 #include "Utils/RegistryEntry.h"
-REGISTER_SYSTEM(tomato::SystemPhase::Input, KinematicMovementSystem)
+REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Input, KinematicMovementSystem)
 
 namespace tomato {
     void KinematicMovementSystem::Update(SimContext &simCtx)

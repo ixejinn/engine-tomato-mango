@@ -43,7 +43,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Systems/CameraSystem.h
         Source/Runtime/Engine/Public/ECS/Systems/System.h
         Source/Runtime/Engine/Public/Engine.h
-        Source/Runtime/Engine/Public/SimulationConfig.h
+		Source/Runtime/Engine/Public/Simulation/SimulationConfig.h
         Source/Runtime/Engine/Public/Services/Window.h
         Source/Runtime/Engine/Public/Services/ServiceFwd.h
         Source/Runtime/Engine/Public/Event/EventDispatcher.h
@@ -56,8 +56,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Input/KeyConstants.h
         Source/Runtime/Engine/Public/Input/InputEventFwd.h
         Source/Runtime/Engine/Public/Services/Input.h
-        Source/Runtime/Engine/Public/Tick/TickClock.h
-        Source/Runtime/Engine/Public/Tick/TickFwd.h
+        Source/Runtime/Engine/Public/Simulation/Tick/TickClock.h
+        Source/Runtime/Engine/Public/Simulation/Tick/TickFwd.h
         Source/Runtime/Engine/Public/State/DefaultState.h
         Source/Runtime/Engine/Public/GameplayConfig.h
         Source/Runtime/Engine/Public/State/StateFwd.h
@@ -155,6 +155,9 @@ set(ENGINE_HEADERS
         Source/Runtime/Editor/Public/InspectorPanel.h
         Source/Runtime/Editor/Public/InspectorDraw.h
 		Source/Runtime/Engine/Public/ECS/Components/Character.h
+		Source/Runtime/Core/Public/Clock/Timer.h
+		../Contents/Source/TimerTestComponent.h
+		../Contents/Source/TimerTestSystem.h
 )
 
 set(ENGINE_SOURCES
@@ -165,7 +168,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Services/Window.cpp
         Source/Runtime/Engine/Private/Input/InputRecorder.cpp
         Source/Runtime/Engine/Private/Services/Input.cpp
-        Source/Runtime/Engine/Private/Tick/TickClock.cpp
+		Source/Runtime/Engine/Private/Simulation/Tick/TickClock.cpp
         Source/Runtime/Engine/Private/ECS/Systems/CollisionSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/KinematicMovementSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/RenderSystem.cpp
@@ -227,6 +230,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Server/MatchServer.cpp
         Source/Runtime/Editor/Private/InspectorPanel.cpp
         Source/Runtime/Editor/Private/InspectorDraw.cpp
+		Source/Runtime/Core/Private/Clock/Timer.cpp
 )
 
 add_library(engine STATIC

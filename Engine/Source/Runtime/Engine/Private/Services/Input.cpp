@@ -2,7 +2,7 @@
 #include "Services/Window.h"
 #include "Input/InputRecorder.h"
 #include "Input/InputUI.h"
-#include "Tick/TickClock.h"
+#include "Simulation/Tick/TickClock.h"
 #include "Utils/Logger.h"
 #include <GLFW/glfw3.h>
 

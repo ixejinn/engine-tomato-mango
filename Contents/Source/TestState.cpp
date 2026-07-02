@@ -17,8 +17,10 @@
 #include "Prefab/Prefab.h"
 #include "Prefab/UIPrefab.h"
 #include "Serialization/ComponentSerializer.h"
+#include "TimerTestComponent.h"
 
 using namespace tomato;
+using namespace std::chrono_literals;
 
 void TestState::Init() {
     //// Audio test
@@ -80,15 +82,48 @@ void TestState::Init() {
     auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
     uiCmp1.sortOrder = 1;
 
-    auto btn = UIPrefab::CreateButton(registry_, { 0.f, -10.f });
-    auto& btnuiCmp = registry_.get<UIComponent>(btn);
-    btnuiCmp.sortOrder = 100;
-    auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
-    mouseEvt.onClick =
-        [this](const MouseClickEvent& e)
+    // auto btn = UIPrefab::CreateButton(registry_, { 0.f, -10.f });
+    // auto& btnuiCmp = registry_.get<UIComponent>(btn);
+    // btnuiCmp.sortOrder = 100;
+    // auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
+    // mouseEvt.onClick =
+    //     [this](const MouseClickEvent& e)
+    //     {
+    //         uiController_.onClick(e);
+    //     };
+
+    auto tBtn = UIPrefab::CreateButton(registry_, { 0.f, -10.f });
+    auto& tBtnUIComp = registry_.get<UIComponent>(tBtn);
+    tBtnUIComp.sortOrder = 100;
+    auto& tMouseEvt = registry_.get<MouseEventComponent>(tBtn);
+    auto& timerComp = registry_.emplace<TimerTestComponent>(tBtn);
+    if (timerComp.timer.SetTimer(0h, 0min, 10s))
+        TMT_INFO << "set timer";
+    tMouseEvt.onClick = [&](const MouseClickEvent& e)
+    {
+        if (auto* timer = registry_.try_get<TimerTestComponent>(e.e))
         {
-            uiController_.onClick(e);
-        };
+            switch (timer->timer.GetState())
+            {
+            case Timer::Idle:
+                TMT_INFO << "   *** Timer start ***";
+                timer->timer.Start();
+                break;
+            case Timer::Running:
+                timer->timer.Pause();
+                break;
+            case Timer::Paused:
+                timer->timer.Start();
+                break;
+            case Timer::Finished:
+                timer->timer.Reset();
+                break;
+            default:
+                break;
+            }
+        }
+    };
+
 
     UIPrefab::CreateText(registry_, { 100.f, 0.f });
     UIPrefab::CreateImage(registry_, "Resources/Contents/WATER_GAME_LOGO.png", { 200.f, 300.f });

@@ -9,7 +9,7 @@
 #include "Prefab/EntityUtils.h"
 
 #include "Utils/RegistryEntry.h"
-REGISTER_SYSTEM(tomato::SystemPhase::UITransformation, UITransformSystem)
+REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::UITransformation, UITransformSystem)
 
 namespace tomato
 {

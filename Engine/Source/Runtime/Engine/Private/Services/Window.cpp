@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 #include "Services/Window.h"
 #include "Utils/Logger.h"
-#include "Tick/TickClock.h"
+#include "Simulation/Tick/TickClock.h"
 
 namespace tomato {
     int Window::width_ = 0;

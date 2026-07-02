@@ -2,7 +2,7 @@
 #define MANGO_TICKCLOCK_H
 
 #include <chrono>
-#include "SimulationConfig.h"
+#include "../SimulationConfig.h"
 
 namespace tomato {
     class TickClock {
@@ -15,7 +15,6 @@ namespace tomato {
         void ResetTick();
 
     private:
-        static constexpr int MAX_SIMULATION_NUM = 3;
         static constexpr std::chrono::duration<float, std::milli> dt_{1000.f / FRAME_PER_SECOND};
 
         uint32_t tick_{0};

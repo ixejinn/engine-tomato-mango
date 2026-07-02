@@ -3,9 +3,9 @@
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/SystemUpdateContexts.h"
-#include "SimulationConfig.h"
+#include "Simulation/SimulationConfig.h"
 #include "Utils/RegistryEntry.h"
-REGISTER_SYSTEM(tomato::SystemPhase::Integration, IntegrationSystem)
+REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Integration, IntegrationSystem)
 
 namespace tomato
 {

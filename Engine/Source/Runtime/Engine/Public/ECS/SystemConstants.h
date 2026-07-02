@@ -10,6 +10,7 @@ namespace tomato
         Input = 0,
         Physics,
         Collision,
+        Logic,
         Integration,
         Transformation,
         UI,
@@ -25,6 +26,7 @@ namespace tomato
         SystemPhase::Input,
         SystemPhase::Physics,
         SystemPhase::Collision,
+        SystemPhase::Logic,
         SystemPhase::Integration,
         SystemPhase::Transformation,
     };

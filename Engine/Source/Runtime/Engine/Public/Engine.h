@@ -11,7 +11,7 @@
 #include "Network/ClientNetwork.h"
 #include "GameNetwork/GamePlayNetSystem.h"
 #include "GameNetwork/Rollback/RollbackManager.h"
-#include "Tick/TickFwd.h"
+#include "Simulation/Tick/TickFwd.h"
 #include "Editor.h"
 
 namespace tomato
