@@ -43,7 +43,13 @@ namespace tomato::Serialization
 	void ComponentRegistry::InitInspector()
 	{
 		//@Warning : Must initialize ComponentRegistry::Init() first.
+		RegisterInspector<CameraComponent>("Camera", DrawCameraInspcetor);
+		//RegisterInspector<InputChannelComponent>("InputChannel", DrawInputChannelInspcetor);
 		RegisterInspector<TransformComponent>("Transform", DrawTransformInspector);
+		RegisterInspector<MovementComponent>("Movement", DrawMovementInspector);
+		RegisterInspector<VelocityComponent>("Velocity", DrawVelocityInspector);
+		RegisterInspector<ColliderComponent>("Collider", DrawColliderInspector);
+		RegisterInspector<RenderComponent>("Render", DrawRenderInspector);
 	}
 
 	const ComponentInfo* ComponentRegistry::FindComponentInfo(const std::string& name) const

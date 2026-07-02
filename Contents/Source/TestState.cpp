@@ -97,6 +97,8 @@ void TestState::Init() {
 
     EventDispatcher::GetInstance().Connect<CollisionEnterEvent, &TEST_CollisionEnter>();
     EventDispatcher::GetInstance().Connect<CollisionExitEvent, &TEST_CollisionExit>();
+
+    //std::cout << AssetRegistry<Audio>::GetInstance().GetName(id);
 }
 
 void TestState::Update() {

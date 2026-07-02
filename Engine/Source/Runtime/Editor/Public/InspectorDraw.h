@@ -9,10 +9,16 @@ namespace tomato
 {
 	struct EditorContext;
 
+	void DrawCameraInspcetor(EditorContext&, entt::registry&, CameraComponent&);
 	void DrawTransformInspector(EditorContext&, entt::registry&, TransformComponent&);
+	void DrawMovementInspector(EditorContext&, entt::registry&, MovementComponent&);
+	void DrawVelocityInspector(EditorContext&, entt::registry&, VelocityComponent&);
+	void DrawColliderInspector(EditorContext&, entt::registry&, ColliderComponent&);
+	void DrawRenderInspector(EditorContext&, entt::registry&, RenderComponent&);
+
 	
 	
-	bool DrawVec3Control(const char* label, float* vec);
+	bool DrawVec3Control(const char* label, float* vec, int flags = 0);
 }
 
 

@@ -194,11 +194,13 @@ namespace tomato::Serialization
 	void Save(json& data, const InputChannelComponent& channel)
 	{
 		data["channel"] = channel.channel;
+		data["1P"] = channel.is1P;
 	}
 
 	void Load(const json& data, InputChannelComponent& channel)
 	{
 		channel.channel = data["channel"];
+		channel.is1P = data["1P"];
 	}
 
 	void Load(const json& data, TransformComponent& transform)
