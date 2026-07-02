@@ -1,5 +1,5 @@
-﻿#ifndef MANGO_ENTITYPANEL_H
-#define MANGO_ENTITYPANEL_H
+﻿#ifndef MANGO_HIERARCHYPANEL_H
+#define MANGO_HIERARCHYPANEL_H
 
 #include "EditorPanel.h"
 
@@ -8,15 +8,15 @@ namespace tomato
 	class HierarchyPanel : public EditorPanel
 	{
 	public:
+		HierarchyPanel(bool open) : EditorPanel(open) {}
+
 		void Draw(EditorContext&) override;
 
-		const char* GetName() const { return "EntityPanel"; }
-
-		bool isOpened() const { return open; }
+		const char* GetName() const { return "HierarchyPanel"; }
 
 	private:
-		bool open{ true };
+		void Traverse(EditorContext& editorCtx, entt::entity e);
 	};
 }
 
-#endif // !MANGO_ENTITYPANEL_H
+#endif // !MANGO_HIERARCHYPANEL_H

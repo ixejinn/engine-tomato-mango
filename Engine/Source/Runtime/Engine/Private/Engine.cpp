@@ -15,11 +15,11 @@ namespace tomato {
         , input_(window_, inputRecorder_, inputUI_)
         , netMode_(netMode)
     {
-        Serialization::ComponentRegistry::GetInstance().Init();
-
         InitializeNetwork();
-
         editor_.InitImGui(window_.GetHandle());
+
+        Serialization::ComponentRegistry::GetInstance().Init();
+        Serialization::ComponentRegistry::GetInstance().InitInspector();
     }
 
     Engine::~Engine()

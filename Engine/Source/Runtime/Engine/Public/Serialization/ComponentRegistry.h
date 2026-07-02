@@ -9,6 +9,8 @@
 #include "Serialization/ComponentInfo.h"
 #include "Serialization/ComponentSerializer.h"
 
+#include "InspectorDraw.h"
+
 namespace tomato::Serialization
 {
 	struct ComponentRegistry
@@ -27,9 +29,13 @@ namespace tomato::Serialization
 		}
 
 		void Init();
+		void InitInspector();
 
 		template<typename T>
 		void RegisterComponent(const std::string& name);
+
+		template<typename T>
+		void RegisterInspector(const std::string& name, void (*draw)(EditorContext&, entt::registry&, T&));
 
 		const auto& GetComponentInfo() const
 		{
@@ -90,6 +96,18 @@ namespace tomato::Serialization
 
 		nameToIndex_[name] = componentInfo_.size();
 		componentInfo_.push_back(std::move(info));
+	}
+
+	template<typename T>
+	void tomato::Serialization::ComponentRegistry::RegisterInspector
+		(const std::string& name, void (*draw)(EditorContext&, entt::registry&, T&))
+	{
+		auto& component = componentInfo_[nameToIndex_[name]];
+		component.Draw =
+			[draw](EditorContext& eCtx, entt::registry& reg, entt::entity e)
+			{
+				draw(eCtx, reg, reg.get<T>(e));
+			};
 	}
 }
 

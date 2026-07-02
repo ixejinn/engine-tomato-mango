@@ -9,6 +9,7 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Rigidbody.h"
+#include "ECS/Components/Collision.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
@@ -268,6 +269,21 @@ namespace tomato::Serialization
 		};
 	}
 
+	void Save(json& data, const ColliderComponent& collider)
+	{
+		data["layer"] = collider.layer;
+		data["type"] =  collider.type;
+		data["trigger"] = collider.isTrigger;
+	}
+
+	void Load(const json& data, ColliderComponent& collider)
+	{
+		collider.layer = data["layer"];
+		collider.type = data["type"];
+		collider.isTrigger = data["trigger"];
+	}
+
+	
 	void Save(json& data, const UIComponent& ui)
 	{
 		data["canvas"] = ui.canvas;

@@ -1,5 +1,7 @@
 ﻿#include "Editor.h"
 
+#include <entt/entt.hpp>
+
 #include "GLFW/glfw3.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -9,6 +11,7 @@
 
 #include "EditorPanel.h"
 #include "HierarchyPanel.h"
+#include "InspectorPanel.h"
 
 namespace tomato
 {
@@ -41,7 +44,9 @@ namespace tomato
 			&config,
 			io.Fonts->GetGlyphRangesKorean());
 
-		panels.push_back(std::make_unique<HierarchyPanel>());
+		eCtx.selectedEntity = entt::null;
+		panels.push_back(std::make_unique<HierarchyPanel>(true));
+		panels.push_back(std::make_unique<InspectorPanel>(true));
 	}
 
 	void Editor::ShutdownImGui()
@@ -60,12 +65,13 @@ namespace tomato
 
 	void Editor::Draw(State* state)
 	{
-#if 0
+#if 1
 		ImGui::ShowDemoWindow();
-#elif 1
 		eCtx.currentState = state;
 		for (auto& panel : panels)
 			panel->Draw(eCtx);
+		
+#elif 1
 #endif
 	}
 

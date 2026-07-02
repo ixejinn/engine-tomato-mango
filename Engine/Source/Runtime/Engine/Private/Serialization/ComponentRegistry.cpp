@@ -4,6 +4,7 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Rigidbody.h"
+#include "ECS/Components/Collision.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
@@ -22,6 +23,7 @@ namespace tomato::Serialization
 		RegisterComponent<TransformComponent>("Transform");
 		RegisterComponent<MovementComponent>("Movement");
 		RegisterComponent<VelocityComponent>("Velocity");
+		RegisterComponent<ColliderComponent>("Collider");
 		RegisterComponent<RenderComponent>("Render");
 		RegisterComponent<UIComponent>("UI");
 		RegisterComponent<CanvasComponent>("Canvas");
@@ -36,6 +38,12 @@ namespace tomato::Serialization
 
 
 		initialized = true;
+	}
+
+	void ComponentRegistry::InitInspector()
+	{
+		//@Warning : Must initialize ComponentRegistry::Init() first.
+		RegisterInspector<TransformComponent>("Transform", DrawTransformInspector);
 	}
 
 	const ComponentInfo* ComponentRegistry::FindComponentInfo(const std::string& name) const

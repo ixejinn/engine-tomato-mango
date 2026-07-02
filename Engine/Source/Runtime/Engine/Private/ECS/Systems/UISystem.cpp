@@ -181,15 +181,16 @@ namespace tomato
 					auto& target = registry.get<TargetComponent>(entity);
 					auto& targetTransform = registry.get<TransformComponent>(GetEntityByUUID(registry, target.target));
 
-					// if (!ctx.registry.ctx().get<RenderContext*>())
-					// 	return;
-					auto& renderCtx = registry.ctx().get<RenderContext>();
-					if (renderCtx.mainCam == entt::null)
+					 if (!registry.ctx().find<RenderContext*>())
+					 	continue;
+					auto renderCtx = registry.ctx().get<RenderContext*>();
+					if (renderCtx->mainCam == entt::null)
+
 					{
 						TMT_WARN << "Main camera not present";
 						continue;
 					}
-					auto viewProjMat = registry.try_get<CameraComponent>(renderCtx.mainCam)->viewProjMat;
+					auto viewProjMat = registry.try_get<CameraComponent>(renderCtx->mainCam)->viewProjMat;
 
 					glm::vec3 screenPos = WorldToScreen(targetTransform.GetWorldPosition(), viewProjMat, Window::GetWidth(), Window::GetHeight());
 					rect.position = screenPos + target.headOffset;

@@ -15,6 +15,8 @@ namespace tomato
 	class EditorPanel
 	{
 	public:
+		EditorPanel(bool open) : open(open) {}
+
 		virtual const char* GetName() const = 0;
 		virtual void Draw(EditorContext&) = 0;
 
