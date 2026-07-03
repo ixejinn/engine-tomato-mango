@@ -3,11 +3,9 @@
 
 #include <chrono>
 #include <ratio>
-#include "Simulation/SimulationConfig.h"
+#include "Simulation/Tick/TickFwd.h"
 
 namespace tomato {
-    using Tick = std::chrono::duration<int64_t, std::ratio<1, FRAME_PER_SECOND>>;
-
     class TickClock {
     public:
         [[nodiscard]] int64_t GetTick() const { return tick_.count(); }

@@ -105,21 +105,21 @@ void TestState::Init() {
         {
             switch (timer->timer.GetState())
             {
-            case Timer::Idle:
-                TMT_INFO << "   *** Timer start ***";
-                timer->timer.Start();
-                break;
-            case Timer::Running:
-                timer->timer.Pause();
-                break;
-            case Timer::Paused:
-                timer->timer.Start();
-                break;
-            case Timer::Finished:
-                timer->timer.Reset();
-                break;
-            default:
-                break;
+                case TimerState::Idle:
+                    TMT_INFO << "   *** Timer start ***";
+                    timer->timer.Start(e.tick);
+                    break;
+                case TimerState::Running:
+                    timer->timer.Pause(e.tick);
+                    break;
+                case TimerState::Paused:
+                    timer->timer.Start(e.tick);
+                    break;
+                case TimerState::Finished:
+                    timer->timer.Reset();
+                    break;
+                default:
+                    break;
             }
         }
     };

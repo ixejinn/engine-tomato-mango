@@ -158,6 +158,8 @@ set(ENGINE_HEADERS
 		Source/Runtime/Core/Public/Clock/Timer.h
 		../Contents/Source/TimerTestComponent.h
 		../Contents/Source/TimerTestSystem.h
+		Source/Runtime/Core/Public/Clock/TickTimer.h
+		Source/Runtime/Core/Public/Clock/TimerState.h
 )
 
 set(ENGINE_SOURCES
@@ -231,6 +233,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Editor/Private/InspectorPanel.cpp
         Source/Runtime/Editor/Private/InspectorDraw.cpp
 		Source/Runtime/Core/Private/Clock/Timer.cpp
+		Source/Runtime/Core/Private/Clock/TickTimer.cpp
 )
 
 add_library(engine STATIC

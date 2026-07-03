@@ -19,18 +19,18 @@ void TimerTestSystem::Update(SimContext& simCtx)
     {
         if (auto* text = reg.try_get<TextComponent>(hierarchy.children.front()))
         {
-            text->text = ttc.timer.GetString();
+            text->text = ttc.timer.GetString(simCtx.tick);
             text->dirty = true;
         }
         else
             TMT_INFO << "other children";
 
-        if (ttc.timer.IsTimeUp())
+        if (ttc.timer.IsTimeUp(simCtx.tick))
         {
             TMT_INFO << "time up";
             std::random_device rd;
             std::mt19937 gen(rd());
-            std::uniform_int_distribution<uint8_t> dis(0, 255);
+            std::uniform_int_distribution<int> dis(0, 255);
 
             render.color = glm::vec4(dis(gen)/255.f, dis(gen)/255.f, dis(gen)/255.f, 1.f);
         }

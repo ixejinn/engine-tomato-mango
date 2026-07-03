@@ -2,21 +2,13 @@
 #define MANGO_TIMER_H
 
 #include <chrono>
+#include "Clock/TimerState.h"
 
 namespace tomato
 {
     class Timer
     {
     public:
-        enum State
-        {
-            Idle,
-            Running,
-            Paused,
-            TimeUp,
-            Finished
-        };
-
         Timer() = default;
         Timer(std::chrono::hours hr, std::chrono::minutes min, std::chrono::seconds sec)
         {
@@ -24,7 +16,7 @@ namespace tomato
             duration_ = goal_;
         }
 
-        State GetState() const { return state_; }
+        TimerState GetState() const { return state_; }
 
         [[nodiscard]] bool IsTimeUp();
         std::string GetString(bool padMinutes = false, bool showHours = false);
@@ -55,7 +47,7 @@ namespace tomato
         std::chrono::milliseconds duration_{0};
         std::chrono::steady_clock::time_point latest_;
 
-        State state_{Idle};
+        TimerState state_{Idle};
     };
 }
 

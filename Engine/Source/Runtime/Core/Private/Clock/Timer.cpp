@@ -6,18 +6,28 @@ namespace tomato
 {
     bool Timer::IsTimeUp()
     {
-        switch (state_)
-        {
-        case Running:
+        if (state_ == Running)
             Update();
-            break;
-        case TimeUp:
+
+        if (state_ == TimeUp)
+        {
             state_ = Finished;
             return true;
-        default:
-            break;
         }
+
         return false;
+//        switch (state_)
+//        {
+//        case Running:
+//            Update();
+//            break;
+//        case TimeUp:
+//            state_ = Finished;
+//            return true;
+//        default:
+//            break;
+//        }
+//        return false;
     }
 
     std::string Timer::GetString(bool padMinutes, bool showHours)
@@ -70,10 +80,8 @@ namespace tomato
         if (state_ != Paused && state_ != Running)
         {
             goal_ = (hr + min + sec);
-            duration_ = goal_;
+            Reset();
             return true;
-
-            state_ = Idle;
         }
         return false;
     }

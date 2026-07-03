@@ -9,6 +9,7 @@ namespace tomato
 	{
 		entt::entity e;
 		entt::registry* reg;
+        int64_t tick;
 	};
 
 	using UIMouseEventCallBack = std::function<void(const MouseClickEvent&)>;

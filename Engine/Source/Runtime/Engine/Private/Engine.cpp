@@ -57,8 +57,6 @@ namespace tomato {
     void Engine::Run()
     {
         TickClock tickClock;
-        Timer timer{0h, 0min, 1s};
-        timer.Start();
         window_.SetWindowUserPointer(input_, tickClock);
         GarbageEntityCollectionSystem garbageCollectionSystem;
 
@@ -94,9 +92,6 @@ namespace tomato {
             garbageCollectionSystem.Update(simCtx);
 
             Simulate(tickClock, simCtx);
-
-            if (timer.IsTimeUp())
-                std::cout << "0000000000000000000";
 
             Render(simCtx);
             // ----------* Simulate and render

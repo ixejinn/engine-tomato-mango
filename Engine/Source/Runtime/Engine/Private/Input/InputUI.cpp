@@ -39,7 +39,7 @@ namespace tomato
 			render.color = selectable.normalColor;
 
 			if (pressed == currentHovered && mouseEvnt.onClick)
-				mouseEvnt.onClick(MouseClickEvent{ currentHovered, &r });
+				mouseEvnt.onClick(MouseClickEvent{ currentHovered, &r , mouseEvent.tick});
 		}
 
 		return false;
