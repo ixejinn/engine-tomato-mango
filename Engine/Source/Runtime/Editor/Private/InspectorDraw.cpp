@@ -9,9 +9,11 @@
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
+#include "Resource/Render/Font.h"
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
+#include "imgui_stdlib.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
@@ -134,13 +136,8 @@ namespace tomato
 		}
 
 		ImGui::SeparatorText("Trigger");
-		if (ImGui::RadioButton("T", collider.isTrigger == true))
-			collider.isTrigger = true;
-
-		ImGui::SameLine();
-
-		if (ImGui::RadioButton("F", collider.isTrigger == false))
-			collider.isTrigger = false;
+		ImGui::Text("Trigger"); ImGui::SameLine();
+		ImGui::Checkbox("##Trigger", &collider.isTrigger);
 
 		ImGui::NewLine();
 	}
@@ -174,7 +171,7 @@ namespace tomato
 			auto endIt = AssetRegistry<Shader>::GetInstance().GetNameMapEnd();
 			for (it; it != endIt; it++)
 			{
-				if (ImGui::Selectable(it->second, render.shader == it->first))
+				if (ImGui::Selectable(it->second.c_str(), render.shader == it->first))
 					render.shader = it->first;
 			}
 			ImGui::EndCombo();
@@ -188,7 +185,7 @@ namespace tomato
 			auto endIt = AssetRegistry<Texture>::GetInstance().GetNameMapEnd();
 			for (it; it != endIt; it++)
 			{
-				if (ImGui::Selectable(it->second, render.texture == it->first))
+				if (ImGui::Selectable(it->second.c_str(), render.texture == it->first))
 					render.texture = it->first;
 			}
 			ImGui::EndCombo();
@@ -259,41 +256,158 @@ namespace tomato
 
 	void DrawRectTransformInspector(EditorContext& eCtx, entt::registry& reg, RectTransformComponent& rect)
 	{
+		auto ui = reg.try_get<UIComponent>(eCtx.selectedEntity);
+
 		if (rect.anchorMin == rect.anchorMax)
 		{
 			ImGui::SeparatorText("Position");
-			ImGui::DragFloat2("##anchoredPos", glm::value_ptr(rect.anchoredPosition));
+			ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(60.f);
+			ImGui::DragFloat("##anchoredPosx", &rect.anchoredPosition.x, 1.f, 0.f, 0.f, "%g"); ImGui::SameLine();
+			ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(60.f);
+			ImGui::DragFloat("##anchoredPosy", &rect.anchoredPosition.y, 1.f, 0.f, 0.f, "%g");
+
+			if (ui && ui->type != UIType::Text)
+			{
+				ImGui::SeparatorText("Size");
+				ImGui::Text("Width"); ImGui::SameLine(); ImGui::SetCursorPosX(95.f);
+				ImGui::Text("Height"); ImGui::SetNextItemWidth(80.f);
+				ImGui::DragFloat("##sizewidth", &rect.sizeDelta.x, 1.f, 0.f, 0.f, "%g");
+				ImGui::SameLine(); ImGui::SetNextItemWidth(80.f);
+				ImGui::DragFloat("##sizeheight", &rect.sizeDelta.y, 1.f, 0.f, 0.f, "%g");
+			}
 
 			ImGui::SeparatorText("Offset");
-			ImGui::DragFloat2("OMin", glm::value_ptr(rect.offsetMin));
-			ImGui::DragFloat2("OMax", glm::value_ptr(rect.offsetMax));
+			ImGui::Text("Min"); ImGui::SameLine(); ImGui::SetCursorPosX(50.f); ImGui::SameLine();
+			ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
+			ImGui::DragFloat("##offsetMinX", &rect.offsetMin.x, 0.1f, 0.f, 1.f, "%.1f"); ImGui::SameLine();
+			ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
+			ImGui::DragFloat("##offsetMinY", &rect.offsetMin.y, 0.1f, 0.f, 1.f, "%.1f");
 
-			ImGui::SeparatorText("Size");
-			ImGui::DragFloat2("##size", glm::value_ptr(rect.sizeDelta));
+			ImGui::Text("Max");ImGui::SameLine(); ImGui::SetCursorPosX(40.f); ImGui::SameLine();
+			ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f); ImGui::SameLine();
+			ImGui::DragFloat("##offsetMaxX", &rect.offsetMax.x, 0.1f, 0.f, 1.f, "%.1f"); ImGui::SameLine();
+			ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
+			ImGui::DragFloat("##offsetMaxY", &rect.offsetMax.x, 0.1f, 0.f, 1.f, "%.1f");
 
 		}
 		else
 		{
-			float offsetRight{ rect.offsetMax.x }, offsetTop{ rect.offsetMax.y };
+			float offsetRight{ std::abs(rect.offsetMax.x) }, offsetTop{ std::abs(rect.offsetMax.y) };
+
 			ImGui::SeparatorText("Margin"); // Offset? Margin?
-			ImGui::SetNextItemWidth(200.f);
-			ImGui::InputFloat("Left", &rect.offsetMin.x, 0.0f, 0.0f, "%.2f"); ImGui::SameLine();
-			ImGui::SetNextItemWidth(200.f);
-			ImGui::InputFloat("Bottom", &rect.offsetMin.y, 0.0f, 0.0f, "%.2f"); //@TODO : minus
-			ImGui::SetNextItemWidth(200.f);
-			if(ImGui::InputFloat("Right", &offsetRight, 0.0f, 0.0f, "%.2f"))
+			ImGui::Text("Left");
+			ImGui::SameLine(); ImGui::SetCursorPosX(95.f);
+			ImGui::Text("Top");
+
+			ImGui::SetNextItemWidth(80.f);
+			ImGui::InputFloat("##Left", &rect.offsetMin.x, 0.0f, 0.0f, "%g"); ImGui::SameLine();
+			ImGui::SetNextItemWidth(80.f);
+			if (ImGui::InputFloat("##Top", &offsetTop, 0.0f, 0.0f, "%g"))
+				rect.offsetMax.y = -offsetTop;
+
+			ImGui::Text("Right");
+			ImGui::SameLine(); ImGui::SetCursorPosX(95.f);
+			ImGui::Text("Bottom");
+			ImGui::SetNextItemWidth(80.f);
+
+			if(ImGui::InputFloat("##Right", &offsetRight, 0.0f, 0.0f, "%g"))
 				rect.offsetMax.x = -offsetRight;
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(200.f);
-			ImGui::InputFloat("Top", &rect.offsetMax.y, 0.0f, 0.0f, "%.2f");
+			ImGui::SameLine(); ImGui::SetNextItemWidth(80.f);
+			ImGui::InputFloat("##Bottom", &rect.offsetMin.y, 0.0f, 0.0f, "%g");
 		}
 
 		ImGui::SeparatorText("Anchor");
-		ImGui::DragFloat2("AMin", glm::value_ptr(rect.anchorMin));
-		ImGui::DragFloat2("AMax", glm::value_ptr(rect.anchorMax));
+		ImGui::Text("Min"); ImGui::SameLine(); ImGui::SetCursorPosX(50.f); ImGui::SameLine();
+		ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
+		ImGui::DragFloat("##anchorMinX", &rect.anchorMin.x, 0.1f, 0.f, 1.f, "%.1f"); ImGui::SameLine();
+		ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
+		ImGui::DragFloat("##anchorMinY", &rect.anchorMin.y, 0.1f, 0.f, 1.f, "%.1f");
+
+		ImGui::Text("Max");ImGui::SameLine(); ImGui::SetCursorPosX(40.f); ImGui::SameLine();
+		ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
+		ImGui::DragFloat("##anchorMaxX", &rect.anchorMax.x, 0.1f, 0.f, 1.f, "%.1f"); ImGui::SameLine();
+		ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
+		ImGui::DragFloat("##anchorMaxY", &rect.anchorMax.y, 0.1f, 0.f, 1.f, "%.1f");
 
 		ImGui::SeparatorText("Pivot");
-		ImGui::DragFloat2("##pivot", glm::value_ptr(rect.pivot));
+		ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(60.f);
+		ImGui::DragFloat("##pivotx", &rect.pivot.x, 0.1f, 0.f, 1.f, "%.1f"); ImGui::SameLine();
+		ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(60.f);
+		ImGui::DragFloat("##pivoty", &rect.pivot.y, 0.1f, 0.f, 1.f, "%.1f");
+
+		ImGui::NewLine();
+	}
+
+	void DrawTextInspector(EditorContext& eCtx, entt::registry& reg, TextComponent& text)
+	{
+		ImGui::SeparatorText("Text");
+		if (ImGui::InputText("##text", &text.text))
+			text.dirty = true;
+
+		ImGui::SeparatorText("Color");
+		ImGui::ColorEdit4("##textcolor", glm::value_ptr(text.color));
+
+		ImGui::SeparatorText("Size");
+		ImGui::DragFloat("##fontSize", &text.fontSize, 1.f, 0.0f, 0.0f, "%g");
+
+		auto beginIt = AssetRegistry<Font>::GetInstance().GetNameMapBegin();
+		auto endIt = AssetRegistry<Font>::GetInstance().GetNameMapEnd();
+		const char* fontPreview = AssetRegistry<Font>::GetInstance().GetName(text.font);
+		if (ImGui::BeginCombo("##fontCombo", fontPreview))
+		{
+			for (beginIt; beginIt != endIt; ++beginIt)
+			{
+				if (ImGui::Selectable(beginIt->second.c_str(), text.font == beginIt->first))
+				{
+					text.font = beginIt->first;
+					text.dirty = true;
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::NewLine();
+	}
+
+	void DrawTargetInspector(EditorContext& eCtx, entt::registry& reg, TargetComponent& target)
+	{
+		ImGui::SeparatorText("Target");
+		
+		entt::entity targetEntity = GetEntityByUUID(reg, target.target);
+		const char* namePreview = reg.try_get<NametagComponent>(targetEntity)->name.c_str();
+		if (ImGui::BeginCombo("##entityCombo", namePreview))
+		{
+			auto view = reg.view<NametagComponent, TransformComponent>();
+			for (auto [e, tag, transform] : view.each())
+			{
+				if (ImGui::Selectable(tag.name.c_str(), target.target == tag.id))
+					target.target = tag.id;
+			}
+			ImGui::EndCombo();
+		}
+
+		DrawVec3Control("Offset", glm::value_ptr(target.headOffset));
+
+		ImGui::NewLine();
+	}
+
+	void DrawSelectableInspector(EditorContext& eCtx, entt::registry& reg, SelectableComponent& selectable)
+	{
+		ImGui::SeparatorText("Interactable");
+		ImGui::Text("Interactable"); ImGui::SameLine();
+		ImGui::Checkbox("##interactable", &selectable.interactable);
+
+		ImGui::SeparatorText("Normal Color");
+		//ImGui::Text("Normal Color"); ImGui::SameLine();
+		ImGui::ColorEdit4("##normalcolor", glm::value_ptr(selectable.normalColor));
+
+		ImGui::SeparatorText("Highlighted Color");
+		//ImGui::Text("Highlighted Color"); ImGui::SameLine();
+		ImGui::ColorEdit4("##highlightedColor", glm::value_ptr(selectable.highlightedColor));
+
+		ImGui::SeparatorText("Pressed Color");
+		//ImGui::Text("Pressed Color"); ImGui::SameLine();
+		ImGui::ColorEdit4("##pressedColor", glm::value_ptr(selectable.pressedColor));
 
 		ImGui::NewLine();
 	}

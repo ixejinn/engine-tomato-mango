@@ -53,6 +53,9 @@ namespace tomato::Serialization
 		RegisterInspector<UIComponent>("UI", DrawUIInspector);
 		RegisterInspector<CanvasComponent>("Canvas", DrawCanvasInspector);
 		RegisterInspector<RectTransformComponent>("RectTransform", DrawRectTransformInspector);
+		RegisterInspector<TextComponent>("Text", DrawTextInspector);
+		RegisterInspector<TargetComponent>("Target", DrawTargetInspector);
+		RegisterInspector<SelectableComponent>("Selectable", DrawSelectableInspector);
 	}
 
 	const ComponentInfo* ComponentRegistry::FindComponentInfo(const std::string& name) const

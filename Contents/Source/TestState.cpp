@@ -25,6 +25,8 @@ void TestState::Init() {
     auto id = Audio::Create("Resources/Contents/sfx_get_heart.mp3", 8);
     audioPtr_ = AssetRegistry<Audio>::GetInstance().Get(id);
     Texture::Create("Resources/Contents/WATER_GAME_LOGO.png");
+    Font::Create("Resources/Engine/Assets/Fonts/D2Coding.ttf");
+    Font::Create("Resources/Engine/Assets/Fonts/Pretendard-SemiBold.ttf");
 
     engine_.GetInputRecorder().BindInputIntent(Key::J, InputIntent::Test_1);
 

@@ -18,6 +18,9 @@ namespace tomato
 	void DrawUIInspector(EditorContext&, entt::registry&, UIComponent&);
 	void DrawCanvasInspector(EditorContext&, entt::registry&, CanvasComponent&);
 	void DrawRectTransformInspector(EditorContext&, entt::registry&, RectTransformComponent&);
+	void DrawTextInspector(EditorContext&, entt::registry&, TextComponent&);
+	void DrawTargetInspector(EditorContext&, entt::registry&, TargetComponent&);
+	void DrawSelectableInspector(EditorContext&, entt::registry&, SelectableComponent&);
 
 	
 	
