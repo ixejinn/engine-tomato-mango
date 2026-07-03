@@ -23,18 +23,36 @@ namespace tomato {
 		glm::vec2 referenceSize{ 1600.f, 900.f };
 		glm::vec2 actualSize{ 1600.f, 900.f };
 
-		entt::entity camera; // optinal
+		UUID camera; // optinal
 		int sortOrder{ 0 };
 	};
 
+#define TMT_UI_TYPE_LIST(X)	\
+	X(Canvas, "Canvas")		\
+	X(Default, "Default")	\
+	X(Text, "Text")			
+
 	enum class UIType
 	{
-		Canvas,
-		Default,
-		Text,
-
+#define X(Enum, Display) Enum,
+		TMT_UI_TYPE_LIST(X)
+#undef X
 		COUNT
 	};
+
+	struct UITypeMeta
+	{
+		UIType type;
+		const char* name;
+	};
+
+	static constexpr UITypeMeta UITypeMetas[] =
+	{
+#define X(Enum, Display) { UIType::Enum, Display },
+		TMT_UI_TYPE_LIST(X)
+#undef X
+	};
+#undef TMT_UI_TYPE_LIST
 
 	NLOHMANN_JSON_SERIALIZE_ENUM(
 		UIType,

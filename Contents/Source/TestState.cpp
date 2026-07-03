@@ -92,7 +92,9 @@ void TestState::Init() {
 
     UIPrefab::CreateText(registry_, { 100.f, 0.f });
     UIPrefab::CreateImage(registry_, "Resources/Contents/WATER_GAME_LOGO.png", { 200.f, 300.f });
-
+    //UIPrefab::CreateCanvas(registry_);
+    //UIPrefab::CreateCanvas(registry_);
+    //UIPrefab::CreateCanvas(registry_);
     //Serialization::SaveScene(registry_, "Resources/Engine/Assets/test.data");
 
     EventDispatcher::GetInstance().Connect<CollisionEnterEvent, &TEST_CollisionEnter>();

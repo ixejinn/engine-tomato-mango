@@ -15,6 +15,9 @@ namespace tomato
 	void DrawVelocityInspector(EditorContext&, entt::registry&, VelocityComponent&);
 	void DrawColliderInspector(EditorContext&, entt::registry&, ColliderComponent&);
 	void DrawRenderInspector(EditorContext&, entt::registry&, RenderComponent&);
+	void DrawUIInspector(EditorContext&, entt::registry&, UIComponent&);
+	void DrawCanvasInspector(EditorContext&, entt::registry&, CanvasComponent&);
+	void DrawRectTransformInspector(EditorContext&, entt::registry&, RectTransformComponent&);
 
 	
 	

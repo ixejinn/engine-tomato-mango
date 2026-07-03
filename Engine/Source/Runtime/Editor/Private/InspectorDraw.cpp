@@ -4,8 +4,11 @@
 #include <entt/entt.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "EditorPanel.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Mesh.h"
+#include "Resource/Render/Shader.h"
+#include "Resource/Render/Texture.h"
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
@@ -21,7 +24,11 @@
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
 #include "ECS/Components/Text.h"
+#include "ECS/Components/Nametag.h"
 #include "ECS/Components/Hierarchy.h"
+
+#include "ECS/Entity/Hierarchy.h"
+#include "Prefab/EntityUtils.h"
 
 namespace tomato
 {
@@ -56,6 +63,8 @@ namespace tomato
 		camera.degree = std::clamp(fov, 1.0f, 179.0f);
 		camera.zNear = std::max(0.01f, near);
 		camera.zFar = std::max(camera.zNear + 0.01f, far);
+
+		ImGui::NewLine();
 	}
 
 
@@ -75,12 +84,15 @@ namespace tomato
 		float scaleVec3[3] = { scale.x, scale.y, scale.z };
 		if (DrawVec3Control("Scale", scaleVec3))
 			transform.SetScale(scaleVec3[0], scaleVec3[1], scaleVec3[2]);
+
+		ImGui::NewLine();
 	}
 
 	void DrawMovementInspector(EditorContext& eCtx, entt::registry& reg, MovementComponent& movement)
 	{
 		ImGui::SeparatorText("Speed");
 		ImGui::DragFloat("Speed", &movement.horizontalSpeed, 1.0f, 0.f, 100.f, "%.2f");
+		ImGui::NewLine();
 	}
 
 	void DrawVelocityInspector(EditorContext& eCtx, entt::registry& reg, VelocityComponent& vel)
@@ -90,6 +102,7 @@ namespace tomato
 		ImGuiSliderFlags flags = ImGuiSliderFlags_NoInput;
 		if (DrawVec3Control("Velocity", velVec3, flags))
 			vel.velocity = glm::vec3(velVec3[0], velVec3[1], velVec3[2]);
+		ImGui::NewLine();
 	}
 
 	void DrawColliderInspector(EditorContext& eCtx, entt::registry& reg, ColliderComponent& collider)
@@ -106,21 +119,17 @@ namespace tomato
 		}
 
 		ImGui::SeparatorText("Type");
-		const char* typePreview = collider.type == ColliderType::Cube ? "Cube" : "Sphere";
+		const char* typePreview = ColliderTypeMetas[(uint8_t)collider.type].name;
 		if (ImGui::BeginCombo("##Type", typePreview))
 		{
-			if (ImGui::Selectable("Cube", collider.type == ColliderType::Cube))
+			for (const auto& info : ColliderTypeMetas)
 			{
-				collider.type = ColliderType::Cube;
-				collider.aabbDirty = true;
+				if (ImGui::Selectable(info.name, collider.type == info.type))
+				{
+					collider.type = info.type;
+					collider.aabbDirty = true;
+				}
 			}
-
-			if (ImGui::Selectable("Sphere", collider.type == ColliderType::Sphere))
-			{
-				collider.type = ColliderType::Sphere;
-				collider.aabbDirty = true;
-			}
-
 			ImGui::EndCombo();
 		}
 
@@ -132,6 +141,8 @@ namespace tomato
 
 		if (ImGui::RadioButton("F", collider.isTrigger == false))
 			collider.isTrigger = false;
+
+		ImGui::NewLine();
 	}
 
 	void DrawRenderInspector(EditorContext& eCtx, entt::registry& reg, RenderComponent& render)
@@ -140,7 +151,7 @@ namespace tomato
 		ImGui::ColorEdit4("##color", glm::value_ptr(render.color));
 
 		ImGui::SeparatorText("Mesh");
-		const char* meshPreview = "Plain";
+		const char* meshPreview = AssetRegistry<Mesh>::GetInstance().GetName(render.mesh) + 11;
 
 		if (ImGui::BeginCombo("##mesh", meshPreview))
 		{
@@ -154,6 +165,137 @@ namespace tomato
 			
 			ImGui::EndCombo();
 		}
+
+		ImGui::SeparatorText("Shader");
+		const char* shaderPreview = AssetRegistry<Shader>::GetInstance().GetName(render.shader);
+		if (ImGui::BeginCombo("##shader", shaderPreview))
+		{
+			auto it = AssetRegistry<Shader>::GetInstance().GetNameMapBegin();
+			auto endIt = AssetRegistry<Shader>::GetInstance().GetNameMapEnd();
+			for (it; it != endIt; it++)
+			{
+				if (ImGui::Selectable(it->second, render.shader == it->first))
+					render.shader = it->first;
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::SeparatorText("Texture");
+		const char* texPreview = AssetRegistry<Texture>::GetInstance().GetName(render.texture);
+		if (ImGui::BeginCombo("##texture", texPreview))
+		{
+			auto it = AssetRegistry<Texture>::GetInstance().GetNameMapBegin();
+			auto endIt = AssetRegistry<Texture>::GetInstance().GetNameMapEnd();
+			for (it; it != endIt; it++)
+			{
+				if (ImGui::Selectable(it->second, render.texture == it->first))
+					render.texture = it->first;
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::NewLine();
+	}
+
+	void DrawUIInspector(EditorContext& eCtx, entt::registry& reg, UIComponent& ui)
+	{
+		if (ui.canvas != 0)
+		{
+			ImGui::SeparatorText("Canvas");
+			auto canvasView = reg.view<CanvasComponent, NametagComponent>();
+			auto curCanvas = reg.try_get<NametagComponent>(GetEntityByUUID(reg, ui.canvas));
+			const char* canvasPreview = curCanvas != nullptr ? curCanvas->name.c_str() : "null";
+			if (ImGui::BeginCombo("##canvas", canvasPreview))
+			{
+				//@TODO : Set Canvas, Hierarchy
+				//for (auto [e, canvas, tag] : canvasView.each())
+				//{
+				//	if (ImGui::Selectable(tag.name.c_str(), ui.canvas == tag.id))
+				//	{
+				//		ui.canvas = tag.id;
+				//		SetHierarchy(reg, GetEntityByUUID(reg, ui.canvas), e);
+				//	}
+				//}
+				ImGui::EndCombo();
+			}
+		}
+
+		ImGui::SeparatorText("Sort Order");
+		ImGui::InputInt("##ui Order", &ui.sortOrder, 0, 1000);
+
+		ImGui::SeparatorText("UI Type");
+		const char* typePreview = UITypeMetas[(int)ui.type].name;
+		if (ImGui::BeginCombo("##uitypes", typePreview))
+		{
+			for (auto info : UITypeMetas)
+			{
+				if (ImGui::Selectable(info.name, ui.type == info.type, ImGuiSelectableFlags_Disabled))
+					ui.type = info.type;
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::NewLine();
+	}
+
+	void DrawCanvasInspector(EditorContext& eCtx, entt::registry& reg, CanvasComponent& canvas)
+	{
+		ImGui::SeparatorText("Render Mode");
+		if (ImGui::BeginCombo("##renderMode", "ScreenOverlay"))
+			ImGui::EndCombo();
+		
+		ImGui::SeparatorText("Size");
+		ImGui::Text("Reference Size");// ImGui::SameLine();
+		ImGui::DragFloat2("##refSize", glm::value_ptr(canvas.referenceSize));
+
+		ImGui::Text("Actual Size");// ImGui::SameLine();
+		ImGui::DragFloat2("##actSize", glm::value_ptr(canvas.actualSize));
+
+		ImGui::SeparatorText("Sort Order");
+		ImGui::InputInt("##canvasOrder", &canvas.sortOrder, 0, 1000);
+
+		ImGui::NewLine();
+	}
+
+	void DrawRectTransformInspector(EditorContext& eCtx, entt::registry& reg, RectTransformComponent& rect)
+	{
+		if (rect.anchorMin == rect.anchorMax)
+		{
+			ImGui::SeparatorText("Position");
+			ImGui::DragFloat2("##anchoredPos", glm::value_ptr(rect.anchoredPosition));
+
+			ImGui::SeparatorText("Offset");
+			ImGui::DragFloat2("OMin", glm::value_ptr(rect.offsetMin));
+			ImGui::DragFloat2("OMax", glm::value_ptr(rect.offsetMax));
+
+			ImGui::SeparatorText("Size");
+			ImGui::DragFloat2("##size", glm::value_ptr(rect.sizeDelta));
+
+		}
+		else
+		{
+			float offsetRight{ rect.offsetMax.x }, offsetTop{ rect.offsetMax.y };
+			ImGui::SeparatorText("Margin"); // Offset? Margin?
+			ImGui::SetNextItemWidth(200.f);
+			ImGui::InputFloat("Left", &rect.offsetMin.x, 0.0f, 0.0f, "%.2f"); ImGui::SameLine();
+			ImGui::SetNextItemWidth(200.f);
+			ImGui::InputFloat("Bottom", &rect.offsetMin.y, 0.0f, 0.0f, "%.2f"); //@TODO : minus
+			ImGui::SetNextItemWidth(200.f);
+			if(ImGui::InputFloat("Right", &offsetRight, 0.0f, 0.0f, "%.2f"))
+				rect.offsetMax.x = -offsetRight;
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(200.f);
+			ImGui::InputFloat("Top", &rect.offsetMax.y, 0.0f, 0.0f, "%.2f");
+		}
+
+		ImGui::SeparatorText("Anchor");
+		ImGui::DragFloat2("AMin", glm::value_ptr(rect.anchorMin));
+		ImGui::DragFloat2("AMax", glm::value_ptr(rect.anchorMax));
+
+		ImGui::SeparatorText("Pivot");
+		ImGui::DragFloat2("##pivot", glm::value_ptr(rect.pivot));
+
+		ImGui::NewLine();
 	}
 
 	bool DrawVec3Control(const char* label, float* vec, int flags)

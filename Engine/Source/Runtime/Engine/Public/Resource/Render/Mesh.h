@@ -17,17 +17,9 @@ namespace tomato {
             : position(pos), normal(normal), uv(uv) {}
     };
 
-    class Mesh {
+    class Mesh
+    {
     public:
-        //enum class Primitive {
-        //    Plain,
-        //    LBPlain,
-        //    Cube,
-        //    Sphere,
-        //    Cylinder,
-        //    COUNT
-        //};
-
 #define TMT_MESH_PRIMITIVE_LIST(X)  \
     X(Plain,    "Plain")            \
     X(LBPlain,  "LBPlain")          \
@@ -57,8 +49,8 @@ namespace tomato {
     };
 #undef TMT_MESH_PRIMITIVE_LIST
 
-
-        static constexpr const char* GetPrimitiveName(Primitive type) {
+        static constexpr const char* GetPrimitiveName(Primitive type)
+        {
             switch (type) {
                 case Primitive::Plain:
                     return "Primitive::Plain";

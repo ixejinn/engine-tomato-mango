@@ -46,6 +46,9 @@ namespace tomato {
             throw std::runtime_error("AssetID not found");
         }
 
+        std::unordered_map<AssetID, const char*>::const_iterator GetNameMapBegin() const { return idToName_.begin(); }
+        std::unordered_map<AssetID, const char*>::const_iterator GetNameMapEnd() const { return idToName_.end(); }
+
         void Register(const char* name, std::unique_ptr<T>&& asset);
 
 
