@@ -2,12 +2,15 @@
 #define MANGO_TICKCLOCK_H
 
 #include <chrono>
-#include "../SimulationConfig.h"
+#include <ratio>
+#include "Simulation/SimulationConfig.h"
 
 namespace tomato {
+    using Tick = std::chrono::duration<int64_t, std::ratio<1, FRAME_PER_SECOND>>;
+
     class TickClock {
     public:
-        uint32_t GetTick() const { return tick_; }
+        [[nodiscard]] int64_t GetTick() const { return tick_.count(); }
 
         int GetSimulateNum();
 
@@ -15,11 +18,10 @@ namespace tomato {
         void ResetTick();
 
     private:
-        static constexpr std::chrono::duration<float, std::milli> dt_{1000.f / FRAME_PER_SECOND};
+        static constexpr Tick DT_{1};
+        Tick tick_{0};
 
-        uint32_t tick_{0};
-
-        std::chrono::duration<float, std::milli> adder_{0};
+        std::chrono::nanoseconds adder_{0};
         std::chrono::steady_clock::time_point start_{};
     };
 }

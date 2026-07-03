@@ -17,7 +17,7 @@ namespace tomato::CharacterMovement
                 if (--move.gndStayCnt == 0)
                 {
                     move.mode = Falling;
-                    // TMT_INFO << "Falling " << (int)e;
+                    TMT_INFO << "Falling " << (int)event.e;
                 }
             }
             break;
@@ -31,7 +31,7 @@ namespace tomato::CharacterMovement
                 move.jumpCnt = 0;
 
                 event.reg->get<VelocityComponent>(root).velocity.y = 0;
-                // TMT_INFO << "Walking " << (int)e;
+                TMT_INFO << "Walking " << (int)event.e;
             }
             break;
         }

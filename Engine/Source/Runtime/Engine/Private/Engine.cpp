@@ -9,6 +9,9 @@
 #include "Editor.h"
 #include "Utils/Logger.h"
 
+#include "Clock/Timer.h"
+using namespace std::chrono_literals;
+
 namespace tomato {
     Engine::Engine(const int width, const int height, const char* title, NetMode netMode)
         : window_(width, height, title)
@@ -54,6 +57,8 @@ namespace tomato {
     void Engine::Run()
     {
         TickClock tickClock;
+        Timer timer{0h, 0min, 1s};
+        timer.Start();
         window_.SetWindowUserPointer(input_, tickClock);
         GarbageEntityCollectionSystem garbageCollectionSystem;
 
@@ -64,7 +69,7 @@ namespace tomato {
             if (nextState_)
                 ChangeState(tickClock);
 
-            // std::cout << "       *--------- " << tickClock.GetTick() << " ---------*\n";
+            // std::cout << "       *========== " << tickClock.GetTick() << " ==========*\n";
             ProcessQueuedPackets(tickClock);
 
             // *---------- Rollback and resimulate
@@ -89,6 +94,9 @@ namespace tomato {
             garbageCollectionSystem.Update(simCtx);
 
             Simulate(tickClock, simCtx);
+
+            if (timer.IsTimeUp())
+                std::cout << "0000000000000000000";
 
             Render(simCtx);
             // ----------* Simulate and render
@@ -121,6 +129,7 @@ namespace tomato {
         while (cnt--)
         {
             simCtx.tick = tc.GetTick();
+            std::cout << "       *--------- " << simCtx.tick << " ---------*\n";
 
             systemManager_.Simulate(simCtx);
 

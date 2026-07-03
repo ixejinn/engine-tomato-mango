@@ -25,13 +25,13 @@ namespace tomato
 		void SetNetwork(ClientNetwork* network) { network_ = network; }
 
         void InitializeConfirmedTick(uint32_t t) { confirmedTick = t; }
-        uint32_t GetConfirmedTick() const { return confirmedTick; }
+        int64_t GetConfirmedTick() const { return confirmedTick; }
 
 	private:
 		State* currentStatePtr_{ nullptr };
 		ClientNetwork* network_;
 
-        uint32_t confirmedTick{0};
+        int64_t confirmedTick{0};
 	};
 }
 #endif // !MANGO_GAMEPLAYNETSYSTEM_H

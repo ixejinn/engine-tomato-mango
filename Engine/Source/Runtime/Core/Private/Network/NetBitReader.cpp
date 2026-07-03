@@ -16,7 +16,7 @@ namespace tomato
             TMT_ERR << "byteSize exceeds MAX_PACKET_SIZE";
     }
 
-    uint32_t NetBitReader::DeserializeInt(const uint32_t maxValue)
+    int64_t NetBitReader::DeserializeInt(const int64_t maxValue)
     {
         if (bitPos_ < 0)
         {
@@ -25,11 +25,11 @@ namespace tomato
         }
 
         // Use local variable to avoid Load-Hit-Store
-        uint32_t value = 0;
+        int64_t value = 0;
         int16_t pos = bitPos_;
         int16_t num = byteNum_;
 
-        for (uint32_t mask = 1; (value + mask) < maxValue && mask; mask <<= 1, pos++)
+        for (int64_t mask = 1; (value + mask) < maxValue && mask; mask <<= 1, pos++)
         {
             if (pos >= num * 8)
             {

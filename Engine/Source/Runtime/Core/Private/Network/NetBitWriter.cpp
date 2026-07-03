@@ -15,7 +15,7 @@ namespace tomato
             TMT_ERR << "byteSize exceeds MAX_PACKET_SIZE";
     }
 
-    void NetBitWriter::SerializeInt(const uint32_t value, const uint32_t maxValue)
+    void NetBitWriter::SerializeInt(const int64_t value, const int64_t maxValue)
     {
         if (bitPos_ < 0)
         {
@@ -24,11 +24,11 @@ namespace tomato
         }
 
         // Use local variable to avoid Load-Hit-Store
-        uint32_t tmp = 0;
+        int64_t tmp = 0;
         int16_t pos = bitPos_;
         int16_t num = byteNum_;
 
-        for (uint32_t mask = 1; (tmp + mask) < maxValue && mask; mask <<= 1, pos++)
+        for (int64_t mask = 1; (tmp + mask) < maxValue && mask; mask <<= 1, pos++)
         {
             if (pos >= num * 8)
             {

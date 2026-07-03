@@ -12,7 +12,7 @@ namespace tomato {
      */
     struct InputRecord
     {
-        uint32_t tick{0};
+        int64_t tick{0};
 
         /// Key state (held)
         InputIntent held{InputIntent::None};

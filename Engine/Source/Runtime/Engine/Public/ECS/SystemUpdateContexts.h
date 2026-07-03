@@ -11,10 +11,10 @@ namespace tomato
 {
     struct SimContext
     {
-        SimContext(State* s, uint32_t t) : state(s), tick(t) {}
+        SimContext(State* s, int64_t t) : state(s), tick(t) {}
 
         State* state;
-        uint32_t tick;
+        int64_t tick;
     };
 
     struct CollisionContext

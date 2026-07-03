@@ -10,7 +10,7 @@ namespace tomato {
      */
     struct KeyEvent
     {
-        KeyEvent(Key k, KeyAction a, float v, uint32_t t)
+        KeyEvent(Key k, KeyAction a, float v, int64_t t)
         : key(k), action(a), value(v), tick(t) {}
 
         Key key;
@@ -18,7 +18,7 @@ namespace tomato {
 
         float value;
 
-        uint32_t tick;
+        int64_t tick;
     };
 
     /**
@@ -26,7 +26,7 @@ namespace tomato {
      */
     struct MouseEvent : public KeyEvent
     {
-        MouseEvent(Key k, KeyAction a, float v, uint32_t t, float x, float y)
+        MouseEvent(Key k, KeyAction a, float v, int64_t t, float x, float y)
         : KeyEvent(k, a, v, t), xPos(x), yPos(y) {}
 
         float xPos, yPos;
@@ -37,7 +37,7 @@ namespace tomato {
      */
     struct MouseMoveEvent
     {
-        MouseMoveEvent(uint32_t t, float x, float y) : xPos(x), yPos(y) {}
+        MouseMoveEvent(int64_t t, float x, float y) : xPos(x), yPos(y) {}
         float xPos, yPos;
     };
 }

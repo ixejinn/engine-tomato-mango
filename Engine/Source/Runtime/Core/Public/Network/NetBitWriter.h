@@ -42,10 +42,8 @@ namespace tomato
          * @note inValue \< maxValue
          */
         template<typename T>
-            requires std::same_as<T, uint8_t>
-            || std::same_as<T, uint16_t>
-            || std::same_as<T, uint32_t>
-        void WriteInt(const T inValue, uint32_t maxValue)
+        requires std::integral<T>
+        void WriteInt(const T inValue, int64_t maxValue)
         {
             SerializeInt(inValue, maxValue);
         }
@@ -57,7 +55,7 @@ namespace tomato
         }
 
     private:
-        void SerializeInt(uint32_t value, uint32_t maxValue);
+        void SerializeInt(int64_t value, int64_t maxValue);
 
         uint8_t* buffer_{ nullptr };
         int16_t byteNum_;
