@@ -118,7 +118,7 @@ namespace tomato::Serialization
 		{
 			std::cout << "key : " << key << ", value : " << value << '\n';
 			if (auto* info = ComponentRegistry::GetInstance().FindComponentInfo(key))
-				info->Load(value, reg, entity);
+				info->serialization.Load(value, reg, entity);
 		}
 	}
 
@@ -149,7 +149,7 @@ namespace tomato::Serialization
 				continue;
 
 			json componentJson;
-			info.Save(componentJson, reg, entity);
+			info.serialization.Save(componentJson, reg, entity);
 
 			components[info.name] = componentJson;
 		}

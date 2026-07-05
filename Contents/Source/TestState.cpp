@@ -38,11 +38,12 @@ void TestState::Init() {
 
     // Camera
     Prefab::CreateCamera(registry_,
+        true,
         glm::vec3(0.f, 4.f, 10.f),
         // glm::vec3(0.f, 6.f, 0.f),
-        glm::vec3(-30.f, 0.f, 0.f),
+        glm::vec3(-30.f, 0.f, 0.f)
         // glm::vec3(-90.f, 0.f, 0.f),
-        true);
+        );
 
     //// Player0 character
     entt::entity player0 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, 2, 0 });

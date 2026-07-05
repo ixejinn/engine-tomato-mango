@@ -18,23 +18,23 @@ namespace tomato::Serialization
 		if (initialized)
 			return;
 
-		RegisterComponent<CameraComponent>("Camera");
-		RegisterComponent<InputChannelComponent>("InputChannel");
-		RegisterComponent<TransformComponent>("Transform");
-		RegisterComponent<MovementComponent>("Movement");
-		RegisterComponent<VelocityComponent>("Velocity");
-		RegisterComponent<ColliderComponent>("Collider");
-		RegisterComponent<RenderComponent>("Render");
-		RegisterComponent<UIComponent>("UI");
-		RegisterComponent<CanvasComponent>("Canvas");
-		RegisterComponent<RectTransformComponent>("RectTransform");
-		RegisterComponent<TextComponent>("Text");
-		RegisterComponent<TargetComponent>("Target");
-		RegisterComponent<SelectableComponent>("Selectable");
-		RegisterComponent<MouseEventComponent>("MouseEvent");
-		RegisterComponent<HierarchyComponent>("Hierarchy");
-		RegisterComponent<RootEntityTag>("TagRoot");
-		RegisterComponent<MainCameraTag>("TagMainCam");
+		RegisterComponent<CameraComponent>("Camera", ComponentCategory::Common);
+		RegisterComponent<InputChannelComponent>("InputChannel", ComponentCategory::Common);
+		RegisterComponent<TransformComponent>("Transform", ComponentCategory::Common);
+		RegisterComponent<MovementComponent>("Movement", ComponentCategory::Common);
+		RegisterComponent<VelocityComponent>("Velocity", ComponentCategory::Common);
+		RegisterComponent<ColliderComponent>("Collider", ComponentCategory::Common);
+		RegisterComponent<RenderComponent>("Render", ComponentCategory::Common);
+		RegisterComponent<UIComponent>("UI", ComponentCategory::UI);
+		RegisterComponent<CanvasComponent>("Canvas", ComponentCategory::UI);
+		RegisterComponent<RectTransformComponent>("RectTransform", ComponentCategory::UI);
+		RegisterComponent<TextComponent>("Text", ComponentCategory::UI);
+		RegisterComponent<TargetComponent>("Target", ComponentCategory::UI);
+		RegisterComponent<SelectableComponent>("Selectable", ComponentCategory::UI);
+		RegisterComponent<MouseEventComponent>("MouseEvent", ComponentCategory::UI);
+		RegisterComponent<HierarchyComponent>("Hierarchy", ComponentCategory::Common);
+		RegisterComponent<RootEntityTag>("TagRoot", ComponentCategory::Tag);
+		RegisterComponent<MainCameraTag>("TagMainCam", ComponentCategory::Tag);
 
 
 		initialized = true;
