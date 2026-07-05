@@ -20,9 +20,10 @@ namespace tomato::Prefab
                                         glm::vec3 pos = glm::vec3{0.f});
 
     entt::entity CreateCamera(entt::registry& reg,
+                                        bool isMain = true,
                                         glm::vec3 pos = {0.f, 7.5f, 15.f},
-                                        glm::vec3 rot = {-30.f, 0.f, 0.f},
-                                        bool isMain = true);
+                                        glm::vec3 rot = {-30.f, 0.f, 0.f}
+                                        );
 
     entt::entity AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type);
 

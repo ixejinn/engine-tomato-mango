@@ -1,4 +1,4 @@
-#ifndef MANGO_ASSETREGISTRY_H
+﻿#ifndef MANGO_ASSETREGISTRY_H
 #define MANGO_ASSETREGISTRY_H
 
 #include <memory>
@@ -22,7 +22,8 @@ namespace tomato {
         AssetRegistry() = default;
 
     public:
-        ~AssetRegistry() {
+        ~AssetRegistry()
+        {
             Clear();
             T::Cleanup();
         }
@@ -30,20 +31,36 @@ namespace tomato {
         AssetRegistry(const AssetRegistry&) = delete;
         AssetRegistry& operator=(const AssetRegistry&) = delete;
 
-        static AssetRegistry& GetInstance() {
+        static AssetRegistry& GetInstance()
+        {
             static AssetRegistry instance;
             return instance;
         }
 
-        void Register(const char* name, std::unique_ptr<T>&& asset);
+        const char* GetName(AssetID id)
+        {
+            auto it = idToName_.find(id);
+            if (it != idToName_.end())
+                return it->second.c_str();
+
+            throw std::runtime_error("AssetID not found");
+        }
+
+        std::unordered_map<AssetID, std::string>::const_iterator GetNameMapBegin() const { return idToName_.begin(); }
+        std::unordered_map<AssetID, std::string>::const_iterator GetNameMapEnd() const { return idToName_.end(); }
+
+        void Register(std::string name, std::unique_ptr<T>&& asset);
+
 
         T* Get(AssetID id);
 
-        void CreatePrimitives() {
+        void CreatePrimitives()
+        {
             T::Create();
         }
 
-        void Clear() {
+        void Clear()
+        {
             data_.clear();
             idToIdx_.clear();
         }
@@ -51,16 +68,20 @@ namespace tomato {
     private:
         std::vector<std::unique_ptr<T>> data_;
         std::unordered_map<AssetID, uint32_t> idToIdx_;
+        //std::unordered_map<AssetID, const char*> idToName_;
+        std::unordered_map<AssetID, std::string> idToName_;
     };
 
     template<typename T>
-    void AssetRegistry<T>::Register(const char* name, std::unique_ptr<T>&& asset)
+    void AssetRegistry<T>::Register(std::string name, std::unique_ptr<T>&& asset)
     {
-        const auto id = GetAssetID(name);
+
+        const auto id = GetAssetID(name.c_str());
         auto it = idToIdx_.find(id);
         if (it == idToIdx_.end())
         {
             idToIdx_[id] = data_.size();
+            idToName_[id] = name;
             data_.emplace_back(std::move(asset));
         }
         else

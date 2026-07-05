@@ -1,4 +1,4 @@
-#include <entt/entt.hpp>
+﻿#include <entt/entt.hpp>
 #include "ECS/Systems/CameraSystem.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Camera.h"

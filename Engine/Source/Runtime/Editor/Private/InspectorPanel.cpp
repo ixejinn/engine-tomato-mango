@@ -35,9 +35,9 @@ namespace tomato
 					continue;
 
 				bool is_open = ImGui::CollapsingHeader(comp.name.c_str());
-				if (is_open && comp.Draw)
+				if (is_open && comp.editor.Draw)
 				{
-					comp.Draw(editorCtx, editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
+					comp.editor.Draw(editorCtx, editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
 				}
 			}
 		}

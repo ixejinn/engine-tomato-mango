@@ -5,6 +5,11 @@
 
 namespace tomato
 {
+	namespace Serialization
+	{
+		enum class ComponentCategory;
+	}
+
 	class HierarchyPanel : public EditorPanel
 	{
 	public:
@@ -16,6 +21,9 @@ namespace tomato
 
 	private:
 		void Traverse(EditorContext& editorCtx, entt::entity e);
+
+		void MenuBar(EditorContext& editorCtx);
+		void ShowAddComponent(EditorContext&, Serialization::ComponentCategory);
 	};
 }
 

@@ -59,7 +59,7 @@ namespace tomato {
         }
 
         // Register using the parsed key
-        AssetRegistry<Font>::GetInstance().Register(assetKey.c_str(), std::move(ptr));
+        AssetRegistry<Font>::GetInstance().Register(assetKey, std::move(ptr));
 
         TMT_INFO << "Font Registered with key: " << assetKey;
     }

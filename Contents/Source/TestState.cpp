@@ -27,6 +27,8 @@ void TestState::Init() {
     auto id = Audio::Create("Resources/Contents/sfx_get_heart.mp3", 8);
     audioPtr_ = AssetRegistry<Audio>::GetInstance().Get(id);
     Texture::Create("Resources/Contents/WATER_GAME_LOGO.png");
+    Font::Create("Resources/Engine/Assets/Fonts/D2Coding.ttf");
+    Font::Create("Resources/Engine/Assets/Fonts/Pretendard-SemiBold.ttf");
 
     engine_.GetInputRecorder().BindInputIntent(Key::J, InputIntent::Test_1);
 
@@ -38,11 +40,12 @@ void TestState::Init() {
 
     // Camera
     Prefab::CreateCamera(registry_,
+        true,
         glm::vec3(0.f, 4.f, 10.f),
         // glm::vec3(0.f, 6.f, 0.f),
-        glm::vec3(-30.f, 0.f, 0.f),
+        glm::vec3(-30.f, 0.f, 0.f)
         // glm::vec3(-90.f, 0.f, 0.f),
-        true);
+        );
 
     //// Player0 character
     entt::entity player0 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, 2, 0 });
@@ -127,11 +130,15 @@ void TestState::Init() {
 
     UIPrefab::CreateText(registry_, { 100.f, 0.f });
     UIPrefab::CreateImage(registry_, "Resources/Contents/WATER_GAME_LOGO.png", { 200.f, 300.f });
-
+    //UIPrefab::CreateCanvas(registry_);
+    //UIPrefab::CreateCanvas(registry_);
+    //UIPrefab::CreateCanvas(registry_);
     //Serialization::SaveScene(registry_, "Resources/Engine/Assets/test.data");
 
     EventDispatcher::GetInstance().Connect<CollisionEnterEvent, &TEST_CollisionEnter>();
     EventDispatcher::GetInstance().Connect<CollisionExitEvent, &TEST_CollisionExit>();
+
+    //std::cout << AssetRegistry<Audio>::GetInstance().GetName(id);
 }
 
 void TestState::Update() {

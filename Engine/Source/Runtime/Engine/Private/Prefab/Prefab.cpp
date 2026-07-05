@@ -62,9 +62,9 @@ namespace tomato::Prefab
         return obj;
     }
 
-    entt::entity CreateCamera(entt::registry& reg,
-                                      glm::vec3 pos, glm::vec3 rot,
-                                      bool isMain) {
+    entt::entity CreateCamera(entt::registry& reg, bool isMain,
+                                      glm::vec3 pos, glm::vec3 rot
+                                      ) {
         const entt::entity obj = reg.create();
 
         reg.emplace<NametagComponent>(obj, GenerateUUID(), GenerateEntityName(reg, "Camera"));

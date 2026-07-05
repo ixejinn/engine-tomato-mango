@@ -32,7 +32,7 @@ namespace tomato::Serialization
 		void InitInspector();
 
 		template<typename T>
-		void RegisterComponent(const std::string& name);
+		void RegisterComponent(const std::string& name, ComponentCategory category);
 
 		template<typename T>
 		void RegisterInspector(const std::string& name, void (*draw)(EditorContext&, entt::registry&, T&));
@@ -51,11 +51,12 @@ namespace tomato::Serialization
 	};
 
 	template<typename T>
-	void tomato::Serialization::ComponentRegistry::RegisterComponent(const std::string& name)
+	void tomato::Serialization::ComponentRegistry::RegisterComponent(const std::string& name, ComponentCategory category)
 	{
 		ComponentInfo info;
 
 		info.name = name;
+		info.category = category;
 
 		info.Has =
 			[](entt::registry& reg, entt::entity e)
@@ -63,28 +64,41 @@ namespace tomato::Serialization
 				return reg.any_of<T>(e);
 			};
 
+		info.editor.Add =
+			[](entt::registry& reg, entt::entity e)
+			{
+				reg.get_or_emplace<T>(e);	
+			};
+
+		info.editor.Remove =
+			[](entt::registry& reg, entt::entity e)
+			{
+				if (reg.any_of<T>(e))
+					reg.remove<T>(e);
+			};
+
 		if constexpr (std::is_empty_v<T>)
 		{
-			info.Save =
+			info.serialization.Save =
 				[](json&, entt::registry&, entt::entity)
 				{
 				};
 
-			info.Load =
+			info.serialization.Load =
 				[](const json&, entt::registry& reg, entt::entity e)
 				{
-					reg.emplace<T>(e);
+					reg.emplace_or_replace<T>(e);
 				};
 		}
 		else
 		{
-			info.Save =
+			info.serialization.Save =
 				[](json& j, entt::registry& reg, entt::entity e)
 				{
 					Serialization::Save(j, reg.get<T>(e));
 				};
 
-			info.Load =
+			info.serialization.Load =
 				[](const json& j, entt::registry& reg, entt::entity e)
 				{
 					T component;
@@ -103,7 +117,7 @@ namespace tomato::Serialization
 		(const std::string& name, void (*draw)(EditorContext&, entt::registry&, T&))
 	{
 		auto& component = componentInfo_[nameToIndex_[name]];
-		component.Draw =
+		component.editor.Draw =
 			[draw](EditorContext& eCtx, entt::registry& reg, entt::entity e)
 			{
 				draw(eCtx, reg, reg.get<T>(e));

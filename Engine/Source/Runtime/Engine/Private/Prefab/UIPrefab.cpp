@@ -25,6 +25,7 @@ namespace tomato::UIPrefab
         reg.emplace<tomato::CanvasComponent>(canvas);
         reg.emplace<tomato::UIComponent>(canvas, (UUID)0, 0, UIType::Canvas);
         reg.emplace<tomato::RectTransformComponent>(canvas);
+        reg.emplace<tomato::RootEntityTag>(canvas);
         reg.emplace<tomato::HierarchyComponent>(canvas);
         reg.emplace<tomato::RenderComponent>(canvas,
             glm::vec4{ 1.f, 1.f, 1.f, 0.0f },

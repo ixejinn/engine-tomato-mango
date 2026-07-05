@@ -7,6 +7,7 @@
 		Source/ThirdParty/imgui/imgui_draw.cpp
 		Source/ThirdParty/imgui/imgui_tables.cpp
 		Source/ThirdParty/imgui/imgui_widgets.cpp
+		Source/ThirdParty/imgui/imgui_stdlib.cpp
 		
 		Source/ThirdParty/imgui/backends/imgui_impl_glfw.cpp
 		Source/ThirdParty/imgui/backends/imgui_impl_opengl3.cpp
@@ -85,6 +86,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Resource/Audio/Audio.h
         Source/Runtime/Engine/Public/TomatoFwd.h
         Source/Runtime/Core/Public/Containers/UnorderedPair.h
+        
 		Source/Runtime/Engine/Public/Collision/Narrow/GJK/GJK.h
 		Source/Runtime/Engine/Public/Collision/Narrow/GJK/EPA.h
         Source/Runtime/Engine/Public/Collision/Broad/BroadPhase.h
