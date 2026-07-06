@@ -34,7 +34,9 @@ namespace tomato
 	void UISystem::Traverse(SimContext& ctx, entt::entity e, std::vector<entt::entity>& drawList)
 	{
 		auto& registry = ctx.state->GetRegistry();
-		auto& ui = registry.get<UIComponent>(e);
+		auto* ui = registry.try_get<UIComponent>(e);
+		if (!ui) return;
+
 		//std::cout << ui.type << " ";
 		drawList.push_back(e);
 
@@ -178,8 +180,10 @@ namespace tomato
 				// World Name Label
 				if (registry.all_of<TargetComponent>(entity))
 				{
-					auto& target = registry.get<TargetComponent>(entity);
-					auto& targetTransform = registry.get<TransformComponent>(GetEntityByUUID(registry, target.target));
+					auto* target = registry.try_get<TargetComponent>(entity);
+					auto* targetTransform = registry.try_get<TransformComponent>(GetEntityByUUID(registry, target->target));
+					if (!target || !targetTransform)
+						continue;
 
 					 if (!registry.ctx().find<RenderContext>())
 					 	continue;
@@ -192,8 +196,8 @@ namespace tomato
 					}
 					auto viewProjMat = registry.try_get<CameraComponent>(renderCtx.mainCam)->viewProjMat;
 
-					glm::vec3 screenPos = WorldToScreen(targetTransform.GetWorldPosition(), viewProjMat, Window::GetWidth(), Window::GetHeight());
-					rect.position = screenPos + target.headOffset;
+					glm::vec3 screenPos = WorldToScreen(targetTransform->GetWorldPosition(), viewProjMat, Window::GetWidth(), Window::GetHeight());
+					rect.position = screenPos + target->headOffset;
 
 					rect.computedSize = rect.sizeDelta;
 					continue;

@@ -23,8 +23,8 @@ namespace tomato
 
 		float width{ 300.f }, height{ 600.f };
 
-		ImGui::SetNextWindowPos(ImVec2(1600.f, 300.f + height), ImGuiCond_Appearing, ImVec2(1.f, 1.f));
-		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
+		ImGui::SetNextWindowPos(ImVec2(1600.f, 300.f + height), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
+		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_FirstUseEver);
 		
 		if (ImGui::Begin("Inspector", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize))
 		{

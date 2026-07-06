@@ -124,7 +124,7 @@ namespace tomato {
         while (cnt--)
         {
             simCtx.tick = tc.GetTick();
-            std::cout << "       *--------- " << simCtx.tick << " ---------*\n";
+            //std::cout << "       *--------- " << simCtx.tick << " ---------*\n";
 
             systemManager_.Simulate(simCtx);
 

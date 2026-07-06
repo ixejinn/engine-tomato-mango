@@ -21,9 +21,13 @@ namespace tomato
 
 	private:
 		void Traverse(EditorContext& editorCtx, entt::entity e);
+		void CreateAndSetHierarchyEntity(EditorContext& editorCtx, entt::entity e, bool hierarchy);
 
 		void MenuBar(EditorContext& editorCtx);
+		void AddItems(EditorContext& editorCtx, bool isPopup);
+		void ShowComponentMenu(EditorContext&);
 		void ShowAddComponent(EditorContext&, Serialization::ComponentCategory);
+		void ShowMoreButton(EditorContext&);
 	};
 }
 

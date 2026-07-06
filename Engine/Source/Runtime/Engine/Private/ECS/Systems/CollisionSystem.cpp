@@ -185,6 +185,8 @@ namespace tomato {
 
         for (const auto& candidate : candidates_)
         {
+            if (!simCtx.state->GetRegistry().valid(candidate.a) ||
+                !simCtx.state->GetRegistry().valid(candidate.a)) continue;
             auto& col1 = registry.get<ColliderComponent>(candidate.a);
             auto& col2 = registry.get<ColliderComponent>(candidate.b);
 
@@ -229,10 +231,13 @@ namespace tomato {
             if (!it->second)
             {
                 // Exit
-                auto& col1 = registry.get<ColliderComponent>(it->first.a);
-                auto& col2 = registry.get<ColliderComponent>(it->first.b);
+                auto* col1 = registry.try_get<ColliderComponent>(it->first.a);
+                auto* col2 = registry.try_get<ColliderComponent>(it->first.b);
 
-                if (col1.isTrigger || col2.isTrigger)
+                //if (!col1 || !col2)
+                //    continue;
+
+                if (col1->isTrigger || col2->isTrigger)
                 {
                     EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{it->first.a, it->first.b, &registry});
 

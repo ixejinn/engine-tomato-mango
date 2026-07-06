@@ -92,6 +92,9 @@ namespace tomato::UIPrefab
         reg.emplace<UIComponent>(img, GetUUID(reg, canvas), 0);
 
         auto texture = AssetRegistry<Texture>::GetInstance().Get(GetAssetID(textureName));
+        if (textureName == Texture::PrimitiveName)
+            size = glm::vec2{ 100.f, 100.f };
+
         reg.emplace<RectTransformComponent>(
             img,
             pos,

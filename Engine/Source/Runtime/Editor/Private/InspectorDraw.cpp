@@ -136,7 +136,7 @@ namespace tomato
 		}
 
 		ImGui::SeparatorText("Trigger");
-		ImGui::Text("Trigger"); ImGui::SameLine();
+		ImGui::Text("Is Trigger"); ImGui::SameLine();
 		ImGui::Checkbox("##Trigger", &collider.isTrigger);
 
 		ImGui::NewLine();
@@ -205,14 +205,14 @@ namespace tomato
 			if (ImGui::BeginCombo("##canvas", canvasPreview))
 			{
 				//@TODO : Set Canvas, Hierarchy
-				//for (auto [e, canvas, tag] : canvasView.each())
-				//{
-				//	if (ImGui::Selectable(tag.name.c_str(), ui.canvas == tag.id))
-				//	{
-				//		ui.canvas = tag.id;
-				//		SetHierarchy(reg, GetEntityByUUID(reg, ui.canvas), e);
-				//	}
-				//}
+				for (auto [e, canvas, tag] : canvasView.each())
+				{
+					if (ImGui::Selectable(tag.name.c_str(), ui.canvas == tag.id))
+					{
+						ui.canvas = tag.id;
+						SetHierarchy(reg, GetEntityByUUID(reg, ui.canvas), eCtx.selectedEntity);
+					}
+				}
 				ImGui::EndCombo();
 			}
 		}

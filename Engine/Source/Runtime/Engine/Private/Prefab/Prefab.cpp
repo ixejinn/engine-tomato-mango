@@ -18,6 +18,18 @@
 
 namespace tomato::Prefab
 {
+    entt::entity CreateEmpty(entt::registry& reg, Primitive mesh, glm::vec3 pos)
+    {
+        const entt::entity obj = reg.create();
+
+        reg.emplace<NametagComponent>(obj, GenerateUUID(), GenerateEntityName(reg, "GameObject"));
+        reg.emplace<TransformComponent>(obj, pos);
+        reg.emplace<RootEntityTag>(obj);
+
+        TMT_INFO << "Create Empty object: " << (int)obj;
+        return obj;
+    }
+
     entt::entity CreateStaticObject(entt::registry& reg,
                                             Primitive mesh, glm::vec3 pos) {
         const entt::entity obj = reg.create();
