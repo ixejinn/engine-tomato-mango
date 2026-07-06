@@ -7,6 +7,10 @@ namespace tomato {
     using AssetID = uint64_t;
 
     struct Audio;
+
+    struct Mesh;
+    struct Shader;
+    struct Texture;
 }
 
 #endif //MANGO_RESOURCEFWD_H

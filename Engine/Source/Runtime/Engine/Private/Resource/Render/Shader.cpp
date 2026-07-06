@@ -26,6 +26,9 @@ namespace tomato {
         std::unique_ptr<Shader> shaderPtr{new Shader};
         AssetRegistry<Shader>::GetInstance().Register(PrimitiveName, std::move(shaderPtr));
 
+        std::unique_ptr<Shader> particleShaderPtr{ new Shader{"Resources/Engine/Shaders/billboarding.vs", "Resources/Engine/Shaders/billboarding.fs"} };
+        AssetRegistry<Shader>::GetInstance().Register("ParticleShader", std::move(particleShaderPtr));
+
         std::unique_ptr<Shader> fShaderPtr{ new Shader{"Resources/Engine/Shaders/text.vs", "Resources/Engine/Shaders/text.fs"} };
         AssetRegistry<Shader>::GetInstance().Register("FontShader", std::move(fShaderPtr));
 

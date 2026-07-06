@@ -4,8 +4,10 @@
 #include "ECS/Systems/System.h"
 #include "Resource/ResourceFwd.h"
 
-namespace tomato {
-    class RenderSystem : public System {
+namespace tomato
+{
+    class RenderSystem : public System
+    {
     public:
         RenderSystem();
 

@@ -18,6 +18,7 @@
 #include "Prefab/UIPrefab.h"
 #include "Serialization/ComponentSerializer.h"
 #include "TimerTestComponent.h"
+#include "ECS/Components/Nametag.h"
 
 using namespace tomato;
 using namespace std::chrono_literals;
@@ -70,6 +71,17 @@ void TestState::Init() {
     trfGnd.SetScale(10, 0.1, 10);
     auto& renderGnd = registry_.get<RenderComponent>(ground);
     renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
+
+    // Test billboarding
+    entt::entity billboarding = registry_.create();
+    registry_.emplace<NametagComponent>(billboarding, GenerateUUID(), GenerateEntityName(registry_, "billboarding"));
+    registry_.emplace<TransformComponent>(billboarding, glm::vec3{3, 0, 0});
+    registry_.emplace<RenderComponent>(billboarding,
+        glm::vec4(1.f),
+        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain)),
+        GetAssetID("ParticleShader"),
+        GetAssetID(Texture::PrimitiveName));
+    registry_.emplace<RootEntityTag>(billboarding);
 
 
     ////UI
