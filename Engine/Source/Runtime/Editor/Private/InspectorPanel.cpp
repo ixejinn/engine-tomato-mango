@@ -28,6 +28,7 @@ namespace tomato
 		
 		if (ImGui::Begin("Inspector", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize))
 		{
+			MenuBar(editorCtx);
 			auto& componentInfo = Serialization::ComponentRegistry::GetInstance().GetComponentInfo();
 			for (const auto& comp : componentInfo)
 			{
@@ -44,4 +45,51 @@ namespace tomato
 		ImGui::End();
 	}
 
+	void InspectorPanel::MenuBar(EditorContext& editorCtx)
+	{
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("Add"))
+			{
+				if (ImGui::BeginMenu("Component"))
+				{
+					for (auto info : Serialization::componentCategoryMetas)
+					{
+						if (info.category == Serialization::ComponentCategory::Tag) continue;
+						if (ImGui::BeginMenu(info.name))
+						{
+							ShowAddComponent(editorCtx, info.category);
+							ImGui::EndMenu();
+						}
+					}
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Tag"))
+				{
+					ShowAddComponent(editorCtx, Serialization::ComponentCategory::Tag);
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
+		}
+	}
+
+	void InspectorPanel::ShowAddComponent(EditorContext& editorCtx, Serialization::ComponentCategory category)
+	{
+		auto& reg = editorCtx.currentState->GetRegistry();
+
+		bool enabled = editorCtx.selectedEntity != entt::null ? true : false;
+
+		auto& componentInfo = Serialization::ComponentRegistry::GetInstance().GetComponentInfo();
+		for (const auto& comp : componentInfo)
+		{
+			if (comp.category == category)
+			{
+				if (ImGui::MenuItem(comp.name.c_str(), NULL, false, enabled))
+					comp.editor.Add(reg, editorCtx.selectedEntity);
+			}
+		}
+	}
 }

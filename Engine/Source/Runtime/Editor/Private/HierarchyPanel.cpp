@@ -101,6 +101,16 @@ namespace tomato
 			if (ImGui::IsItemClicked())
 				editorCtx.selectedEntity = child;
 
+			if (ImGui::BeginPopupContextItem())
+			{
+				if (editorCtx.selectedEntity != child)
+					editorCtx.selectedEntity = child;
+
+				ShowMoreButton(editorCtx);
+
+				ImGui::EndPopup();
+			}
+
 			if (is_open)
 			{
 				Traverse(editorCtx, child);
@@ -134,7 +144,7 @@ namespace tomato
 		auto selected = editorCtx.selectedEntity;
 
 		if (ImGui::MenuItem("Create Empty"))
-			CreateAndSetHierarchyEntity(editorCtx, Prefab::CreateEmpty(reg), isPopup);
+			 CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateEmpty(reg), isPopup);
 		
 
 		if (ImGui::BeginMenu("Game Object"))
@@ -142,23 +152,23 @@ namespace tomato
 			if (ImGui::BeginMenu("Static"))
 			{
 				if (ImGui::MenuItem("Cube"))
-					CreateAndSetHierarchyEntity(editorCtx, Prefab::CreateStaticObject(reg), isPopup);
+					CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateStaticObject(reg), isPopup);
 
 				if (ImGui::MenuItem("Sphere"))
-					CreateAndSetHierarchyEntity(editorCtx, Prefab::CreateStaticObject(reg, Prefab::Sphere), isPopup);
+					CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateStaticObject(reg, Prefab::Sphere), isPopup);
 
 				ImGui::EndMenu();
 			}
 
 			if (ImGui::MenuItem("Character"))
-				CreateAndSetHierarchyEntity(editorCtx, Prefab::CreateCharacter(reg), isPopup);
+				CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateCharacter(reg), isPopup);
 
 			if (ImGui::MenuItem("Camera"))
 			{
 				auto view = reg.view<MainCameraTag>();
 				CreateAndSetHierarchyEntity(
 					editorCtx,
-					Prefab::CreateCamera(reg, view.empty() == true ? true : false),
+					selected = Prefab::CreateCamera(reg, view.empty() == true ? true : false),
 					isPopup);
 			}
 
@@ -168,68 +178,34 @@ namespace tomato
 		if (ImGui::BeginMenu("UI"))
 		{
 			if (ImGui::MenuItem("Canvas"))
-				UIPrefab::CreateCanvas(reg);
+				CreateAndSetHierarchyEntity(editorCtx, selected = UIPrefab::CreateCanvas(reg), isPopup);
 
 			if (ImGui::MenuItem("Button"))
-				UIPrefab::CreateButton(reg);
+				CreateAndSetHierarchyEntity(editorCtx, selected = UIPrefab::CreateButton(reg), isPopup);				
 
 			if (ImGui::MenuItem("Text"))
-				UIPrefab::CreateText(reg);
+				CreateAndSetHierarchyEntity(editorCtx, selected = UIPrefab::CreateText(reg), isPopup);
 
 			if (ImGui::MenuItem("Image"))
-				UIPrefab::CreateImage(reg);
+				CreateAndSetHierarchyEntity(editorCtx, selected = UIPrefab::CreateImage(reg), isPopup);
 
 			ImGui::EndMenu();
 		}
+
+		editorCtx.selectedEntity = selected;
 	}
 
-	void HierarchyPanel::ShowComponentMenu(EditorContext& editorCtx)
-	{
-		if (ImGui::BeginMenu("Component"))
-		{
-			for (auto info : Serialization::componentCategoryMetas)
-			{
-				if (info.category == Serialization::ComponentCategory::Tag) continue;
-				if (ImGui::BeginMenu(info.name))
-				{
-					ShowAddComponent(editorCtx, info.category);
-					ImGui::EndMenu();
-				}
-			}
-			ImGui::EndMenu();
-		}
-
-		if (ImGui::BeginMenu("Tag"))
-		{
-			ShowAddComponent(editorCtx, Serialization::ComponentCategory::Tag);
-			ImGui::EndMenu();
-		}
-	}
-
-	void HierarchyPanel::ShowAddComponent(EditorContext& editorCtx, Serialization::ComponentCategory category)
-	{
-		auto& reg = editorCtx.currentState->GetRegistry();
-
-		bool enabled = editorCtx.selectedEntity != entt::null ? true : false;
-
-		auto& componentInfo = Serialization::ComponentRegistry::GetInstance().GetComponentInfo();
-		for (const auto& comp : componentInfo)
-		{
-			if (comp.category == category)
-			{
-				if (ImGui::MenuItem(comp.name.c_str(), NULL, false, enabled))
-					comp.editor.Add(reg, editorCtx.selectedEntity);
-			}
-		}
-	}
 	void HierarchyPanel::ShowMoreButton(EditorContext& editorCtx)
 	{
+		int t_entitynum = (int)editorCtx.selectedEntity;
+
 		auto& reg = editorCtx.currentState->GetRegistry();
 		if (ImGui::MenuItem("Delete"))
 		{
 			DestroyHierarchyEntity(reg, editorCtx.selectedEntity);
 			editorCtx.selectedEntity = entt::null;
-			std::cout << "delete entity\n";
+
+			std::cout << "delete entity " << t_entitynum << '\n';
 		}
 
 		ImGui::Separator();

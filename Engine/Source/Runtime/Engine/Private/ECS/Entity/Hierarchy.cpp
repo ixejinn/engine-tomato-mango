@@ -2,7 +2,8 @@
 #include "ECS/Entity/Hierarchy.h"
 
 namespace tomato {
-    entt::entity GetRootEntity(entt::registry& reg, entt::entity cur) {
+    entt::entity GetRootEntity(entt::registry& reg, entt::entity cur)
+    {
         entt::entity root = cur;
 
         auto* hierarchy = reg.try_get<HierarchyComponent>(root);
@@ -14,7 +15,8 @@ namespace tomato {
         return root;
     }
 
-    entt::entity GetRootEntity(entt::registry* reg, entt::entity cur) {
+    entt::entity GetRootEntity(entt::registry* reg, entt::entity cur)
+    {
         entt::entity root = cur;
 
         auto* hierarchy = reg->try_get<HierarchyComponent>(root);
@@ -67,10 +69,22 @@ namespace tomato {
         }
     }
 
-    void DestroyHierarchyEntity(entt::registry& reg, entt::entity parent) {
+    void DestroyHierarchyEntity(entt::registry& reg, entt::entity parent)
+    {
         auto* hierarchy = reg.try_get<HierarchyComponent>(parent);
         if (!hierarchy)
+        {
+            reg.destroy(parent);
             return;
+        }
+
+        // if this entity has a parent,
+        // remove it from parent's children list
+        if (hierarchy && hierarchy->parent != entt::null)
+        {
+            auto& pHierarchy = reg.get<HierarchyComponent>(hierarchy->parent);
+            std::erase(pHierarchy.children, parent);
+        }
 
         for (entt::entity child : hierarchy->children)
             DestroyHierarchyEntity(reg, child);

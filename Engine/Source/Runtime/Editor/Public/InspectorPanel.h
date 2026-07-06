@@ -5,6 +5,11 @@
 
 namespace tomato
 {
+	namespace Serialization
+	{
+		enum class ComponentCategory;
+	}
+
 	class InspectorPanel : public EditorPanel
 	{
 	public:
@@ -13,6 +18,10 @@ namespace tomato
 		void Draw(EditorContext&) override;
 
 		const char* GetName() const { return "InspectorPanel"; }
+
+	private:
+		void MenuBar(EditorContext&);
+		void ShowAddComponent(EditorContext&, Serialization::ComponentCategory);
 	};
 }
 

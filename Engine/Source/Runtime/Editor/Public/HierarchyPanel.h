@@ -5,11 +5,6 @@
 
 namespace tomato
 {
-	namespace Serialization
-	{
-		enum class ComponentCategory;
-	}
-
 	class HierarchyPanel : public EditorPanel
 	{
 	public:
@@ -25,8 +20,6 @@ namespace tomato
 
 		void MenuBar(EditorContext& editorCtx);
 		void AddItems(EditorContext& editorCtx, bool isPopup);
-		void ShowComponentMenu(EditorContext&);
-		void ShowAddComponent(EditorContext&, Serialization::ComponentCategory);
 		void ShowMoreButton(EditorContext&);
 	};
 }
