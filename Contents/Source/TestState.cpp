@@ -81,6 +81,10 @@ void TestState::Init() {
         GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain)),
         GetAssetID("ParticleShader"),
         GetAssetID(Texture::PrimitiveName));
+    registry_.emplace<ParticleComponent>(billboarding, 1, GetAssetID(Texture::PrimitiveName));
+    auto& particle = registry_.get<ParticleComponent>(billboarding);
+    particle.positions.emplace_back(0.f);
+    particle.velocities.emplace_back(1.f, 0.f, 0.f);
     registry_.emplace<RootEntityTag>(billboarding);
 
 
