@@ -2,6 +2,9 @@
 
 #include "Prefab/Prefab.h"
 #include "Prefab/UIPrefab.h"
+#include "Prefab/EntityUtils.h"
+
+#include "Resource/AssetRegistry.h"
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
@@ -14,14 +17,30 @@
 #include "Serialization/ComponentRegistry.h"
 
 #include "ECS/Components/Nametag.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Camera.h"
 
 #include "ECS/Entity/Hierarchy.h"
-
 #include <iostream>
 namespace tomato
 {
+	HierarchyPanel::HierarchyPanel(bool open) : EditorPanel(open)
+	{
+		LoadResources();
+	}
+
+	void HierarchyPanel::LoadResources()
+	{
+		icon_visibility[0] =
+			AssetRegistry<Texture>::GetInstance().
+			Get(GetAssetID("Resources/Engine/Assets/img/visibility_off.png"))->GetTexture();
+
+		icon_visibility[1] =
+			AssetRegistry<Texture>::GetInstance().
+			Get(GetAssetID("Resources/Engine/Assets/img/visibility_on.png"))->GetTexture();
+	}
+
 	void HierarchyPanel::Draw(EditorContext& editorCtx)
 	{
 		float width{ 400.f }, height{ 300.f };
@@ -40,7 +59,10 @@ namespace tomato
 				auto view = editorCtx.currentState->GetRegistry().view<RootEntityTag, NametagComponent>();
 				for (auto [e, tag] : view.each())
 				{
-					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_DrawLinesFull | ImGuiTreeNodeFlags_DrawLinesToNodes | ImGuiTreeNodeFlags_OpenOnArrow;
+					VisibleButton(editorCtx, e, tag.name);
+					ImGui::SameLine();
+
+					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_OpenOnArrow; // | ImGuiTreeNodeFlags_DrawLinesToNodes | ImGuiTreeNodeFlags_DrawLinesFull;
 
 					if (editorCtx.selectedEntity == e)
 						flags |= ImGuiTreeNodeFlags_Selected;
@@ -91,7 +113,10 @@ namespace tomato
 		{
 			auto& nameTag = reg.get<NametagComponent>(child);
 
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_DrawLinesFull | ImGuiTreeNodeFlags_DrawLinesToNodes | ImGuiTreeNodeFlags_OpenOnArrow;
+			VisibleButton(editorCtx, child, nameTag.name);
+			ImGui::SameLine();
+
+			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_OpenOnArrow; //ImGuiTreeNodeFlags_DrawLinesToNodes |  ImGuiTreeNodeFlags_DrawLinesFull
 
 			if (editorCtx.selectedEntity == child)
 				flags |= ImGuiTreeNodeFlags_Selected;
@@ -194,6 +219,61 @@ namespace tomato
 
 		editorCtx.selectedEntity = selected;
 	}
+
+	void HierarchyPanel::VisibleButton(EditorContext& editorCtx, entt::entity e, std::string& str)
+	{
+		auto& reg = editorCtx.currentState->GetRegistry();
+
+		std::string label = "visible" + str;
+
+		auto* visibility = reg.try_get<VisibilityComponent>(e);
+		if (ImGui::ImageButton(label.c_str(), icon_visibility[visibility->visible && visibility->inheritedVisible], ImVec2(15.f, 15.f)))
+			ToggleVisible(reg, e);
+	}
+
+	void HierarchyPanel::ToggleVisible(entt::registry& reg, entt::entity e)
+	{
+		auto& visibility = reg.get<VisibilityComponent>(e);
+		visibility.visible = !visibility.visible;
+
+		UpdateInheritedVisibility(reg, e);
+	}
+
+	void HierarchyPanel::UpdateInheritedVisibility(entt::registry& reg, entt::entity e)
+	{
+		auto& visibility = reg.get<VisibilityComponent>(e);
+		
+		bool currentVisible = visibility.visible && visibility.inheritedVisible;
+
+		auto* hierarchy = reg.try_get<HierarchyComponent>(e);
+		if (!hierarchy) return;
+
+		for (auto& child : hierarchy->children)
+		{
+			auto& cVisibility = reg.get<VisibilityComponent>(child);
+			cVisibility.inheritedVisible = currentVisible;
+
+			UpdateInheritedVisibility(reg, child);
+		}
+	}
+
+	void SetVisible(entt::registry& reg, entt::entity e, bool parentVisibility)
+	{
+		auto* visibility = reg.try_get<VisibilityComponent>(e);
+		if (visibility)
+		{
+			visibility->visible = !visibility->visible;
+			visibility->inheritedVisible = parentVisibility;
+
+			auto* hierarchy = reg.try_get<HierarchyComponent>(e);
+			if (hierarchy)
+			{
+				for (auto& child : hierarchy->children)
+					SetVisible(reg, child, visibility->inheritedVisible);
+			}
+		}
+	}
+
 
 	void HierarchyPanel::ShowMoreButton(EditorContext& editorCtx)
 	{

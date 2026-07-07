@@ -133,6 +133,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Components/EntityComponents.h
         Source/Runtime/Engine/Public/ECS/Components/CharComponents.h
         Source/Runtime/Engine/Public/ECS/Components/ComponentFwd.h
+        Source/Runtime/Engine/Public/ECS/Components/Visibility.h
         Source/Runtime/Engine/Public/Prefab/UIPrefab.h
         Source/Runtime/Engine/Public/ECS/Systems/UITransformSystem.h
         Source/Runtime/Engine/Public/Serialization/ComponentSerializer.h

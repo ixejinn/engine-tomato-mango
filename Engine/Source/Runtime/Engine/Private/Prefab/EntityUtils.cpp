@@ -1,6 +1,7 @@
 ﻿#include <entt/entt.hpp>
 #include "Prefab/EntityUtils.h"
 #include "ECS/Components/Nametag.h"
+#include "ECS/Components/Visibility.h"
 
 namespace tomato
 {
@@ -70,5 +71,14 @@ namespace tomato
 	{
 		auto& tag = reg.get<NametagComponent>(e);
 		return tag.id;
+	}
+
+	bool IsVisible(entt::registry& reg, entt::entity e)
+	{
+		auto* v = reg.try_get<VisibilityComponent>(e);
+		if (v)
+			return v->visible && v->inheritedVisible;
+
+		throw std::runtime_error("Not found Visibility Component");
 	}
 }

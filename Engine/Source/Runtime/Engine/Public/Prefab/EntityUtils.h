@@ -14,5 +14,7 @@ namespace tomato
 	
 	entt::entity GetEntityByUUID(entt::registry& reg, UUID id);
 	UUID GetUUID(entt::registry& reg, entt::entity e);
+
+	bool IsVisible(entt::registry& reg, entt::entity e);
 }
 #endif // !MANGO_ENTITYUTILS_H

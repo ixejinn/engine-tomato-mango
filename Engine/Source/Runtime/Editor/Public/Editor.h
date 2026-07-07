@@ -24,6 +24,9 @@ namespace tomato
 		void SetInputCallbacks();
 
 	private:
+		void LoadResources();
+
+	private:
 		std::vector<std::unique_ptr<EditorPanel>> panels;
 		
 		EditorContext eCtx;

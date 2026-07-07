@@ -1,6 +1,7 @@
 ﻿#include "Editor.h"
 
 #include <entt/entt.hpp>
+#include "Resource/Render/Texture.h"
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
@@ -44,9 +45,17 @@ namespace tomato
 			&config,
 			io.Fonts->GetGlyphRangesKorean());
 
+		LoadResources();
+
 		eCtx.selectedEntity = entt::null;
 		panels.push_back(std::make_unique<HierarchyPanel>(true));
 		panels.push_back(std::make_unique<InspectorPanel>(true));
+	}
+
+	void Editor::LoadResources()
+	{
+		Texture::Create("Resources/Engine/Assets/img/visibility_on.png");
+		Texture::Create("Resources/Engine/Assets/img/visibility_off.png");
 	}
 
 	void Editor::ShutdownImGui()

@@ -7,6 +7,7 @@
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Rollback.h"
 #include "ECS/Components/Nametag.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/Components/Character.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "Resource/AssetHash.h"
@@ -42,7 +43,7 @@ namespace tomato::Prefab
                                              mesh == Cube ? Mesh::Primitive::Cube : Mesh::Primitive::Sphere)),
                                      GetAssetID(Shader::PrimitiveName),
                                      GetAssetID(Texture::PrimitiveName));
-
+        reg.emplace<VisibilityComponent>(obj);
         const entt::entity col = AttachCollider(reg, obj, mesh == Cube ? ColliderType::Cube : ColliderType::Sphere);
 
         TMT_INFO << "Create static object: " << (int)obj;
@@ -61,6 +62,7 @@ namespace tomato::Prefab
                                              mesh == Cube ? Mesh::Primitive::Cube : Mesh::Primitive::Sphere)),
                                      GetAssetID(Shader::PrimitiveName),
                                      GetAssetID(Texture::PrimitiveName));
+        reg.emplace<VisibilityComponent>(obj);
 
         const entt::entity col = AttachCharacterCollider(reg, obj, mesh == Cube ? ColliderType::Cube : ColliderType::Sphere);
 
@@ -83,6 +85,7 @@ namespace tomato::Prefab
         reg.emplace<TransformComponent>(obj, pos, rot);
         reg.emplace<CameraComponent>(obj);
         reg.emplace<RootEntityTag>(obj);
+        reg.emplace<VisibilityComponent>(obj);
         // reg.emplace<RollbackEntityTag>(obj);
 
         if (isMain)
@@ -106,6 +109,7 @@ namespace tomato::Prefab
                                              type == ColliderType::Cube ? Mesh::Primitive::Cube : Mesh::Primitive::Sphere)),
                                      GetAssetID(Shader::PrimitiveName),
                                      GetAssetID(Texture::PrimitiveName));
+        reg.emplace<VisibilityComponent>(col);
 
         TMT_INFO << "Create collider: " << (int)col;
         return col;

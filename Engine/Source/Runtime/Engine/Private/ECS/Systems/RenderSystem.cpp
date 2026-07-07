@@ -1,9 +1,11 @@
-#include <glm/glm.hpp>
+﻿#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "ECS/Systems/RenderSystem.h"
+#include "Prefab/EntityUtils.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Render.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "Resource/AssetHash.h"
@@ -62,6 +64,9 @@ namespace tomato
         auto group = registry.group<TransformComponent, RenderComponent>();
         for (auto [e, trf, render] : group.each()) {
             // TODO: frustum culling
+
+            if (!IsVisible(registry, e))
+                continue;
 
             if (curShader_ != render.shader)
             {

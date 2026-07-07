@@ -6,8 +6,10 @@
 
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Render.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/Components/Text.h"
 #include "ECS/Components/UI.h"
+#include "Prefab/EntityUtils.h"
 
 #include "Resource/AssetHash.h"
 #include "Resource/AssetRegistry.h"
@@ -61,6 +63,9 @@ namespace tomato
 
             auto& rect = registry.get<RectTransformComponent>(e);
             auto& render = registry.get<RenderComponent>(e);
+ 
+            if (!IsVisible(registry, e))
+                continue;
 
             if (curShader_ != render.shader)
             {
@@ -104,6 +109,9 @@ namespace tomato
 
             auto& text = registry.get<TextComponent>(e);
             auto& rect = registry.get<RectTransformComponent>(e);
+
+            if (!IsVisible(registry, e))
+                continue;
 
             Font* font = AssetRegistry<Font>::GetInstance().Get(text.font);
             if (!font)
