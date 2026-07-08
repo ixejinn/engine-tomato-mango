@@ -76,16 +76,11 @@ void TestState::Init() {
     entt::entity billboarding = registry_.create();
     registry_.emplace<NametagComponent>(billboarding, GenerateUUID(), GenerateEntityName(registry_, "billboarding"));
     registry_.emplace<TransformComponent>(billboarding, glm::vec3{3, 0, 0});
-    registry_.emplace<RenderComponent>(billboarding,
-        glm::vec4(1.f),
-        GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain)),
-        GetAssetID("ParticleShader"),
-        GetAssetID(Texture::PrimitiveName));
     registry_.emplace<ParticleComponent>(billboarding, 1, GetAssetID(Texture::PrimitiveName));
     auto& particle = registry_.get<ParticleComponent>(billboarding);
     particle.positions.emplace_back(0.f);
     particle.velocities.emplace_back(1.f, 0.f, 0.f);
-    registry_.emplace<RootEntityTag>(billboarding);
+    SetHierarchy(registry_, player0, billboarding);
 
 
     ////UI

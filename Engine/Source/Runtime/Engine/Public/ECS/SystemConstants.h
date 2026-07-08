@@ -18,6 +18,7 @@ namespace tomato
         Rendering,
         Camera,
         ScreenUI,
+        Particle,
         COUNT
     };
 
@@ -37,6 +38,7 @@ namespace tomato
         SystemPhase::UI,
         SystemPhase::UITransformation,
         SystemPhase::Rendering,
+        SystemPhase::Particle,
         SystemPhase::ScreenUI
     };
 }
