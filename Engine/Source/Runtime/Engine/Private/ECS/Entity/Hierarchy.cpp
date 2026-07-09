@@ -1,5 +1,6 @@
 ﻿#include "ECS/Components/Hierarchy.h"
 #include "ECS/Entity/Hierarchy.h"
+#include "ECS/Entity/Entity.h"
 
 namespace tomato {
     entt::entity GetRootEntity(entt::registry& reg, entt::entity cur)

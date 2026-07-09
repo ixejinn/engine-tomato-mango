@@ -1,7 +1,7 @@
 ﻿#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "ECS/Systems/RenderSystem.h"
-#include "Prefab/EntityUtils.h"
+#include "ECS/Entity/Entity.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Render.h"

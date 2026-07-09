@@ -1,5 +1,8 @@
 ﻿#include <entt/entt.hpp>
-#include "Prefab/EntityUtils.h"
+
+#include "ECS/Entity/Entity.h"
+#include "ECS/Entity/Hierarchy.h"
+#include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Visibility.h"
 
@@ -38,12 +41,12 @@ namespace tomato
 			};
 
 		std::string candidate(baseName);
-		
+
 		if (!Exists(candidate))
 			return candidate;
 
 		int index = 1;
-		
+
 		while (true)
 		{
 			candidate = std::string(baseName) + " (" + std::to_string(index) + ")";
@@ -82,4 +85,11 @@ namespace tomato
 
 		throw std::runtime_error("Not found Visibility Component");
 	}
+
+    void DestroyEntity(entt::registry& reg, entt::entity e) {
+        if (reg.try_get<HierarchyComponent>(e))
+            DestroyHierarchyEntity(reg, e);
+        else
+            reg.destroy(e);
+    }
 }

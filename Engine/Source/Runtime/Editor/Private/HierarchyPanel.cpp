@@ -2,7 +2,7 @@
 
 #include "Prefab/Prefab.h"
 #include "Prefab/UIPrefab.h"
-#include "Prefab/EntityUtils.h"
+#include "ECS/Entity/Entity.h"
 
 #include "Resource/AssetRegistry.h"
 
@@ -22,7 +22,7 @@
 #include "ECS/Components/Camera.h"
 
 #include "ECS/Entity/Hierarchy.h"
-#include <iostream>
+
 namespace tomato
 {
 	HierarchyPanel::HierarchyPanel(bool open) : EditorPanel(open)
@@ -104,8 +104,9 @@ namespace tomato
 		if (editorCtx.selectedEntity == e)
 			flags |= ImGuiTreeNodeFlags_Selected;
 
-		bool is_open = ImGui::TreeNodeEx((void*)(entt::id_type)e, flags, tag.name.c_str());
-		
+		ImGui::PushID((int)entt::to_integral(e));
+		bool is_open = ImGui::TreeNodeEx("Entity Node", flags, tag.name.c_str());
+
 		DragDropSource(editorCtx, e);
 		DragDropTarget(editorCtx, e);
 
@@ -121,6 +122,7 @@ namespace tomato
 
 			ImGui::EndPopup();
 		}
+		ImGui::PopID();
 
 		return is_open;
 	}
@@ -312,8 +314,6 @@ namespace tomato
 		{
 			DestroyHierarchyEntity(reg, editorCtx.selectedEntity);
 			editorCtx.selectedEntity = entt::null;
-
-			std::cout << "delete entity " << t_entitynum << '\n';
 		}
 
 		ImGui::Separator();

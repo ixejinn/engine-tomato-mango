@@ -3,8 +3,8 @@
 
 #include <entt/entt.hpp>
 #include <vector>
-#include "UUID.h"
-#include "Prefab/EntityUtils.h"
+
+#include "ECS/Entity/Entity.h"
 
 namespace tomato {
     struct RootEntityTag {};
