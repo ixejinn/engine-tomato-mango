@@ -73,15 +73,14 @@ void TestState::Init() {
     renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
 
     // Test billboarding
-    entt::entity billboarding = registry_.create();
-    registry_.emplace<NametagComponent>(billboarding, GenerateUUID(), GenerateEntityName(registry_, "billboarding"));
-    registry_.emplace<TransformComponent>(billboarding, glm::vec3{3, 0, 0});
-    registry_.emplace<ParticleComponent>(billboarding, 1, GetAssetID(Texture::PrimitiveName));
-    auto& particle = registry_.get<ParticleComponent>(billboarding);
-    particle.positions.emplace_back(0.f);
-    particle.velocities.emplace_back(1.f, 0.f, 0.f);
-    SetHierarchy(registry_, player0, billboarding);
-
+//    entt::entity billboarding = registry_.create();
+//    registry_.emplace<NametagComponent>(billboarding, GenerateUUID(), GenerateEntityName(registry_, "billboarding"));
+//    registry_.emplace<TransformComponent>(billboarding, glm::vec3{3, 0, 0});
+//    registry_.emplace<ParticleComponent>(billboarding, 1, GetAssetID(Texture::PrimitiveName));
+//    auto& particle = registry_.get<ParticleComponent>(billboarding);
+//    particle.positions.emplace_back(0.f);
+//    particle.velocities.emplace_back(1.f, 0.f, 0.f);
+//    SetHierarchy(registry_, player0, billboarding);
 
     ////UI
     auto targetLabel = UIPrefab::CreateText(registry_, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 20.f);

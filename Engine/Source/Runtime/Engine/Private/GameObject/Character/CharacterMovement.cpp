@@ -3,17 +3,19 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Entity/Hierarchy.h"
+#include "State/State.h"
 #include "Utils/Logger.h"
 
 namespace tomato::CharacterMovement
 {
     void ChangeMovementMode(ChangeMovementModeEvent& event)
     {
+        auto& registry = event.state->GetRegistry();
         switch (event.mode)
         {
         case Falling:
             {
-                auto& move = event.reg->get<MovementComponent>(GetRootEntity(event.reg, event.e));
+                auto& move = registry.get<MovementComponent>(GetRootEntity(registry, event.e));
                 if (--move.gndStayCnt == 0)
                 {
                     move.mode = Falling;
@@ -23,14 +25,14 @@ namespace tomato::CharacterMovement
             break;
         case Walking:
             {
-                entt::entity root = GetRootEntity(event.reg, event.e);
-                auto& move = event.reg->get<MovementComponent>(root);
+                entt::entity root = GetRootEntity(registry, event.e);
+                auto& move = registry.get<MovementComponent>(root);
                 ++move.gndStayCnt;
 
                 move.mode = Walking;
                 move.jumpCnt = 0;
 
-                event.reg->get<VelocityComponent>(root).velocity.y = 0;
+                registry.get<VelocityComponent>(root).velocity.y = 0;
                 TMT_INFO << "Walking " << (int)event.e;
             }
             break;

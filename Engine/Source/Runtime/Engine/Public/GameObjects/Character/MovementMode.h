@@ -2,6 +2,7 @@
 #define MANGO_MOVEMENTMODE_H
 
 #include <entt/fwd.hpp>
+#include "State/StateFwd.h"
 
 namespace tomato
 {
@@ -14,7 +15,7 @@ namespace tomato
     struct ChangeMovementModeEvent
     {
         entt::entity e;
-        entt::registry* reg;
+        State* state;
         MovementMode mode;
     };
 }

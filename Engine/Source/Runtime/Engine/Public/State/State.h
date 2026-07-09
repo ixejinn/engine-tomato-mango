@@ -4,8 +4,9 @@
 #include <array>
 #include <unordered_map>
 #include <entt/entity/registry.hpp>
-#include "UUID.h"
 #include "State/StateFwd.h"
+#include "Particle/ParticleEmitterPool.h"
+#include "UUID.h"
 #include "TomatoFwd.h"
 
 namespace tomato
@@ -25,6 +26,8 @@ namespace tomato
         PlayerInputTimelines& GetPlayerInputTimelines() { return playerInputs_; }
 
         void SetPlayerInput(uint32_t tick, InputRecord input, int playerID);
+
+//        ParticleEmitterPool particlePool_;
 
     protected:
         Engine& engine_;

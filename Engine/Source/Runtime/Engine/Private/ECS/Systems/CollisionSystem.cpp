@@ -200,9 +200,9 @@ namespace tomato {
                         eventDispatcher.Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
 
                         if (registry.all_of<CharacterTag>(GetRootEntity(registry, candidate.a)))
-                            eventDispatcher.Enqueue(ChangeMovementModeEvent{candidate.a, &registry, Walking});
+                            eventDispatcher.Enqueue(ChangeMovementModeEvent{candidate.a, simCtx.state, Walking});
                         if (registry.all_of<CharacterTag>(GetRootEntity(registry, candidate.b)))
-                            eventDispatcher.Enqueue(ChangeMovementModeEvent{candidate.b, &registry, Walking});
+                            eventDispatcher.Enqueue(ChangeMovementModeEvent{candidate.b, simCtx.state, Walking});
                     }
                     else
                     {
@@ -241,9 +241,9 @@ namespace tomato {
                         EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{ it->first.a, it->first.b, &registry });
 
                         if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.a)))
-                            eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.a, &registry, Falling });
+                            eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.a, simCtx.state, Falling });
                         if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.b)))
-                            eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.b, &registry, Falling });
+                            eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.b, simCtx.state, Falling });
                     }
                     else
                         EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{ it->first.a, it->first.b, &registry });
