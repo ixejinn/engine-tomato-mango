@@ -14,7 +14,7 @@
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
-#include "Prefab/EntityUtils.h"
+#include "ECS/Entity/Entity.h"
 #include "Utils/Logger.h"
 
 namespace tomato::Prefab

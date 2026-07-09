@@ -30,7 +30,7 @@
 #include "ECS/Components/Hierarchy.h"
 
 #include "ECS/Entity/Hierarchy.h"
-#include "Prefab/EntityUtils.h"
+#include "ECS/Entity/Entity.h"
 
 namespace tomato
 {

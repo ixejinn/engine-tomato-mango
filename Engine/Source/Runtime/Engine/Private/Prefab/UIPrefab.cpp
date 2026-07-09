@@ -1,5 +1,7 @@
 ﻿#include <entt/entt.hpp>
+
 #include "Prefab/UIPrefab.h"
+
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Visibility.h"
 #include "ECS/Components/UI.h"
@@ -7,6 +9,7 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UIEvents.h"
+
 #include "Resource/AssetHash.h"
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
@@ -14,7 +17,7 @@
 #include "Resource/AssetRegistry.h"
 
 #include "ECS/Entity/Hierarchy.h"
-#include "Prefab/EntityUtils.h"
+#include "ECS/Entity/Entity.h"
 
 namespace tomato::UIPrefab
 {

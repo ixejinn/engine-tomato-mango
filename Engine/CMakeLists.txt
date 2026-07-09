@@ -113,7 +113,6 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/GameNetwork/Message/NetMessage.h
         Source/Runtime/Engine/Public/GameNetwork/GamePlayNetSystem.h
         Source/Runtime/Engine/Public/ECS/Components/Hierarchy.h
-        Source/Runtime/Engine/Private/ECS/Hierarchy/Hierarchy.h
         Source/Runtime/Engine/Public/ECS/Systems/IntegrationSystem.h
         Source/Runtime/Engine/Public/Prefab/Prefab.h
         Source/Runtime/Engine/Public/ECS/Systems/GravitySystem.h
@@ -121,10 +120,10 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackManager.h
         Source/Runtime/Engine/Public/GameNetwork/Rollback/ComponentTimeline.h
         Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackFwd.h
-        Source/Runtime/Engine/Public/ECS/Components/Lifetime.h
+        
         Source/Runtime/Engine/Private/ECS/Systems/GarbageEntityCollectionSystem.h
         Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackConfig.h
-        Source/Runtime/Engine/Public/ECS/Entity/Lifetime.h
+        Source/Runtime/Engine/Public/ECS/Entity/Entity.h
         Source/Runtime/Engine/Public/ECS/Entity/Hierarchy.h
         Source/Runtime/Engine/Public/ECS/Components/Rollback.h
         Source/Runtime/Engine/Public/ECS/Forward/EntityCompFwd.h
@@ -140,7 +139,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Serialization/ComponentInfo.h
         Source/Runtime/Engine/Public/ECS/Components/Nametag.h
         Source/Runtime/Core/Public/UUID.h
-        Source/Runtime/Engine/Public/Prefab/EntityUtils.h
+        
         Source/Runtime/Engine/Public/Serialization/ComponentRegistry.h
         Source/Runtime/Engine/Public/Serialization/Json.h
         Source/Runtime/Editor/Public/Editor.h
@@ -163,7 +162,8 @@ set(ENGINE_HEADERS
 		../Contents/Source/TimerTestSystem.h
 		Source/Runtime/Core/Public/Clock/TickTimer.h
 		Source/Runtime/Core/Public/Clock/TimerState.h
- "Source/Runtime/Core/Public/EnumFlags.h")
+        Source/Runtime/Core/Public/EnumFlags.h
+ )
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -208,7 +208,6 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Network/CilentNetwork.cpp
         Source/Runtime/Engine/Private/GameNetwork/Message/InputMessage.cpp
         Source/Runtime/Engine/Private/GameNetwork/GamePlayNetSystem.cpp
-        Source/Runtime/Engine/Private/ECS/Hierarchy/Hierarchy.cpp
         Source/Runtime/Engine/Private/ECS/Systems/IntegrationSystem.cpp
         Source/Runtime/Engine/Private/Collision/Broad/BroadPhase.cpp
         Source/Runtime/Engine/Private/ECS/Components/Transform.cpp
@@ -217,13 +216,13 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/GameObject/Character/CharacterMovement.cpp
         Source/Runtime/Engine/Private/ECS/Systems/GarbageEntityCollectionSystem.cpp
         Source/Runtime/Engine/Private/ECS/Entity/Hierarchy.cpp
-        Source/Runtime/Engine/Private/ECS/Entity/Lifetime.cpp
+        Source/Runtime/Engine/Private/ECS/Entity/Entity.cpp
         Source/Runtime/Engine/Private/GameNetwork/Rollback/RollbackManager.cpp
         Source/Runtime/Engine/Private/Prefab/UIPrefab.cpp
         Source/Runtime/Engine/Private/ECS/Systems/UITransformSystem.cpp
         Source/Runtime/Engine/Private/Serialization/ComponentSerializer.cpp
         Source/Runtime/Core/Private/UUID.cpp
-        Source/Runtime/Engine/Private/Prefab/EntityUtils.cpp
+        
         Source/Runtime/Engine/Private/Serialization/ComponentRegistry.cpp
         Source/Runtime/Editor/Private/Editor.cpp
         Source/Runtime/Editor/Private/HierarchyPanel.cpp

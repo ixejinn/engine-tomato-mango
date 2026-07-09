@@ -6,7 +6,7 @@
 
 #include "ECS/Components/Camera.h"
 #include "ECS/SystemUpdateContexts.h"
-#include "Prefab/EntityUtils.h"
+#include "ECS/Entity/Entity.h"
 
 #include "Utils/RegistryEntry.h"
 REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::UITransformation, UITransformSystem)

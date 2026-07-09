@@ -9,7 +9,7 @@
 #include "ECS/Components/Visibility.h"
 #include "ECS/Components/Text.h"
 #include "ECS/Components/UI.h"
-#include "Prefab/EntityUtils.h"
+#include "ECS/Entity/Entity.h"
 
 #include "Resource/AssetHash.h"
 #include "Resource/AssetRegistry.h"

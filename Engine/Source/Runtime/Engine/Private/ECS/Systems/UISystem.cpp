@@ -10,7 +10,7 @@
 #include "Services/Input.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Font.h"
-#include "Prefab/EntityUtils.h"
+#include "ECS/Entity/Entity.h"
 #include "Utils/Utf.h"
 #include "Utils/Logger.h"
 

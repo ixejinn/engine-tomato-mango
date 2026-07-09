@@ -17,7 +17,6 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Camera.h"
 
-#include <iostream>
 namespace tomato
 {
 	InspectorPanel::InspectorPanel(bool open) : EditorPanel(open)
@@ -49,12 +48,16 @@ namespace tomato
 				if (HasFlag<Serialization::ComponentFlags>(comp.flags, Serialization::ComponentFlags::Hidden))
 					continue;
 
-				bool is_open = ImGui::CollapsingHeader(comp.name.c_str(), ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_AllowOverlap);
+				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_AllowOverlap;
+				if(!comp.editor.Draw)
+					flags |= ImGuiTreeNodeFlags_Leaf;
+
+				bool is_open = ImGui::CollapsingHeader(comp.name.c_str(), flags);
+
 				MoreButton(editorCtx, comp);
+
 				if (is_open && comp.editor.Draw)
-				{
 					comp.editor.Draw(editorCtx, editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
-				}
 			}
 		}
 		ImGui::End();

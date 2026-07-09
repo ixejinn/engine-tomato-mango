@@ -1,7 +1,7 @@
-#include "ECS/Systems/GarbageEntityCollectionSystem.h"
+﻿#include "ECS/Systems/GarbageEntityCollectionSystem.h"
 #include "ECS/Components/Lifetime.h"
 #include "ECS/Components/Hierarchy.h"
-#include "ECS/Entity/Lifetime.h"
+#include "ECS/Entity/Entity.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "GameNetwork/Rollback/RollbackConfig.h"
 
