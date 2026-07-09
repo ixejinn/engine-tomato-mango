@@ -27,15 +27,15 @@ namespace tomato
 
         void SetPlayerInput(uint32_t tick, InputRecord input, int playerID);
 
-//        ParticleEmitterPool particlePool_;
-
     protected:
         Engine& engine_;
         entt::registry registry_;
-
         std::unordered_map<UUID, entt::entity> entityMap_;
 
         PlayerInputTimelines playerInputs_;
+
+    public:
+        ParticleEmitterPool particlePool_;
     };
 }
 

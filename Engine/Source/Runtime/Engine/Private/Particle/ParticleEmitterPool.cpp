@@ -1,9 +1,13 @@
+#include <random>
 #include <entt/entt.hpp>
 #include "Particle/ParticleEmitterPool.h"
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Particle.h"
+#include "ECS/Entity/Hierarchy.h"
+#include "Resource/AssetRegistry.h"
+#include "Resource/Render/Texture.h"
 
 namespace tomato
 {
@@ -25,6 +29,8 @@ namespace tomato
             particle.velocities.reserve(ParticleEffectComponent::MAX_PARTICLE);
             particle.lifetimes.reserve(ParticleEffectComponent::MAX_PARTICLE);
             particle.scales.reserve(ParticleEffectComponent::MAX_PARTICLE);
+
+            freeEmitters_.push_back(e);
         }
     }
 
@@ -42,17 +48,36 @@ namespace tomato
         auto& transform = registry_.get<TransformComponent>(e);
         transform.SetPosition(pos);
 
-        auto& particle = registry_.get<ParticleComponent>(e);
+        auto& particle = registry_.get<ParticleEffectComponent>(e);
         switch (type)
         {
         case Jump:
-            {
-
-            }
-            break;
-
         case Move:
+        {
+            const auto& details = ParticleEffectMap::ParticleDetails[Jump];
+            particle.activeCnt = details.spawnNum;
+
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> dis(0, 359);
+
+            for (int i = 0; i < particle.activeCnt; ++i)
+            {
+                particle.positions.emplace_back(0.f);
+
+                auto radian = glm::radians(static_cast<float>(dis(gen)));
+                particle.velocities.emplace_back(glm::sin(radian), 0, glm::cos(radian));
+
+                particle.lifetimes.emplace_back(details.duration.first, std::chrono::steady_clock::now());
+                particle.scales.push_back(details.scale.first);
+            }
+
+            particle.texture = GetAssetID(Texture::PrimitiveName);
+        }
             break;
+
+//        case Move:
+//            break;
         default: ;
         }
 
@@ -70,7 +95,37 @@ namespace tomato
         entt::entity e = freeEmitters_.back();
         freeEmitters_.pop_back();
 
-        // TODO: Initialize ParticleEffectComponent
+        SetHierarchy(registry_, parent, e);
+
+        auto& particle = registry_.get<ParticleEffectComponent>(e);
+        switch (type)
+        {
+            case Jump:
+            case Move:
+            {
+                const auto& details = ParticleEffectMap::ParticleDetails[Jump];
+                particle.activeCnt = details.spawnNum;
+
+                std::random_device rd;
+                std::mt19937 gen(rd());
+                std::uniform_int_distribution<> dis(0, 359);
+
+                for (int i = 0; i < particle.activeCnt; ++i)
+                {
+                    particle.positions.emplace_back(0.f);
+
+                    auto radian = glm::radians(static_cast<float>(dis(gen)));
+                    particle.velocities.emplace_back(glm::sin(radian), 0, glm::cos(radian));
+
+                    particle.lifetimes.emplace_back(details.duration.first, std::chrono::steady_clock::now());
+                    particle.scales.push_back(details.scale.first);
+                }
+
+                particle.texture = GetAssetID(Texture::PrimitiveName);
+            }
+            break;
+            default: ;
+        }
 
         return e;
     }
@@ -80,6 +135,8 @@ namespace tomato
         auto* particle = registry_.try_get<ParticleEffectComponent>(e);
         if (!particle)
             return false;
+
+        SetHierarchy(registry_, entt::null, e);
 
         particle->positions.clear();
         particle->velocities.clear();
