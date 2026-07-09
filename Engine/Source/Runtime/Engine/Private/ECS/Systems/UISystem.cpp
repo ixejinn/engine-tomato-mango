@@ -194,9 +194,13 @@ namespace tomato
 						TMT_WARN << "Main camera not present";
 						continue;
 					}
-					auto viewProjMat = registry.try_get<CameraComponent>(renderCtx.mainCam)->viewProjMat;
+					auto viewProjMat = registry.try_get<CameraComponent>(renderCtx.mainCam);
 
-					glm::vec3 screenPos = WorldToScreen(targetTransform->GetWorldPosition(), viewProjMat, Window::GetWidth(), Window::GetHeight());
+					glm::vec3 screenPos =
+						WorldToScreen(
+							targetTransform->GetWorldPosition(),
+							viewProjMat == nullptr ? glm::mat4(1.f) : viewProjMat->viewProjMat,
+							Window::GetWidth(), Window::GetHeight());
 					rect.position = screenPos + target->headOffset;
 
 					rect.computedSize = rect.sizeDelta;

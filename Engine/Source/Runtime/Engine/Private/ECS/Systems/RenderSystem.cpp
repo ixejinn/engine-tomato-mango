@@ -51,7 +51,7 @@ namespace tomato
             TMT_WARN << "Main camera is not found.";
             return;
         }
-        auto& viewProjMat = registry.try_get<CameraComponent>(mainCam)->viewProjMat;
+        auto* viewProjMat = registry.try_get<CameraComponent>(mainCam);
 
         Mesh* mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
         mesh->Bind();
@@ -90,7 +90,7 @@ namespace tomato
 
             const auto& mtx = trf.GetTransformMatrix();
             shader->SetUniformMat4("uModel", mtx);
-            shader->SetUniformMat4("uViewProj", viewProjMat);
+            shader->SetUniformMat4("uViewProj", viewProjMat == nullptr ? glm::mat4(1.f) : viewProjMat->viewProjMat);
             shader->SetUniformMat3("uNormal", glm::transpose(glm::inverse(glm::mat3(mtx))));
 
             shader->SetUniformInt("uTexture", 0);

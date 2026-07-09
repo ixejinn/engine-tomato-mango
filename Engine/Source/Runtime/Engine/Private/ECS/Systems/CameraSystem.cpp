@@ -74,6 +74,9 @@ namespace tomato
             return;
         }
 
+        if (viewMainCam.empty())
+            renderCtx.mainCam = entt::null;
+
         renderCtx.mainCam = viewMainCam.front();
     }
 }

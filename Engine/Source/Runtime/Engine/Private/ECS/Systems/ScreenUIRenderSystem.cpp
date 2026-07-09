@@ -62,14 +62,15 @@ namespace tomato
                 continue; //text
 
             auto& rect = registry.get<RectTransformComponent>(e);
-            auto& render = registry.get<RenderComponent>(e);
- 
+            auto* render = registry.try_get<RenderComponent>(e);
+            if (!render) continue;
+
             if (!IsVisible(registry, e))
                 continue;
 
-            if (curShader_ != render.shader)
+            if (curShader_ != render->shader)
             {
-                curShader_ = render.shader;
+                curShader_ = render->shader;
                 shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
                 shader->Use();
 
@@ -77,21 +78,21 @@ namespace tomato
                 shader->SetUniformMat4("projection", projection);
             }
 
-            if (curTexture_ != render.texture)
+            if (curTexture_ != render->texture)
             {
-                curTexture_ = render.texture;
+                curTexture_ = render->texture;
                 AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
             }
 
-            if (curMesh_ != render.mesh)
+            if (curMesh_ != render->mesh)
             {
-                curMesh_ = render.mesh;
+                curMesh_ = render->mesh;
                 mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
                 mesh->Bind();
             }
 
             shader->SetUniformMat4("uModel", rect.model_matrix);
-            shader->SetUniformVec4("uColor", render.color);
+            shader->SetUniformVec4("uColor", render->color);
 
             mesh->Draw();
         }

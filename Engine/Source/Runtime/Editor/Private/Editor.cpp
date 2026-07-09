@@ -56,6 +56,7 @@ namespace tomato
 	{
 		Texture::Create("Resources/Engine/Assets/img/visibility_on.png");
 		Texture::Create("Resources/Engine/Assets/img/visibility_off.png");
+		Texture::Create("Resources/Engine/Assets/img/more_vert.png");
 	}
 
 	void Editor::ShutdownImGui()

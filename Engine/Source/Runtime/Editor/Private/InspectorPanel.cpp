@@ -1,5 +1,8 @@
 ﻿#include "InspectorPanel.h"
 
+#include "Resource/AssetRegistry.h"
+#include "Resource/Render/Texture.h"
+
 #include "GLFW/glfw3.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -14,8 +17,14 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Camera.h"
 
+#include <iostream>
 namespace tomato
 {
+	InspectorPanel::InspectorPanel(bool open) : EditorPanel(open)
+	{
+		LoadResources();
+	}
+
 	void InspectorPanel::Draw(EditorContext& editorCtx)
 	{
 		if (editorCtx.selectedEntity == entt::null)
@@ -41,7 +50,7 @@ namespace tomato
 					continue;
 
 				bool is_open = ImGui::CollapsingHeader(comp.name.c_str(), ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_AllowOverlap);
-				ShowMoreButton(editorCtx, comp.name);
+				MoreButton(editorCtx, comp);
 				if (is_open && comp.editor.Draw)
 				{
 					comp.editor.Draw(editorCtx, editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
@@ -49,6 +58,13 @@ namespace tomato
 			}
 		}
 		ImGui::End();
+	}
+
+	void InspectorPanel::LoadResources()
+	{
+		more_vert =
+			AssetRegistry<Texture>::GetInstance().
+			Get(GetAssetID("Resources/Engine/Assets/img/more_vert.png"))->GetTexture();
 	}
 
 	void InspectorPanel::MenuBar(EditorContext& editorCtx)
@@ -131,23 +147,28 @@ namespace tomato
 		}
 	}
 
-	void InspectorPanel::ShowMoreButton(EditorContext& editorCtx, std::string str)
+	void InspectorPanel::MoreButton(EditorContext& editorCtx, const Serialization::ComponentInfo& comp)
 	{
 		ImGui::SameLine();
 
-		auto w = ImGui::GetContentRegionMax().x - 20.f;
+		auto w = ImGui::GetContentRegionMax().x - 18.f;
 		ImGui::SetCursorPosX(w);
 		
-		std::string tmp = ":##" + str;
-		if (ImGui::Button(tmp.c_str(), ImVec2(18.f, 18.f)))
-		{
-			if (ImGui::BeginPopupContextItem())
-			{
-				ImGui::MenuItem("Delete");
-				ImGui::Separator();
+		ImGui::PushID(comp.name.c_str());
+		if (ImGui::ImageButton("##more_vert", more_vert, ImVec2(14.f, 14.f)))
+			ImGui::OpenPopup("inspector more popup");
 
-				ImGui::EndPopup();
+		if (ImGui::BeginPopup("inspector more popup"))
+		{
+			if (ImGui::MenuItem("Remove Component"))
+			{
+				if (!HasFlag<Serialization::ComponentFlags>(comp.flags, Serialization::ComponentFlags::Essential))
+					comp.editor.Remove(editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
 			}
+
+			ImGui::EndPopup();
 		}
+		ImGui::PopID();
 	}
+
 }

@@ -24,6 +24,7 @@ namespace tomato::Prefab
         const entt::entity obj = reg.create();
 
         reg.emplace<NametagComponent>(obj, GenerateUUID(), GenerateEntityName(reg, "GameObject"));
+        reg.emplace<VisibilityComponent>(obj);
         reg.emplace<TransformComponent>(obj, pos);
         reg.emplace<RootEntityTag>(obj);
 
