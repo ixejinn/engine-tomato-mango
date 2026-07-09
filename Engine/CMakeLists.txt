@@ -164,6 +164,9 @@ set(ENGINE_HEADERS
 		Source/Runtime/Core/Public/Clock/TimerState.h
 		Source/Runtime/Engine/Public/ECS/Components/Particle.h
 		Source/Runtime/Engine/Public/ECS/Systems/ParticleRenderSystem.h
+		Source/Runtime/Engine/Public/Utils/PassKey.h
+		Source/Runtime/Engine/Public/Particle/ParticleEmitterPool.h
+		Source/Runtime/Engine/Public/Particle/ParticleType.h
 )
 
 set(ENGINE_SOURCES
@@ -239,6 +242,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Core/Private/Clock/Timer.cpp
 		Source/Runtime/Core/Private/Clock/TickTimer.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/ParticleRenderSystem.cpp
+		Source/Runtime/Engine/Private/Particle/ParticleEmitterPool.cpp
 )
 
 add_library(engine STATIC

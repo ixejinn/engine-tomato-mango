@@ -4,13 +4,15 @@
 #include <optional>
 #include <cstdint>
 
-namespace tomato {
+namespace tomato
+{
 //@TODO : Register Component
-    struct LifetimeComponent {
-        std::optional<uint32_t> constructed{std::nullopt};
-        std::optional<uint32_t> destructed{std::nullopt};
+    struct LifetimeComponent
+    {
+        std::optional<int64_t> constructed{std::nullopt};
+        std::optional<int64_t> destructed{std::nullopt};
 
-        std::optional<uint32_t> inactivated{std::nullopt};
+        std::optional<int64_t> inactivated{std::nullopt};
         bool isActive{true};
     };
 }

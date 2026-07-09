@@ -3,6 +3,7 @@
 
 #include <array>
 #include <initializer_list>
+#include <optional>
 
 namespace tomato
 {
@@ -19,19 +20,26 @@ namespace tomato
     public:
         EnumArray() : data_() {}
 
-        EnumArray(std::initializer_list<std::pair<E, T>> list) {
+        EnumArray(std::initializer_list<std::pair<E, T>> list)
+        {
             for (auto& p : list)
                 data_[static_cast<std::size_t>(p.first)] = p.second;
         }
 
-        T& operator[](E enumIdx) { return data_[static_cast<std::size_t>(enumIdx)]; }
-        const T& operator[](E enumIdx) const { return data_[static_cast<std::size_t>(enumIdx)]; }
+        T& operator[](E enumIdx)
+        {
+            auto& opt = data_[static_cast<std::size_t>(enumIdx)];
+            if (!opt.has_value())
+                opt.emplace();
+            return opt.value();
+        }
+        const T& operator[](E enumIdx) const { return data_[static_cast<std::size_t>(enumIdx)].value(); }
 
         auto begin() { return data_.begin(); }
         auto end() { return data_.end(); }
 
     private:
-        std::array<T, static_cast<std::size_t>(E::COUNT)> data_;
+        std::array<std::optional<T>, static_cast<std::size_t>(E::COUNT)> data_{};
     };
 }
 
