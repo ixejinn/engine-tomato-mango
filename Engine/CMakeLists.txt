@@ -156,6 +156,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Server/MatchServer.h
         Source/Runtime/Editor/Public/InspectorPanel.h
         Source/Runtime/Editor/Public/InspectorDraw.h
+        Source/Runtime/Editor/Public/MainMenuBar.h
 		Source/Runtime/Engine/Public/ECS/Components/Character.h
 		Source/Runtime/Core/Public/Clock/Timer.h
 		../Contents/Source/TimerTestComponent.h
@@ -236,6 +237,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Editor/Private/InspectorDraw.cpp
 		Source/Runtime/Core/Private/Clock/Timer.cpp
 		Source/Runtime/Core/Private/Clock/TickTimer.cpp
+        Source/Runtime/Editor/Private/MainMenuBar.cpp
 )
 
 add_library(engine STATIC

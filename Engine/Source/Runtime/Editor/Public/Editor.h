@@ -7,6 +7,7 @@
 #include <State/StateFwd.h>
 
 #include "EditorPanel.h"
+#include "MainMenuBar.h"
 
 struct GLFWwindow;
 namespace tomato
@@ -28,7 +29,8 @@ namespace tomato
 
 	private:
 		std::vector<std::unique_ptr<EditorPanel>> panels;
-		
+		MainMenuBar mainMenu_;
+
 		EditorContext eCtx;
 		entt::entity selectedEntity;
 	};

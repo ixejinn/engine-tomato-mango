@@ -19,6 +19,12 @@
 
 namespace tomato::Prefab
 {
+    void AddRequiredComponents(entt::registry& reg, entt::entity e, std::string name)
+    {
+        reg.emplace<NametagComponent>(e, GenerateUUID(), GenerateEntityName(reg, name));
+        reg.emplace<VisibilityComponent>(e);
+    }
+
     entt::entity CreateEmpty(entt::registry& reg, Primitive mesh, glm::vec3 pos)
     {
         const entt::entity obj = reg.create();
