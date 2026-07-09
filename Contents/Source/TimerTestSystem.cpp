@@ -1,4 +1,4 @@
-#include <random>
+﻿#include <random>
 #include "TimerTestSystem.h"
 #include "TimerTestComponent.h"
 #include "ECS/Components/Render.h"
@@ -17,6 +17,9 @@ void TimerTestSystem::Update(SimContext& simCtx)
     auto view = reg.view<TimerTestComponent, RenderComponent, HierarchyComponent>();
     for (auto [e, ttc, render, hierarchy] : view.each())
     {
+        if (hierarchy.children.empty())
+            continue;
+
         if (auto* text = reg.try_get<TextComponent>(hierarchy.children.front()))
         {
             text->text = ttc.timer.GetString(simCtx.tick);

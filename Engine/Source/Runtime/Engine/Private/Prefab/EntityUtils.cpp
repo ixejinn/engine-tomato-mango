@@ -69,8 +69,9 @@ namespace tomato
 
 	UUID GetUUID(entt::registry& reg, entt::entity e)
 	{
-		auto& tag = reg.get<NametagComponent>(e);
-		return tag.id;
+		auto* tag = reg.try_get<NametagComponent>(e);
+
+		return e == entt::null ? 0 : tag->id;
 	}
 
 	bool IsVisible(entt::registry& reg, entt::entity e)

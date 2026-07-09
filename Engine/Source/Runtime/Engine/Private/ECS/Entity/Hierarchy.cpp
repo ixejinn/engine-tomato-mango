@@ -28,7 +28,11 @@ namespace tomato {
         return root;
     }
 
-    void SetHierarchy(entt::registry& reg, entt::entity parent, entt::entity child) {
+    void SetHierarchy(entt::registry& reg, entt::entity parent, entt::entity child)
+    {
+        if (IsDescendant(reg, parent, child))
+            return;
+
         auto* cHierarchy = reg.try_get<HierarchyComponent>(child);
         if (!cHierarchy)
             cHierarchy = &(reg.emplace<HierarchyComponent>(child));
@@ -44,7 +48,8 @@ namespace tomato {
         cHierarchy->parentID = GetUUID(reg, parent);
         cHierarchy->parent = parent;
 
-        if (parent != entt::null) {
+        if (parent != entt::null)
+        {
             auto* newPHierarchy = reg.try_get<HierarchyComponent>(parent);
             if (!newPHierarchy)
                 newPHierarchy = &(reg.emplace<HierarchyComponent>(parent));
@@ -74,7 +79,9 @@ namespace tomato {
         auto* hierarchy = reg.try_get<HierarchyComponent>(parent);
         if (!hierarchy)
         {
-            reg.destroy(parent);
+            if(reg.valid(parent))
+                reg.destroy(parent);
+
             return;
         }
 
@@ -90,5 +97,24 @@ namespace tomato {
             DestroyHierarchyEntity(reg, child);
 
         reg.destroy(parent);
+    }
+
+    bool IsDescendant(entt::registry& reg, entt::entity descendant, entt::entity ancestor)
+    {
+        entt::entity current = descendant;
+
+        while (current != entt::null)
+        {
+            if (current == ancestor)
+                return true;
+
+            auto* hierarchy = reg.try_get<HierarchyComponent>(current);
+            if (!hierarchy)
+                break;
+            
+            current = hierarchy->parent;
+        }
+
+        return false;
     }
 }

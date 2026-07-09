@@ -1,5 +1,6 @@
 ﻿#include "Serialization/ComponentRegistry.h"
 
+#include "ECS/Components/Visibility.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Movement.h"
@@ -18,6 +19,10 @@ namespace tomato::Serialization
 		if (initialized)
 			return;
 
+		//RegisterComponent<NametagComponent>("Nametag", ComponentCategory::Common,
+		//	ComponentFlags::Hidden | ComponentFlags::ReadOnly | ComponentFlags::Essential);
+		RegisterComponent<VisibilityComponent>("Visibility", ComponentCategory::Common,
+			ComponentFlags::Hidden | ComponentFlags::ReadOnly | ComponentFlags::Essential);
 		RegisterComponent<CameraComponent>("Camera", ComponentCategory::Common);
 		RegisterComponent<InputChannelComponent>("InputChannel", ComponentCategory::Common);
 		RegisterComponent<TransformComponent>("Transform", ComponentCategory::Common);
@@ -43,6 +48,8 @@ namespace tomato::Serialization
 	void ComponentRegistry::InitInspector()
 	{
 		//@Warning : Must initialize ComponentRegistry::Init() first.
+
+		//RegisterInspector<NametagComponent>("Nametag", );
 		RegisterInspector<CameraComponent>("Camera", DrawCameraInspcetor);
 		//RegisterInspector<InputChannelComponent>("InputChannel", DrawInputChannelInspcetor);
 		RegisterInspector<TransformComponent>("Transform", DrawTransformInspector);

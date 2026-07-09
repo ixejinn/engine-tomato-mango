@@ -56,93 +56,121 @@ namespace tomato
 			{
 				int node_n = 0;
 
-				auto view = editorCtx.currentState->GetRegistry().view<RootEntityTag, NametagComponent>();
-				for (auto [e, tag] : view.each())
-				{
-					VisibleButton(editorCtx, e, tag.name);
-					ImGui::SameLine();
+				auto view = editorCtx.currentState->GetRegistry().view<RootEntityTag>();
 
-					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_OpenOnArrow; // | ImGuiTreeNodeFlags_DrawLinesToNodes | ImGuiTreeNodeFlags_DrawLinesFull;
+				for (auto e : view)
+					DrawEntity(editorCtx, e);
 
-					if (editorCtx.selectedEntity == e)
-						flags |= ImGuiTreeNodeFlags_Selected;
-
-					bool is_open = ImGui::TreeNodeEx((void*)(intptr_t)node_n, flags, tag.name.c_str(), node_n);
-
-					if (ImGui::IsItemClicked())
-						editorCtx.selectedEntity = e;
-
-					if (ImGui::BeginPopupContextItem())
-					{
-						if(editorCtx.selectedEntity != e)
-							editorCtx.selectedEntity = e;
-
-						ShowMoreButton(editorCtx);
-						
-						ImGui::EndPopup();
-					}
-					if (is_open)
-					{
-						Traverse(editorCtx, e);
-
-						ImGui::TreePop();
-					}
-
-					node_n++;
-				}
+				ImGui::InvisibleButton("HierarchyBackground", ImGui::GetContentRegionAvail());
+				DragDropTargetBackground(editorCtx);
 			}
 		}
 		ImGui::End();
 	}
 
-	void HierarchyPanel::Traverse(EditorContext& editorCtx, entt::entity e)
+	void HierarchyPanel::DrawEntity(EditorContext& editorCtx, entt::entity e)
 	{
-		auto& reg = editorCtx.currentState->GetRegistry();
+		auto& r = editorCtx.currentState->GetRegistry();
+		auto* hierarchy = r.try_get<HierarchyComponent>(e);
 
-		if (reg.all_of<MainCameraTag>(e))
+		bool opened = DrawRow(editorCtx, e);
+
+		if (!opened)
 			return;
 
-		auto* hierarchy = reg.try_get<HierarchyComponent>(e);
-		if (!hierarchy)
-			return;
-
-		if (hierarchy->children.empty())
-			return;
-
-		for (auto& child : hierarchy->children)
+		if(hierarchy)
 		{
-			auto& nameTag = reg.get<NametagComponent>(child);
+			for (auto child : hierarchy->children)
+				DrawEntity(editorCtx, child);
+		}
 
-			VisibleButton(editorCtx, child, nameTag.name);
-			ImGui::SameLine();
+		ImGui::TreePop();
+	}
 
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_OpenOnArrow; //ImGuiTreeNodeFlags_DrawLinesToNodes |  ImGuiTreeNodeFlags_DrawLinesFull
+	bool HierarchyPanel::DrawRow(EditorContext& editorCtx, entt::entity e)
+	{
+		auto& r = editorCtx.currentState->GetRegistry();
 
-			if (editorCtx.selectedEntity == child)
-				flags |= ImGuiTreeNodeFlags_Selected;
+		auto& tag = r.get<NametagComponent>(e);
+		VisibleButton(editorCtx, e, tag.name);
+		ImGui::SameLine();
+		
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow; // | ImGuiTreeNodeFlags_DrawLinesToNodes | ImGuiTreeNodeFlags_DrawLinesFull;
+		
+		auto* hierarchy = r.try_get<HierarchyComponent>(e);
+		if (!hierarchy || hierarchy->children.empty())
+			flags |= ImGuiTreeNodeFlags_Leaf;
 
-			bool is_open = ImGui::TreeNodeEx(nameTag.name.c_str(), flags);
+		if (editorCtx.selectedEntity == e)
+			flags |= ImGuiTreeNodeFlags_Selected;
 
-			if (ImGui::IsItemClicked())
-				editorCtx.selectedEntity = child;
+		bool is_open = ImGui::TreeNodeEx((void*)(entt::id_type)e, flags, tag.name.c_str());
+		
+		DragDropSource(editorCtx, e);
+		DragDropTarget(editorCtx, e);
 
-			if (ImGui::BeginPopupContextItem())
-			{
-				if (editorCtx.selectedEntity != child)
-					editorCtx.selectedEntity = child;
+		if (ImGui::IsItemClicked())
+			editorCtx.selectedEntity = e;
 
-				ShowMoreButton(editorCtx);
+		if (ImGui::BeginPopupContextItem())
+		{
+			if (editorCtx.selectedEntity != e)
+				editorCtx.selectedEntity = e;
 
-				ImGui::EndPopup();
-			}
+			ShowMoreButton(editorCtx);
 
-			if (is_open)
-			{
-				Traverse(editorCtx, child);
-				ImGui::TreePop();
-			}
+			ImGui::EndPopup();
+		}
+
+		return is_open;
+	}
+
+	void HierarchyPanel::DragDropSource(EditorContext& editorCtx, entt::entity e)
+	{
+		if (ImGui::BeginDragDropSource())
+		{
+			entt::entity entity = e;
+			ImGui::SetDragDropPayload("HIERARCHY_ENTITY", &entity, sizeof(entity));
+
+			auto& tag = editorCtx.currentState->GetRegistry().get<NametagComponent>(e);
+			ImGui::Text(tag.name.c_str());
+
+			ImGui::EndDragDropSource();
 		}
 	}
+
+	void HierarchyPanel::DragDropTarget(EditorContext& editorCtx, entt::entity e)
+	{
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_ENTITY"))
+			{
+				IM_ASSERT(payload->DataSize == sizeof(entt::id_type));
+				auto dragged = *(const entt::entity*)payload->Data;
+
+				SetHierarchy(editorCtx.currentState->GetRegistry(), e, dragged);
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+	}
+
+	void HierarchyPanel::DragDropTargetBackground(EditorContext& editorCtx)
+	{
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_ENTITY"))
+			{
+				IM_ASSERT(payload->DataSize == sizeof(entt::id_type));
+				auto dragged = *(const entt::entity*)payload->Data;
+
+				SetHierarchy(editorCtx.currentState->GetRegistry(), entt::null, dragged);
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+	}
+
 	void HierarchyPanel::CreateAndSetHierarchyEntity(EditorContext& editorCtx, entt::entity e, bool hierarchy)
 	{
 		if (hierarchy)

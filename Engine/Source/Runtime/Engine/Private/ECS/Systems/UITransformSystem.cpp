@@ -47,10 +47,10 @@ namespace tomato
 
             else if (hierarchy.parent != entt::null)
             {
-                auto& parentRect = r.get<tomato::RectTransformComponent>(hierarchy.parent);
-
+                auto* parentRect = r.try_get<RectTransformComponent>(hierarchy.parent);
+                if(parentRect)
                 //std::cout << "child rect " << ui.type << " pos(" << rect.position.x << ", " << rect.position.y << ")\n";
-                rect.world_matrix = parentRect.world_matrix * rect.local_matrix;
+                    rect.world_matrix = parentRect->world_matrix * rect.local_matrix;
             }
             else
                 rect.world_matrix = rect.local_matrix;

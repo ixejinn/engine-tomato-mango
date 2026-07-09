@@ -163,7 +163,7 @@ set(ENGINE_HEADERS
 		../Contents/Source/TimerTestSystem.h
 		Source/Runtime/Core/Public/Clock/TickTimer.h
 		Source/Runtime/Core/Public/Clock/TimerState.h
-)
+ "Source/Runtime/Core/Public/EnumFlags.h")
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp

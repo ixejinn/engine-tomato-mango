@@ -32,7 +32,7 @@ namespace tomato::Serialization
 		void InitInspector();
 
 		template<typename T>
-		void RegisterComponent(const std::string& name, ComponentCategory category);
+		void RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags = (ComponentFlags)0);
 
 		template<typename T>
 		void RegisterInspector(const std::string& name, void (*draw)(EditorContext&, entt::registry&, T&));
@@ -51,12 +51,13 @@ namespace tomato::Serialization
 	};
 
 	template<typename T>
-	void tomato::Serialization::ComponentRegistry::RegisterComponent(const std::string& name, ComponentCategory category)
+	void tomato::Serialization::ComponentRegistry::RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags)
 	{
 		ComponentInfo info;
 
 		info.name = name;
 		info.category = category;
+		info.flags = flags;
 
 		info.Has =
 			[](entt::registry& reg, entt::entity e)

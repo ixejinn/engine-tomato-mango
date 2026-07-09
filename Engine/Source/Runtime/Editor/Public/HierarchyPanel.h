@@ -17,7 +17,13 @@ namespace tomato
 	private:
 		void LoadResources();
 
-		void Traverse(EditorContext& editorCtx, entt::entity e);
+		void DrawEntity(EditorContext&, entt::entity);
+		bool DrawRow(EditorContext&, entt::entity);
+
+		void DragDropSource(EditorContext&, entt::entity);
+		void DragDropTarget(EditorContext&, entt::entity);
+		void DragDropTargetBackground(EditorContext&);
+
 		void CreateAndSetHierarchyEntity(EditorContext& editorCtx, entt::entity e, bool hierarchy);
 
 		void MenuBar(EditorContext& editorCtx);
