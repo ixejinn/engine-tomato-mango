@@ -36,6 +36,7 @@ namespace tomato {
 
         void Bind() const;
 
+        GLuint GetTexture() const { return textureID_; }
         int GetWidth() const { return width; }
         int GetHeight() const { return height; }
     private:

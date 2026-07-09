@@ -52,7 +52,12 @@ namespace tomato
         if (auto* hierarchy = reg.try_get<HierarchyComponent>(cur))
         {
             for (const auto child : hierarchy->children)
+            {
+                if (!reg.any_of<TransformComponent>(child))
+                    continue;
+
                 UpdateFrom(reg, child, trf.wRotation, trf.wScale, trf.transformMatrix, bUpdated);
+            }
         }
     }
 }

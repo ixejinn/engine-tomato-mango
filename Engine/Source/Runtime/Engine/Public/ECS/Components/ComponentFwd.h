@@ -3,6 +3,8 @@
 
 namespace tomato
 {
+	struct VisibilityComponent;
+
 	struct CameraComponent;
 	struct TransformComponent;
 	struct InputChannelComponent;

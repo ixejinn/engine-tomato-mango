@@ -1,6 +1,7 @@
 ﻿#include <entt/entt.hpp>
 #include "Prefab/UIPrefab.h"
 #include "ECS/Components/Nametag.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/Text.h"
 #include "ECS/Components/Hierarchy.h"
@@ -32,6 +33,7 @@ namespace tomato::UIPrefab
             GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
             GetAssetID("UIShader"),
             GetAssetID(Texture::PrimitiveName));
+        reg.emplace<tomato::VisibilityComponent>(canvas);
 
         return canvas;
 	}
@@ -54,12 +56,14 @@ namespace tomato::UIPrefab
             GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
             GetAssetID("UIShader"),
             GetAssetID(Texture::PrimitiveName));
+        reg.emplace<VisibilityComponent>(button);
 
         const auto buttonText = reg.create();
         reg.emplace<NametagComponent>(buttonText, GenerateUUID(), GenerateEntityName(reg, "Text"));
         reg.emplace<UIComponent>(buttonText, GetUUID(reg, canvas), 0, UIType::Text);
         reg.emplace<TextComponent>(buttonText, "Button", glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f }, 30.f);
         reg.emplace<RectTransformComponent>(buttonText, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+        reg.emplace<VisibilityComponent>(buttonText);
         reg.emplace<HierarchyComponent>(buttonText);
         SetHierarchy(reg, button, buttonText);
 
@@ -76,6 +80,7 @@ namespace tomato::UIPrefab
         reg.emplace<UIComponent>(text, GetUUID(reg, canvas), 0, UIType::Text);
         reg.emplace<TextComponent>(text, inText, color, size, GetAssetID(fontName));
         reg.emplace<RectTransformComponent>(text, pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+        reg.emplace<VisibilityComponent>(text);
         reg.emplace<HierarchyComponent>(text);
         SetHierarchy(reg, canvas, text);
 
@@ -92,6 +97,9 @@ namespace tomato::UIPrefab
         reg.emplace<UIComponent>(img, GetUUID(reg, canvas), 0);
 
         auto texture = AssetRegistry<Texture>::GetInstance().Get(GetAssetID(textureName));
+        if (textureName == Texture::PrimitiveName)
+            size = glm::vec2{ 100.f, 100.f };
+
         reg.emplace<RectTransformComponent>(
             img,
             pos,
@@ -109,6 +117,7 @@ namespace tomato::UIPrefab
             GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
             GetAssetID("UIShader"),
             GetAssetID(textureName));
+        reg.emplace<VisibilityComponent>(img);
         reg.emplace<HierarchyComponent>(img);
         SetHierarchy(reg, canvas, img);
         

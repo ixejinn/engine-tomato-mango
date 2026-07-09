@@ -1,5 +1,6 @@
 ﻿#include "Serialization/ComponentRegistry.h"
 
+#include "ECS/Components/Visibility.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Movement.h"
@@ -18,21 +19,25 @@ namespace tomato::Serialization
 		if (initialized)
 			return;
 
+		//RegisterComponent<NametagComponent>("Nametag", ComponentCategory::Common,
+		//	ComponentFlags::Hidden | ComponentFlags::ReadOnly | ComponentFlags::Essential);
+		RegisterComponent<VisibilityComponent>("Visibility", ComponentCategory::Common,
+			ComponentFlags::Hidden | ComponentFlags::ReadOnly | ComponentFlags::Essential);
 		RegisterComponent<CameraComponent>("Camera", ComponentCategory::Common);
 		RegisterComponent<InputChannelComponent>("InputChannel", ComponentCategory::Common);
-		RegisterComponent<TransformComponent>("Transform", ComponentCategory::Common);
+		RegisterComponent<TransformComponent>("Transform", ComponentCategory::Common , ComponentFlags::Essential);
 		RegisterComponent<MovementComponent>("Movement", ComponentCategory::Common);
 		RegisterComponent<VelocityComponent>("Velocity", ComponentCategory::Common);
 		RegisterComponent<ColliderComponent>("Collider", ComponentCategory::Common);
 		RegisterComponent<RenderComponent>("Render", ComponentCategory::Common);
 		RegisterComponent<UIComponent>("UI", ComponentCategory::UI);
 		RegisterComponent<CanvasComponent>("Canvas", ComponentCategory::UI);
-		RegisterComponent<RectTransformComponent>("RectTransform", ComponentCategory::UI);
+		RegisterComponent<RectTransformComponent>("RectTransform", ComponentCategory::UI, ComponentFlags::Essential);
 		RegisterComponent<TextComponent>("Text", ComponentCategory::UI);
 		RegisterComponent<TargetComponent>("Target", ComponentCategory::UI);
 		RegisterComponent<SelectableComponent>("Selectable", ComponentCategory::UI);
 		RegisterComponent<MouseEventComponent>("MouseEvent", ComponentCategory::UI);
-		RegisterComponent<HierarchyComponent>("Hierarchy", ComponentCategory::Common);
+		RegisterComponent<HierarchyComponent>("Hierarchy", ComponentCategory::Common, ComponentFlags::Hidden);
 		RegisterComponent<RootEntityTag>("TagRoot", ComponentCategory::Tag);
 		RegisterComponent<MainCameraTag>("TagMainCam", ComponentCategory::Tag);
 
@@ -43,6 +48,7 @@ namespace tomato::Serialization
 	void ComponentRegistry::InitInspector()
 	{
 		//@Warning : Must initialize ComponentRegistry::Init() first.
+
 		RegisterInspector<CameraComponent>("Camera", DrawCameraInspcetor);
 		//RegisterInspector<InputChannelComponent>("InputChannel", DrawInputChannelInspcetor);
 		RegisterInspector<TransformComponent>("Transform", DrawTransformInspector);

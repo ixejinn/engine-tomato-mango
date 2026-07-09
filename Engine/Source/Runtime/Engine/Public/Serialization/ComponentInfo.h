@@ -5,6 +5,7 @@
 #include <functional>
 #include <entt/fwd.hpp>
 #include "Serialization/Json.h"
+#include "EnumFlags.h"
 
 namespace tomato
 {
@@ -41,6 +42,36 @@ namespace tomato::Serialization
 	};
 #undef TMT_COMPONENT_CATEGORY_LIST
 
+
+#define TMT_COMPONENT_FLAGS_LIST(X)		\
+	X(None, "None", 0)					\
+	X(Hidden, "Hidden", 1 << 0)			\
+	X(ReadOnly, "ReadOnly", 1 << 1)		\
+	X(Essential, "Essential", 1 << 2)	
+
+	enum class ComponentFlags : uint32_t
+	{
+#define X(Enum, Display, Value) Enum = Value,
+		TMT_COMPONENT_FLAGS_LIST(X)
+#undef X
+		COUNT
+	};
+	TMT_ENABLE_ENUM_FLAGS(ComponentFlags)
+
+	struct ComponentFlagsMeta
+	{
+		ComponentFlags category;
+		const char* name;
+	};
+
+	inline constexpr ComponentFlagsMeta componentFlagsMetas[] =
+	{
+#define X(Enum, Display, Value) { ComponentFlags::Enum, Display },
+		TMT_COMPONENT_FLAGS_LIST(X)
+#undef X
+	};
+#undef TMT_COMPONENT_FLAGS_LIST
+
 	struct ComponentSerializationInfo
 	{
 		void (*Save)(json&, entt::registry&, entt::entity);
@@ -60,6 +91,7 @@ namespace tomato::Serialization
 		std::string name;
 
 		ComponentCategory category;
+		ComponentFlags flags;
 
 		bool (*Has)(entt::registry&, entt::entity);
 		

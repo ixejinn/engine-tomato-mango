@@ -1,6 +1,7 @@
 ﻿#include <entt/entt.hpp>
 #include "Prefab/EntityUtils.h"
 #include "ECS/Components/Nametag.h"
+#include "ECS/Components/Visibility.h"
 
 namespace tomato
 {
@@ -68,7 +69,17 @@ namespace tomato
 
 	UUID GetUUID(entt::registry& reg, entt::entity e)
 	{
-		auto& tag = reg.get<NametagComponent>(e);
-		return tag.id;
+		auto* tag = reg.try_get<NametagComponent>(e);
+
+		return e == entt::null ? 0 : tag->id;
+	}
+
+	bool IsVisible(entt::registry& reg, entt::entity e)
+	{
+		auto* v = reg.try_get<VisibilityComponent>(e);
+		if (v)
+			return v->visible && v->inheritedVisible;
+
+		throw std::runtime_error("Not found Visibility Component");
 	}
 }

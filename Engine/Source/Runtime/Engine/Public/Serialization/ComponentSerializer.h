@@ -23,6 +23,9 @@ namespace tomato::Serialization
 	void ResolveHierarchy(entt::registry&, std::unordered_map<UUID, entt::entity>&);
 	
 	//Component Save & Load Func
+	void Save(json&, const VisibilityComponent&);
+	void Load(const json&, VisibilityComponent&);
+
 	void Save(json&, const CameraComponent&);
 	void Load(const json&, CameraComponent&);
 

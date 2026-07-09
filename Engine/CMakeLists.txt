@@ -133,6 +133,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Components/EntityComponents.h
         Source/Runtime/Engine/Public/ECS/Components/CharComponents.h
         Source/Runtime/Engine/Public/ECS/Components/ComponentFwd.h
+        Source/Runtime/Engine/Public/ECS/Components/Visibility.h
         Source/Runtime/Engine/Public/Prefab/UIPrefab.h
         Source/Runtime/Engine/Public/ECS/Systems/UITransformSystem.h
         Source/Runtime/Engine/Public/Serialization/ComponentSerializer.h
@@ -167,7 +168,8 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Utils/PassKey.h
 		Source/Runtime/Engine/Public/Particle/ParticleEmitterPool.h
 		Source/Runtime/Engine/Public/Particle/ParticleType.h
-)
+        Source/Runtime/Core/Public/EnumFlags.h
+ )
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp

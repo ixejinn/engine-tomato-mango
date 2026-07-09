@@ -5,6 +5,7 @@
 #include "Serialization/ComponentRegistry.h"
 
 #include "ECS/Components/Nametag.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Movement.h"
@@ -157,22 +158,14 @@ namespace tomato::Serialization
 		data["Components"] = components;
 	}
 
-	void Save(json& data, const TransformComponent& transform)
+	void Save(json& data, const VisibilityComponent& visibility)
 	{
-		//TMT_DEBUG << "Save TransformComponent to Json";
+		data["visible"] = visibility.visible;
+	}
 
-		data["position"] = {
-			transform.GetLocalPosition().x, transform.GetLocalPosition().y, transform.GetLocalPosition().z
-		};
-		
-		data["degree"] = {
-			transform.GetLocalEulerDegree().x, transform.GetLocalEulerDegree().y, transform.GetLocalEulerDegree().z
-		};
-		
-		data["scale"] = {
-			transform.GetLocalScale().x, transform.GetLocalScale().y, transform.GetLocalScale().z
-		};
-
+	void Load(const json& data, VisibilityComponent& visibility)
+	{
+		visibility.visible = data["visible"];
 	}
 
 	void Save(json& data, const CameraComponent& camera)
@@ -201,6 +194,23 @@ namespace tomato::Serialization
 	{
 		channel.channel = data["channel"];
 		channel.is1P = data["1P"];
+	}
+
+	void Save(json& data, const TransformComponent& transform)
+	{
+		//TMT_DEBUG << "Save TransformComponent to Json";
+
+		data["position"] = {
+			transform.GetLocalPosition().x, transform.GetLocalPosition().y, transform.GetLocalPosition().z
+		};
+
+		data["degree"] = {
+			transform.GetLocalEulerDegree().x, transform.GetLocalEulerDegree().y, transform.GetLocalEulerDegree().z
+		};
+
+		data["scale"] = {
+			transform.GetLocalScale().x, transform.GetLocalScale().y, transform.GetLocalScale().z
+		};
 	}
 
 	void Load(const json& data, TransformComponent& transform)

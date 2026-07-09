@@ -6,8 +6,10 @@
 
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Render.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/Components/Text.h"
 #include "ECS/Components/UI.h"
+#include "Prefab/EntityUtils.h"
 
 #include "Resource/AssetHash.h"
 #include "Resource/AssetRegistry.h"
@@ -60,11 +62,15 @@ namespace tomato
                 continue; //text
 
             auto& rect = registry.get<RectTransformComponent>(e);
-            auto& render = registry.get<RenderComponent>(e);
+            auto* render = registry.try_get<RenderComponent>(e);
+            if (!render) continue;
 
-            if (curShader_ != render.shader)
+            if (!IsVisible(registry, e))
+                continue;
+
+            if (curShader_ != render->shader)
             {
-                curShader_ = render.shader;
+                curShader_ = render->shader;
                 shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
                 shader->Use();
 
@@ -72,21 +78,21 @@ namespace tomato
                 shader->SetUniformMat4("projection", projection);
             }
 
-            if (curTexture_ != render.texture)
+            if (curTexture_ != render->texture)
             {
-                curTexture_ = render.texture;
+                curTexture_ = render->texture;
                 AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
             }
 
-            if (curMesh_ != render.mesh)
+            if (curMesh_ != render->mesh)
             {
-                curMesh_ = render.mesh;
+                curMesh_ = render->mesh;
                 mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
                 mesh->Bind();
             }
 
             shader->SetUniformMat4("uModel", rect.model_matrix);
-            shader->SetUniformVec4("uColor", render.color);
+            shader->SetUniformVec4("uColor", render->color);
 
             mesh->Draw();
         }
@@ -104,6 +110,9 @@ namespace tomato
 
             auto& text = registry.get<TextComponent>(e);
             auto& rect = registry.get<RectTransformComponent>(e);
+
+            if (!IsVisible(registry, e))
+                continue;
 
             Font* font = AssetRegistry<Font>::GetInstance().Get(text.font);
             if (!font)

@@ -185,6 +185,8 @@ namespace tomato {
 
         for (const auto& candidate : candidates_)
         {
+            if (!simCtx.state->GetRegistry().valid(candidate.a) ||
+                !simCtx.state->GetRegistry().valid(candidate.a)) continue;
             auto& col1 = registry.get<ColliderComponent>(candidate.a);
             auto& col2 = registry.get<ColliderComponent>(candidate.b);
 
@@ -229,20 +231,23 @@ namespace tomato {
             if (!it->second)
             {
                 // Exit
-                auto& col1 = registry.get<ColliderComponent>(it->first.a);
-                auto& col2 = registry.get<ColliderComponent>(it->first.b);
+                auto* col1 = registry.try_get<ColliderComponent>(it->first.a);
+                auto* col2 = registry.try_get<ColliderComponent>(it->first.b);
 
-                if (col1.isTrigger || col2.isTrigger)
+                if (!col1 && !col2)
                 {
-                    EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{it->first.a, it->first.b, &registry});
+                    if (col1->isTrigger || col2->isTrigger)
+                    {
+                        EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{ it->first.a, it->first.b, &registry });
 
-                    if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.a)))
-                        eventDispatcher.Enqueue(ChangeMovementModeEvent{it->first.a, &registry, Falling});
-                    if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.b)))
-                        eventDispatcher.Enqueue(ChangeMovementModeEvent{it->first.b, &registry, Falling});
+                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.a)))
+                            eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.a, &registry, Falling });
+                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.b)))
+                            eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.b, &registry, Falling });
+                    }
+                    else
+                        EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{ it->first.a, it->first.b, &registry });
                 }
-                else
-                    EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{it->first.a, it->first.b, &registry});
 
                 it = collisionPairs.erase(it);
             }

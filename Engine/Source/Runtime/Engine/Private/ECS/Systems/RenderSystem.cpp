@@ -1,9 +1,11 @@
-#include <glm/glm.hpp>
+﻿#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "ECS/Systems/RenderSystem.h"
+#include "Prefab/EntityUtils.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Render.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/SystemUpdateContexts.h"
 #include "Resource/AssetHash.h"
@@ -49,7 +51,7 @@ namespace tomato
             TMT_WARN << "Main camera is not found.";
             return;
         }
-        auto& viewProjMat = registry.try_get<CameraComponent>(mainCam)->viewProjMat;
+        auto* viewProjMat = registry.try_get<CameraComponent>(mainCam);
 
         Mesh* mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
         mesh->Bind();
@@ -62,6 +64,9 @@ namespace tomato
         auto group = registry.group<TransformComponent, RenderComponent>();
         for (auto [e, trf, render] : group.each()) {
             // TODO: frustum culling
+
+            if (!IsVisible(registry, e))
+                continue;
 
             if (curShader_ != render.shader)
             {
@@ -85,7 +90,7 @@ namespace tomato
 
             const auto& mtx = trf.GetTransformMatrix();
             shader->SetUniformMat4("uModel", mtx);
-            shader->SetUniformMat4("uViewProj", viewProjMat);
+            shader->SetUniformMat4("uViewProj", viewProjMat == nullptr ? glm::mat4(1.f) : viewProjMat->viewProjMat);
             shader->SetUniformMat3("uNormal", glm::transpose(glm::inverse(glm::mat3(mtx))));
 
             shader->SetUniformInt("uTexture", 0);
