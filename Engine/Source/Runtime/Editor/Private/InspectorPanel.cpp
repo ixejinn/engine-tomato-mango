@@ -118,7 +118,7 @@ namespace tomato
 			ImGui::Text("%s", nametag.name.c_str());
 
 			ImGui::TableSetColumnIndex(1);
-			ImGui::Text("%d", editorCtx.selectedEntity);
+			ImGui::Text("%d", entt::to_entity(editorCtx.selectedEntity));
 
 			ImGui::TableSetColumnIndex(2);
 			ImGui::Text("%llu", nametag.id);

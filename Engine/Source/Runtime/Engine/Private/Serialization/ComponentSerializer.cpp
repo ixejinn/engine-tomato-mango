@@ -78,7 +78,7 @@ namespace tomato::Serialization
 		if (root == nullptr)
 			return;
 
-		//Temporary map
+		reg.clear();
 
 		CreateEntity(root, reg, entityMap);
 

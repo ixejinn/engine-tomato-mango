@@ -78,9 +78,9 @@ namespace tomato
 #if 1
 		ImGui::ShowDemoWindow();
 
-		mainMenu_.Draw();
-
 		eCtx.currentState = state;
+
+		mainMenu_.Draw(eCtx);
 		for (auto& panel : panels)
 			panel->Draw(eCtx);
 		

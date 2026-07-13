@@ -1,6 +1,7 @@
 ﻿#ifndef MANGO_EDITORPANEL_H
 #define MANGO_EDITORPANEL_H
 
+#include <filesystem>
 #include <entt/fwd.hpp>
 #include <State/StateFwd.h>
 
@@ -10,6 +11,10 @@ namespace tomato
 	{
 		State* currentState;
 		entt::entity selectedEntity;
+
+		// Scene
+		std::filesystem::path currentScenePath;
+		bool sceneDirty = false;
 	};
 
 	class EditorPanel

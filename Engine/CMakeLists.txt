@@ -164,7 +164,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Core/Public/Clock/TickTimer.h
 		Source/Runtime/Core/Public/Clock/TimerState.h
         Source/Runtime/Core/Public/EnumFlags.h
- )
+  "Source/Runtime/Engine/Private/Utils/FileDialog.h")
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -238,7 +238,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Core/Private/Clock/Timer.cpp
 		Source/Runtime/Core/Private/Clock/TickTimer.cpp
         Source/Runtime/Editor/Private/MainMenuBar.cpp
-)
+ "Source/Runtime/Engine/Private/Utils/FileDialog.cpp")
 
 add_library(engine STATIC
         ${ENGINE_HEADERS}

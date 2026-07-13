@@ -3,13 +3,15 @@
 
 namespace tomato
 {
+	struct EditorContext;
+
 	class MainMenuBar
 	{
 	public:
-		void Draw();
+		void Draw(EditorContext&);
 
 	private:
-		void MenuFile();
+		void MenuFile(EditorContext&);
 	};
 }
 #endif // !MANGO_MAINMENUBAR_H

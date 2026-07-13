@@ -21,6 +21,7 @@ namespace tomato
         virtual void Exit() = 0;
 
         entt::registry& GetRegistry() { return registry_; }
+        std::unordered_map<UUID, entt::entity>& GetEntityMap() { return entityMap_; }
 
         PlayerInputTimelines& GetPlayerInputTimelines() { return playerInputs_; }
 
