@@ -5,6 +5,7 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Particle.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Texture.h"
@@ -23,6 +24,7 @@ namespace tomato
                 GenerateUUID(), GenerateEntityName(registry_, "ParticleEffect"));
             registry_.emplace<TransformComponent>(e);
             registry_.emplace<RootEntityTag>(e);
+            registry_.emplace<VisibilityComponent>(e);
 
             auto& particle = registry_.emplace<ParticleEffectComponent>(e);
             particle.positions.reserve(ParticleEffectComponent::MAX_PARTICLE);

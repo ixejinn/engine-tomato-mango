@@ -87,7 +87,7 @@ namespace tomato
                 }
 
                 particle.positions[i] += particle.velocities[i] * FIXED_DELTA_TIME;
-                auto position = trf.GetWorldPosition() + particle.positions[i];
+                auto position = trf.GetWorldPosition() + trf.GetLocalQuaternion() * particle.positions[i];
 
                 auto T = glm::translate(glm::mat4(1.f), position);
                 auto S = glm::scale(glm::mat4(1.f), glm::vec3(particle.scales[i]));
