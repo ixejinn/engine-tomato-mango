@@ -12,6 +12,8 @@ namespace tomato
 
 	private:
 		void MenuFile(EditorContext&);
+
+		void SaveAs(EditorContext&);
 	};
 }
 #endif // !MANGO_MAINMENUBAR_H

@@ -13,6 +13,7 @@
 #include "Serialization/ComponentSerializer.h"
 
 #include "Utils/FileDialog.h"
+#include "Resource/PathManager.h"
 
 namespace tomato
 {
@@ -37,6 +38,9 @@ namespace tomato
 
 				eCtx.currentState->GetRegistry().clear();
 				eCtx.currentState->GetEntityMap().clear();
+
+				eCtx.currentScenePath = "";
+				eCtx.sceneDirty = true;
 			}
 
 			if (ImGui::MenuItem("Open Scene"))
@@ -47,15 +51,15 @@ namespace tomato
 				auto path = FileDialog::OpenFile("Open Scene");
 				if (path)
 				{
-					std::string dir = path.value().string();
-
 					eCtx.selectedEntity = entt::null;
-					//eCtx.currentState->GetRegistry().clear();
 					eCtx.currentState->GetEntityMap().clear();
 
 					Serialization::LoadScene(eCtx.currentState->GetRegistry(),
-						dir.c_str(),
+						path.value().string().c_str(),
 						eCtx.currentState->GetEntityMap());
+
+					eCtx.currentScenePath = path.value();
+					eCtx.sceneDirty = false;
 				}
 			}
 
@@ -63,23 +67,38 @@ namespace tomato
 			if (ImGui::MenuItem("Save"))
 			{
 				// if scene file is not exist, create new one
-				//if(eCtx.currentScenePath)
+				if (eCtx.currentScenePath.empty())
+					SaveAs(eCtx);
 
-				if (eCtx.sceneDirty)
-				{
+				//if (eCtx.sceneDirty)
 					Serialization::SaveScene(eCtx.currentState->GetRegistry(),
-						"Resources/Engine/Assets/test.data");
+						eCtx.currentScenePath.string().c_str());
 
-				}
+					eCtx.sceneDirty = false;
 			}
 
 			if (ImGui::MenuItem("Save As..."))
-			{
-				
-				Serialization::SaveScene(eCtx.currentState->GetRegistry(),
-					"Resources/Engine/Assets/test.data");
-			}
+				SaveAs(eCtx);
+			
 			ImGui::EndMenu();
+		}
+	}
+
+	void MainMenuBar::SaveAs(EditorContext& eCtx)
+	{
+		auto path = FileDialog::SaveFile(
+			"Save Scene",
+			"scene",
+			"Scene Files (*.scene)\0*.scene\0""All Files (*.*)\0*.*\0",
+			"Resources/Contents/Scenes");
+
+		if (path)
+		{
+			Serialization::SaveScene(eCtx.currentState->GetRegistry(),
+				path.value().string().c_str());
+
+			eCtx.currentScenePath = path.value();
+			eCtx.sceneDirty = false;
 		}
 	}
 }
