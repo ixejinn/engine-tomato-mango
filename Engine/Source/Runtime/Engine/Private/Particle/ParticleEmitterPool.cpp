@@ -10,6 +10,9 @@
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Texture.h"
 
+// Acquire
+// - Active particle component
+
 namespace tomato
 {
     ParticleEmitterPool::ParticleEmitterPool(const PassKey<State>& key, entt::registry& reg, uint8_t poolSize)

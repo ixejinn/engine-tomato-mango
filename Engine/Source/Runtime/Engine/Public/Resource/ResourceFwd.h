@@ -11,6 +11,7 @@ namespace tomato {
     struct Mesh;
     struct Shader;
     struct Texture;
+    struct ParticleEffect;
 }
 
 #endif //MANGO_RESOURCEFWD_H

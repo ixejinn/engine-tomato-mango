@@ -168,7 +168,10 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Particle/ParticleEmitterPool.h
 		Source/Runtime/Engine/Public/Particle/ParticleType.h
         Source/Runtime/Core/Public/EnumFlags.h
- )
+		Source/Runtime/Engine/Public/Resource/Render/ParticleEffect.h
+		Source/Runtime/Engine/Public/ECS/Forward/ParticleCompFwd.h
+		Source/Runtime/Engine/Public/Utils/RandomNumberGenerator.h
+)
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -243,6 +246,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Core/Private/Clock/TickTimer.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/ParticleRenderSystem.cpp
 		Source/Runtime/Engine/Private/Particle/ParticleEmitterPool.cpp
+		Source/Runtime/Engine/Private/Resource/Render/ParticleEffect.cpp
 )
 
 add_library(engine STATIC

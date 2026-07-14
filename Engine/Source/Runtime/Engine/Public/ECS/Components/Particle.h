@@ -32,17 +32,40 @@ namespace tomato
 
     struct ParticleComponent
     {
-        ParticleComponent(int spawnCount, AssetID texID) : spawnCnt(spawnCount), texture(texID) {}
+        inline static int MAX_PARTICLE = 64;
 
-        glm::vec4 color{1.f, 1.f, 1.f, 1.f};
+        struct Lifetime
+        {
+            std::chrono::milliseconds duration;
+            std::chrono::steady_clock::time_point start;
+        };
+
+        bool active{false};
+
+        Lifetime emitter;
+        bool looping;
+        ParticleEffectShape shape;
+        float angle;
+
+        std::chrono::milliseconds emitPeriod;
+        std::chrono::steady_clock::time_point latestTP;
+
+        std::chrono::milliseconds startDelay;
+        float startSpeed;
+
         AssetID texture;
-        float scale{1.f};
+        float size;
+        glm::vec4 color;
 
-        int spawnCnt;
+        // each particle
+        std::chrono::milliseconds lifetime;
 
-    // private:
         std::vector<glm::vec3> positions;
         std::vector<glm::vec3> velocities;
+        std::vector<Lifetime> lifetimes;
+
+        int activeCnt = 0;
+        uint8_t maxParticles;
     };
 }
 

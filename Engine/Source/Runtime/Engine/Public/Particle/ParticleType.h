@@ -7,18 +7,48 @@
 
 namespace tomato
 {
+#define TMT_PARTICLE_EFFECT_SHAPE_LIST(X)   \
+        X(Sphere, "Sphere")                 \
+        X(Circle, "Circle")                 \
+        X(Cone, "Cone")
+
+    enum class ParticleEffectShape
+    {
+#define X(Enum, Display) Enum,
+        TMT_PARTICLE_EFFECT_SHAPE_LIST(X)
+#undef X
+    };
+
+    struct ParticleEffectShapeMeta
+    {
+        ParticleEffectShape shape;
+        const char* name;
+    };
+
+    static constexpr ParticleEffectShapeMeta shapeMetas[]
+            {
+#define X(Enum, Display) {ParticleEffectShape::Enum, Display},
+                    TMT_PARTICLE_EFFECT_SHAPE_LIST(X)
+#undef X
+            };
+#undef TMT_PARTICLE_EFFECT_SHAPE_LIST
+
+    NLOHMANN_JSON_SERIALIZE_ENUM(
+            ParticleEffectShape,
+            {
+                {ParticleEffectShape::Sphere, "Sphere"},
+                {ParticleEffectShape::Circle, "Circle"},
+                {ParticleEffectShape::Cone, "Cone"}
+            }
+    )
+
+
+
     enum ParticleEffectType
     {
         Jump,
         Move,
         COUNT
-    };
-
-    enum ParticleEffectShape
-    {
-        Sphere,
-        Hemisphere,
-        Cone
     };
 
     struct ParticleEffectDetails

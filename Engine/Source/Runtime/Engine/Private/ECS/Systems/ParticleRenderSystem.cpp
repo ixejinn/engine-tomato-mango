@@ -8,7 +8,9 @@
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
+#include "Resource/Render/ParticleEffect.h"
 #include "Simulation/SimulationConfig.h"
+#include "Utils/RandomNumberGenerator.h"
 #include "Utils/RegistryEntry.h"
 REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Particle, ParticleRenderSystem)
 
@@ -17,6 +19,8 @@ namespace tomato
     ParticleRenderSystem::ParticleRenderSystem()
     : curTexture_(GetAssetID(Texture::PrimitiveName))
     {
+        ParticleEffect::Create("Test.tmt.ptc");
+
         mesh2D_ = AssetRegistry<Mesh>::GetInstance().Get(
             GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain)));
         shader_ = AssetRegistry<Shader>::GetInstance().Get(
@@ -25,6 +29,9 @@ namespace tomato
 
     void ParticleRenderSystem::Update(SimContext& simCtx)
     {
+        if (simCtx.state->particlePool_.GetActiveEmitterNum() == 0)
+            return;
+
         if (!mesh2D_ || !shader_)
         {
             TMT_ERR << "Invalid mesh or shader.";
@@ -51,57 +58,188 @@ namespace tomato
          "uCamUp",
          glm::normalize(glm::vec3(viewProjMat[0][1], viewProjMat[1][1], viewProjMat[2][1])));
 
-        auto view = registry.view<TransformComponent, ParticleEffectComponent>();
-        for (auto [e, trf, particle] : view.each())
+        auto view = registry.view<TransformComponent, ParticleComponent>();
+        for (auto [e, trf, pc] : view.each())
         {
-            if (particle.activeCnt <= 0)
+            if (!pc.active)
                 continue;
 
-            if (curTexture_ != particle.texture)
+            auto now = std::chrono::steady_clock::now();
+            auto activeDuration =
+                    std::chrono::duration_cast<std::chrono::milliseconds>(now - pc.emitter.start);
+            if (activeDuration >= pc.emitter.duration)
             {
-                curTexture_ = particle.texture;
+                if (pc.looping)
+                    pc.emitter.start = now;
+                else if (pc.activeCnt == 0)
+                {
+                    simCtx.state->particlePool_.Release(e);
+                    continue;
+                }
+            }
+
+            // remove particle
+
+            if (activeDuration >= pc.startDelay)
+                InitializeParticles(pc);
+
+            // add burst
+
+            if (curTexture_ != pc.texture)
+            {
+                curTexture_ = pc.texture;
                 AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
             }
 
-            for (int i = 0; i < particle.activeCnt; )
+            for (int i = 0; i < pc.activeCnt; )
             {
                 if (std::chrono::duration_cast<std::chrono::milliseconds>(
-                        std::chrono::steady_clock::now() - particle.lifetimes[i].start
-                        )
-                        > particle.lifetimes[i].duration)
+                        std::chrono::steady_clock::now() - pc.lifetimes[i].start)
+                        > pc.lifetimes[i].duration)
                 {
-                    int backIdx = particle.activeCnt - 1;
+                    int backIdx = pc.activeCnt - 1;
                     if (i == backIdx)
                     {
-                        particle.activeCnt = 0;
+                        pc.activeCnt = 0;
                         break;
                     }
 
-                    std::swap(particle.positions[i], particle.positions[backIdx]);
-                    std::swap(particle.velocities[i], particle.velocities[backIdx]);
-                    std::swap(particle.lifetimes[i], particle.lifetimes[backIdx]);
-                    std::swap(particle.scales[i], particle.scales[backIdx]);
+                    std::swap(pc.positions[i], pc.positions[backIdx]);
+                    std::swap(pc.velocities[i], pc.velocities[backIdx]);
+                    std::swap(pc.lifetimes[i], pc.lifetimes[backIdx]);
 
-                    --particle.activeCnt;
+                    --pc.activeCnt;
                     continue;
                 }
 
-                particle.positions[i] += particle.velocities[i] * FIXED_DELTA_TIME;
-                auto position = trf.GetWorldPosition() + trf.GetLocalQuaternion() * particle.positions[i];
+                pc.positions[i] += pc.velocities[i] * FIXED_DELTA_TIME;
+                auto position = trf.GetWorldPosition() + trf.GetLocalQuaternion() * pc.positions[i];
 
                 auto T = glm::translate(glm::mat4(1.f), position);
-                auto S = glm::scale(glm::mat4(1.f), glm::vec3(particle.scales[i]));
+                auto S = glm::scale(glm::mat4(1.f), glm::vec3(pc.size));
                 shader_->SetUniformMat4("uModel", T * S);
 
                 shader_->SetUniformInt("uTexture", 0);
-                shader_->SetUniformVec4("uColor", particle.color);
+                shader_->SetUniformVec4("uColor", pc.color);
 
                 mesh2D_->Draw();
                 ++i;
             }
-
-            if (particle.activeCnt <= 0)
-                simCtx.state->particlePool_.Release(e);
         }
+
+//        auto view = registry.view<TransformComponent, ParticleEffectComponent>();
+//        for (auto [e, trf, particle] : view.each())
+//        {
+//            if (particle.activeCnt <= 0)
+//                continue;
+//
+//            if (curTexture_ != particle.texture)
+//            {
+//                curTexture_ = particle.texture;
+//                AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
+//            }
+//
+//            for (int i = 0; i < particle.activeCnt; )
+//            {
+//                if (std::chrono::duration_cast<std::chrono::milliseconds>(
+//                        std::chrono::steady_clock::now() - particle.lifetimes[i].start
+//                        )
+//                        > particle.lifetimes[i].duration)
+//                {
+//                    int backIdx = particle.activeCnt - 1;
+//                    if (i == backIdx)
+//                    {
+//                        particle.activeCnt = 0;
+//                        break;
+//                    }
+//
+//                    std::swap(particle.positions[i], particle.positions[backIdx]);
+//                    std::swap(particle.velocities[i], particle.velocities[backIdx]);
+//                    std::swap(particle.lifetimes[i], particle.lifetimes[backIdx]);
+//                    std::swap(particle.scales[i], particle.scales[backIdx]);
+//
+//                    --particle.activeCnt;
+//                    continue;
+//                }
+//
+//                particle.positions[i] += particle.velocities[i] * FIXED_DELTA_TIME;
+//                auto position = trf.GetWorldPosition() + trf.GetLocalQuaternion() * particle.positions[i];
+//
+//                auto T = glm::translate(glm::mat4(1.f), position);
+//                auto S = glm::scale(glm::mat4(1.f), glm::vec3(particle.scales[i]));
+//                shader_->SetUniformMat4("uModel", T * S);
+//
+//                shader_->SetUniformInt("uTexture", 0);
+//                shader_->SetUniformVec4("uColor", particle.color);
+//
+//                mesh2D_->Draw();
+//                ++i;
+//            }
+//
+//            if (particle.activeCnt <= 0)
+//                simCtx.state->particlePool_.Release(e);
+//        }
+    }
+
+    void ParticleRenderSystem::InitializeParticles(ParticleComponent& comp, int num)
+    {
+        int initCnt = std::min(comp.activeCnt + num, ParticleComponent::MAX_PARTICLE);
+        num = initCnt - comp.activeCnt;
+
+        comp.positions.assign(num, {0, 0, 0});
+
+        switch (comp.shape)
+        {
+            case ParticleEffectShape::Sphere:
+                for (int i = comp.activeCnt; i < initCnt; ++i)
+                {
+                    int lambda = RandomNumberGenerator::GetUniformIntDistribution(0, 359);
+                    int phi = RandomNumberGenerator::GetUniformIntDistribution(-90, 90);
+
+                    auto lambdaR = glm::radians(static_cast<float>(lambda));
+                    auto phiR = glm::radians(static_cast<float>(phi));
+
+                    comp.velocities[i] =
+                            {glm::cos(phiR) * glm::cos(lambdaR),
+                             glm::sin(phiR),
+                             glm::cos(phiR) * glm::sin(lambdaR)};
+                    comp.velocities[i] *= comp.startSpeed;
+                }
+                break;
+
+            case ParticleEffectShape::Circle:
+                for (int i = comp.activeCnt; i < initCnt; ++i)
+                {
+                    int lambda = RandomNumberGenerator::GetUniformIntDistribution(0, 359);
+                    auto lambdaR = glm::radians(static_cast<float>(lambda));
+
+                    comp.velocities[i] = {glm::cos(lambdaR), 0, glm::sin(lambdaR)};
+                    comp.velocities[i] *= comp.startSpeed;
+                }
+                break;
+
+            case ParticleEffectShape::Cone:
+                for (int i = comp.activeCnt; i < initCnt; ++i)
+                {
+                    int lambda = RandomNumberGenerator::GetUniformIntDistribution(0, 359);
+                    float phi = RandomNumberGenerator::GetUniformRealDistribution(0.f, comp.angle);
+
+                    auto lambdaR = glm::radians(static_cast<float>(lambda));
+                    auto phiR = glm::radians(phi);
+
+                    comp.velocities[i] =
+                            {glm::cos(phiR) * glm::cos(lambdaR),
+                             glm::sin(phiR),
+                             glm::cos(phiR) * glm::sin(lambdaR)};
+                    comp.velocities[i] *= comp.startSpeed;
+                }
+                break;
+        }
+
+        comp.lifetimes.assign(num,
+                              ParticleComponent::Lifetime
+                                      {comp.lifetime, std::chrono::steady_clock::now()});
+
+        comp.activeCnt = initCnt;
     }
 }

@@ -20,11 +20,14 @@ namespace tomato
         std::optional<entt::entity> Acquire(ParticleEffectType type, entt::entity parent);
         bool Release(entt::entity e);
 
+        uint8_t GetActiveEmitterNum() const { return poolSize_ - freeEmitters_.size(); }
+
     private:
         void SetParticleEmitter(ParticleEffectType type);
 
         entt::registry& registry_;
 
+        uint8_t poolSize_;
         std::vector<entt::entity> freeEmitters_;
     };
 }
