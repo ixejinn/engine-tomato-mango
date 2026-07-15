@@ -11,42 +11,33 @@ namespace tomato
 {
     ParticleEffect::ParticleEffect(const char* filename)
     {
-        const std::string path = "Resource/Contents/";
-        const std::string file = path + filename;
-//        auto data = Serialization::LoadJsonData(file.c_str());
+//        const std::string path = "Resource/Contents/";
+//        const std::string file = path + filename;
+        auto data = Serialization::LoadJsonData(filename);
 
-        json data;
+        duration_ = data["duration"];
+        looping_ = data["looping"];
 
-        data["duration"] = 5;
-        data["looping"] = true;
+        startDelay_ = data["startDelay"];
+        startSpeed_ = data["startSpeed"];
 
-        data["startDelay"] = 0;
-        data["startSpeed"] = 1;
+        maxParticles_ = data["maxParticles"];
 
-        data["maxParticles"] = 100;
+        shape_ = data["shape"];
+        angle_ = data["angle"];
 
-        data["shape"] = ParticleEffectShape::Cone;
-        data["angle"] = 45;
+        lifetime_ = data["lifetime"];
 
-        data["lifetime"] = 1;
+        texture_ = data["texture"];
+        size_ = data["size"];
+        color_ = {data["color"][0], data["color"][1], data["color"][2], data["color"][3]};
 
-        data["texture"] = GetAssetID(Texture::PrimitiveName);
-        data["size"] = 0.1;
-        data["color"] = {1, 1, 1, 1};
+        rateOverTime_ = data["rateOverTime"];
 
-        data["rateOverTime"] = 5;
-
-        data["burst"] =
-                {
-                {"period", 1},
-                {"cycles", 5},
-                {"count", 5}
-                };
-
-        std::ofstream ofs(filename);
-        ofs << data.dump(4);
-
-        /////////////////
+        if (!data["burst"].is_null())
+            burst_.emplace(data["burst"]["period"], data["burst"]["cycles"], data["burst"]["count"]);
+        else
+            burst_ = std::nullopt;
     }
 
     void ParticleEffect::Create(const char* filename)
@@ -67,20 +58,26 @@ namespace tomato
         comp.shape = shape_;
         comp.angle = angle_;
 
-        const std::chrono::duration<float> emitPeriodFSec(1.f / rateOverTime_);
-        comp.emitPeriod = std::chrono::duration_cast<std::chrono::milliseconds>(emitPeriodFSec);
+        if (rateOverTime_ != 0)
+        {
+            const std::chrono::duration<float> emitPeriodFSec(1.f / rateOverTime_);
+            comp.emitPeriod = std::chrono::duration_cast<std::chrono::milliseconds>(emitPeriodFSec);
+        }
+        else
+            comp.emitPeriod = std::chrono::milliseconds::zero();
         comp.adder = std::chrono::milliseconds::zero();
         comp.latestTP = now;
 
         if (burst_.has_value())
         {
             const std::chrono::duration<float> burstPeriodFSec(burst_->period);
-            comp.burst->period = std::chrono::duration_cast<std::chrono::milliseconds>(burstPeriodFSec);
-            comp.burst->adder = std::chrono::milliseconds::zero();
-            comp.burst->latest = now;
-
-            comp.burst->cycles = burst_->cycles;
-            comp.burst->count = burst_->count;
+            comp.burst.emplace(
+                    std::chrono::duration_cast<std::chrono::milliseconds>(burstPeriodFSec),
+                    std::chrono::milliseconds::zero(),
+                    now,
+                    burst_->cycles,
+                    0,
+                    burst_->count);
         }
 
         std::chrono::duration<float> startDelayFSec(startDelay_);
@@ -97,6 +94,10 @@ namespace tomato
         comp.positions.clear();
         comp.velocities.clear();
         comp.lifetimes.clear();
+
+        comp.positions.resize(maxParticles_);
+        comp.velocities.resize(maxParticles_);
+        comp.lifetimes.resize(maxParticles_);
 
         comp.activeCnt = 0;
         comp.maxParticles = maxParticles_;

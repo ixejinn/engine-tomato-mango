@@ -60,6 +60,8 @@ namespace tomato
             std::chrono::steady_clock::time_point latest;
 
             int cycles;
+            int finishedCycles;
+
             uint8_t count;
         };
         std::optional<Burst> burst;
@@ -79,7 +81,7 @@ namespace tomato
         std::vector<Lifetime> lifetimes;
 
         int activeCnt = 0;
-        uint8_t maxParticles;
+        int maxParticles;
     };
 }
 

@@ -36,7 +36,7 @@ namespace tomato
         float startDelay_;
         float startSpeed_;
 
-        uint8_t maxParticles_;
+        int maxParticles_;
 
         ParticleEffectShape shape_;
         float angle_;  // for Shape::Cone

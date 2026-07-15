@@ -19,6 +19,7 @@
 #include "Serialization/ComponentSerializer.h"
 #include "TimerTestComponent.h"
 #include "ECS/Components/Nametag.h"
+#include "Particle/ParticleEmitterPool.h"
 
 using namespace tomato;
 using namespace std::chrono_literals;
@@ -28,6 +29,7 @@ void TestState::Init() {
     auto id = Audio::Create("Resources/Contents/sfx_get_heart.mp3", 8);
     audioPtr_ = AssetRegistry<Audio>::GetInstance().Get(id);
     Texture::Create("Resources/Contents/WATER_GAME_LOGO.png");
+    Texture::Create("Resources/Contents/heart.png");
     Font::Create("Resources/Engine/Assets/Fonts/D2Coding.ttf");
     Font::Create("Resources/Engine/Assets/Fonts/Pretendard-SemiBold.ttf");
 
@@ -56,6 +58,7 @@ void TestState::Init() {
     auto& channelp0 = registry_.get<InputChannelComponent>(player0);
     channelp0.channel = 0;
     registry_.emplace<CollisionTestComponent>(player0);
+    particlePool_.Acquire(GetAssetID("Test.tmt.ptc"), player0);
 
     //// Player1 character
     entt::entity player1 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { -1, 2, 0 });

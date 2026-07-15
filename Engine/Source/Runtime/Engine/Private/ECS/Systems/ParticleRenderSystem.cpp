@@ -14,6 +14,8 @@
 #include "Utils/RegistryEntry.h"
 REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Particle, ParticleRenderSystem)
 
+using namespace std::chrono_literals;
+
 namespace tomato
 {
     ParticleRenderSystem::ParticleRenderSystem()
@@ -72,7 +74,17 @@ namespace tomato
             if (activeDuration >= pc.emitter.duration)
             {
                 if (pc.looping)
+                {
+                    std::cout << "   LOOPING(" << simCtx.tick << ") ----------\n";
                     pc.emitter.start = now;
+
+                    if (pc.burst.has_value())
+                    {
+                        pc.burst->adder = std::chrono::milliseconds::zero();
+                        pc.burst->latest = now;
+                        pc.burst->finishedCycles = 0;
+                    }
+                }
                 else if (pc.activeCnt == 0) // 루프 아닌데 활성화된 파티클이 없으면 풀에 반납(완전 종료)
                 {
                     simCtx.state->particlePool_.Release(e);
@@ -104,13 +116,16 @@ namespace tomato
             }
 
             // rate over time 의한 파티클 생성
-            pc.adder += std::chrono::duration_cast<std::chrono::milliseconds>(now - pc.latestTP);
-            pc.latestTP = now;
-
-            if (pc.adder >= pc.emitPeriod)
+            if (pc.emitPeriod > 0ms)
             {
-                pc.adder -= pc.emitPeriod;
-                InitializeParticles(pc);
+                pc.adder += std::chrono::duration_cast<std::chrono::milliseconds>(now - pc.latestTP);
+                pc.latestTP = now;
+
+                if (pc.adder >= pc.emitPeriod)
+                {
+                    pc.adder -= pc.emitPeriod;
+                    InitializeParticles(pc);
+                }
             }
 
             // burst 의한 파티클 생성
@@ -119,10 +134,13 @@ namespace tomato
                 pc.burst->adder += std::chrono::duration_cast<std::chrono::milliseconds>(now - pc.burst->latest);
                 pc.burst->latest = now;
 
-                if (pc.burst->adder >= pc.burst->period)
+                if (pc.burst->finishedCycles < pc.burst->cycles && pc.burst->adder >= pc.burst->period)
                 {
+                    ++pc.burst->finishedCycles;
+
                     pc.burst->adder -= pc.burst->period;
                     InitializeParticles(pc, pc.burst->count);
+                    std::cout << "   BURST(" << simCtx.tick << ") ---------- " << pc.activeCnt << "\n";
                 }
             }
 
@@ -209,7 +227,17 @@ namespace tomato
         int initCnt = std::min(comp.activeCnt + num, ParticleComponent::MAX_PARTICLE);
         num = initCnt - comp.activeCnt;
 
-        comp.positions.assign(num, {0, 0, 0});
+//        comp.positions.assign(num, {0, 0, 0});
+//        comp.lifetimes.assign(num,
+//                              ParticleComponent::Lifetime
+//                                      {comp.lifetime, std::chrono::steady_clock::now()});
+
+        auto now = std::chrono::steady_clock::now();
+        for (int i = comp.activeCnt; i < initCnt; ++i)
+        {
+            comp.positions[i] = {0, 0, 0};
+            comp.lifetimes[i] = {comp.lifetime, now};
+        }
 
         switch (comp.shape)
         {
@@ -258,10 +286,6 @@ namespace tomato
                 }
                 break;
         }
-
-        comp.lifetimes.assign(num,
-                              ParticleComponent::Lifetime
-                                      {comp.lifetime, std::chrono::steady_clock::now()});
 
         comp.activeCnt = initCnt;
     }
