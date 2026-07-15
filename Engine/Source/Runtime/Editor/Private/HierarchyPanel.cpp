@@ -22,7 +22,7 @@
 #include "ECS/Components/Camera.h"
 
 #include "ECS/Entity/Hierarchy.h"
-
+#include <iostream>
 namespace tomato
 {
 	HierarchyPanel::HierarchyPanel(bool open) : EditorPanel(open)
@@ -48,11 +48,18 @@ namespace tomato
 		ImGui::SetNextWindowPos(ImVec2(1600.f, height), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
 		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_FirstUseEver);
 
+		std::string sceneName =
+			editorCtx.currentScenePath.empty() == true ?
+			"New Scene" : editorCtx.currentScenePath.stem().string();
+
 		if (ImGui::Begin("Hierarchy", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus))
 		{
 			MenuBar(editorCtx);
-			ImGuiTreeNodeFlags tFlags = ImGuiTreeNodeFlags_DefaultOpen;
-			if (ImGui::CollapsingHeader("Scene", tFlags))
+
+			if (editorCtx.sceneDirty)
+				sceneName += " *";
+
+			if (ImGui::CollapsingHeader(sceneName.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				int node_n = 0;
 
@@ -151,6 +158,7 @@ namespace tomato
 				auto dragged = *(const entt::entity*)payload->Data;
 
 				SetHierarchy(editorCtx.currentState->GetRegistry(), e, dragged);
+				editorCtx.sceneDirty = true;
 			}
 
 			ImGui::EndDragDropTarget();
@@ -167,6 +175,7 @@ namespace tomato
 				auto dragged = *(const entt::entity*)payload->Data;
 
 				SetHierarchy(editorCtx.currentState->GetRegistry(), entt::null, dragged);
+				editorCtx.sceneDirty = true;
 			}
 
 			ImGui::EndDragDropTarget();
@@ -177,6 +186,8 @@ namespace tomato
 	{
 		if (hierarchy)
 			SetHierarchy(editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity, e);
+
+		editorCtx.sceneDirty = true;
 	}
 
 	void HierarchyPanel::MenuBar(EditorContext& editorCtx)
@@ -258,7 +269,10 @@ namespace tomato
 
 		auto* visibility = reg.try_get<VisibilityComponent>(e);
 		if (ImGui::ImageButton(label.c_str(), icon_visibility[visibility->visible && visibility->inheritedVisible], ImVec2(15.f, 15.f)))
+		{
 			ToggleVisible(reg, e);
+			editorCtx.sceneDirty = true;
+		}
 	}
 
 	void HierarchyPanel::ToggleVisible(entt::registry& reg, entt::entity e)
@@ -304,7 +318,6 @@ namespace tomato
 		}
 	}
 
-
 	void HierarchyPanel::ShowMoreButton(EditorContext& editorCtx)
 	{
 		int t_entitynum = (int)editorCtx.selectedEntity;
@@ -314,6 +327,7 @@ namespace tomato
 		{
 			DestroyHierarchyEntity(reg, editorCtx.selectedEntity);
 			editorCtx.selectedEntity = entt::null;
+			editorCtx.sceneDirty = true;
 		}
 
 		ImGui::Separator();

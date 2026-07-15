@@ -9,18 +9,18 @@ namespace tomato
 {
 	struct EditorContext;
 
-	void DrawCameraInspcetor(EditorContext&, entt::registry&, CameraComponent&);
-	void DrawTransformInspector(EditorContext&, entt::registry&, TransformComponent&);
-	void DrawMovementInspector(EditorContext&, entt::registry&, MovementComponent&);
-	void DrawVelocityInspector(EditorContext&, entt::registry&, VelocityComponent&);
-	void DrawColliderInspector(EditorContext&, entt::registry&, ColliderComponent&);
-	void DrawRenderInspector(EditorContext&, entt::registry&, RenderComponent&);
-	void DrawUIInspector(EditorContext&, entt::registry&, UIComponent&);
-	void DrawCanvasInspector(EditorContext&, entt::registry&, CanvasComponent&);
-	void DrawRectTransformInspector(EditorContext&, entt::registry&, RectTransformComponent&);
-	void DrawTextInspector(EditorContext&, entt::registry&, TextComponent&);
-	void DrawTargetInspector(EditorContext&, entt::registry&, TargetComponent&);
-	void DrawSelectableInspector(EditorContext&, entt::registry&, SelectableComponent&);
+	bool DrawCameraInspcetor(EditorContext&, entt::registry&, CameraComponent&);
+	bool DrawTransformInspector(EditorContext&, entt::registry&, TransformComponent&);
+	bool DrawMovementInspector(EditorContext&, entt::registry&, MovementComponent&);
+	bool DrawVelocityInspector(EditorContext&, entt::registry&, VelocityComponent&);
+	bool DrawColliderInspector(EditorContext&, entt::registry&, ColliderComponent&);
+	bool DrawRenderInspector(EditorContext&, entt::registry&, RenderComponent&);
+	bool DrawUIInspector(EditorContext&, entt::registry&, UIComponent&);
+	bool DrawCanvasInspector(EditorContext&, entt::registry&, CanvasComponent&);
+	bool DrawRectTransformInspector(EditorContext&, entt::registry&, RectTransformComponent&);
+	bool DrawTextInspector(EditorContext&, entt::registry&, TextComponent&);
+	bool DrawTargetInspector(EditorContext&, entt::registry&, TargetComponent&);
+	bool DrawSelectableInspector(EditorContext&, entt::registry&, SelectableComponent&);
 
 	
 	

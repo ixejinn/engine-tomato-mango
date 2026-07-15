@@ -57,7 +57,12 @@ namespace tomato
 				MoreButton(editorCtx, comp);
 
 				if (is_open && comp.editor.Draw)
-					comp.editor.Draw(editorCtx, editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
+				{
+					if (comp.editor.Draw(editorCtx,
+						editorCtx.currentState->GetRegistry(),
+						editorCtx.selectedEntity))
+						editorCtx.sceneDirty = true;
+				}
 			}
 		}
 		ImGui::End();
@@ -145,7 +150,10 @@ namespace tomato
 			if (comp.category == category)
 			{
 				if (ImGui::MenuItem(comp.name.c_str(), NULL, false, enabled))
+				{
 					comp.editor.Add(reg, editorCtx.selectedEntity);
+					editorCtx.sceneDirty = true;
+				}
 			}
 		}
 	}
@@ -166,7 +174,10 @@ namespace tomato
 			if (ImGui::MenuItem("Remove Component"))
 			{
 				if (!HasFlag<Serialization::ComponentFlags>(comp.flags, Serialization::ComponentFlags::Essential))
+				{
 					comp.editor.Remove(editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
+					editorCtx.sceneDirty = true;
+				}
 			}
 
 			ImGui::EndPopup();

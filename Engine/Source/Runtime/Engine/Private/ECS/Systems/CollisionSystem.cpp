@@ -234,7 +234,7 @@ namespace tomato {
                 auto* col1 = registry.try_get<ColliderComponent>(it->first.a);
                 auto* col2 = registry.try_get<ColliderComponent>(it->first.b);
 
-                if (!col1 && !col2)
+                if (col1 && col2)
                 {
                     if (col1->isTrigger || col2->isTrigger)
                     {

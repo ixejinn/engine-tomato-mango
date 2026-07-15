@@ -34,14 +34,17 @@
 
 namespace tomato
 {
-	void DrawCameraInspcetor(EditorContext& eCtx, entt::registry& reg, CameraComponent& camera)
+	bool DrawCameraInspcetor(EditorContext& eCtx, entt::registry& reg, CameraComponent& camera)
 	{
+		bool changed = false;
+
 		ImGui::SeparatorText("Mode");
 
 		if (ImGui::RadioButton("Perspective", camera.mode == ProjectionMode::Perspective))
 		{
 			camera.mode = ProjectionMode::Perspective;
 			camera.dirty = true;
+			changed = true;
 		}
 
 		ImGui::SameLine();
@@ -50,72 +53,115 @@ namespace tomato
 		{
 			camera.mode = ProjectionMode::Orthogonal;
 			camera.dirty = true;
+			changed = true;
 		}
 
 		float fov{ camera.degree }, near{ camera.zNear }, far{ camera.zFar };
 		if (camera.mode == ProjectionMode::Perspective)
 		{
 			if(ImGui::SliderFloat("Field Of View", &fov, 1.f, 179.f, "%.2f"))
+			{
 				camera.dirty = true;
+				changed = true;
+			}
 		}
 			
-		if(ImGui::DragFloat("Near Clip", &near, 0.1f, 0.01f, 100.f, "%.2f")) camera.dirty = true;
-		if(ImGui::DragFloat("Far Clip", &far, 0.1f, near, 10000.f, "%.2f")) camera.dirty = true;
+		if(ImGui::DragFloat("Near Clip", &near, 0.1f, 0.01f, 100.f, "%.2f"))
+		{
+			camera.dirty = true;
+			changed = true;
+		}
+		if(ImGui::DragFloat("Far Clip", &far, 0.1f, near, 10000.f, "%.2f"))
+		{
+			camera.dirty = true;
+			changed = true;
+		}
 
 		camera.degree = std::clamp(fov, 1.0f, 179.0f);
 		camera.zNear = std::max(0.01f, near);
 		camera.zFar = std::max(camera.zNear + 0.01f, far);
 
 		ImGui::NewLine();
+
+		return changed;
 	}
 
-
-	void DrawTransformInspector(EditorContext& eCtx, entt::registry& reg, TransformComponent& transform)
+	bool DrawTransformInspector(EditorContext& eCtx, entt::registry& reg, TransformComponent& transform)
 	{
+		bool changed = false;
+
 		glm::vec3 pos = transform.GetLocalPosition();
 		float posVec3[3] = { pos.x, pos.y, pos.z };
 		if (DrawVec3Control("Position", posVec3))
+		{
 			transform.SetPosition(posVec3[0], posVec3[1], posVec3[2]);
+			changed = true;
+		}
 
 		glm::vec3 degree = transform.GetLocalEulerDegree();
 		float degreeVec3[3] = { degree.x, degree.y, degree.z };
 		if (DrawVec3Control("Degree", degreeVec3))
+		{
 			transform.SetEulerDegree(degreeVec3[0], degreeVec3[1], degreeVec3[2]);
+			changed = true;
+		}
 
 		glm::vec3 scale = transform.GetLocalScale();
 		float scaleVec3[3] = { scale.x, scale.y, scale.z };
 		if (DrawVec3Control("Scale", scaleVec3))
+		{
 			transform.SetScale(scaleVec3[0], scaleVec3[1], scaleVec3[2]);
+			changed = true;
+		}
 
 		ImGui::NewLine();
+
+		return changed;
 	}
 
-	void DrawMovementInspector(EditorContext& eCtx, entt::registry& reg, MovementComponent& movement)
+	bool DrawMovementInspector(EditorContext& eCtx, entt::registry& reg, MovementComponent& movement)
 	{
+		bool changed = false;
+
 		ImGui::SeparatorText("Speed");
-		ImGui::DragFloat("Speed", &movement.horizontalSpeed, 1.0f, 0.f, 100.f, "%.2f");
+		if (ImGui::DragFloat("Speed", &movement.horizontalSpeed, 1.0f, 0.f, 100.f, "%.2f"))
+			changed = true;
+
 		ImGui::NewLine();
+
+		return changed;
 	}
 
-	void DrawVelocityInspector(EditorContext& eCtx, entt::registry& reg, VelocityComponent& vel)
+	bool DrawVelocityInspector(EditorContext& eCtx, entt::registry& reg, VelocityComponent& vel)
 	{
+		bool changed = false;
+
 		float velVec3[3] = { vel.velocity.x, vel.velocity.y, vel.velocity.z };
 
 		ImGuiSliderFlags flags = ImGuiSliderFlags_NoInput;
 		if (DrawVec3Control("Velocity", velVec3, flags))
+		{
 			vel.velocity = glm::vec3(velVec3[0], velVec3[1], velVec3[2]);
+			changed = true;
+		}
 		ImGui::NewLine();
+
+		return changed;
 	}
 
-	void DrawColliderInspector(EditorContext& eCtx, entt::registry& reg, ColliderComponent& collider)
+	bool DrawColliderInspector(EditorContext& eCtx, entt::registry& reg, ColliderComponent& collider)
 	{
-		//@TODO : Add EnumTraits
+		bool changed = false;
+
 		ImGui::SeparatorText("Layer");
 		const char* layPreview = "Default";
 		if (ImGui::BeginCombo("##Layer", layPreview))
 		{
 			if (ImGui::Selectable("Default", collider.layer == CollisionLayer::Default))
+			{
 				collider.layer = CollisionLayer::Default;
+				changed = true;
+			}
 
 			ImGui::EndCombo();
 		}
@@ -130,6 +176,7 @@ namespace tomato
 				{
 					collider.type = info.type;
 					collider.aabbDirty = true;
+					changed = true;
 				}
 			}
 			ImGui::EndCombo();
@@ -137,13 +184,18 @@ namespace tomato
 
 		ImGui::SeparatorText("Trigger");
 		ImGui::Text("Is Trigger"); ImGui::SameLine();
-		ImGui::Checkbox("##Trigger", &collider.isTrigger);
+		if(ImGui::Checkbox("##Trigger", &collider.isTrigger))
+			changed = true;
 
 		ImGui::NewLine();
+
+		return changed;
 	}
 
-	void DrawRenderInspector(EditorContext& eCtx, entt::registry& reg, RenderComponent& render)
+	bool DrawRenderInspector(EditorContext& eCtx, entt::registry& reg, RenderComponent& render)
 	{
+		bool changed = false;
+
 		ImGui::SeparatorText("Color");
 		ImGui::ColorEdit4("##color", glm::value_ptr(render.color));
 
@@ -157,7 +209,10 @@ namespace tomato
 				if(ImGui::Selectable(
 					info.name,
 					render.mesh == GetAssetID(Mesh::GetPrimitiveName(info.primitive))))
+				{
 					render.mesh = GetAssetID(Mesh::GetPrimitiveName(info.primitive));
+					changed = true;
+				}
 			}
 			
 			ImGui::EndCombo();
@@ -172,7 +227,10 @@ namespace tomato
 			for (it; it != endIt; it++)
 			{
 				if (ImGui::Selectable(it->second.c_str(), render.shader == it->first))
+				{
 					render.shader = it->first;
+					changed = true;
+				}
 			}
 			ImGui::EndCombo();
 		}
@@ -186,16 +244,23 @@ namespace tomato
 			for (it; it != endIt; it++)
 			{
 				if (ImGui::Selectable(it->second.c_str(), render.texture == it->first))
+				{
 					render.texture = it->first;
+					changed = true;
+				}
 			}
 			ImGui::EndCombo();
 		}
 
 		ImGui::NewLine();
+
+		return changed;
 	}
 
-	void DrawUIInspector(EditorContext& eCtx, entt::registry& reg, UIComponent& ui)
+	bool DrawUIInspector(EditorContext& eCtx, entt::registry& reg, UIComponent& ui)
 	{
+		bool changed = false;
+
 		if (ui.canvas != 0)
 		{
 			ImGui::SeparatorText("Canvas");
@@ -204,13 +269,13 @@ namespace tomato
 			const char* canvasPreview = curCanvas != nullptr ? curCanvas->name.c_str() : "null";
 			if (ImGui::BeginCombo("##canvas", canvasPreview))
 			{
-				//@TODO : Set Canvas, Hierarchy
 				for (auto [e, canvas, tag] : canvasView.each())
 				{
 					if (ImGui::Selectable(tag.name.c_str(), ui.canvas == tag.id))
 					{
 						ui.canvas = tag.id;
 						SetHierarchy(reg, GetEntityByUUID(reg, ui.canvas), eCtx.selectedEntity);
+						changed = true;
 					}
 				}
 				ImGui::EndCombo();
@@ -218,7 +283,8 @@ namespace tomato
 		}
 
 		ImGui::SeparatorText("Sort Order");
-		ImGui::InputInt("##ui Order", &ui.sortOrder, 0, 1000);
+		if(ImGui::InputInt("##ui Order", &ui.sortOrder, 0, 1000))
+			changed = true;
 
 		ImGui::SeparatorText("UI Type");
 		const char* typePreview = UITypeMetas[(int)ui.type].name;
@@ -227,68 +293,96 @@ namespace tomato
 			for (auto info : UITypeMetas)
 			{
 				if (ImGui::Selectable(info.name, ui.type == info.type, ImGuiSelectableFlags_Disabled))
+				{
 					ui.type = info.type;
+					changed = true;
+				}
 			}
 			ImGui::EndCombo();
 		}
 
 		ImGui::NewLine();
+
+		return changed;
 	}
 
-	void DrawCanvasInspector(EditorContext& eCtx, entt::registry& reg, CanvasComponent& canvas)
+	bool DrawCanvasInspector(EditorContext& eCtx, entt::registry& reg, CanvasComponent& canvas)
 	{
+		bool changed = false;
+
 		ImGui::SeparatorText("Render Mode");
 		if (ImGui::BeginCombo("##renderMode", "ScreenOverlay"))
 			ImGui::EndCombo();
 		
 		ImGui::SeparatorText("Size");
 		ImGui::Text("Reference Size");// ImGui::SameLine();
-		ImGui::DragFloat2("##refSize", glm::value_ptr(canvas.referenceSize));
+		if (ImGui::DragFloat2("##refSize", glm::value_ptr(canvas.referenceSize)))
+			changed = true;
 
 		ImGui::Text("Actual Size");// ImGui::SameLine();
-		ImGui::DragFloat2("##actSize", glm::value_ptr(canvas.actualSize));
+		if(ImGui::DragFloat2("##actSize", glm::value_ptr(canvas.actualSize)))
+			changed = true;
 
 		ImGui::SeparatorText("Sort Order");
-		ImGui::InputInt("##canvasOrder", &canvas.sortOrder, 0, 1000);
+		if(ImGui::InputInt("##canvasOrder", &canvas.sortOrder, 0, 1000))
+			changed = true;
 
 		ImGui::NewLine();
+
+		return changed;
 	}
 
-	void DrawRectTransformInspector(EditorContext& eCtx, entt::registry& reg, RectTransformComponent& rect)
+	bool DrawRectTransformInspector(EditorContext& eCtx, entt::registry& reg, RectTransformComponent& rect)
 	{
+		bool changed = false;
+
 		auto ui = reg.try_get<UIComponent>(eCtx.selectedEntity);
 
 		if (rect.anchorMin == rect.anchorMax)
 		{
 			ImGui::SeparatorText("Position");
 			ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(60.f);
-			ImGui::DragFloat("##anchoredPosx", &rect.anchoredPosition.x, 1.f, 0.f, 0.f, "%g"); ImGui::SameLine();
+			if(ImGui::DragFloat("##anchoredPosx", &rect.anchoredPosition.x, 1.f, 0.f, 0.f, "%g"))
+				changed = true; 
+
+			ImGui::SameLine();
 			ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(60.f);
-			ImGui::DragFloat("##anchoredPosy", &rect.anchoredPosition.y, 1.f, 0.f, 0.f, "%g");
+			if(ImGui::DragFloat("##anchoredPosy", &rect.anchoredPosition.y, 1.f, 0.f, 0.f, "%g"))
+				changed = true;
 
 			if (ui && ui->type != UIType::Text)
 			{
 				ImGui::SeparatorText("Size");
 				ImGui::Text("Width"); ImGui::SameLine(); ImGui::SetCursorPosX(95.f);
 				ImGui::Text("Height"); ImGui::SetNextItemWidth(80.f);
-				ImGui::DragFloat("##sizewidth", &rect.sizeDelta.x, 1.f, 0.f, 0.f, "%g");
+				if(ImGui::DragFloat("##sizewidth", &rect.sizeDelta.x, 1.f, 0.f, 0.f, "%g"))
+					changed = true;
+
 				ImGui::SameLine(); ImGui::SetNextItemWidth(80.f);
-				ImGui::DragFloat("##sizeheight", &rect.sizeDelta.y, 1.f, 0.f, 0.f, "%g");
+				if(ImGui::DragFloat("##sizeheight", &rect.sizeDelta.y, 1.f, 0.f, 0.f, "%g"))
+					changed = true;
 			}
 
 			ImGui::SeparatorText("Offset");
 			ImGui::Text("Min"); ImGui::SameLine(); ImGui::SetCursorPosX(50.f); ImGui::SameLine();
 			ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
-			ImGui::DragFloat("##offsetMinX", &rect.offsetMin.x, 0.1f, 0.f, 1.f, "%.1f"); ImGui::SameLine();
+			if(ImGui::DragFloat("##offsetMinX", &rect.offsetMin.x, 0.1f, 0.f, 1.f, "%.1f"))
+				changed = true;
+
+			ImGui::SameLine();
 			ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
-			ImGui::DragFloat("##offsetMinY", &rect.offsetMin.y, 0.1f, 0.f, 1.f, "%.1f");
+			if(ImGui::DragFloat("##offsetMinY", &rect.offsetMin.y, 0.1f, 0.f, 1.f, "%.1f"))
+				changed = true;
 
 			ImGui::Text("Max");ImGui::SameLine(); ImGui::SetCursorPosX(40.f); ImGui::SameLine();
 			ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f); ImGui::SameLine();
-			ImGui::DragFloat("##offsetMaxX", &rect.offsetMax.x, 0.1f, 0.f, 1.f, "%.1f"); ImGui::SameLine();
+			if(ImGui::DragFloat("##offsetMaxX", &rect.offsetMax.x, 0.1f, 0.f, 1.f, "%.1f"))
+				changed = true; 
+			
+			ImGui::SameLine();
 			ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
-			ImGui::DragFloat("##offsetMaxY", &rect.offsetMax.x, 0.1f, 0.f, 1.f, "%.1f");
-
+			if(ImGui::DragFloat("##offsetMaxY", &rect.offsetMax.x, 0.1f, 0.f, 1.f, "%.1f"))
+				changed = true;
 		}
 		else
 		{
@@ -300,10 +394,16 @@ namespace tomato
 			ImGui::Text("Top");
 
 			ImGui::SetNextItemWidth(80.f);
-			ImGui::InputFloat("##Left", &rect.offsetMin.x, 0.0f, 0.0f, "%g"); ImGui::SameLine();
+			if(ImGui::InputFloat("##Left", &rect.offsetMin.x, 0.0f, 0.0f, "%g"))
+				changed = true; 
+			
+			ImGui::SameLine();
 			ImGui::SetNextItemWidth(80.f);
 			if (ImGui::InputFloat("##Top", &offsetTop, 0.0f, 0.0f, "%g"))
+			{
 				rect.offsetMax.y = -offsetTop;
+				changed = true;
+			}
 
 			ImGui::Text("Right");
 			ImGui::SameLine(); ImGui::SetCursorPosX(95.f);
@@ -311,44 +411,69 @@ namespace tomato
 			ImGui::SetNextItemWidth(80.f);
 
 			if(ImGui::InputFloat("##Right", &offsetRight, 0.0f, 0.0f, "%g"))
+			{
 				rect.offsetMax.x = -offsetRight;
+				changed = true;
+			}
 			ImGui::SameLine(); ImGui::SetNextItemWidth(80.f);
-			ImGui::InputFloat("##Bottom", &rect.offsetMin.y, 0.0f, 0.0f, "%g");
+			if(ImGui::InputFloat("##Bottom", &rect.offsetMin.y, 0.0f, 0.0f, "%g"))
+				changed = true;
 		}
 
 		ImGui::SeparatorText("Anchor");
 		ImGui::Text("Min"); ImGui::SameLine(); ImGui::SetCursorPosX(50.f); ImGui::SameLine();
 		ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
-		ImGui::DragFloat("##anchorMinX", &rect.anchorMin.x, 0.1f, 0.f, 1.f, "%.1f"); ImGui::SameLine();
+		if(ImGui::DragFloat("##anchorMinX", &rect.anchorMin.x, 0.1f, 0.f, 1.f, "%.1f"))
+			changed = true; 
+		
+		ImGui::SameLine();
 		ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
-		ImGui::DragFloat("##anchorMinY", &rect.anchorMin.y, 0.1f, 0.f, 1.f, "%.1f");
+		if(ImGui::DragFloat("##anchorMinY", &rect.anchorMin.y, 0.1f, 0.f, 1.f, "%.1f"))
+			changed = true;
 
 		ImGui::Text("Max");ImGui::SameLine(); ImGui::SetCursorPosX(40.f); ImGui::SameLine();
 		ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
-		ImGui::DragFloat("##anchorMaxX", &rect.anchorMax.x, 0.1f, 0.f, 1.f, "%.1f"); ImGui::SameLine();
+		if(ImGui::DragFloat("##anchorMaxX", &rect.anchorMax.x, 0.1f, 0.f, 1.f, "%.1f"))
+			changed = true; 
+		
+		ImGui::SameLine();
 		ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
-		ImGui::DragFloat("##anchorMaxY", &rect.anchorMax.y, 0.1f, 0.f, 1.f, "%.1f");
+		if(ImGui::DragFloat("##anchorMaxY", &rect.anchorMax.y, 0.1f, 0.f, 1.f, "%.1f"))
+			changed = true;
 
 		ImGui::SeparatorText("Pivot");
 		ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(60.f);
-		ImGui::DragFloat("##pivotx", &rect.pivot.x, 0.1f, 0.f, 1.f, "%.1f"); ImGui::SameLine();
+		if(ImGui::DragFloat("##pivotx", &rect.pivot.x, 0.1f, 0.f, 1.f, "%.1f"))
+			changed = true; 
+		
+		ImGui::SameLine();
 		ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(60.f);
-		ImGui::DragFloat("##pivoty", &rect.pivot.y, 0.1f, 0.f, 1.f, "%.1f");
+		if(ImGui::DragFloat("##pivoty", &rect.pivot.y, 0.1f, 0.f, 1.f, "%.1f"))
+			changed = true;
 
 		ImGui::NewLine();
+
+		return changed;
 	}
 
-	void DrawTextInspector(EditorContext& eCtx, entt::registry& reg, TextComponent& text)
+	bool DrawTextInspector(EditorContext& eCtx, entt::registry& reg, TextComponent& text)
 	{
+		bool changed = false;
+
 		ImGui::SeparatorText("Text");
 		if (ImGui::InputText("##text", &text.text))
+		{
 			text.dirty = true;
+			changed = true;
+		}
 
 		ImGui::SeparatorText("Color");
-		ImGui::ColorEdit4("##textcolor", glm::value_ptr(text.color));
+		if(ImGui::ColorEdit4("##textcolor", glm::value_ptr(text.color)))
+			changed = true;
 
 		ImGui::SeparatorText("Size");
-		ImGui::DragFloat("##fontSize", &text.fontSize, 1.f, 0.0f, 0.0f, "%g");
+		if(ImGui::DragFloat("##fontSize", &text.fontSize, 1.f, 0.0f, 0.0f, "%g"))
+			changed = true;
 
 		auto beginIt = AssetRegistry<Font>::GetInstance().GetNameMapBegin();
 		auto endIt = AssetRegistry<Font>::GetInstance().GetNameMapEnd();
@@ -361,16 +486,21 @@ namespace tomato
 				{
 					text.font = beginIt->first;
 					text.dirty = true;
+					changed = true;
 				}
 			}
 			ImGui::EndCombo();
 		}
 
 		ImGui::NewLine();
+
+		return changed;
 	}
 
-	void DrawTargetInspector(EditorContext& eCtx, entt::registry& reg, TargetComponent& target)
+	bool DrawTargetInspector(EditorContext& eCtx, entt::registry& reg, TargetComponent& target)
 	{
+		bool changed = false;
+
 		ImGui::SeparatorText("Target");
 		
 		entt::entity targetEntity = GetEntityByUUID(reg, target.target);
@@ -381,35 +511,46 @@ namespace tomato
 			for (auto [e, tag, transform] : view.each())
 			{
 				if (ImGui::Selectable(tag.name.c_str(), target.target == tag.id))
+				{
 					target.target = tag.id;
+					changed = true;
+				}
 			}
 			ImGui::EndCombo();
 		}
 
-		DrawVec3Control("Offset", glm::value_ptr(target.headOffset));
+		if(DrawVec3Control("Offset", glm::value_ptr(target.headOffset)))
+			changed = true;
 
 		ImGui::NewLine();
+
+		return changed;
 	}
 
-	void DrawSelectableInspector(EditorContext& eCtx, entt::registry& reg, SelectableComponent& selectable)
+	bool DrawSelectableInspector(EditorContext& eCtx, entt::registry& reg, SelectableComponent& selectable)
 	{
+		bool changed = false;
+
 		ImGui::SeparatorText("Interactable");
 		ImGui::Text("Interactable"); ImGui::SameLine();
-		ImGui::Checkbox("##interactable", &selectable.interactable);
+		if (ImGui::Checkbox("##interactable", &selectable.interactable))
+			changed = true;
 
 		ImGui::SeparatorText("Normal Color");
-		//ImGui::Text("Normal Color"); ImGui::SameLine();
-		ImGui::ColorEdit4("##normalcolor", glm::value_ptr(selectable.normalColor));
+		if(ImGui::ColorEdit4("##normalcolor", glm::value_ptr(selectable.normalColor)))
+			changed = true;
 
 		ImGui::SeparatorText("Highlighted Color");
-		//ImGui::Text("Highlighted Color"); ImGui::SameLine();
-		ImGui::ColorEdit4("##highlightedColor", glm::value_ptr(selectable.highlightedColor));
+		if(ImGui::ColorEdit4("##highlightedColor", glm::value_ptr(selectable.highlightedColor)))
+			changed = true;
 
 		ImGui::SeparatorText("Pressed Color");
-		//ImGui::Text("Pressed Color"); ImGui::SameLine();
-		ImGui::ColorEdit4("##pressedColor", glm::value_ptr(selectable.pressedColor));
+		if(ImGui::ColorEdit4("##pressedColor", glm::value_ptr(selectable.pressedColor)))
+			changed = true;
 
 		ImGui::NewLine();
+
+		return changed;
 	}
 
 	bool DrawVec3Control(const char* label, float* vec, int flags)
@@ -436,7 +577,7 @@ namespace tomato
 		std::string tmpLabel = "##";
 		tmpLabel += label;
 
-		if (ImGui::DragFloat3(tmpLabel.c_str(), vec, 1.0f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), "%.2f", flags))
+		if (ImGui::DragFloat3(tmpLabel.c_str(), vec, 1.f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), "%g", flags))
 			return true;
 
 		ImGui::PopItemWidth();

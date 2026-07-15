@@ -78,7 +78,7 @@ namespace tomato::Serialization
 		void (*Load)(const json&, entt::registry&, entt::entity);
 	};
 
-	using DrawInspector = std::function<void(EditorContext&, entt::registry&, entt::entity)>;
+	using DrawInspector = std::function<bool(EditorContext&, entt::registry&, entt::entity)>;
 	struct ComponentEditorInfo
 	{
 		DrawInspector Draw;
