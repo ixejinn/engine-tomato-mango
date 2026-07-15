@@ -40,6 +40,7 @@ namespace tomato
 
         ParticleEffectShape shape_;
         float angle_;  // for Shape::Cone
+        ParticleSimulationSpace space_;
 
         float lifetime_;
 

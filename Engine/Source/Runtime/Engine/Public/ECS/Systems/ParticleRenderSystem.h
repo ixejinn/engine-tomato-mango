@@ -3,6 +3,7 @@
 
 #include "ECS/Systems/System.h"
 #include "ECS/Forward/ParticleCompFwd.h"
+#include "ECS/Forward/PhysCompFwd.h"
 #include "Resource/ResourceFwd.h"
 
 namespace tomato
@@ -16,6 +17,7 @@ namespace tomato
 
     private:
         void InitializeParticles(ParticleComponent& comp, int num = 1);
+        void InitializeParticles(ParticleComponent& comp, TransformComponent& trf, int num = 1);
 
         Mesh* mesh2D_;
         Shader* shader_;

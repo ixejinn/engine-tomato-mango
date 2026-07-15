@@ -44,6 +44,39 @@ namespace tomato
     )
 
 
+#define TMT_PARTICLE_SIMULATION_SPACE_LIST(X)   \
+    X(World, "World")                           \
+    X(Local, "Local")
+
+    enum ParticleSimulationSpace
+    {
+#define X(Enum, Display) Enum,
+        TMT_PARTICLE_SIMULATION_SPACE_LIST(X)
+#undef X
+    };
+
+    struct ParticleSimulationSpaceMeta
+    {
+        ParticleSimulationSpace type;
+        const char* name;
+    };
+
+    static constexpr ParticleSimulationSpaceMeta particleSimulationSpaceMetas[]
+            {
+#define X(Enum, Display) {ParticleSimulationSpace::Enum, Display},
+                    TMT_PARTICLE_SIMULATION_SPACE_LIST(X)
+#undef X
+            };
+#undef TMT_PARTICLE_SIMULATION_SPACE_LIST
+
+NLOHMANN_JSON_SERIALIZE_ENUM(
+        ParticleSimulationSpace,
+        {
+            {ParticleSimulationSpace::World, "World"},
+            {ParticleSimulationSpace::Local, "Local"}
+        }
+        )
+
 
     // enum ParticleEffectType
     // {

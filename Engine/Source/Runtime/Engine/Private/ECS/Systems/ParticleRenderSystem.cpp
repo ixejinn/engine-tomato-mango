@@ -124,7 +124,11 @@ namespace tomato
                 if (pc.adder >= pc.emitPeriod)
                 {
                     pc.adder -= pc.emitPeriod;
-                    InitializeParticles(pc);
+
+                    if (pc.space == World)
+                        InitializeParticles(pc, trf);
+                    else
+                        InitializeParticles(pc);
                 }
             }
 
@@ -139,7 +143,10 @@ namespace tomato
                     ++pc.burst->finishedCycles;
 
                     pc.burst->adder -= pc.burst->period;
-                    InitializeParticles(pc, pc.burst->count);
+                    if (pc.space == World)
+                        InitializeParticles(pc, trf, pc.burst->count);
+                    else
+                        InitializeParticles(pc, pc.burst->count);
                     std::cout << "   BURST(" << simCtx.tick << ") ---------- " << pc.activeCnt << "\n";
                 }
             }
@@ -154,7 +161,9 @@ namespace tomato
             for (int i = 0; i < pc.activeCnt; )
             {
                 pc.positions[i] += pc.velocities[i] * FIXED_DELTA_TIME;
-                auto position = trf.GetWorldPosition() + trf.GetLocalQuaternion() * pc.positions[i];
+                auto position = trf.GetLocalQuaternion() * pc.positions[i];
+                if (pc.space == Local)
+                    position += trf.GetWorldPosition();
 
                 auto T = glm::translate(glm::mat4(1.f), position);
                 auto S = glm::scale(glm::mat4(1.f), glm::vec3(pc.size));
@@ -236,6 +245,74 @@ namespace tomato
         for (int i = comp.activeCnt; i < initCnt; ++i)
         {
             comp.positions[i] = {0, 0, 0};
+            comp.lifetimes[i] = {comp.lifetime, now};
+        }
+
+        switch (comp.shape)
+        {
+            case ParticleEffectShape::Sphere:
+                for (int i = comp.activeCnt; i < initCnt; ++i)
+                {
+                    int lambda = RandomNumberGenerator::GetUniformIntDistribution(0, 359);
+                    int phi = RandomNumberGenerator::GetUniformIntDistribution(-90, 90);
+
+                    auto lambdaR = glm::radians(static_cast<float>(lambda));
+                    auto phiR = glm::radians(static_cast<float>(phi));
+
+                    comp.velocities[i] =
+                            {glm::cos(phiR) * glm::cos(lambdaR),
+                             glm::sin(phiR),
+                             glm::cos(phiR) * glm::sin(lambdaR)};
+                    comp.velocities[i] *= comp.startSpeed;
+                }
+                break;
+
+            case ParticleEffectShape::Circle:
+                for (int i = comp.activeCnt; i < initCnt; ++i)
+                {
+                    int lambda = RandomNumberGenerator::GetUniformIntDistribution(0, 359);
+                    auto lambdaR = glm::radians(static_cast<float>(lambda));
+
+                    comp.velocities[i] = {glm::cos(lambdaR), 0, glm::sin(lambdaR)};
+                    comp.velocities[i] *= comp.startSpeed;
+                }
+                break;
+
+            case ParticleEffectShape::Cone:
+                for (int i = comp.activeCnt; i < initCnt; ++i)
+                {
+                    int lambda = RandomNumberGenerator::GetUniformIntDistribution(0, 359);
+                    float phi = RandomNumberGenerator::GetUniformRealDistribution(0.f, comp.angle);
+
+                    auto lambdaR = glm::radians(static_cast<float>(lambda));
+                    auto phiR = glm::radians(phi);
+
+                    comp.velocities[i] =
+                            {glm::cos(phiR) * glm::cos(lambdaR),
+                             glm::sin(phiR),
+                             glm::cos(phiR) * glm::sin(lambdaR)};
+                    comp.velocities[i] *= comp.startSpeed;
+                }
+                break;
+        }
+
+        comp.activeCnt = initCnt;
+    }
+
+    void ParticleRenderSystem::InitializeParticles(ParticleComponent& comp, TransformComponent& trf, int num)
+    {
+        int initCnt = std::min(comp.activeCnt + num, ParticleComponent::MAX_PARTICLE);
+        num = initCnt - comp.activeCnt;
+
+//        comp.positions.assign(num, {0, 0, 0});
+//        comp.lifetimes.assign(num,
+//                              ParticleComponent::Lifetime
+//                                      {comp.lifetime, std::chrono::steady_clock::now()});
+
+        auto now = std::chrono::steady_clock::now();
+        for (int i = comp.activeCnt; i < initCnt; ++i)
+        {
+            comp.positions[i] = trf.GetWorldPosition();
             comp.lifetimes[i] = {comp.lifetime, now};
         }
 

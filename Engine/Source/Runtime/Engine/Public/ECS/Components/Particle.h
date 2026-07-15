@@ -48,6 +48,7 @@ namespace tomato
 
         ParticleEffectShape shape;
         float angle;
+        ParticleSimulationSpace space;
 
         std::chrono::milliseconds emitPeriod;
         std::chrono::milliseconds adder;

@@ -24,7 +24,9 @@ namespace tomato
         maxParticles_ = data["maxParticles"];
 
         shape_ = data["shape"];
-        angle_ = data["angle"];
+        if (shape_ == ParticleEffectShape::Cone)
+            angle_ = data["angle"];
+        space_ = data["space"];
 
         lifetime_ = data["lifetime"];
 
@@ -57,6 +59,7 @@ namespace tomato
 
         comp.shape = shape_;
         comp.angle = angle_;
+        comp.space = space_;
 
         if (rateOverTime_ != 0)
         {
