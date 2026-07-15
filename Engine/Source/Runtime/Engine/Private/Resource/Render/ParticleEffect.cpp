@@ -57,15 +57,48 @@ namespace tomato
 
     void ParticleEffect::InitializeParticleComponent(ParticleComponent& comp) const
     {
-        std::chrono::duration<float> floatSecs(duration_);
-        comp.emitter.duration = std::chrono::duration_cast<std::chrono::milliseconds>(floatSecs);
-        comp.emitter.start = std::chrono::steady_clock::now();
-        comp.activeCnt = 0;
+        auto now = std::chrono::steady_clock::now();
 
+        const std::chrono::duration<float> durationFSec(duration_);
+        comp.emitter.duration = std::chrono::duration_cast<std::chrono::milliseconds>(durationFSec);
+        comp.emitter.start = now;
         comp.looping = looping_;
+
+        comp.shape = shape_;
+        comp.angle = angle_;
+
+        const std::chrono::duration<float> emitPeriodFSec(1.f / rateOverTime_);
+        comp.emitPeriod = std::chrono::duration_cast<std::chrono::milliseconds>(emitPeriodFSec);
+        comp.adder = std::chrono::milliseconds::zero();
+        comp.latestTP = now;
+
+        if (burst_.has_value())
+        {
+            const std::chrono::duration<float> burstPeriodFSec(burst_->period);
+            comp.burst->period = std::chrono::duration_cast<std::chrono::milliseconds>(burstPeriodFSec);
+            comp.burst->adder = std::chrono::milliseconds::zero();
+            comp.burst->latest = now;
+
+            comp.burst->cycles = burst_->cycles;
+            comp.burst->count = burst_->count;
+        }
+
+        std::chrono::duration<float> startDelayFSec(startDelay_);
+        comp.startDelay = std::chrono::duration_cast<std::chrono::milliseconds>(startDelayFSec);
+        comp.startSpeed = startSpeed_;
+
+        comp.texture = texture_;
+        comp.size = size_;
+        comp.color = color_;
+
+        startDelayFSec = std::chrono::duration<float>(lifetime_);
+        comp.lifetime = std::chrono::duration_cast<std::chrono::milliseconds>(startDelayFSec);
 
         comp.positions.clear();
         comp.velocities.clear();
         comp.lifetimes.clear();
+
+        comp.activeCnt = 0;
+        comp.maxParticles = maxParticles_;
     }
 }

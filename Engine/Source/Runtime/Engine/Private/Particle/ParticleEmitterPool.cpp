@@ -9,6 +9,7 @@
 #include "ECS/Entity/Hierarchy.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Texture.h"
+#include "Resource/Render/ParticleEffect.h"
 
 // Acquire
 // - Active particle component
@@ -29,67 +30,23 @@ namespace tomato
             registry_.emplace<RootEntityTag>(e);
             registry_.emplace<VisibilityComponent>(e);
 
-            auto& particle = registry_.emplace<ParticleEffectComponent>(e);
-            particle.positions.reserve(ParticleEffectComponent::MAX_PARTICLE);
-            particle.velocities.reserve(ParticleEffectComponent::MAX_PARTICLE);
-            particle.lifetimes.reserve(ParticleEffectComponent::MAX_PARTICLE);
-            particle.scales.reserve(ParticleEffectComponent::MAX_PARTICLE);
+            auto& ptc = registry_.emplace<ParticleComponent>(e);
+            ptc.active = false;
+            ptc.positions.reserve(ParticleComponent::MAX_PARTICLE);
+            ptc.velocities.reserve(ParticleComponent::MAX_PARTICLE);
+            ptc.lifetimes.reserve(ParticleComponent::MAX_PARTICLE);
+
+            // auto& particle = registry_.emplace<ParticleEffectComponent>(e);
+            // particle.positions.reserve(ParticleEffectComponent::MAX_PARTICLE);
+            // particle.velocities.reserve(ParticleEffectComponent::MAX_PARTICLE);
+            // particle.lifetimes.reserve(ParticleEffectComponent::MAX_PARTICLE);
+            // particle.scales.reserve(ParticleEffectComponent::MAX_PARTICLE);
 
             freeEmitters_.push_back(e);
         }
     }
 
-    std::optional<entt::entity> ParticleEmitterPool::Acquire(ParticleEffectType type, glm::vec3 pos)
-    {
-        if (freeEmitters_.empty() || type >= COUNT)
-        {
-            TMT_DEBUG << "Empty particle emitter pool.";
-            return std::nullopt;
-        }
-
-        entt::entity e = freeEmitters_.back();
-        freeEmitters_.pop_back();
-
-        auto& transform = registry_.get<TransformComponent>(e);
-        transform.SetPosition(pos);
-
-        auto& particle = registry_.get<ParticleEffectComponent>(e);
-        switch (type)
-        {
-        case Jump:
-        case Move:
-        {
-            const auto& details = ParticleEffectMap::ParticleDetails[Jump];
-            particle.activeCnt = details.spawnNum;
-
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution<> dis(0, 359);
-
-            for (int i = 0; i < particle.activeCnt; ++i)
-            {
-                particle.positions.emplace_back(0.f);
-
-                auto radian = glm::radians(static_cast<float>(dis(gen)));
-                particle.velocities.emplace_back(glm::sin(radian), 0, glm::cos(radian));
-
-                particle.lifetimes.emplace_back(details.duration.first, std::chrono::steady_clock::now());
-                particle.scales.push_back(details.scale.first);
-            }
-
-            particle.texture = GetAssetID(Texture::PrimitiveName);
-        }
-            break;
-
-//        case Move:
-//            break;
-        default: ;
-        }
-
-        return e;
-    }
-
-    std::optional<entt::entity> ParticleEmitterPool::Acquire(ParticleEffectType type, entt::entity parent)
+    std::optional<entt::entity> ParticleEmitterPool::Acquire(AssetID ptcID, glm::vec3 pos)
     {
         if (freeEmitters_.empty())
         {
@@ -97,64 +54,54 @@ namespace tomato
             return std::nullopt;
         }
 
+        ParticleEffect* ptcEffect = AssetRegistry<ParticleEffect>::GetInstance().Get(ptcID);
+
+        entt::entity e = freeEmitters_.back();
+        freeEmitters_.pop_back();
+
+        auto& transform = registry_.get<TransformComponent>(e);
+        transform.SetPosition(pos);
+
+        auto& particle = registry_.get<ParticleComponent>(e);
+        particle.active = true;
+        ptcEffect->InitializeParticleComponent(particle);
+
+        return e;
+    }
+
+    std::optional<entt::entity> ParticleEmitterPool::Acquire(AssetID ptcID, entt::entity parent)
+    {
+        if (freeEmitters_.empty())
+        {
+            TMT_DEBUG << "Empty particle emitter pool.";
+            return std::nullopt;
+        }
+
+        ParticleEffect* ptcEffect = AssetRegistry<ParticleEffect>::GetInstance().Get(ptcID);
+
         entt::entity e = freeEmitters_.back();
         freeEmitters_.pop_back();
 
         SetHierarchy(registry_, parent, e);
 
-        auto& particle = registry_.get<ParticleEffectComponent>(e);
-        switch (type)
-        {
-            case Jump:
-            case Move:
-            {
-                const auto& details = ParticleEffectMap::ParticleDetails[Jump];
-                particle.activeCnt = details.spawnNum;
-
-                std::random_device rd;
-                std::mt19937 gen(rd());
-                std::uniform_int_distribution<> dis(0, 359);
-
-                for (int i = 0; i < particle.activeCnt; ++i)
-                {
-                    particle.positions.emplace_back(0.f);
-
-                    auto radian = glm::radians(static_cast<float>(dis(gen)));
-                    particle.velocities.emplace_back(glm::sin(radian), 0, glm::cos(radian));
-
-                    particle.lifetimes.emplace_back(details.duration.first, std::chrono::steady_clock::now());
-                    particle.scales.push_back(details.scale.first);
-                }
-
-                particle.texture = GetAssetID(Texture::PrimitiveName);
-            }
-            break;
-            default: ;
-        }
+        auto& particle = registry_.get<ParticleComponent>(e);
+        particle.active = true;
+        ptcEffect->InitializeParticleComponent(particle);
 
         return e;
     }
 
     bool ParticleEmitterPool::Release(entt::entity e)
     {
-        auto* particle = registry_.try_get<ParticleEffectComponent>(e);
+        auto* particle = registry_.try_get<ParticleComponent>(e);
         if (!particle)
             return false;
 
         SetHierarchy(registry_, entt::null, e);
 
-        particle->positions.clear();
-        particle->velocities.clear();
-        particle->lifetimes.clear();
-        particle->scales.clear();
-        particle->activeCnt = 0;
+        particle->active = false;
 
         freeEmitters_.push_back(e);
         return true;
-    }
-
-    void ParticleEmitterPool::SetParticleEmitter(ParticleEffectType type)
-    {
-
     }
 }

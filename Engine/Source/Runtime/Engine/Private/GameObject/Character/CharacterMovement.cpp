@@ -31,7 +31,7 @@ namespace tomato::CharacterMovement
                 auto& move = registry.get<MovementComponent>(root);
                 ++move.gndStayCnt;
 
-                event.state->particlePool_.Acquire(Jump, registry.get<TransformComponent>(event.e).GetWorldPosition());
+                // event.state->particlePool_.Acquire(Jump, registry.get<TransformComponent>(event.e).GetWorldPosition());
 
                 move.mode = Walking;
                 move.jumpCnt = 0;

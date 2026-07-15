@@ -29,6 +29,7 @@ namespace tomato
 
     void ParticleRenderSystem::Update(SimContext& simCtx)
     {
+        // 활성화된 파티클 엔티티가 없으면 종료
         if (simCtx.state->particlePool_.GetActiveEmitterNum() == 0)
             return;
 
@@ -37,14 +38,13 @@ namespace tomato
             TMT_ERR << "Invalid mesh or shader.";
             return;
         }
-
         mesh2D_->Bind();
         shader_->Use();
-
         AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
 
         auto& registry = simCtx.state->GetRegistry();
 
+        // 카메라 축 설정
         auto& [mainCam] = registry.ctx().get<RenderContext>();
         if (mainCam == entt::null)
             return;
@@ -58,12 +58,14 @@ namespace tomato
          "uCamUp",
          glm::normalize(glm::vec3(viewProjMat[0][1], viewProjMat[1][1], viewProjMat[2][1])));
 
+        // 컴포넌트 업데이트
         auto view = registry.view<TransformComponent, ParticleComponent>();
         for (auto [e, trf, pc] : view.each())
         {
             if (!pc.active)
                 continue;
 
+            // 이미터 lifetime 확인
             auto now = std::chrono::steady_clock::now();
             auto activeDuration =
                     std::chrono::duration_cast<std::chrono::milliseconds>(now - pc.emitter.start);
@@ -71,31 +73,18 @@ namespace tomato
             {
                 if (pc.looping)
                     pc.emitter.start = now;
-                else if (pc.activeCnt == 0)
+                else if (pc.activeCnt == 0) // 루프 아닌데 활성화된 파티클이 없으면 풀에 반납(완전 종료)
                 {
                     simCtx.state->particlePool_.Release(e);
                     continue;
                 }
             }
 
-            // remove particle
-
-            if (activeDuration >= pc.startDelay)
-                InitializeParticles(pc);
-
-            // add burst
-
-            if (curTexture_ != pc.texture)
-            {
-                curTexture_ = pc.texture;
-                AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
-            }
-
+            // lifetime 지난 파티클 제거
             for (int i = 0; i < pc.activeCnt; )
             {
-                if (std::chrono::duration_cast<std::chrono::milliseconds>(
-                        std::chrono::steady_clock::now() - pc.lifetimes[i].start)
-                        > pc.lifetimes[i].duration)
+                if (std::chrono::duration_cast<std::chrono::milliseconds>(now - pc.lifetimes[i].start)
+                    >= pc.lifetimes[i].duration)
                 {
                     int backIdx = pc.activeCnt - 1;
                     if (i == backIdx)
@@ -109,9 +98,43 @@ namespace tomato
                     std::swap(pc.lifetimes[i], pc.lifetimes[backIdx]);
 
                     --pc.activeCnt;
-                    continue;
                 }
+                else
+                    ++i;
+            }
 
+            // rate over time 의한 파티클 생성
+            pc.adder += std::chrono::duration_cast<std::chrono::milliseconds>(now - pc.latestTP);
+            pc.latestTP = now;
+
+            if (pc.adder >= pc.emitPeriod)
+            {
+                pc.adder -= pc.emitPeriod;
+                InitializeParticles(pc);
+            }
+
+            // burst 의한 파티클 생성
+            if (pc.burst.has_value())
+            {
+                pc.burst->adder += std::chrono::duration_cast<std::chrono::milliseconds>(now - pc.burst->latest);
+                pc.burst->latest = now;
+
+                if (pc.burst->adder >= pc.burst->period)
+                {
+                    pc.burst->adder -= pc.burst->period;
+                    InitializeParticles(pc, pc.burst->count);
+                }
+            }
+
+            // 파티클 그리기
+            if (curTexture_ != pc.texture)
+            {
+                curTexture_ = pc.texture;
+                AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
+            }
+
+            for (int i = 0; i < pc.activeCnt; )
+            {
                 pc.positions[i] += pc.velocities[i] * FIXED_DELTA_TIME;
                 auto position = trf.GetWorldPosition() + trf.GetLocalQuaternion() * pc.positions[i];
 

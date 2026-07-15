@@ -13,8 +13,6 @@ namespace tomato
     class ParticleEffect
     {
     public:
-        constexpr static uint8_t MAX_PARTICLES = 128;
-
         struct Burst
         {
             float period;
