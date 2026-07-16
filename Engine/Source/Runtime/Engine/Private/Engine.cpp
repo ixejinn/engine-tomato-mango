@@ -174,7 +174,6 @@ namespace tomato {
         currState_->Init();
 
         TMT_DEBUG << "Key for current State's factory function: " << std::type_index(typeid(*currState_)).name();
-        // 실제 사용되는 키: std::type_index(typeid(*currState_)) (Main.cpp 참고)
 
         inputUI_.SetState(currState_.get());
 

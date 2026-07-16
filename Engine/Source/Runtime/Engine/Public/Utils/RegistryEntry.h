@@ -2,6 +2,7 @@
 #define MANGO_REGISTRYENTRY_H
 
 #include <typeindex>
+#include <string>
 #include "ECS/SystemRegistry.h"
 #include "State/StateRegistry.h"
 
@@ -18,9 +19,9 @@ namespace tomato {
             SystemRegistry::GetInstance().RegisterFactory(phase, std::move(factory));
         }
 
-        RegistryEntry(const std::type_index type, StateFactory&& factory)
+        RegistryEntry(const std::type_index type, const std::string& name, StateFactory&& factory)
         {
-            StateRegistry::GetInstance().RegisterFactory(type, std::move(factory));
+            StateRegistry::GetInstance().RegisterFactory(type, name, std::move(factory));
         }
     };
 }
@@ -32,9 +33,9 @@ namespace { static tomato::RegistryEntry CLASS##Entry{PHASE, []() { return std::
 namespace { static tomato::RegistryEntry CLASS##Entry{PHASE, []() { return std::make_unique<CLASS>(); }}; }
 
 #define REGISTER_BUILT_IN_STATE(CLASS) \
-namespace { static tomato::RegistryEntry CLASS##Entry{std::type_index(typeid(tomato::CLASS)), [](tomato::Engine& engine) { return std::make_unique<tomato::CLASS>(engine); }}; }
+namespace { static tomato::RegistryEntry CLASS##Entry{std::type_index(typeid(tomato::CLASS)), "tomato::"#CLASS, [](tomato::Engine& engine) { return std::make_unique<tomato::CLASS>(engine); }}; }
 
 #define REGISTER_STATE(CLASS) \
-namespace { static tomato::RegistryEntry CLASS##Entry{std::type_index(typeid(CLASS)), [](tomato::Engine& engine) { return std::make_unique<CLASS>(engine); }}; }
+namespace { static tomato::RegistryEntry CLASS##Entry{std::type_index(typeid(CLASS)), #CLASS, [](tomato::Engine& engine) { return std::make_unique<CLASS>(engine); }}; }
 
 #endif //MANGO_REGISTRYENTRY_H
