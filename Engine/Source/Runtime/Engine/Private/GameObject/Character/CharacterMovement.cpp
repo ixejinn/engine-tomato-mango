@@ -33,7 +33,6 @@ namespace tomato::CharacterMovement
                 auto& move = registry.get<MovementComponent>(root);
                 ++move.gndStayCnt;
 
-                event.state->particlePool_.Acquire(GetAssetID("Resources/Engine/jump_test.tmt.ptc"), registry.get<TransformComponent>(event.e).GetWorldPosition());
                 EventDispatcher::GetInstance().Enqueue(LandingEvent{event.e, event.state, registry.get<TransformComponent>(event.e).GetWorldPosition()});
 
                 move.mode = Walking;

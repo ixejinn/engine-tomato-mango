@@ -21,8 +21,6 @@ namespace tomato
     ParticleRenderSystem::ParticleRenderSystem()
     : curTexture_(GetAssetID(Texture::PrimitiveName))
     {
-        ParticleEffect::Create("Resources/Engine/jump_test.tmt.ptc");
-
         mesh2D_ = AssetRegistry<Mesh>::GetInstance().Get(
             GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain)));
         shader_ = AssetRegistry<Shader>::GetInstance().Get(
@@ -242,7 +240,6 @@ namespace tomato
 
     void ParticleRenderSystem::InitializeParticles(ParticleComponent& comp, TransformComponent& trf, int num)
     {
-        std::cout << "Initialize particles\n";
         int initCnt = std::min(comp.activeCnt + num, ParticleComponent::MAX_PARTICLE);
 
         auto now = std::chrono::steady_clock::now();

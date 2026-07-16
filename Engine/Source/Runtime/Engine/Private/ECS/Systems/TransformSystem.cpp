@@ -1,12 +1,11 @@
 ﻿#include "ECS/Systems/TransformSystem.h"
-
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
-
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/SystemUpdateContexts.h"
-
+#include "Event/EventDispatcher.h"
+#include "GameObjects/Character/MovementMode.h"
 #include "Utils/RegistryEntry.h"
 REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Transformation, TransformSystem)
 
@@ -14,6 +13,8 @@ namespace tomato
 {
     void TransformSystem::Update(SimContext &simCtx)
     {
+        EventDispatcher::GetInstance().Update<LandingEvent>();
+
         auto& registry = simCtx.state->GetRegistry();
         auto rootView = registry.view<RootEntityTag, TransformComponent>();
 
