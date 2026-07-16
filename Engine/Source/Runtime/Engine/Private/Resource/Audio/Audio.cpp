@@ -1,4 +1,4 @@
-#include <filesystem>
+﻿#include <filesystem>
 #include <bit>
 #include "Resource/Audio/Audio.h"
 #include "Resource/AssetRegistry.h"
@@ -40,6 +40,8 @@ namespace tomato {
             TMT_WARN << "failed to initialize sound from file: " << filename;
     }
 
+    Audio::Audio(const std::filesystem::path& path, unsigned int simultaneousCnt) : Audio(path.string().c_str(), simultaneousCnt) {}
+
     Audio::~Audio() {
         for (auto& sound : sounds_)
             ma_sound_uninit(&sound);
@@ -53,6 +55,11 @@ namespace tomato {
 
     void Audio::Cleanup() {
         ma_engine_uninit(&engine_);
+    }
+
+    AssetID Audio::Create(const std::filesystem::path& path, unsigned int simultaneousCnt)
+    {
+        return Create(path.string().c_str(), simultaneousCnt);
     }
 
     AssetID Audio::Create(const char* filename, unsigned int simultaneousCnt) {

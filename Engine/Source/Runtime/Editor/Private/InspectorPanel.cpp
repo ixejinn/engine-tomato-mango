@@ -1,6 +1,7 @@
 ﻿#include "InspectorPanel.h"
 
 #include "Resource/AssetRegistry.h"
+#include "Resource/PathManager.h"
 #include "Resource/Render/Texture.h"
 
 #include "GLFW/glfw3.h"
@@ -57,7 +58,12 @@ namespace tomato
 				MoreButton(editorCtx, comp);
 
 				if (is_open && comp.editor.Draw)
-					comp.editor.Draw(editorCtx, editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
+				{
+					if (comp.editor.Draw(editorCtx,
+						editorCtx.currentState->GetRegistry(),
+						editorCtx.selectedEntity))
+						editorCtx.sceneDirty = true;
+				}
 			}
 		}
 		ImGui::End();
@@ -67,7 +73,7 @@ namespace tomato
 	{
 		more_vert =
 			AssetRegistry<Texture>::GetInstance().
-			Get(GetAssetID("Resources/Engine/Assets/img/more_vert.png"))->GetTexture();
+			Get(GetAssetID(PathManager::Icon("more_vert.png").string().c_str()))->GetTexture();
 	}
 
 	void InspectorPanel::MenuBar(EditorContext& editorCtx)
@@ -118,7 +124,7 @@ namespace tomato
 			ImGui::Text("%s", nametag.name.c_str());
 
 			ImGui::TableSetColumnIndex(1);
-			ImGui::Text("%d", editorCtx.selectedEntity);
+			ImGui::Text("%d", entt::to_entity(editorCtx.selectedEntity));
 
 			ImGui::TableSetColumnIndex(2);
 			ImGui::Text("%llu", nametag.id);
@@ -145,7 +151,10 @@ namespace tomato
 			if (comp.category == category)
 			{
 				if (ImGui::MenuItem(comp.name.c_str(), NULL, false, enabled))
+				{
 					comp.editor.Add(reg, editorCtx.selectedEntity);
+					editorCtx.sceneDirty = true;
+				}
 			}
 		}
 	}
@@ -166,7 +175,10 @@ namespace tomato
 			if (ImGui::MenuItem("Remove Component"))
 			{
 				if (!HasFlag<Serialization::ComponentFlags>(comp.flags, Serialization::ComponentFlags::Essential))
+				{
 					comp.editor.Remove(editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
+					editorCtx.sceneDirty = true;
+				}
 			}
 
 			ImGui::EndPopup();

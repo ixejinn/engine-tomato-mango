@@ -7,11 +7,22 @@
 namespace tomato {
     FT_Library Font::library_ = nullptr;
 
-    Font::Font(const char *path) {
+    //Font::Font(const char *path) {
+    //    if (!library_)
+    //        Initialize();
+
+    //    if (FT_New_Face(library_, path, 0, &face_))
+    //        TMT_ERR << "FreeType: Failed to load font " << path;
+    //    else
+    //        FT_Set_Pixel_Sizes(face_, 0, baseSize_);
+    //}
+
+    Font::Font(const std::filesystem::path& path)
+    {
         if (!library_)
             Initialize();
 
-        if (FT_New_Face(library_, path, 0, &face_))
+        if (FT_New_Face(library_, path.string().c_str(), 0, &face_))
             TMT_ERR << "FreeType: Failed to load font " << path;
         else
             FT_Set_Pixel_Sizes(face_, 0, baseSize_);
@@ -36,33 +47,46 @@ namespace tomato {
         }
     }
 
-    void Font::Create(const char *path) {
-        std::unique_ptr<Font> ptr{new Font(path)};
-
-        std::string fullPath(path);
-
-        // Find the last slash and the last dot
-        size_t lastSlash = fullPath.find_last_of("/\\");
-        size_t lastDot = fullPath.find_last_of(".");
+    void Font::Create(const std::filesystem::path& path)
+    {
+        std::unique_ptr<Font> ptr{ new Font(path) };
 
         // Extract the file name without extension
-        std::string assetKey;
-        if (path == defaultPath)
-            assetKey = PrimitiveName;
-        else
-        {
-            size_t start = (lastSlash == std::string::npos) ? 0 : lastSlash + 1;
-            size_t count = (lastDot == std::string::npos || lastDot < start)
-                ? std::string::npos : lastDot - start;
-
-            assetKey = fullPath.substr(start, count);
-        }
+        std::string assetKey = path.stem().string();
 
         // Register using the parsed key
         AssetRegistry<Font>::GetInstance().Register(assetKey, std::move(ptr));
 
         TMT_INFO << "Font Registered with key: " << assetKey;
     }
+
+    //void Font::Create(const char *path) {
+    //    std::unique_ptr<Font> ptr{new Font(path)};
+
+    //    std::string fullPath(path);
+
+    //    // Find the last slash and the last dot
+    //    size_t lastSlash = fullPath.find_last_of("/\\");
+    //    size_t lastDot = fullPath.find_last_of(".");
+
+    //    // Extract the file name without extension
+    //    std::string assetKey;
+    //    if (path == defaultPath)
+    //        assetKey = PrimitiveName;
+    //    else
+    //    {
+    //        size_t start = (lastSlash == std::string::npos) ? 0 : lastSlash + 1;
+    //        size_t count = (lastDot == std::string::npos || lastDot < start)
+    //            ? std::string::npos : lastDot - start;
+
+    //        assetKey = fullPath.substr(start, count);
+    //    }
+
+    //    // Register using the parsed key
+    //    AssetRegistry<Font>::GetInstance().Register(assetKey, std::move(ptr));
+
+    //    TMT_INFO << "Font Registered with key: " << assetKey;
+    //}
 
     const Glyph& Font::GetGlyph(char32_t codepoint)
     {

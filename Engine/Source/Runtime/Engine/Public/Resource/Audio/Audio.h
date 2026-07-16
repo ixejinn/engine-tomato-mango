@@ -1,13 +1,15 @@
-#ifndef MANGO_AUDIO_H
+﻿#ifndef MANGO_AUDIO_H
 #define MANGO_AUDIO_H
 
 #include <vector>
+#include <filesystem>
 #include <miniaudio/miniaudio.h>
 #include "Resource/ResourceFwd.h"
 
 namespace tomato {
     class Audio {
         explicit Audio(const char* filename, unsigned int simultaneousCnt);
+        explicit Audio(const std::filesystem::path& path, unsigned int simultaneousCnt);
 
     public:
         ~Audio();
@@ -15,6 +17,7 @@ namespace tomato {
         static void Initialize();
         static void Cleanup();
         static AssetID Create(const char* filename, unsigned int simultaneousCnt = 1);
+        static AssetID Create(const std::filesystem::path& path, unsigned int simultaneousCnt = 1);
 
         void SetLooping(bool repeat = true);
 

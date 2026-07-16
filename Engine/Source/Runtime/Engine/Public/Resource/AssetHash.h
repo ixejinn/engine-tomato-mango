@@ -1,6 +1,7 @@
-#ifndef MANGO_ASSETHASH_H
+﻿#ifndef MANGO_ASSETHASH_H
 #define MANGO_ASSETHASH_H
 
+#include <filesystem>
 #include "Resource/ResourceFwd.h"
 
 namespace tomato {
@@ -17,6 +18,10 @@ namespace tomato {
 
     constexpr AssetID GetAssetID(const char* name) {
         return FNV1a64B(name);
+    }
+
+    constexpr AssetID GetAssetID(const std::filesystem::path& name) {
+        return FNV1a64B(name.string().c_str());
     }
 }
 

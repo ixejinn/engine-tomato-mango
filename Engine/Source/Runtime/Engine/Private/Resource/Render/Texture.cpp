@@ -61,6 +61,8 @@ namespace tomato {
             TMT_ERR << "Failed to load texture: " << filename;
     }
 
+    Texture::Texture(const std::filesystem::path& path, Format format) : Texture(path.string().c_str(), format) {}
+
     Texture::~Texture()
     {
         if (textureID_ != 0)
@@ -77,6 +79,13 @@ namespace tomato {
     {
         std::unique_ptr<Texture> ptr{new Texture(filename, format)};
         AssetRegistry<Texture>::GetInstance().Register(filename, std::move(ptr));
+
+        TMT_INFO << "Texture Registered " << filename;
+    }
+
+    void Texture::Create(const std::filesystem::path& path, Format format)
+    {
+        Create(path.string().c_str(), format);
     }
 
     void Texture::Bind() const

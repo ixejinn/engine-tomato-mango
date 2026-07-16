@@ -156,6 +156,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Server/MatchServer.h
         Source/Runtime/Editor/Public/InspectorPanel.h
         Source/Runtime/Editor/Public/InspectorDraw.h
+        Source/Runtime/Editor/Public/MainMenuBar.h
 		Source/Runtime/Engine/Public/ECS/Components/Character.h
 		Source/Runtime/Core/Public/Clock/Timer.h
 		../Contents/Source/TimerTestComponent.h
@@ -171,7 +172,8 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Resource/Render/ParticleEffect.h
 		Source/Runtime/Engine/Public/ECS/Forward/ParticleCompFwd.h
 		Source/Runtime/Engine/Public/Utils/RandomNumberGenerator.h
-)
+        Source/Runtime/Engine/Private/Utils/FileDialog.h
+  )
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -186,17 +188,18 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Systems/KinematicMovementSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/RenderSystem.cpp
         Source/Runtime/Engine/Private/Resource/Render/Font.cpp
+        Source/Runtime/Engine/Private/Resource/Render/Mesh.cpp
+        Source/Runtime/Engine/Private/Resource/Render/Shader.cpp
+        Source/Runtime/Engine/Private/Resource/Render/Texture.cpp
+        Source/Runtime/Engine/Private/Resource/Audio/Audio.cpp
+        Source/Runtime/Engine/Private/Resource/PathManager.cpp
         Source/Runtime/Engine/Private/Font/TextureAtlas.cpp
         Source/Runtime/Engine/Private/Font/TextRenderer.cpp
         Source/Runtime/Engine/Private/Font/AtlasManager.cpp
-        Source/Runtime/Engine/Private/Resource/Render/Mesh.cpp
         Source/Runtime/Engine/Private/State/State.cpp
-        Source/Runtime/Engine/Private/Resource/Render/Shader.cpp
-        Source/Runtime/Engine/Private/Resource/Render/Texture.cpp
         Source/Runtime/Engine/Private/ECS/Systems/TransformSystem.cpp
         Source/Runtime/Engine/Private/ECS/SystemRegistry.cpp
         Source/Runtime/Engine/Private/ECS/SystemManager.cpp
-        Source/Runtime/Engine/Private/Resource/Audio/Audio.cpp
 		Source/Runtime/Engine/Private/Collision/Narrow/GJK/GJK.cpp
 		Source/Runtime/Engine/Private/Collision/Narrow/GJK/EPA.cpp
         Source/Runtime/Engine/Private/Math/Normal.cpp
@@ -230,7 +233,6 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Systems/UITransformSystem.cpp
         Source/Runtime/Engine/Private/Serialization/ComponentSerializer.cpp
         Source/Runtime/Core/Private/UUID.cpp
-        
         Source/Runtime/Engine/Private/Serialization/ComponentRegistry.cpp
         Source/Runtime/Editor/Private/Editor.cpp
         Source/Runtime/Editor/Private/HierarchyPanel.cpp
@@ -247,6 +249,8 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/ECS/Systems/ParticleRenderSystem.cpp
 		Source/Runtime/Engine/Private/Particle/ParticleEmitterPool.cpp
 		Source/Runtime/Engine/Private/Resource/Render/ParticleEffect.cpp
+        Source/Runtime/Editor/Private/MainMenuBar.cpp
+        Source/Runtime/Engine/Private/Utils/FileDialog.cpp
 )
 
 add_library(engine STATIC

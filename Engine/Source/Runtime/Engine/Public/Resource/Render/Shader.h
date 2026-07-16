@@ -1,6 +1,7 @@
-#ifndef MANGO_SHADER_H
+﻿#ifndef MANGO_SHADER_H
 #define MANGO_SHADER_H
 
+#include <filesystem>
 #include <glm/fwd.hpp>
 #include <glad/glad.h>
 
@@ -12,6 +13,7 @@ namespace tomato {
     private:
         Shader();
         Shader(const char* vsName, const char* fsName);
+        Shader(const std::filesystem::path& vsPath, const std::filesystem::path& fsPath);
 
     public:
         ~Shader();
@@ -19,6 +21,7 @@ namespace tomato {
         static void Cleanup() {}
         static void Create();
         static void Create(const char* vsName, const char* fsName);
+        static void Create(const std::filesystem::path& vsPath, const std::filesystem::path& fsPath);
 
         void Use() const;
 
