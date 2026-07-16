@@ -21,6 +21,8 @@
 #include "TimerTestComponent.h"
 #include "ECS/Components/Nametag.h"
 #include "Particle/ParticleEmitterPool.h"
+#include "Utils/RegistryEntry.h"
+REGISTER_STATE(TestState)
 
 using namespace tomato;
 using namespace std::chrono_literals;

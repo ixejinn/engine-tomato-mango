@@ -26,7 +26,7 @@ namespace tomato::FileDialog
 
 		return std::nullopt;
 	}
-	std::optional<std::filesystem::path> FileDialog::SaveFile(const char* title, const char* extension, const char* filter, const std::filesystem::path& initialDir)
+	std::optional<std::filesystem::path> SaveFile(const char* title, const char* extension, const char* filter, const std::filesystem::path& initialDir)
 	{
 		char filePath[260] = "";
 

@@ -173,7 +173,8 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Forward/ParticleCompFwd.h
 		Source/Runtime/Engine/Public/Utils/RandomNumberGenerator.h
         Source/Runtime/Engine/Private/Utils/FileDialog.h
-  )
+		Source/Runtime/Engine/Public/State/StateRegistry.h
+)
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -251,6 +252,8 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Resource/Render/ParticleEffect.cpp
         Source/Runtime/Editor/Private/MainMenuBar.cpp
         Source/Runtime/Engine/Private/Utils/FileDialog.cpp
+		Source/Runtime/Engine/Private/State/StateRegistry.cpp
+		Source/Runtime/Engine/Private/State/DefaultState.cpp
 )
 
 add_library(engine STATIC

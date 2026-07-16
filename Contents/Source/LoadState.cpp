@@ -8,6 +8,8 @@
 #include "Prefab/Prefab.h"
 #include "Prefab/UIPrefab.h"
 #include "TestState.h"
+#include "Utils/RegistryEntry.h"
+REGISTER_STATE(LoadState)
 
 using namespace tomato;
 
