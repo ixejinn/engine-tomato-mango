@@ -1,6 +1,5 @@
 #include <fstream>
 #include <string>
-#include <glm/glm.hpp>
 #include "Resource/Render/ParticleEffect.h"
 #include "Resource/Render/Texture.h"
 #include "Resource/AssetRegistry.h"

@@ -5,6 +5,7 @@
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
+#include "Resource/Render/ParticleEffect.h"
 #include "Input/InputRecorder.h"
 #include "Input/InputConstants.h"
 #include "Input/KeyConstants.h"
@@ -33,6 +34,12 @@ void TestState::Init() {
     Font::Create("Resources/Engine/Assets/Fonts/D2Coding.ttf");
     Font::Create("Resources/Engine/Assets/Fonts/Pretendard-SemiBold.ttf");
 
+    ParticleEffect::Create("Resources/Contents/burst_test.tmt.ptc");
+    ParticleEffect::Create("Resources/Contents/ribbon_particle.tmt.ptc");
+    ParticleEffect::Create("Resources/Contents/jump.tmt.ptc");
+
+    EventDispatcher::GetInstance().Connect<LandingEvent, TestState::CallbackJump>();
+
     engine_.GetInputRecorder().BindInputIntent(Key::J, InputIntent::Test_1);
 
     //// Set rollback
@@ -57,8 +64,9 @@ void TestState::Init() {
     renderp0.color = { 1.f, 1.f, 0.f, 1.f };
     auto& channelp0 = registry_.get<InputChannelComponent>(player0);
     channelp0.channel = 0;
-    registry_.emplace<CollisionTestComponent>(player0);
-    particlePool_.Acquire(GetAssetID("Test.tmt.ptc"), player0);
+    // registry_.emplace<CollisionTestComponent>(player0);
+    // particlePool_.Acquire(GetAssetID("Resources/Contents/burst_test.tmt.ptc"), player0);
+    // particlePool_.Acquire(GetAssetID("Resources/Contents/ribbon_particle.tmt.ptc"), player0);
 
     //// Player1 character
     entt::entity player1 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { -1, 2, 0 });
@@ -74,16 +82,6 @@ void TestState::Init() {
     trfGnd.SetScale(10, 0.1, 10);
     auto& renderGnd = registry_.get<RenderComponent>(ground);
     renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
-
-    // Test billboarding
-//    entt::entity billboarding = registry_.create();
-//    registry_.emplace<NametagComponent>(billboarding, GenerateUUID(), GenerateEntityName(registry_, "billboarding"));
-//    registry_.emplace<TransformComponent>(billboarding, glm::vec3{3, 0, 0});
-//    registry_.emplace<ParticleComponent>(billboarding, 1, GetAssetID(Texture::PrimitiveName));
-//    auto& particle = registry_.get<ParticleComponent>(billboarding);
-//    particle.positions.emplace_back(0.f);
-//    particle.velocities.emplace_back(1.f, 0.f, 0.f);
-//    SetHierarchy(registry_, player0, billboarding);
 
     ////UI
     auto targetLabel = UIPrefab::CreateText(registry_, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 20.f);
@@ -199,4 +197,12 @@ void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
             render->color = testComp->color.value();
     }
+}
+
+void TestState::CallbackJump(const tomato::LandingEvent& event)
+{
+    auto e = event.state->particlePool_.Acquire(
+        GetAssetID("Resources/Contents/jump.tmt.ptc"),
+        event.position);
+    std::cout << "Callback Jump " << (int)e.value() << "\n";
 }

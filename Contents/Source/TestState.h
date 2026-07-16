@@ -6,6 +6,7 @@
 #include "Resource/ResourceFwd.h"
 #include "Collision/CollisionEventFwd.h"
 #include "UIController.h"
+#include "GameObjects/Character/MovementMode.h"
 
 class TestState : public tomato::State {
 public:
@@ -18,6 +19,8 @@ public:
 private:
     static void TEST_CollisionEnter(const tomato::CollisionEnterEvent& event);
     static void TEST_CollisionExit(const tomato::CollisionExitEvent& event);
+
+    static void CallbackJump(const tomato::LandingEvent& event);
 
     tomato::Audio* audioPtr_{nullptr};
     UIController uiController_;

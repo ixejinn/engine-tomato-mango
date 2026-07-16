@@ -2,6 +2,7 @@
 #define MANGO_MOVEMENTMODE_H
 
 #include <entt/fwd.hpp>
+#include <glm/vec3.hpp>
 #include "State/StateFwd.h"
 
 namespace tomato
@@ -17,6 +18,13 @@ namespace tomato
         entt::entity e;
         State* state;
         MovementMode mode;
+    };
+
+    struct LandingEvent
+    {
+        entt::entity e;
+        State* state;
+        glm::vec3 position;
     };
 }
 

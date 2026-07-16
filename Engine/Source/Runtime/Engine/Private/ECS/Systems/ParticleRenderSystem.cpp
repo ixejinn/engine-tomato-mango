@@ -21,7 +21,7 @@ namespace tomato
     ParticleRenderSystem::ParticleRenderSystem()
     : curTexture_(GetAssetID(Texture::PrimitiveName))
     {
-        ParticleEffect::Create("Test.tmt.ptc");
+        ParticleEffect::Create("Resources/Engine/jump_test.tmt.ptc");
 
         mesh2D_ = AssetRegistry<Mesh>::GetInstance().Get(
             GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain)));
@@ -75,7 +75,7 @@ namespace tomato
             {
                 if (pc.looping)
                 {
-                    std::cout << "   LOOPING(" << simCtx.tick << ") ----------\n";
+                    // std::cout << "   LOOPING(" << simCtx.tick << ") ----------\n";
                     pc.emitter.start = now;
 
                     if (pc.burst.has_value())
@@ -147,7 +147,7 @@ namespace tomato
                         InitializeParticles(pc, trf, pc.burst->count);
                     else
                         InitializeParticles(pc, pc.burst->count);
-                    std::cout << "   BURST(" << simCtx.tick << ") ---------- " << pc.activeCnt << "\n";
+                    // std::cout << "   BURST(" << simCtx.tick << ") ---------- " << pc.activeCnt << "\n";
                 }
             }
 
@@ -176,70 +176,11 @@ namespace tomato
                 ++i;
             }
         }
-
-//        auto view = registry.view<TransformComponent, ParticleEffectComponent>();
-//        for (auto [e, trf, particle] : view.each())
-//        {
-//            if (particle.activeCnt <= 0)
-//                continue;
-//
-//            if (curTexture_ != particle.texture)
-//            {
-//                curTexture_ = particle.texture;
-//                AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
-//            }
-//
-//            for (int i = 0; i < particle.activeCnt; )
-//            {
-//                if (std::chrono::duration_cast<std::chrono::milliseconds>(
-//                        std::chrono::steady_clock::now() - particle.lifetimes[i].start
-//                        )
-//                        > particle.lifetimes[i].duration)
-//                {
-//                    int backIdx = particle.activeCnt - 1;
-//                    if (i == backIdx)
-//                    {
-//                        particle.activeCnt = 0;
-//                        break;
-//                    }
-//
-//                    std::swap(particle.positions[i], particle.positions[backIdx]);
-//                    std::swap(particle.velocities[i], particle.velocities[backIdx]);
-//                    std::swap(particle.lifetimes[i], particle.lifetimes[backIdx]);
-//                    std::swap(particle.scales[i], particle.scales[backIdx]);
-//
-//                    --particle.activeCnt;
-//                    continue;
-//                }
-//
-//                particle.positions[i] += particle.velocities[i] * FIXED_DELTA_TIME;
-//                auto position = trf.GetWorldPosition() + trf.GetLocalQuaternion() * particle.positions[i];
-//
-//                auto T = glm::translate(glm::mat4(1.f), position);
-//                auto S = glm::scale(glm::mat4(1.f), glm::vec3(particle.scales[i]));
-//                shader_->SetUniformMat4("uModel", T * S);
-//
-//                shader_->SetUniformInt("uTexture", 0);
-//                shader_->SetUniformVec4("uColor", particle.color);
-//
-//                mesh2D_->Draw();
-//                ++i;
-//            }
-//
-//            if (particle.activeCnt <= 0)
-//                simCtx.state->particlePool_.Release(e);
-//        }
     }
 
     void ParticleRenderSystem::InitializeParticles(ParticleComponent& comp, int num)
     {
         int initCnt = std::min(comp.activeCnt + num, ParticleComponent::MAX_PARTICLE);
-        num = initCnt - comp.activeCnt;
-
-//        comp.positions.assign(num, {0, 0, 0});
-//        comp.lifetimes.assign(num,
-//                              ParticleComponent::Lifetime
-//                                      {comp.lifetime, std::chrono::steady_clock::now()});
 
         auto now = std::chrono::steady_clock::now();
         for (int i = comp.activeCnt; i < initCnt; ++i)
@@ -301,13 +242,8 @@ namespace tomato
 
     void ParticleRenderSystem::InitializeParticles(ParticleComponent& comp, TransformComponent& trf, int num)
     {
+        std::cout << "Initialize particles\n";
         int initCnt = std::min(comp.activeCnt + num, ParticleComponent::MAX_PARTICLE);
-        num = initCnt - comp.activeCnt;
-
-//        comp.positions.assign(num, {0, 0, 0});
-//        comp.lifetimes.assign(num,
-//                              ParticleComponent::Lifetime
-//                                      {comp.lifetime, std::chrono::steady_clock::now()});
 
         auto now = std::chrono::steady_clock::now();
         for (int i = comp.activeCnt; i < initCnt; ++i)
@@ -353,7 +289,7 @@ namespace tomato
                     float phi = RandomNumberGenerator::GetUniformRealDistribution(0.f, comp.angle);
 
                     auto lambdaR = glm::radians(static_cast<float>(lambda));
-                    auto phiR = glm::radians(phi);
+                    auto phiR = glm::radians(90.f - phi);
 
                     comp.velocities[i] =
                             {glm::cos(phiR) * glm::cos(lambdaR),

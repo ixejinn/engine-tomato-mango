@@ -5,8 +5,10 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "Particle/ParticleEmitterPool.h"
+#include "Event/EventDispatcher.h"
 #include "State/State.h"
 #include "Utils/Logger.h"
+#include "Resource/AssetHash.h"
 
 namespace tomato::CharacterMovement
 {
@@ -31,7 +33,8 @@ namespace tomato::CharacterMovement
                 auto& move = registry.get<MovementComponent>(root);
                 ++move.gndStayCnt;
 
-                // event.state->particlePool_.Acquire(Jump, registry.get<TransformComponent>(event.e).GetWorldPosition());
+                event.state->particlePool_.Acquire(GetAssetID("Resources/Engine/jump_test.tmt.ptc"), registry.get<TransformComponent>(event.e).GetWorldPosition());
+                EventDispatcher::GetInstance().Enqueue(LandingEvent{event.e, event.state, registry.get<TransformComponent>(event.e).GetWorldPosition()});
 
                 move.mode = Walking;
                 move.jumpCnt = 0;

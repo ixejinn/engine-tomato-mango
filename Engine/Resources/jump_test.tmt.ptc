@@ -1,0 +1,24 @@
+{
+    "duration": 1,
+    "looping": false,
+    "startDelay": 0,
+    "startSpeed": 1,
+    "maxParticles": 100,
+    "shape": "Circle",
+    "space": "World",
+    "lifetime": 1,
+    "texture": 1055259141834019825,
+    "size": 0.1,
+    "color": [
+        1,
+        0,
+        0,
+        1
+    ],
+    "rateOverTime": 0,
+    "burst": {
+        "period": 0,
+        "cycles": 1,
+        "count": 6
+    }
+}

@@ -1,4 +1,3 @@
-#include <random>
 #include <entt/entt.hpp>
 #include "Particle/ParticleEmitterPool.h"
 #include "ECS/Components/Nametag.h"
@@ -11,13 +10,10 @@
 #include "Resource/Render/Texture.h"
 #include "Resource/Render/ParticleEffect.h"
 
-// Acquire
-// - Active particle component
-
 namespace tomato
 {
     ParticleEmitterPool::ParticleEmitterPool(const PassKey<State>& key, entt::registry& reg, uint8_t poolSize)
-        : registry_(reg)
+        : registry_(reg), poolSize_(poolSize)
     {
         freeEmitters_.reserve(poolSize);
 
@@ -35,12 +31,6 @@ namespace tomato
             ptc.positions.reserve(ParticleComponent::MAX_PARTICLE);
             ptc.velocities.reserve(ParticleComponent::MAX_PARTICLE);
             ptc.lifetimes.reserve(ParticleComponent::MAX_PARTICLE);
-
-            // auto& particle = registry_.emplace<ParticleEffectComponent>(e);
-            // particle.positions.reserve(ParticleEffectComponent::MAX_PARTICLE);
-            // particle.velocities.reserve(ParticleEffectComponent::MAX_PARTICLE);
-            // particle.lifetimes.reserve(ParticleEffectComponent::MAX_PARTICLE);
-            // particle.scales.reserve(ParticleEffectComponent::MAX_PARTICLE);
 
             freeEmitters_.push_back(e);
         }
