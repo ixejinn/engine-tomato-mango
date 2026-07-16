@@ -4,7 +4,8 @@
 
 namespace tomato
 {
-    State::State(Engine& engine) : engine_(engine), particlePool_(PassKey<State>(), registry_)
+    State::State(Engine& engine)
+    : engine_(engine), particlePool_(PassKey<State>(), registry_)
     {
         registry_.ctx().emplace<RenderContext>();
         registry_.ctx().emplace<CollisionContext>();

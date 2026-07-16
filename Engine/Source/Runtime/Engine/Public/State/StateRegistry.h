@@ -4,8 +4,7 @@
 #include <functional>
 #include <memory>
 #include <unordered_map>
-#include <string>
-#include "Resource/ResourceFwd.h"
+#include <typeindex>
 #include "State/StateFwd.h"
 #include "TomatoFwd.h"
 
@@ -29,14 +28,12 @@ namespace tomato
             return instance;
         }
 
-        void RegisterFactory(const std::string& stateName, StateFactory&& factory);
+        void RegisterFactory(std::type_index type, StateFactory&& factory);
 
-        StateFactory& GetStateFactory(AssetID id) { return idToFactory_[id]; }
-        const std::string& GetStateName(AssetID id) { return idToName_[id]; }
+        StateFactory& GetStateFactory(std::type_index type) { return typeToFactory_[type]; }
 
     private:
-        std::unordered_map<AssetID, StateFactory> idToFactory_;
-        std::unordered_map<AssetID, std::string> idToName_;
+        std::unordered_map<std::type_index, StateFactory> typeToFactory_;
     };
 }
 

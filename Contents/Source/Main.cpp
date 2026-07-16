@@ -15,7 +15,7 @@ int main() {
     // engine.SetNextState(std::make_unique<LoadState>(engine));
     Engine engine(1600, 900, "TOMATO", NetMode::NM_Alone);
 //    engine.SetNextState(std::make_unique<TestState>(engine));
-    auto sf = StateRegistry::GetInstance().GetStateFactory(GetAssetID("TestState"));
+    auto sf = StateRegistry::GetInstance().GetStateFactory(std::type_index(typeid(TestState)));
     engine.SetNextState(sf(engine));
     engine.Run();
 

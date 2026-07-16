@@ -1,19 +1,13 @@
 #include "State/StateRegistry.h"
-#include "State/State.h"
-#include "Resource/AssetHash.h"
 #include "Utils/Logger.h"
 
 namespace tomato
 {
-    void StateRegistry::RegisterFactory(const std::string& stateName, StateFactory &&factory)
+    void StateRegistry::RegisterFactory(const std::type_index type, StateFactory&& factory)
     {
-        const AssetID id = GetAssetID(stateName);
+        if (typeToFactory_.contains(type))
+            TMT_WARN << "Duplicated State name " << type.name() << " detected. Overwriting with the new StateFactory.";
 
-        if (idToFactory_.contains(id))
-            TMT_WARN << "Duplicated State name " << idToName_[id] << " detected. Overwriting with the new StateFactory.";
-        else
-            idToName_[id] = stateName;
-
-        idToFactory_[id] = factory;
+        typeToFactory_[type] = factory;
     }
 }

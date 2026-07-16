@@ -3,6 +3,7 @@
 
 #include <array>
 #include <unordered_map>
+#include <typeindex>
 #include <entt/entity/registry.hpp>
 #include "State/StateFwd.h"
 #include "Particle/ParticleEmitterPool.h"
