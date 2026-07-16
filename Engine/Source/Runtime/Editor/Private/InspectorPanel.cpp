@@ -1,6 +1,7 @@
 ﻿#include "InspectorPanel.h"
 
 #include "Resource/AssetRegistry.h"
+#include "Resource/PathManager.h"
 #include "Resource/Render/Texture.h"
 
 #include "GLFW/glfw3.h"
@@ -72,7 +73,7 @@ namespace tomato
 	{
 		more_vert =
 			AssetRegistry<Texture>::GetInstance().
-			Get(GetAssetID("Resources/Engine/Assets/img/more_vert.png"))->GetTexture();
+			Get(GetAssetID(PathManager::Icon("more_vert.png").string().c_str()))->GetTexture();
 	}
 
 	void InspectorPanel::MenuBar(EditorContext& editorCtx)

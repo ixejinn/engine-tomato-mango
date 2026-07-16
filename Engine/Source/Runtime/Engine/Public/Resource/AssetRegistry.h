@@ -68,7 +68,6 @@ namespace tomato {
     private:
         std::vector<std::unique_ptr<T>> data_;
         std::unordered_map<AssetID, uint32_t> idToIdx_;
-        //std::unordered_map<AssetID, const char*> idToName_;
         std::unordered_map<AssetID, std::string> idToName_;
     };
 

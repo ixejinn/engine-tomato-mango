@@ -1,6 +1,7 @@
 ﻿#ifndef MANGO_TEXTURE_H
 #define MANGO_TEXTURE_H
 
+#include <filesystem>
 #include <glad/glad.h>
 
 namespace tomato {
@@ -26,6 +27,7 @@ namespace tomato {
     private:
         Texture();
         Texture(const char* filename, Format format = Format::RGBA8);
+        Texture(const std::filesystem::path& path, Format format = Format::RGBA8);
 
     public:
         ~Texture();
@@ -33,6 +35,7 @@ namespace tomato {
         static void Cleanup() {}
         static void Create();
         static void Create(const char* filename, Format format = Format::RGBA8);
+        static void Create(const std::filesystem::path& path, Format format = Format::RGBA8);
 
         void Bind() const;
 

@@ -15,6 +15,9 @@ namespace tomato {
         ReadShaderSourceFile(vsName, fsName);
     }
 
+    Shader::Shader(const std::filesystem::path& vsPath, const std::filesystem::path& fsPath)
+        : Shader(vsPath.string().c_str(), fsPath.string().c_str()) {}
+
     Shader::~Shader()
     {
         if (programID_)
@@ -37,6 +40,11 @@ namespace tomato {
     {
         std::unique_ptr<Shader> ptr{new Shader(vsName, fsName)};
         AssetRegistry<Shader>::GetInstance().Register(fsName, std::move(ptr));
+    }
+
+    void Shader::Create(const std::filesystem::path& vsPath, const std::filesystem::path& fsPath)
+    {
+        Create(vsPath.string().c_str(), fsPath.string().c_str());
     }
 
     void Shader::Use() const

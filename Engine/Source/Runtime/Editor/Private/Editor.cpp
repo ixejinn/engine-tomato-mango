@@ -1,6 +1,7 @@
 ﻿#include "Editor.h"
 
 #include <entt/entt.hpp>
+#include "Resource/PathManager.h"
 #include "Resource/Render/Texture.h"
 
 #include "GLFW/glfw3.h"
@@ -54,9 +55,12 @@ namespace tomato
 
 	void Editor::LoadResources()
 	{
-		Texture::Create("Resources/Engine/Assets/img/visibility_on.png");
-		Texture::Create("Resources/Engine/Assets/img/visibility_off.png");
-		Texture::Create("Resources/Engine/Assets/img/more_vert.png");
+		Texture::Create(PathManager::Icon("visibility_on.png"));
+		Texture::Create(PathManager::Icon("visibility_off.png"));
+		Texture::Create(PathManager::Icon("more_vert.png"));
+		//Texture::Create("Resources/Engine/Assets/img/visibility_on.png");
+		//Texture::Create("Resources/Engine/Assets/img/visibility_off.png");
+		//Texture::Create("Resources/Engine/Assets/img/more_vert.png");
 	}
 
 	void Editor::ShutdownImGui()

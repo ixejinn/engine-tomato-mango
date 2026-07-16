@@ -5,6 +5,7 @@
 #include "ECS/Entity/Entity.h"
 
 #include "Resource/AssetRegistry.h"
+#include "Resource/PathManager.h"
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
@@ -34,11 +35,11 @@ namespace tomato
 	{
 		icon_visibility[0] =
 			AssetRegistry<Texture>::GetInstance().
-			Get(GetAssetID("Resources/Engine/Assets/img/visibility_off.png"))->GetTexture();
+			Get(GetAssetID(PathManager::Icon("visibility_off.png").string().c_str()))->GetTexture();
 
 		icon_visibility[1] =
 			AssetRegistry<Texture>::GetInstance().
-			Get(GetAssetID("Resources/Engine/Assets/img/visibility_on.png"))->GetTexture();
+			Get(GetAssetID(PathManager::Icon("visibility_on.png").string().c_str()))->GetTexture();
 	}
 
 	void HierarchyPanel::Draw(EditorContext& editorCtx)

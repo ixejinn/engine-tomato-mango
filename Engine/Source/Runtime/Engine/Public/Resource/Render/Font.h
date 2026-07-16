@@ -6,6 +6,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include "Resource/PathManager.h"
+
 namespace tomato {
     struct Glyph {
         glm::ivec2 size;
@@ -29,17 +31,19 @@ namespace tomato {
     class Font {
     public:
         constexpr static const char* PrimitiveName = "SpoqaHanSansNeo-Medium";
-        constexpr static const char* defaultPath = "Resources/Engine/Assets/Fonts/SpoqaHanSansNeo-Medium.ttf";
+        constexpr static const char* defaultFontPath = "Resources/Engine/Assets/Fonts/SpoqaHanSansNeo-Medium.ttf";
 
     private:
-        Font(const char* path = defaultPath);
+        //Font(const char* path = defaultPath);
+        Font(const std::filesystem::path& path = defaultFontPath);
 
     public:
         ~Font();
 
         static void Initialize();
         static void Cleanup();
-        static void Create(const char* path = defaultPath);
+        //static void Create(const char* path = defaultPath);
+        static void Create(const std::filesystem::path& path = defaultFontPath);
 
         const Glyph& GetGlyph(char32_t codepoint);
         glm::vec2 MeasureText(const std::u32string& text, float size);

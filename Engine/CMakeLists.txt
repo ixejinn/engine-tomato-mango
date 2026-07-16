@@ -179,17 +179,18 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Systems/KinematicMovementSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/RenderSystem.cpp
         Source/Runtime/Engine/Private/Resource/Render/Font.cpp
+        Source/Runtime/Engine/Private/Resource/Render/Mesh.cpp
+        Source/Runtime/Engine/Private/Resource/Render/Shader.cpp
+        Source/Runtime/Engine/Private/Resource/Render/Texture.cpp
+        Source/Runtime/Engine/Private/Resource/Audio/Audio.cpp
+        Source/Runtime/Engine/Private/Resource/PathManager.cpp
         Source/Runtime/Engine/Private/Font/TextureAtlas.cpp
         Source/Runtime/Engine/Private/Font/TextRenderer.cpp
         Source/Runtime/Engine/Private/Font/AtlasManager.cpp
-        Source/Runtime/Engine/Private/Resource/Render/Mesh.cpp
         Source/Runtime/Engine/Private/State/State.cpp
-        Source/Runtime/Engine/Private/Resource/Render/Shader.cpp
-        Source/Runtime/Engine/Private/Resource/Render/Texture.cpp
         Source/Runtime/Engine/Private/ECS/Systems/TransformSystem.cpp
         Source/Runtime/Engine/Private/ECS/SystemRegistry.cpp
         Source/Runtime/Engine/Private/ECS/SystemManager.cpp
-        Source/Runtime/Engine/Private/Resource/Audio/Audio.cpp
 		Source/Runtime/Engine/Private/Collision/Narrow/GJK/GJK.cpp
 		Source/Runtime/Engine/Private/Collision/Narrow/GJK/EPA.cpp
         Source/Runtime/Engine/Private/Math/Normal.cpp
@@ -223,7 +224,6 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Systems/UITransformSystem.cpp
         Source/Runtime/Engine/Private/Serialization/ComponentSerializer.cpp
         Source/Runtime/Core/Private/UUID.cpp
-        
         Source/Runtime/Engine/Private/Serialization/ComponentRegistry.cpp
         Source/Runtime/Editor/Private/Editor.cpp
         Source/Runtime/Editor/Private/HierarchyPanel.cpp
@@ -238,7 +238,8 @@ set(ENGINE_SOURCES
 		Source/Runtime/Core/Private/Clock/Timer.cpp
 		Source/Runtime/Core/Private/Clock/TickTimer.cpp
         Source/Runtime/Editor/Private/MainMenuBar.cpp
- "Source/Runtime/Engine/Private/Utils/FileDialog.cpp")
+        Source/Runtime/Engine/Private/Utils/FileDialog.cpp
+)
 
 add_library(engine STATIC
         ${ENGINE_HEADERS}

@@ -12,7 +12,7 @@ int main() {
     // Engine engine(1600, 900, "TOMATO", NetMode::NM_Client);
     // engine.SetNextState(std::make_unique<LoadState>(engine));
     Engine engine(1600, 900, "TOMATO", NetMode::NM_Alone);
-    engine.SetNextState(std::make_unique<LoadState>(engine));
+    engine.SetNextState(std::make_unique<TestState>(engine));
     engine.Run();
 
 #elif 0
