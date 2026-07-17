@@ -5,7 +5,13 @@
 #include <entt/fwd.hpp>
 #include "Serialization/Json.h"
 #include "UUID.h"
+#include "State/StateFwd.h"
 #include "ECS/Components/ComponentFwd.h"
+
+namespace tomato
+{
+	class Engine;
+}
 
 namespace tomato::Serialization
 {
@@ -14,6 +20,9 @@ namespace tomato::Serialization
 
 	void SaveScene(entt::registry&, const char*);
 	void LoadScene(entt::registry&, const char*, std::unordered_map<UUID, entt::entity>&);
+	void SaveScene(State*, const char*);
+	void LoadStateScene(Engine&, State*, const char*);
+	void NewStateScene(Engine&, State*);
 
 	void SaveEntity(json&, entt::registry&, entt::entity);
 

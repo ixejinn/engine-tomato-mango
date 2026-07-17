@@ -1,6 +1,11 @@
 ﻿#include <fstream>
 #include <entt/entt.hpp>
 
+#include "Engine.h"
+
+#include "State/State.h"
+#include "State/StateRegistry.h"
+
 #include "Serialization/ComponentSerializer.h"
 #include "Serialization/ComponentRegistry.h"
 
@@ -87,6 +92,57 @@ namespace tomato::Serialization
 		ResolveHierarchy(reg, entityMap);
 	}
 
+	void SaveScene(State* state, const char* path)
+	{
+		json root;
+
+		root["State"] = StateRegistry::GetInstance().GetStateID(typeid(*state));
+		root["State Name"] = std::type_index(typeid(*state)).name();
+		root["Entities"] = json::array();
+
+		auto& reg = state->GetRegistry();
+		auto view = reg.view<NametagComponent>();
+		for (auto entity : view)
+		{
+			json entityJson;
+
+			SaveEntity(entityJson, reg, entity);
+
+			root["Entities"].push_back(entityJson);
+		}
+
+		std::ofstream ofs(path);
+		ofs << root.dump(4);
+	}
+
+	void LoadStateScene(Engine& engine, State* state, const char* path)
+	{
+		json root = LoadJsonData(path);
+		if (root == nullptr)
+			return;
+
+		AssetID stateID = root["State"];
+
+		auto newState = StateRegistry::GetInstance().GetStateFactory(stateID)(engine);
+
+		//Load Resources
+
+		CreateEntity(root, newState->GetRegistry(), newState->GetEntityMap());
+
+		LoadComponents(root, newState->GetRegistry(), newState->GetEntityMap());
+
+		ResolveHierarchy(newState->GetRegistry(), newState->GetEntityMap());
+
+		engine.SetNextState(std::move(newState));
+	}
+
+	void NewStateScene(Engine& engine, State* state)
+	{
+		AssetID stateID = StateRegistry::GetInstance().GetStateID(typeid(*state));
+		auto newState = StateRegistry::GetInstance().GetStateFactory(stateID)(engine);
+		engine.SetNextState(std::move(newState));
+	}
+
 	void CreateEntity(const json& root, entt::registry& reg, std::unordered_map<UUID, entt::entity>& entityMap)
 	{
 		for (auto& entityData : root["Entities"])
@@ -117,7 +173,7 @@ namespace tomato::Serialization
 	{
 		for (auto& [key, value] : componentData.items())
 		{
-			std::cout << "key : " << key << ", value : " << value << '\n';
+			//std::cout << "key : " << key << ", value : " << value << '\n';
 			if (auto* info = ComponentRegistry::GetInstance().FindComponentInfo(key))
 				info->serialization.Load(value, reg, entity);
 		}

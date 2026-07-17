@@ -26,7 +26,7 @@ namespace tomato
 
 	private:
 		void LoadResources();
-
+		void ResetEditorContext(State*);
 	private:
 		std::vector<std::unique_ptr<EditorPanel>> panels;
 		MainMenuBar mainMenu_;

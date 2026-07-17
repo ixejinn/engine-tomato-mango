@@ -12,5 +12,6 @@ namespace tomato
             typeToID_[type] = GetAssetID(name);
 
         IDToFactory_[typeToID_[type]] = factory;
+        std::cout << type.name() << ": " << GetAssetID(name) << '\n';
     }
 }

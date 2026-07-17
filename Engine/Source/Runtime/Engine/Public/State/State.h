@@ -22,6 +22,7 @@ namespace tomato
         virtual void Update() = 0;
         virtual void Exit() = 0;
 
+        Engine& GetEngine() { return engine_; }
         entt::registry& GetRegistry() { return registry_; }
         std::unordered_map<UUID, entt::entity>& GetEntityMap() { return entityMap_; }
 

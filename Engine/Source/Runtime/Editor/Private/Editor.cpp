@@ -53,16 +53,6 @@ namespace tomato
 		panels.push_back(std::make_unique<InspectorPanel>(true));
 	}
 
-	void Editor::LoadResources()
-	{
-		Texture::Create(PathManager::Icon("visibility_on.png"));
-		Texture::Create(PathManager::Icon("visibility_off.png"));
-		Texture::Create(PathManager::Icon("more_vert.png"));
-		//Texture::Create("Resources/Engine/Assets/img/visibility_on.png");
-		//Texture::Create("Resources/Engine/Assets/img/visibility_off.png");
-		//Texture::Create("Resources/Engine/Assets/img/more_vert.png");
-	}
-
 	void Editor::ShutdownImGui()
 	{
 		ImGui_ImplOpenGL3_Shutdown();
@@ -82,7 +72,11 @@ namespace tomato
 #if 1
 		ImGui::ShowDemoWindow();
 
-		eCtx.currentState = state;
+		if (eCtx.currentState != state)
+		{
+			eCtx.currentState = state;
+			ResetEditorContext(state);
+		}
 
 		mainMenu_.Draw(eCtx);
 		for (auto& panel : panels)
@@ -108,5 +102,23 @@ namespace tomato
 		cb.character = ImGui_ImplGlfw_CharCallback;
 
 		Input::SetExternalInputCallbacks(cb);
+	}
+
+	void Editor::LoadResources()
+	{
+		Texture::Create(PathManager::Icon("visibility_on.png"));
+		Texture::Create(PathManager::Icon("visibility_off.png"));
+		Texture::Create(PathManager::Icon("more_vert.png"));
+		//Texture::Create("Resources/Engine/Assets/img/visibility_on.png");
+		//Texture::Create("Resources/Engine/Assets/img/visibility_off.png");
+		//Texture::Create("Resources/Engine/Assets/img/more_vert.png");
+	}
+
+	void Editor::ResetEditorContext(State* newState)
+	{
+		eCtx.currentScenePath = "";
+		eCtx.currentState = newState;
+		eCtx.sceneDirty = false;
+		eCtx.selectedEntity = entt::null;
 	}
 }

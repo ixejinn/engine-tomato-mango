@@ -10,6 +10,8 @@
 
 #include "EditorPanel.h"
 #include "State/State.h"
+#include "State/StateRegistry.h"
+
 #include "Serialization/ComponentSerializer.h"
 
 #include "Utils/FileDialog.h"
@@ -74,12 +76,15 @@ namespace tomato
 
 	void MainMenuBar::NewScene(EditorContext& eCtx)
 	{
-		eCtx.currentState->GetRegistry().clear();
+		/*eCtx.currentState->GetRegistry().clear();
 		eCtx.currentState->GetEntityMap().clear();
 		eCtx.selectedEntity = entt::null;
 
 		eCtx.currentScenePath = "";
-		eCtx.sceneDirty = false;
+		eCtx.sceneDirty = false;*/
+
+		Serialization::NewStateScene(eCtx.currentState->GetEngine(), eCtx.currentState);
+
 	}
 
 	void MainMenuBar::OpenScene(EditorContext& eCtx)
@@ -87,26 +92,22 @@ namespace tomato
 		auto path = FileDialog::OpenFile("Open Scene");
 		if (path)
 		{
-			eCtx.selectedEntity = entt::null;
-			eCtx.currentState->GetEntityMap().clear();
-
-			Serialization::LoadScene(eCtx.currentState->GetRegistry(),
-				path.value().string().c_str(),
-				eCtx.currentState->GetEntityMap());
-
-			eCtx.currentScenePath = path.value();
-			eCtx.sceneDirty = false;
+			Serialization::LoadStateScene(
+				eCtx.currentState->GetEngine(),
+				eCtx.currentState,
+				path.value().string().c_str()
+			);
 		}
 	}
 
 	void MainMenuBar::Save(EditorContext& eCtx)
 	{
-		// if scene file is not exist, create new one
+		// if scene file is not exist, SaveAs
 		if (eCtx.currentScenePath.empty())
 			SaveAs(eCtx);
 
-		else//if (eCtx.sceneDirty)
-			Serialization::SaveScene(eCtx.currentState->GetRegistry(),
+		else
+			Serialization::SaveScene(eCtx.currentState,
 				eCtx.currentScenePath.string().c_str());
 
 		eCtx.sceneDirty = false;
@@ -122,7 +123,7 @@ namespace tomato
 
 		if (path)
 		{
-			Serialization::SaveScene(eCtx.currentState->GetRegistry(),
+			Serialization::SaveScene(eCtx.currentState,
 				path.value().string().c_str());
 
 			eCtx.currentScenePath = path.value();

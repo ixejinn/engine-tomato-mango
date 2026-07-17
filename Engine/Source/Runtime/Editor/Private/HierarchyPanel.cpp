@@ -46,7 +46,7 @@ namespace tomato
 	{
 		float width{ 400.f }, height{ 300.f };
 		
-		ImGui::SetNextWindowPos(ImVec2(1600.f, height), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
+		ImGui::SetNextWindowPos(ImVec2(1600.f, height + 20.f), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
 		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_FirstUseEver);
 
 		std::string sceneName =
