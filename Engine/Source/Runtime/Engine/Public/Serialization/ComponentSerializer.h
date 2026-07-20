@@ -20,12 +20,15 @@ namespace tomato::Serialization
 
 	void SaveScene(entt::registry&, const char*);
 	void LoadScene(entt::registry&, const char*, std::unordered_map<UUID, entt::entity>&);
+	
 	void SaveScene(State*, const char*);
 	void LoadStateScene(Engine&, State*, const char*);
 	void NewStateScene(Engine&, State*);
 
+	void SaveResourcesInfo(json&);
 	void SaveEntity(json&, entt::registry&, entt::entity);
 
+	void LoadResources(const json&);
 	void CreateEntity(const json&, entt::registry&, std::unordered_map<UUID, entt::entity>&);
 	void LoadComponents(const json&, entt::registry&, std::unordered_map<UUID, entt::entity>&);
 	void LoadEntityComponents(const json&, entt::registry&, entt::entity);

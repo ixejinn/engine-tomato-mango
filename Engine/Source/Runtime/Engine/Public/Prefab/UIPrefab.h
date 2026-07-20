@@ -22,7 +22,7 @@ namespace tomato::UIPrefab
 		std::string		inText = "Text",
 		glm::vec4		color = { 1.f, 1.f, 1.f, 1.f },
 		float			size = 12.f,
-		const char*		fontName = Font::PrimitiveName
+		const char*		fontName = Font::defaultFontPath
 	);
 
 	entt::entity CreateImage(

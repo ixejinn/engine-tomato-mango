@@ -219,8 +219,8 @@ namespace tomato
 		}
 
 		ImGui::SeparatorText("Shader");
-		const char* shaderPreview = AssetRegistry<Shader>::GetInstance().GetName(render.shader);
-		if (ImGui::BeginCombo("##shader", shaderPreview))
+		const char* curShader = AssetRegistry<Shader>::GetInstance().GetName(render.shader);
+		if (ImGui::BeginCombo("##shader", curShader))
 		{
 			auto it = AssetRegistry<Shader>::GetInstance().GetNameMapBegin();
 			auto endIt = AssetRegistry<Shader>::GetInstance().GetNameMapEnd();
@@ -236,14 +236,15 @@ namespace tomato
 		}
 
 		ImGui::SeparatorText("Texture");
-		const char* texPreview = AssetRegistry<Texture>::GetInstance().GetName(render.texture);
-		if (ImGui::BeginCombo("##texture", texPreview))
+		std::filesystem::path curTex = AssetRegistry<Texture>::GetInstance().GetName(render.texture);
+		if (ImGui::BeginCombo("##texture", curTex.filename().string().c_str()))
 		{
 			auto it = AssetRegistry<Texture>::GetInstance().GetNameMapBegin();
 			auto endIt = AssetRegistry<Texture>::GetInstance().GetNameMapEnd();
 			for (it; it != endIt; it++)
 			{
-				if (ImGui::Selectable(it->second.c_str(), render.texture == it->first))
+				curTex = it->second;
+				if (ImGui::Selectable(curTex.filename().string().c_str(), render.texture == it->first))
 				{
 					render.texture = it->first;
 					changed = true;
@@ -477,12 +478,14 @@ namespace tomato
 
 		auto beginIt = AssetRegistry<Font>::GetInstance().GetNameMapBegin();
 		auto endIt = AssetRegistry<Font>::GetInstance().GetNameMapEnd();
-		const char* fontPreview = AssetRegistry<Font>::GetInstance().GetName(text.font);
-		if (ImGui::BeginCombo("##fontCombo", fontPreview))
+
+		std::filesystem::path curFont = AssetRegistry<Font>::GetInstance().GetName(text.font);
+		if (ImGui::BeginCombo("##fontCombo", curFont.filename().string().c_str()))
 		{
 			for (beginIt; beginIt != endIt; ++beginIt)
 			{
-				if (ImGui::Selectable(beginIt->second.c_str(), text.font == beginIt->first))
+				curFont = beginIt->second;
+				if (ImGui::Selectable(curFont.filename().string().c_str(), text.font == beginIt->first))
 				{
 					text.font = beginIt->first;
 					text.dirty = true;

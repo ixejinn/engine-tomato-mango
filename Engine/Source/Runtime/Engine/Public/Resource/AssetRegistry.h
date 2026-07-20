@@ -85,8 +85,8 @@ namespace tomato {
         }
         else
         {
-            TMT_WARN << "AssetID " << id << " already exists. Existing asset has been overwritten by " << name;
-            data_[it->second] = std::move(asset);
+            TMT_WARN << "Failed to register " << name << ", " << id << " already exists. Please try a different ID";
+            //data_[it->second] = std::move(asset);
         }
     }
 

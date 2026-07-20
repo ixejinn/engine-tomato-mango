@@ -52,10 +52,10 @@ namespace tomato {
         std::unique_ptr<Font> ptr{ new Font(path) };
 
         // Extract the file name without extension
-        std::string assetKey = path.stem().string();
+        std::string assetKey = path.filename().string();
 
         // Register using the parsed key
-        AssetRegistry<Font>::GetInstance().Register(assetKey, std::move(ptr));
+        AssetRegistry<Font>::GetInstance().Register(path.string(), std::move(ptr));
 
         TMT_INFO << "Font Registered with key: " << assetKey;
     }

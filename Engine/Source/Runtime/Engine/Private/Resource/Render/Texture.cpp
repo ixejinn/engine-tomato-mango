@@ -85,7 +85,8 @@ namespace tomato {
 
     void Texture::Create(const std::filesystem::path& path, Format format)
     {
-        Create(path.string().c_str(), format);
+        if(path.has_extension())
+            Create(path.string().c_str(), format);
     }
 
     void Texture::Bind() const

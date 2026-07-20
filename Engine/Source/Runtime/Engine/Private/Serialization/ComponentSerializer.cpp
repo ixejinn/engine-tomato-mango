@@ -9,6 +9,10 @@
 #include "Serialization/ComponentSerializer.h"
 #include "Serialization/ComponentRegistry.h"
 
+#include "Resource/AssetRegistry.h"
+#include "Resource/Render/Font.h"
+#include "Resource/Render/Texture.h"
+
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Visibility.h"
 #include "ECS/Components/Camera.h"
@@ -98,6 +102,9 @@ namespace tomato::Serialization
 
 		root["State"] = StateRegistry::GetInstance().GetStateID(typeid(*state));
 		root["State Name"] = std::type_index(typeid(*state)).name();
+
+		SaveResourcesInfo(root);
+
 		root["Entities"] = json::array();
 
 		auto& reg = state->GetRegistry();
@@ -126,6 +133,7 @@ namespace tomato::Serialization
 		auto newState = StateRegistry::GetInstance().GetStateFactory(stateID)(engine);
 
 		//Load Resources
+		LoadResources(root);
 
 		CreateEntity(root, newState->GetRegistry(), newState->GetEntityMap());
 
@@ -141,6 +149,25 @@ namespace tomato::Serialization
 		AssetID stateID = StateRegistry::GetInstance().GetStateID(typeid(*state));
 		auto newState = StateRegistry::GetInstance().GetStateFactory(stateID)(engine);
 		engine.SetNextState(std::move(newState));
+	}
+
+	void LoadResources(const json& root)
+	{
+		for (auto& src : root["Resource"])
+		{
+			std::cout << src.items().begin().key() << '\n';
+			if (src.items().begin().key() == "Font")
+			{
+				for(auto& font : src["Font"])
+					Font::Create(font);
+			}
+
+			if (src.items().begin().key() == "Texture")
+			{
+				for(auto& tex : src["Texture"])
+					Texture::Create(tex);
+			}
+		}
 	}
 
 	void CreateEntity(const json& root, entt::registry& reg, std::unordered_map<UUID, entt::entity>& entityMap)
@@ -189,6 +216,27 @@ namespace tomato::Serialization
 			for (auto child : hierarchy.childrenID)
 				hierarchy.children.push_back(entityMap[child]);
 		}
+	}
+
+	void SaveResourcesInfo(json& data)
+	{
+		data["Resource"] = json::array();
+		auto itBegin = AssetRegistry<Font>::GetInstance().GetNameMapBegin();
+		auto itEnd = AssetRegistry<Font>::GetInstance().GetNameMapEnd();
+
+		json font, tex;
+		for (itBegin; itBegin != itEnd; ++itBegin)
+			font["Font"].push_back(itBegin->second);
+		
+		data["Resource"].push_back(font);
+
+		itBegin = AssetRegistry<Texture>::GetInstance().GetNameMapBegin();
+		itEnd = AssetRegistry<Texture>::GetInstance().GetNameMapEnd();
+
+		for (itBegin; itBegin != itEnd; ++itBegin)
+			tex["Texture"].push_back(itBegin->second);
+
+		data["Resource"].push_back(tex);
 	}
 
 	void SaveEntity(json& data, entt::registry& reg, entt::entity entity)
