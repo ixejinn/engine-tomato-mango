@@ -1,4 +1,4 @@
-#ifndef MANGO_MATCH_TYPES_H
+﻿#ifndef MANGO_MATCH_TYPES_H
 #define MANGO_MATCH_TYPES_H
 
 #include <typeinfo>

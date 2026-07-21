@@ -10,7 +10,7 @@
 using namespace tomato;
 
 int main() {
-#if 1
+#if 0
      Engine engine(1600, 900, "TOMATO", NetMode::NM_Client);
      engine.SetNextState(std::make_unique<LoadState>(engine));
 //    engine.SetNextState(std::make_unique<TestState>(engine));
@@ -19,7 +19,7 @@ int main() {
     engine.SetNextState(sf(engine));*/
     engine.Run();
 
-#elif 0
+#elif 1
     auto server = std::make_unique<MatchServer>();
     server->Run();
 
