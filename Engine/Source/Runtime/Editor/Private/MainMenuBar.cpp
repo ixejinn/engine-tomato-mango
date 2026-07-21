@@ -24,6 +24,16 @@ namespace tomato
 		if (ImGui::BeginMainMenuBar())
 		{
 			MenuFile(eCtx);
+
+			float buttonX = ImGui::GetContentRegionAvail().x;
+			ImGui::SetCursorPosX(buttonX / 2.f);
+
+			//Editor mode Start Button
+			ImGui::Button("▶");
+
+			//Editor mode Pause Button
+			ImGui::Button("||");
+
 			ImGui::EndMainMenuBar();
 		}
 		if (openNotSavedPopup)

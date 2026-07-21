@@ -1,4 +1,4 @@
-#include <entt/entt.hpp>
+﻿#include <entt/entt.hpp>
 #include "Particle/ParticleEmitterPool.h"
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Transform.h"
@@ -20,11 +20,11 @@ namespace tomato
         for (int i = 0; i < poolSize; ++i)
         {
             entt::entity e = registry_.create();
-            registry_.emplace<NametagComponent>(e,
-                GenerateUUID(), GenerateEntityName(registry_, "ParticleEffect"));
+            //registry_.emplace<NametagComponent>(e,
+            //    GenerateUUID(), GenerateEntityName(registry_, "ParticleEffect"));
             registry_.emplace<TransformComponent>(e);
             registry_.emplace<RootEntityTag>(e);
-            registry_.emplace<VisibilityComponent>(e);
+            //registry_.emplace<VisibilityComponent>(e);
 
             auto& ptc = registry_.emplace<ParticleComponent>(e);
             ptc.active = false;

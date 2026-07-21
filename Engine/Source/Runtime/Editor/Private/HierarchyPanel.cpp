@@ -64,9 +64,9 @@ namespace tomato
 			{
 				int node_n = 0;
 
-				auto view = editorCtx.currentState->GetRegistry().view<RootEntityTag>();
+				auto view = editorCtx.currentState->GetRegistry().view<RootEntityTag, NametagComponent>();
 
-				for (auto e : view)
+				for (auto [e, tag] : view.each())
 					DrawEntity(editorCtx, e);
 
 				ImGui::InvisibleButton("HierarchyBackground", ImGui::GetContentRegionAvail());
