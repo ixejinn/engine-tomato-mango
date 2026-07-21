@@ -3,7 +3,7 @@
 
 #include <glm/vec3.hpp>
 #include <entt/fwd.hpp>
-#include "ECS/Components/ComponentFwd.h"
+#include "../../Engine/Public/ECS/Forward/ComponentFwd.h"
 
 namespace tomato
 {

@@ -6,9 +6,11 @@
 #include <glm/mat4x4.hpp>
 #include <entt/entt.hpp>
 #include "Serialization/Json.h"
+#include "Services/Window.h"
 #include "UUID.h"
 
-namespace tomato {
+namespace tomato
+{
 	enum class RenderMode
 	{
 		ScreenOverlay,
@@ -18,13 +20,14 @@ namespace tomato {
 
 	struct CanvasComponent // root
 	{
-		RenderMode mode{ RenderMode::ScreenOverlay };
-
-		glm::vec2 referenceSize{ 1600.f, 900.f };
-		glm::vec2 actualSize{ 1600.f, 900.f };
-
 		UUID camera; // optinal
-		int sortOrder{ 0 };
+
+		RenderMode mode{RenderMode::ScreenOverlay};
+
+		glm::vec2 actualSize{Window::GetWidth(), Window::GetHeight()};
+		glm::vec2 referenceSize{actualSize};
+
+		int sortOrder{0};
 	};
 
 #define TMT_UI_TYPE_LIST(X)	\
@@ -85,7 +88,7 @@ namespace tomato {
 		glm::vec2 offsetMin{ 0.f, 0.f }; // stretch, left, bottom
 		glm::vec2 offsetMax{ 0.f, 0.f }; //			 right, top
 
-		glm::vec2 sizeDelta{ 1600.f, 900.f };
+		glm::vec2 sizeDelta{Window::GetWidth(), Window::GetHeight()};
 
 		glm::vec2 anchorMin{ 0.0f, 0.0f };
 		glm::vec2 anchorMax{ 0.0f, 0.0f };

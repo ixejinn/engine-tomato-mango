@@ -6,15 +6,17 @@
 
 #include "ECS/Entity/Entity.h"
 
-namespace tomato {
+namespace tomato
+{
     struct RootEntityTag {};
 
-    struct HierarchyComponent {
-        UUID parentID{ 0 };
+    struct HierarchyComponent
+    {
+        UUID parentID{0};
         std::vector<UUID> childrenID;
 
         //cache
-        entt::entity parent{ entt::null };
+        entt::entity parent{entt::null};
         std::vector<entt::entity> children;
     };
 }

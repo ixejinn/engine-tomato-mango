@@ -4,8 +4,10 @@
 #include <glm/vec4.hpp>
 #include "Resource/ResourceFwd.h"
 
-namespace tomato {
-    struct RenderComponent {
+namespace tomato
+{
+    struct RenderComponent
+    {
         glm::vec4 color{1.f, 1.f, 1.f, 1.f};
         AssetID mesh;
         AssetID shader;

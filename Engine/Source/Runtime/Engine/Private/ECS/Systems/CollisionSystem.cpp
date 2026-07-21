@@ -1,8 +1,8 @@
 ﻿#include <glm/vec3.hpp>
 #include <entt/entt.hpp>
 #include "ECS/Systems/CollisionSystem.h"
-#include "ECS/Components/PhysComponents.h"
-#include "ECS/Components/CharComponents.h"
+#include "ECS/Components/ComponentsPhys.h"
+#include "ECS/Components/Movement.h"
 #include "ECS/Components/Character.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/SystemUpdateContexts.h"

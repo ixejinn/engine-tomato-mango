@@ -4,13 +4,16 @@
 #include <glm/mat4x4.hpp>
 #include "Serialization/Json.h"
 
-namespace tomato {
-    enum ProjectionMode {
+namespace tomato
+{
+    enum ProjectionMode
+    {
         Perspective,
         Orthogonal
     };
 
-    struct CameraComponent {
+    struct CameraComponent
+    {
         CameraComponent(
             const ProjectionMode m = ProjectionMode::Perspective,
             const float degree = 45.f,
@@ -25,7 +28,7 @@ namespace tomato {
         float zFar;
         glm::mat4 viewProjMat;
 
-        bool dirty{ true };
+        bool dirty{true};
     };
 
     struct MainCameraTag {};
@@ -33,8 +36,8 @@ namespace tomato {
     NLOHMANN_JSON_SERIALIZE_ENUM(
         ProjectionMode,
         {
-            { ProjectionMode::Perspective, "Perspective"},
-            { ProjectionMode::Orthogonal, "Orthogonal"}
+            {ProjectionMode::Perspective, "Perspective"},
+            {ProjectionMode::Orthogonal, "Orthogonal"}
         }
     )
 }

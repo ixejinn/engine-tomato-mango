@@ -5,10 +5,11 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include "Utils/Logger.h"
 
-namespace tomato {
-    struct TransformComponent {
+namespace tomato
+{
+    struct TransformComponent
+    {
         explicit TransformComponent(
             const glm::vec3& pos = glm::vec3{0.f},
             const glm::vec3& eulerRot = glm::vec3{0.f},
@@ -37,21 +38,20 @@ namespace tomato {
         const glm::mat4& GetTransformMatrix() const { return transformMatrix; }
 
     private:
-        /// Local
+        // Local
         glm::vec3 position;
         glm::vec3 eulerDegree;
+        glm::quat lRotation;
         glm::vec3 scale;
 
-        glm::quat lRotation;
+        // World
+        glm::quat wRotation{};
+        glm::vec3 wScale{};
 
-        /// World
-        glm::quat wRotation;
-        glm::vec3 wScale;
-
-        bool dirty{ true };
+        bool dirty{true};
 
         /// Local to World.
-        glm::mat4 transformMatrix;
+        glm::mat4 transformMatrix{};
 
         friend class TransformSystem;
     };

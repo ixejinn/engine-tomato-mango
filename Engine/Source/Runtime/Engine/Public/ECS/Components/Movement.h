@@ -9,8 +9,8 @@ namespace tomato
     /// Identifies which player's input timeline this entity uses.
     struct InputChannelComponent
     {
-        uint8_t channel;
-        bool is1P = true;
+        uint8_t channel{0};
+        bool is1P{true};
     };
 
     struct MovementComponent
@@ -19,7 +19,7 @@ namespace tomato
 
         MovementMode mode{Falling};
         int gndStayCnt{0};
-        uint8_t jumpCnt{0};
+        unsigned int jumpCnt{0};
     };
 }
 

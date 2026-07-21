@@ -7,22 +7,26 @@
 #include "Resource/AssetHash.h"
 #include "Resource/Render/Font.h"
 
-namespace tomato {
-    struct TextComponent {
-        /**
-		 * @brief The text to be rendered.
-		 * @note Use UTF-32 literals with 'U' prefix, e.g., U"Your Text Here".
-		 * @todo Planned update:
-		 * Modify the write interface to accept standard std::string (UTF-8)
-		 * and handle internal conversion to UTF-32 for better usability.
-		 */
+namespace tomato
+{
+	/**
+	 * @brief The text to be rendered.
+	 * @note Use UTF-32 literals with 'U' prefix, e.g., U"Your Text Here".
+	 * @todo Planned update:
+	 * Modify the write interface to accept standard std::string (UTF-8)
+	 * and handle internal conversion to UTF-32 for better usability.
+	 */
+    struct TextComponent
+	{
 		std::string text{};
-		glm::vec4 color{ 0.0f, 0.0f, 0.0f, 1.0f };
-		float fontSize{ 48.f };
-		AssetID font{ GetAssetID(Font::defaultFontPath) };
 
 		std::u32string codepoints{};
-		bool dirty{ true };
+
+		glm::vec4 color{0.0f, 0.0f, 0.0f, 1.0f};
+		AssetID font{GetAssetID(Font::defaultFontPath)};
+        float fontSize{48.f};
+
+        bool dirty{true};
 	};
 }
 

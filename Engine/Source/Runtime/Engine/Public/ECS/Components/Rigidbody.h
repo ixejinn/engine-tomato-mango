@@ -3,8 +3,10 @@
 
 #include <glm/vec3.hpp>
 
-namespace tomato {
-    struct VelocityComponent {
+namespace tomato
+{
+    struct VelocityComponent
+    {
         glm::vec3 velocity;
     };
 }

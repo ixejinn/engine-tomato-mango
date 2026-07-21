@@ -64,8 +64,10 @@ namespace tomato::UIPrefab
         const auto buttonText = reg.create();
         reg.emplace<NametagComponent>(buttonText, GenerateUUID(), GenerateEntityName(reg, "Text"));
         reg.emplace<UIComponent>(buttonText, GetUUID(reg, canvas), 0, UIType::Text);
-        reg.emplace<TextComponent>(buttonText, "Button", glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f }, 30.f);
-        reg.emplace<RectTransformComponent>(buttonText, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+        auto& btnTxtComp = reg.emplace<TextComponent>(buttonText, "Button");
+        btnTxtComp.color = glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f };
+	    btnTxtComp.fontSize = 30.f;
+	    reg.emplace<RectTransformComponent>(buttonText, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
         reg.emplace<VisibilityComponent>(buttonText);
         reg.emplace<HierarchyComponent>(buttonText);
         SetHierarchy(reg, button, buttonText);
@@ -81,7 +83,10 @@ namespace tomato::UIPrefab
 
         reg.emplace<NametagComponent>(text, GenerateUUID(), GenerateEntityName(reg, "Text"));
         reg.emplace<UIComponent>(text, GetUUID(reg, canvas), 0, UIType::Text);
-        reg.emplace<TextComponent>(text, inText, color, size, GetAssetID(fontName));
+        auto& txtComp = reg.emplace<TextComponent>(text, inText);
+	    txtComp.color = color;
+	    txtComp.fontSize = size;
+	    txtComp.font = GetAssetID(fontName);
         reg.emplace<RectTransformComponent>(text, pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
         reg.emplace<VisibilityComponent>(text);
         reg.emplace<HierarchyComponent>(text);
