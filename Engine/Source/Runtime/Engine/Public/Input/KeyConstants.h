@@ -1,7 +1,8 @@
 #ifndef MANGO_KEYCONSTANTS_H
 #define MANGO_KEYCONSTANTS_H
 
-namespace tomato {
+namespace tomato
+{
     /**
      * @brief Input code for buttons and axes.
      *
@@ -87,10 +88,11 @@ namespace tomato {
 
     inline bool IsButton(Key key) { return key < Key::AXIS_BEGIN; }
 
-    enum class KeyAction {
+    enum class KeyAction
+    {
         Release,
         Press,
-        COUNT
+        Error
     };
 }
 

@@ -7,12 +7,15 @@
 #include "Input/InputRecord.h"
 #include "Input/InputEventFwd.h"
 
-namespace tomato {
-    struct InputAxis {
+namespace tomato
+{
+    struct InputAxis
+    {
         float value;
     };
 
-    class InputRecorder {
+    class InputRecorder
+    {
     public:
         InputRecorder();
 

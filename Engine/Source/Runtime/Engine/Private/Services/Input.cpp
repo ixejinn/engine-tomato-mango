@@ -143,7 +143,7 @@ namespace tomato
         case GLFW_REPEAT:
             return KeyAction::Press;
         default:
-            return KeyAction::COUNT;
+            return KeyAction::Error;
         }
     }
 
@@ -184,7 +184,7 @@ namespace tomato
         Key k = ConvertKeyGLFW(key);
         KeyAction a = ConvertActionGLFW(action);
 
-        if (a >= KeyAction::COUNT)
+        if (a == KeyAction::Error)
         {
             TMT_WARN << "KeyAction of " << static_cast<int>(k) << " is invalid";
             return;
@@ -204,9 +204,9 @@ namespace tomato
         Key k = ConvertKeyGLFW(button);
         KeyAction a = ConvertActionGLFW(action);
 
-        if (a >= KeyAction::COUNT)
+        if (a == KeyAction::Error)
         {
-            TMT_WARN << "Invalid KeyAction " << action;
+            TMT_WARN << "KeyAction of " << static_cast<int>(k) << " is invalid";
             return;
         }
 

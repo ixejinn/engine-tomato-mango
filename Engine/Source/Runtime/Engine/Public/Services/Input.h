@@ -8,7 +8,8 @@
 
 struct GLFWwindow;
 
-namespace tomato {
+namespace tomato
+{
 
     struct InputCallbacks
     {
@@ -19,7 +20,8 @@ namespace tomato {
         std::function<void(GLFWwindow*, unsigned int)> character;
     };
 
-    class Input {
+    class Input
+    {
     public:
         static Key ConvertKeyGLFW(int glfwKey);
         static KeyAction ConvertActionGLFW(int glfwAction);
@@ -46,7 +48,8 @@ namespace tomato {
 
         static InputCallbacks externalCallbacks_;
 
-        struct InputEventCollector {
+        struct InputEventCollector
+        {
             bool operator()(int ret) { return !ret; }   // 리스너 함수에서 true가 반환되면 계속
         } collector_;
     };
