@@ -77,10 +77,10 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Systems/ScreenUIRenderSystem.h
         Source/Runtime/Engine/Public/ECS/Systems/TransformSystem.h
         Source/Runtime/Engine/Public/ECS/Systems/UISystem.h
-        Source/Runtime/Engine/Public/ECS/SystemRegistry.h
+		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemRegistry.h
         Source/Runtime/Engine/Public/ECS/Forward/SystemFwd.h
-        Source/Runtime/Engine/Public/ECS/SystemConstants.h
-        Source/Runtime/Engine/Public/ECS/SystemManager.h
+		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemConstants.h
+		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemManager.h
         Source/Runtime/Engine/Public/Utils/RegistryEntry.h
         Source/Runtime/Engine/Public/Utils/Utf.h
         Source/Runtime/Engine/Public/Resource/Audio/Audio.h
@@ -197,8 +197,8 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Font/AtlasManager.cpp
         Source/Runtime/Engine/Private/State/State.cpp
         Source/Runtime/Engine/Private/ECS/Systems/TransformSystem.cpp
-        Source/Runtime/Engine/Private/ECS/SystemRegistry.cpp
-        Source/Runtime/Engine/Private/ECS/SystemManager.cpp
+		Source/Runtime/Engine/Private/ECS/SystemFramework/SystemRegistry.cpp
+		Source/Runtime/Engine/Private/ECS/SystemFramework/SystemManager.cpp
 		Source/Runtime/Engine/Private/Collision/Narrow/GJK/GJK.cpp
 		Source/Runtime/Engine/Private/Collision/Narrow/GJK/EPA.cpp
         Source/Runtime/Engine/Private/Math/Normal.cpp

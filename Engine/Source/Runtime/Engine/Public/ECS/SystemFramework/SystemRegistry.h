@@ -4,8 +4,8 @@
 #include <functional>
 #include <memory>
 #include <vector>
-#include "Forward/SystemFwd.h"
-#include "ECS/SystemConstants.h"
+#include "../Forward/SystemFwd.h"
+#include "SystemConstants.h"
 #include "Containers/EnumArray.h"
 
 namespace tomato {

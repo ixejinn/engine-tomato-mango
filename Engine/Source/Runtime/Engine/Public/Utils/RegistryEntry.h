@@ -3,7 +3,7 @@
 
 #include <typeindex>
 #include <string>
-#include "ECS/SystemRegistry.h"
+#include "ECS/SystemFramework/SystemRegistry.h"
 #include "State/StateRegistry.h"
 
 namespace tomato {

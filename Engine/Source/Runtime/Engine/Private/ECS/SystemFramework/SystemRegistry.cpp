@@ -1,4 +1,4 @@
-#include "ECS/SystemRegistry.h"
+#include "ECS/SystemFramework/SystemRegistry.h"
 
 namespace tomato {
     void SystemRegistry::RegisterFactory(SystemPhase phase, SystemFactory&& factory) {
