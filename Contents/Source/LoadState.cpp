@@ -32,20 +32,20 @@ void LoadState::Init()
 	//	{
 	//		uiController_.onClick(e);
 	//	};
-	//Prefab::CreateCamera(registry_);
-	//auto btn = UIPrefab::CreateButton(registry_);
-	//auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
-	//mouseEvt.onClick =
-	//	[this](const MouseClickEvent& e)
-	//	{
-	//		engine_.RequestMatchToServer();
-	//		uiController_.onMatchRequest(e);
-	//	};
+	Prefab::CreateCamera(registry_);
+	auto btn = UIPrefab::CreateButton(registry_);
+	auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
+	mouseEvt.onClick =
+		[this](const MouseClickEvent& e)
+		{
+			engine_.RequestMatchToServer();
+			uiController_.onMatchRequest(e);
+		};
 }
 
 void LoadState::Update()
 {
-	//engine_.TryStartGame(std::make_unique<TestState>(engine_));
+	engine_.TryStartGame(std::make_unique<TestState>(engine_));
 }
 
 void LoadState::Exit() {}

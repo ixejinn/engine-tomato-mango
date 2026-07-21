@@ -11,10 +11,10 @@ using namespace tomato;
 
 int main() {
 #if 1
-    // Engine engine(1600, 900, "TOMATO", NetMode::NM_Client);
-    // engine.SetNextState(std::make_unique<LoadState>(engine));
-    Engine engine(1600, 900, "TOMATO", NetMode::NM_Alone);
+     //Engine engine(1600, 900, "TOMATO", NetMode::NM_Client);
+     //engine.SetNextState(std::make_unique<LoadState>(engine));
 //    engine.SetNextState(std::make_unique<TestState>(engine));
+    Engine engine(1600, 900, "TOMATO", NetMode::NM_Alone);
     auto sf = StateRegistry::GetInstance().GetStateFactory(std::type_index(typeid(TestState)));
     engine.SetNextState(sf(engine));
     engine.Run();

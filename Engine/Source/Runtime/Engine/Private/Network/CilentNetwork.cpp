@@ -129,7 +129,7 @@ namespace tomato
     {
         for (auto it = conn.begin(); it != conn.end(); it++)
         {
-            if (it->second.playerId == playerID_)
+            if (netState_ == ClientNetworkState::NSS_Playing && it->second.playerId == playerID_)
                 continue;
 
             int byteSentCount{};
@@ -287,13 +287,18 @@ namespace tomato
         case TCPPacketType::MATCH_INTRO_SUCCESS:
         case TCPPacketType::MATCH_INTRO_FAILED:
         {
-            std::cout << "MATCH_INTRO_SUCCESS\n";
+            std::cout << "MATCH_INTRO_RESULT: ";
+            if (messageType == TCPPacketType::MATCH_INTRO_SUCCESS)
+                std::cout << "SUCCESS\n";
+            else
+                std::cout << "FAILED\n";
+
             writer.WriteInt(matchID_, std::numeric_limits<MatchId>::max());
             break;
         }
 
         case TCPPacketType::TIME_SYNC_REQ:
-            std::cout << "MATCH_INTRO_SUCCESS\n";
+            std::cout << "TIME_SYNC_REQ\n";
             sendTime = static_cast<ServerTimeMs>(
                 duration_cast<std::chrono::milliseconds>(
                     std::chrono::steady_clock::now().time_since_epoch()).count());

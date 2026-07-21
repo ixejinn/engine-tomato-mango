@@ -1,4 +1,4 @@
-#ifndef MANGO_MATCH_MANAGER_H
+﻿#ifndef MANGO_MATCH_MANAGER_H
 #define MANGO_MATCH_MANAGER_H
 
 #include <unordered_map>
@@ -21,7 +21,7 @@ namespace tomato
 		void Update(float dt);
 
 		void ProcessMatchRequest();
-		void HandleEnqueue(const SessionId& client, const tomato::SocketAddress& inAddress, const std::string& name);
+		void HandleEnqueue(const SessionId& client, const SocketAddress& inAddress, const std::string& name);
 		void HandleCancel(const SessionId& client);
 		void HandleIntroResult(const SessionId&, MatchId& matchId, const int& set);
 
@@ -31,6 +31,7 @@ namespace tomato
 
 		void ProcessMatchResult(float dt);
 		void ReQueing(const MatchId& matchId);
+		void RemoveRequest(const SessionId& client);
 
 	private:
 		struct Compare {

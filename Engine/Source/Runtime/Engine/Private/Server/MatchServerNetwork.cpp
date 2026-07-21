@@ -8,6 +8,7 @@
 #include "Network/NetBitReader.h"
 #include "Network/NetBitWriter.h"
 #include "Server/SessionManager.h"
+#include "Server/MatchManager.h"
 
 namespace tomato
 {
@@ -251,7 +252,7 @@ namespace tomato
 						readBlockSockets.erase(
 							std::remove(readBlockSockets.begin(), readBlockSockets.end(), socket),
 							readBlockSockets.end());
-
+						matchMgr_.RemoveRequest(id);
 						sessionMgr_.RemoveSession(socket);
 					}
 				}

@@ -1,4 +1,4 @@
-#include "Server/MatchManager.h"
+﻿#include "Server/MatchManager.h"
 #include <cstring>
 #include <chrono>
 #include "Network/NetBitWriter.h"
@@ -222,6 +222,17 @@ namespace tomato
 				requests.try_emplace(reRequest.sessionId, reRequest);
 				pq.emplace(reRequest);
 			}
+		}
+	}
+
+	void MatchManager::RemoveRequest(const SessionId& client)
+	{
+		for (auto it = requests.begin(); it != requests.end();)
+		{
+			if (it->first == client)
+				it = requests.erase(it);
+			else
+				++it;
 		}
 	}
 }
