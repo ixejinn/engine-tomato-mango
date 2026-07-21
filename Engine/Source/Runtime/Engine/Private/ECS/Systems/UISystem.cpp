@@ -14,9 +14,6 @@
 #include "Utils/Utf.h"
 #include "Utils/Logger.h"
 
-#include "Utils/RegistryEntry.h"
-REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::UI, UISystem)
-
 namespace tomato
 {
 	UISystem::UISystem() {}

@@ -8,9 +8,6 @@
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/Entity/Entity.h"
 
-#include "Utils/RegistryEntry.h"
-REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::UITransformation, UITransformSystem)
-
 namespace tomato
 {
 	void UITransformSystem::Update(SimContext& simCtx)

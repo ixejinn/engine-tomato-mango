@@ -7,7 +7,7 @@
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "State/State.h"
 #include "Utils/RegistryEntry.h"
-REGISTER_SYSTEM(tomato::SystemPhase::Logic, TimerTestSystem)
+REGISTER_SYSTEM(tomato::TickPhase::Update, tomato::RunMode::Game, TimerTestSystem)
 
 using namespace tomato;
 

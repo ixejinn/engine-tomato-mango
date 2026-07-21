@@ -3,7 +3,7 @@
 
 #include <type_traits>
 #include <ostream>
-#include "BitmaskFwd.h"
+#include "BitmaskDefines.h"
 
 namespace tomato
 {

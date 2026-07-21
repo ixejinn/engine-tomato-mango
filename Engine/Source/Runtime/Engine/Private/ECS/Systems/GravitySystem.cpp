@@ -3,8 +3,6 @@
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Rigidbody.h"
 #include "Utils/Logger.h"
-#include "Utils/RegistryEntry.h"
-REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Physics, GravitySystem)
 
 namespace tomato
 {

@@ -13,8 +13,6 @@
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
-#include "Utils/RegistryEntry.h"
-REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Rendering, RenderSystem);
 
 namespace tomato
 {

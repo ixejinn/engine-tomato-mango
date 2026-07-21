@@ -13,10 +13,9 @@
 #include "Event/EventDispatcher.h"
 #include "GameObject/Character/CharacterMovement.h"
 #include "Utils/Logger.h"
-#include "Utils/RegistryEntry.h"
-REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Collision, CollisionSystem)
 
-namespace tomato {
+namespace tomato
+{
     CollisionSystem::CollisionSystem()
     : broadPhase_(std::make_unique<SAP>())
     , narrowPhase_(std::make_unique<GJK>())

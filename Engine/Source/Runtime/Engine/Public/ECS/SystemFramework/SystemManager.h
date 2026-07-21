@@ -10,25 +10,37 @@
 namespace tomato
 {
     /**
-     * @brief Manages lifecycle, execution, and update order of all systems.
+     * @brief Owns and updates all registered ECS systems.
      *
-     * 시스템 객체를 생성하고 소유하며, 각 시스템의 업데이트 함수를 호출해 컴포넌트 갱신을 수행하는 클래스.
-     * 시스템의 업데이트 순서를 결정한다.
+     * 시스템들을 틱(고정 주기)과 프레임 주기에 맞춰 업데이트하며,
+     * 현재 엔진의 실행 모드에 맞는 시스템의 Update 함수를 호출한다.
      */
     class SystemManager
     {
     public:
-        SystemManager();
+        using SystemPtr = std::unique_ptr<System>;
+
+        SystemManager() = default;
         ~SystemManager();
 
-        void Simulate(SimContext& sim);
-        void Render(SimContext& sim);
+        void AddSystem(TickPhase  phase, RunMode mode, SystemPtr system);
+        void AddSystem(FramePhase phase, RunMode mode, SystemPtr system);
 
-        void InitializeTransform(SimContext& sim);
+        void FixedUpdate(SimContext& simCtx, RunMode mode);
+        void Update     (SimContext& simCtx, RunMode mode);
+
+        void Update(TickPhase  phase, SimContext& simCtx, RunMode mode);
+        void Update(FramePhase phase, SimContext& simCtx, RunMode mode);
 
     private:
-        using SystemPtr = std::unique_ptr<System>;
-        EnumArray<SystemPhase, std::vector<SystemPtr>> systems_;
+        struct SystemTrait
+        {
+            RunMode mode;
+            SystemPtr ptr;
+        };
+
+        EnumArray<TickPhase,  std::vector<SystemTrait>> tickSystems_;
+        EnumArray<FramePhase, std::vector<SystemTrait>> frameSystems_;
     };
 }
 

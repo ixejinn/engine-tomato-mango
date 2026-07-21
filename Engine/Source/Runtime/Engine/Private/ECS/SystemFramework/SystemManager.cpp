@@ -2,49 +2,61 @@
 #include "ECS/SystemFramework/SystemRegistry.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/Systems/System.h"
+#include "Utils/Bitmask/BitmaskOperators.h"
 
 namespace tomato
 {
-    SystemManager::SystemManager()
-    {
-        auto& sysRegistry = SystemRegistry::GetInstance();
-
-        for (const SystemPhase phase : SIMULATION_ORDER)
-        {
-            for (const auto& factory : sysRegistry.GetSimFactory(phase))
-                systems_[phase].emplace_back(factory());
-        }
-
-        for (const SystemPhase phase : RENDERING_ORDER)
-        {
-            for (const auto& factory : sysRegistry.GetSimFactory(phase))
-                systems_[phase].emplace_back(factory());
-        }
-    }
-
     SystemManager::~SystemManager() = default;
 
-    void SystemManager::Simulate(SimContext& sim)
+    void SystemManager::AddSystem(TickPhase phase, RunMode mode, SystemPtr system)
     {
-        for (const SystemPhase phase : SIMULATION_ORDER)
+        tickSystems_[phase].emplace_back(mode, std::move(system));
+    }
+
+    void SystemManager::AddSystem(FramePhase phase, RunMode mode, SystemPtr system)
+    {
+        frameSystems_[phase].emplace_back(mode, std::move(system));
+    }
+
+    void SystemManager::FixedUpdate(SimContext& simCtx, RunMode mode)
+    {
+        for (auto& systems : tickSystems_)
         {
-            for (const auto& system : systems_[phase])
-                system->Update(sim);
+            for (auto& [sysMode, sysPtr] : systems)
+            {
+                if (HasFlag(sysMode, mode))
+                    sysPtr->Update(simCtx);
+            }
         }
     }
 
-    void SystemManager::Render(SimContext& sim)
+    void SystemManager::Update(SimContext& simCtx, RunMode mode)
     {
-        for (const SystemPhase phase : RENDERING_ORDER)
+        for (auto& systems : frameSystems_)
         {
-            for (const auto& system : systems_[phase])
-                system->Update(sim);
+            for (auto& [sysMode, sysPtr] : systems)
+            {
+                if (HasFlag(sysMode, mode))
+                    sysPtr->Update(simCtx);
+            }
         }
     }
 
-    void SystemManager::InitializeTransform(SimContext& sim)
+    void SystemManager::Update(TickPhase phase, SimContext& simCtx, RunMode mode)
     {
-        for (const auto& system : systems_[SystemPhase::Transformation])
-            system->Update(sim);
+        for (auto& [sysMode, sysPtr] : tickSystems_[phase])
+        {
+            if (HasFlag(sysMode, mode))
+                sysPtr->Update(simCtx);
+        }
+    }
+
+    void SystemManager::Update(FramePhase phase, SimContext& simCtx, RunMode mode)
+    {
+        for (auto& [sysMode, sysPtr] : frameSystems_[phase])
+        {
+            if (HasFlag(sysMode, mode))
+                sysPtr->Update(simCtx);
+        }
     }
 }

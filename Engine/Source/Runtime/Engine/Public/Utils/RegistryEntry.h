@@ -6,7 +6,8 @@
 #include "ECS/SystemFramework/SystemRegistry.h"
 #include "State/StateRegistry.h"
 
-namespace tomato {
+namespace tomato
+{
     /**
      * @brief Helper struct used for static registration of factories.
      *
@@ -14,11 +15,20 @@ namespace tomato {
      * 각 시스템 .cpp의 익명 네임스페이스에서 매크로를 사용하여
      * RegistryEntry 정적 객체를 생성하면 팩토리 함수가 Registry에 자동으로 등록된다.
      */
-    struct RegistryEntry {
-        RegistryEntry(const SystemPhase phase, SystemFactory&& factory) {
-            SystemRegistry::GetInstance().RegisterFactory(phase, std::move(factory));
+    struct RegistryEntry
+    {
+        // for System
+        RegistryEntry(const TickPhase phase, const RunMode mode, SystemFactory&& factory)
+        {
+            SystemRegistry::GetInstance().RegisterFactory(phase, mode, std::move(factory));
         }
 
+        RegistryEntry(const FramePhase phase, const RunMode mode, SystemFactory&& factory)
+        {
+            SystemRegistry::GetInstance().RegisterFactory(phase, mode, std::move(factory));
+        }
+
+        // for State
         RegistryEntry(const std::type_index type, const std::string& name, StateFactory&& factory)
         {
             StateRegistry::GetInstance().RegisterFactory(type, name, std::move(factory));
@@ -26,11 +36,11 @@ namespace tomato {
     };
 }
 
-#define REGISTER_BUILT_IN_SYSTEM(PHASE, CLASS)\
-namespace { static tomato::RegistryEntry CLASS##Entry{PHASE, []() { return std::make_unique<tomato::CLASS>(); }}; }
+#define REGISTER_BUILT_IN_SYSTEM(PHASE, MODE, CLASS)\
+namespace { static tomato::RegistryEntry CLASS##Entry{PHASE, MODE, []() { return std::make_unique<tomato::CLASS>(); }}; }
 
-#define REGISTER_SYSTEM(PHASE, CLASS)\
-namespace { static tomato::RegistryEntry CLASS##Entry{PHASE, []() { return std::make_unique<CLASS>(); }}; }
+#define REGISTER_SYSTEM(PHASE, MODE, CLASS)\
+namespace { static tomato::RegistryEntry CLASS##Entry{PHASE, MODE, []() { return std::make_unique<CLASS>(); }}; }
 
 #define REGISTER_BUILT_IN_STATE(CLASS) \
 namespace { static tomato::RegistryEntry CLASS##Entry{std::type_index(typeid(tomato::CLASS)), "tomato::"#CLASS, [](tomato::Engine& engine) { return std::make_unique<tomato::CLASS>(engine); }}; }

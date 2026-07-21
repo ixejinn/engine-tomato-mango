@@ -1,5 +1,5 @@
 #include "Collision/CollisionLayerMatrix.h"
-#include "Utils/BitmaskOperators.h"
+#include "Utils/Bitmask/BitmaskOperators.h"
 
 namespace tomato {
     CollisionLayerMatrix::CollisionLayerMatrix() {

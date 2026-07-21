@@ -5,8 +5,6 @@
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Services/Window.h"
 #include "Utils/Logger.h"
-#include "Utils/RegistryEntry.h"
-REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Camera, CameraSystem)
 
 namespace tomato
 {

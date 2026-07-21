@@ -21,8 +21,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Core/Public/Collision/CollisionConstants.h
         Source/Runtime/Engine/Public/Collision/CollisionEvent.h
         Source/Runtime/Engine/Public/Collision/CollisionLayerMatrix.h
-        Source/Runtime/Engine/Public/Utils/BitmaskOperators.h
-        Source/Runtime/Core/Public/BitmaskFwd.h
+		Source/Runtime/Engine/Public/Utils/Bitmask/BitmaskOperators.h
+		Source/Runtime/Engine/Public/Utils/Bitmask/BitmaskDefines.h
         Source/Runtime/Engine/Public/ECS/Components/Collision.h
         Source/Runtime/Core/Public/Containers/MemoryPool.h
         Source/Runtime/Core/Public/Utils/Logger.h
@@ -172,6 +172,10 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Utils/RandomNumberGenerator.h
         Source/Runtime/Engine/Private/Utils/FileDialog.h
 		Source/Runtime/Engine/Public/State/StateRegistry.h
+		Source/Runtime/Engine/Public/ECS/Forward/SystemFrameworkFwd.h
+		Source/Runtime/Core/Public/Collision/CollisionConstantsFwd.h
+		Source/Runtime/Engine/Public/Input/InputConstantsFwd.h
+		Source/Runtime/Engine/Public/ECS/Systems/Systems.h
 )
 
 set(ENGINE_SOURCES

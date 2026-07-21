@@ -4,9 +4,11 @@
 #include "State/DefaultState.h"
 #include "ECS/Systems/GarbageEntityCollectionSystem.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/SystemRegistry.h"
 #include "GameNetwork/Rollback/RollbackManager.h"
 #include "Serialization/ComponentRegistry.h"
 #include "Editor.h"
+#include "Utils/Bitmask/BitmaskOperators.h"
 #include "Utils/Logger.h"
 
 #include "Clock/Timer.h"
@@ -56,7 +58,12 @@ namespace tomato {
 
     void Engine::Run()
     {
+        SystemRegistry::GetInstance().RegisterSystems(systemManager_);
+
         TickClock tickClock;
+        // RunMode runMode{RunMode::Editor};
+        RunMode runMode{RunMode::Game}; // TODO: remove this line
+
         window_.SetWindowUserPointer(input_, tickClock);
         GarbageEntityCollectionSystem garbageCollectionSystem;
 
@@ -91,9 +98,11 @@ namespace tomato {
             SimContext simCtx{currState_.get(), tickClock.GetTick()};
             garbageCollectionSystem.Update(simCtx);
 
-            Simulate(tickClock, simCtx);
+            FixedUpdate(tickClock, simCtx, runMode);
 
-            Render(simCtx);
+            Update(simCtx, runMode);
+            UpdateEditor(runMode);
+            window_.SwapBuffers();
             // ----------* Simulate and render
 
             inputRecorder_.UpdateCurrInputRecord(tickClock.GetTick());
@@ -118,7 +127,7 @@ namespace tomato {
             network_->GetMyPlayerID());
     }
 
-    void Engine::Simulate(TickClock& tc, SimContext& simCtx)
+    void Engine::FixedUpdate(TickClock& tc, SimContext& simCtx, RunMode mode)
     {
         int cnt = tc.GetSimulateNum();
         while (cnt--)
@@ -126,7 +135,7 @@ namespace tomato {
             simCtx.tick = tc.GetTick();
             // std::cout << "       *--------- " << simCtx.tick << " ---------*\n";
 
-            systemManager_.Simulate(simCtx);
+            systemManager_.FixedUpdate(simCtx, mode);
 
             EventDispatcher::GetInstance().Update();
             currState_->Update();   // !!!!!! temporary !!!!!!
@@ -141,16 +150,16 @@ namespace tomato {
         }
     }
 
-    void Engine::Render(SimContext& simCtx)
+    void Engine::Update(SimContext& simCtx, RunMode mode)
+    {
+        systemManager_.Update(simCtx, mode);
+    }
+
+    void Engine::UpdateEditor(RunMode& mode)
     {
         editor_.BeginFrame();
-
-        systemManager_.Render(simCtx);
-
         editor_.Draw(currState_.get());
         editor_.EndFrame();
-
-        window_.SwapBuffers();
     }
 
     void Engine::ChangeState(TickClock& tc)
@@ -179,7 +188,7 @@ namespace tomato {
 
         tc.ResetTick();
         SimContext simCtx{currState_.get(), tc.GetTick()};
-        systemManager_.InitializeTransform(simCtx);
+        systemManager_.Update(TickPhase::PostUpdate, simCtx, RunMode::Game | RunMode::Editor);
 
         if (netMode_ == NetMode::NM_Client)
         {
@@ -210,7 +219,7 @@ namespace tomato {
     void Engine::Rollback(SimContext& simCtx)
     {
         rollbackManager_->Rollback(simCtx);
-        systemManager_.InitializeTransform(simCtx);
+        systemManager_.Update(TickPhase::PostUpdate, simCtx, RunMode::Rollback);
     }
 
     void Engine::Resimulate(SimContext& simCtx, const uint32_t currT)
@@ -218,7 +227,7 @@ namespace tomato {
         while (simCtx.tick < currT)
         {
             // std::cout << "        --------- " << rbSimCtx.tick << " ---------\n";
-            systemManager_.Simulate(simCtx);
+            systemManager_.FixedUpdate(simCtx, RunMode::Rollback);
             currState_->Update();   // !!!!!! temporary !!!!!!
 
             ++simCtx.tick;

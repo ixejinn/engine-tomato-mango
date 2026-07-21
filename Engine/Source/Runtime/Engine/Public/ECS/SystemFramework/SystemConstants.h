@@ -5,41 +5,32 @@
 
 namespace tomato
 {
-    enum class SystemPhase : uint8_t
+    /// Bitmask that defines which context(s) a system is allowed to run in.
+    enum class RunMode : uint8_t
     {
-        Input = 0,
-        Physics,
-        Collision,
-        Logic,
-        Integration,
-        Transformation,
-        UI,
-        UITransformation,
-        Rendering,
-        Camera,
-        ScreenUI,
-        Particle,
+        None        = 0,
+        Game        = 1 << 0,
+        Editor      = 1 << 1,
+        Rollback    = 1 << 2
+    };
+
+    /// Fixed-timestep phases executed once per simulation tick.
+    enum class TickPhase : uint8_t
+    {
+        PreUpdate,
+        Update,
+        PostUpdate,
         COUNT
     };
 
-    constexpr SystemPhase SIMULATION_ORDER[]
+    /// Per-frame phases executed once per rendered frame, independent of tick rate.
+    enum class FramePhase : uint8_t
     {
-        SystemPhase::Input,
-        SystemPhase::Physics,
-        SystemPhase::Collision,
-        SystemPhase::Logic,
-        SystemPhase::Integration,
-        SystemPhase::Transformation,
-    };
-
-    constexpr SystemPhase RENDERING_ORDER[]
-    {
-        SystemPhase::Camera,
-        SystemPhase::UI,
-        SystemPhase::UITransformation,
-        SystemPhase::Rendering,
-        SystemPhase::Particle,
-        SystemPhase::ScreenUI
+        PreRender,
+        Render,
+        UI,
+        PostRender,
+        COUNT
     };
 }
 

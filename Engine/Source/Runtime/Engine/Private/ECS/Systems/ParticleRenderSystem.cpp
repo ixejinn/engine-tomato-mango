@@ -11,8 +11,6 @@
 #include "Resource/Render/ParticleEffect.h"
 #include "Simulation/SimulationConfig.h"
 #include "Utils/RandomNumberGenerator.h"
-#include "Utils/RegistryEntry.h"
-REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Particle, ParticleRenderSystem)
 
 using namespace std::chrono_literals;
 

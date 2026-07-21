@@ -1,6 +1,6 @@
 #include "Input/InputRecorder.h"
 #include "Input/InputEvent.h"
-#include "Utils/BitmaskOperators.h"
+#include "Utils/Bitmask/BitmaskOperators.h"
 
 namespace tomato
 {
