@@ -5,7 +5,7 @@
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Character.h"
 #include "ECS/Entity/Hierarchy.h"
-#include "ECS/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Collision/CollisionEvent.h"
 #include "Collision/Broad/SAP.h"
 #include "Collision/Narrow/GJK/GJK.h"

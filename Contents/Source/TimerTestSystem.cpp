@@ -4,7 +4,7 @@
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Text.h"
-#include "ECS/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "State/State.h"
 #include "Utils/RegistryEntry.h"
 REGISTER_SYSTEM(tomato::SystemPhase::Logic, TimerTestSystem)

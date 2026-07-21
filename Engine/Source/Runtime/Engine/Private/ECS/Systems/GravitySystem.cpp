@@ -1,5 +1,5 @@
 #include "ECS/Systems/GravitySystem.h"
-#include "ECS/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Rigidbody.h"
 #include "Utils/Logger.h"

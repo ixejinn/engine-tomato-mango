@@ -2,7 +2,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "ECS/Systems/ScreenUIRenderSystem.h"
-#include "ECS/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Render.h"

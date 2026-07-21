@@ -62,7 +62,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/State/DefaultState.h
         Source/Runtime/Engine/Public/GameplayConfig.h
         Source/Runtime/Engine/Public/State/StateFwd.h
-        Source/Runtime/Engine/Public/ECS/SystemUpdateContexts.h
+		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemUpdateContexts.h
         Source/Runtime/Engine/Public/ECS/Systems/CollisionSystem.h
         Source/Runtime/Engine/Public/Collision/CollisionEventFwd.h
         Source/Runtime/Engine/Public/ECS/Systems/KinematicMovementSystem.h

@@ -2,7 +2,7 @@
 #include "ECS/Systems/CameraSystem.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Camera.h"
-#include "ECS/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Services/Window.h"
 #include "Utils/Logger.h"
 #include "Utils/RegistryEntry.h"

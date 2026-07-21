@@ -2,7 +2,7 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Particle.h"
-#include "ECS/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Resource/AssetHash.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Mesh.h"

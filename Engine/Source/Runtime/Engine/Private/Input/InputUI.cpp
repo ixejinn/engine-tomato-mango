@@ -1,7 +1,7 @@
 ﻿#include <GLFW/glfw3.h>
 
 #include "Input/InputUI.h"
-#include "ECS/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Services/Input.h"
 #include "Services/Window.h"
 #include "ECS/Components/Render.h"

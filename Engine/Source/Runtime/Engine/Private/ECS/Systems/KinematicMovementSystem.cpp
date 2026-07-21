@@ -4,7 +4,7 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Movement.h"
-#include "ECS/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Utils/BitmaskOperators.h"
 #include "Utils/RegistryEntry.h"
 REGISTER_BUILT_IN_SYSTEM(tomato::SystemPhase::Input, KinematicMovementSystem)

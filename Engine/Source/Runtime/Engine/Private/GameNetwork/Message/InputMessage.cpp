@@ -7,7 +7,7 @@
 #include "Network/SocketAddress.h"
 #include "Network/ClientNetwork.h"
 
-#include "ECS/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 
 namespace tomato
 {

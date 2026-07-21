@@ -7,7 +7,7 @@
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Visibility.h"
 #include "ECS/Components/Hierarchy.h"
-#include "ECS/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Resource/AssetHash.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Mesh.h"

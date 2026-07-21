@@ -5,7 +5,7 @@
 #include "ECS/Components/UI.h"
 
 #include "ECS/Components/Camera.h"
-#include "ECS/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/Entity/Entity.h"
 
 #include "Utils/RegistryEntry.h"
