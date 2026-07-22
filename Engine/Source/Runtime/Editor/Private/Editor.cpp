@@ -67,7 +67,7 @@ namespace tomato
 		ImGui::NewFrame();
 	}
 
-	void Editor::Draw(State* state)
+	void Editor::Draw(State* state, RunMode& mode)
 	{
 #if 1
 		ImGui::ShowDemoWindow();
@@ -78,7 +78,7 @@ namespace tomato
 			ResetEditorContext(state);
 		}
 
-		mainMenu_.Draw(eCtx);
+		mainMenu_.Draw(eCtx, mode);
 		for (auto& panel : panels)
 			panel->Draw(eCtx);
 		
@@ -116,7 +116,7 @@ namespace tomato
 
 	void Editor::ResetEditorContext(State* newState)
 	{
-		eCtx.currentScenePath = "";
+		//eCtx.currentScenePath = "";
 		eCtx.currentState = newState;
 		eCtx.sceneDirty = false;
 		eCtx.selectedEntity = entt::null;

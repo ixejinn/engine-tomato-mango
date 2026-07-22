@@ -1,6 +1,8 @@
 ﻿#ifndef MANGO_MAINMENUBAR_H
 #define MANGO_MAINMENUBAR_H
 
+#include "ECS/SystemFramework/SystemConstants.h"
+
 namespace tomato
 {
 	struct EditorContext;
@@ -16,7 +18,7 @@ namespace tomato
 	class MainMenuBar
 	{
 	public:
-		void Draw(EditorContext&);
+		void Draw(EditorContext&, RunMode&);
 
 	private:
 		void MenuFile(EditorContext&);
@@ -25,6 +27,7 @@ namespace tomato
 		void OpenScene(EditorContext&);
 		void Save(EditorContext&);
 		void SaveAs(EditorContext&);
+		void ReLoadScene(EditorContext&);
 
 		void OpenPopupModal(EditorContext&);
 		void ExecutePendingAction(EditorContext&, bool);
@@ -32,6 +35,8 @@ namespace tomato
 	private:
 		PendingAction pendingAction_ = PendingAction::None;
 		bool openNotSavedPopup = false;
+
+		bool modeBtnClicked = false;
 	};
 }
 #endif // !MANGO_MAINMENUBAR_H

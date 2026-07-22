@@ -6,6 +6,7 @@
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/SystemFramework/SystemRegistry.h"
 #include "GameNetwork/Rollback/RollbackManager.h"
+#include "Serialization/ComponentSerializer.h"
 #include "Serialization/ComponentRegistry.h"
 #include "Editor.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
@@ -61,8 +62,8 @@ namespace tomato {
         SystemRegistry::GetInstance().RegisterSystems(systemManager_);
 
         TickClock tickClock;
-        // RunMode runMode{RunMode::Editor};
-        RunMode runMode{RunMode::Game}; // TODO: remove this line
+        RunMode runMode{RunMode::Editor};
+        //RunMode runMode{RunMode::Game}; // TODO: remove this line
 
         window_.SetWindowUserPointer(input_, tickClock);
         GarbageEntityCollectionSystem garbageCollectionSystem;
@@ -158,7 +159,7 @@ namespace tomato {
     void Engine::UpdateEditor(RunMode& mode)
     {
         editor_.BeginFrame();
-        editor_.Draw(currState_.get());
+        editor_.Draw(currState_.get(), mode);
         editor_.EndFrame();
     }
 

@@ -19,7 +19,7 @@
 #include <iostream>
 namespace tomato
 {
-	void MainMenuBar::Draw(EditorContext& eCtx)
+	void MainMenuBar::Draw(EditorContext& eCtx, RunMode& mode)
 	{
 		if (ImGui::BeginMainMenuBar())
 		{
@@ -28,14 +28,38 @@ namespace tomato
 			float buttonX = ImGui::GetContentRegionAvail().x;
 			ImGui::SetCursorPosX(buttonX / 2.f);
 
+			static const char* playModeBtn = "▶";
 			//Editor mode Start Button
-			ImGui::Button("▶");
+			if (ImGui::Button(playModeBtn))
+			{
+				if (mode == RunMode::Game)
+				{
+					playModeBtn = "▶";
+					mode = RunMode::Editor;
+				}
+				else
+				{
+					if (eCtx.sceneDirty)
+						SaveAs(eCtx);
+					
+					playModeBtn = "||";
+					mode = RunMode::Game;
+				}
+			}
 
 			//Editor mode Pause Button
-			ImGui::Button("||");
+			ImGui::BeginDisabled(mode == RunMode::Editor);
+			if (ImGui::Button("■"))
+			{
+				playModeBtn = "▶";
+				ReLoadScene(eCtx);
+				mode = RunMode::Editor;
+			}
+			ImGui::EndDisabled();
 
 			ImGui::EndMainMenuBar();
 		}
+
 		if (openNotSavedPopup)
 		{
 			ImGui::OpenPopup("Not Saved");
@@ -107,6 +131,11 @@ namespace tomato
 				eCtx.currentState,
 				path.value().string().c_str()
 			);
+
+			eCtx.currentScenePath = path.value();
+			eCtx.sceneDirty = false;
+
+			std::cout << eCtx.currentScenePath << '\n';
 		}
 	}
 
@@ -138,6 +167,19 @@ namespace tomato
 
 			eCtx.currentScenePath = path.value();
 			eCtx.sceneDirty = false;
+		}
+	}
+
+	void MainMenuBar::ReLoadScene(EditorContext& eCtx)
+	{
+		auto& path = eCtx.currentScenePath;
+		if (!path.empty())
+		{
+			Serialization::LoadStateScene(
+				eCtx.currentState->GetEngine(),
+				eCtx.currentState,
+				path.string().c_str()
+			);
 		}
 	}
 

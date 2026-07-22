@@ -19,7 +19,7 @@ namespace tomato
 		void ShutdownImGui();
 
 		void BeginFrame();
-		void Draw(State*);
+		void Draw(State*, RunMode&);
 		void EndFrame();
 
 		void SetInputCallbacks();
