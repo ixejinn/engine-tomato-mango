@@ -13,6 +13,7 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Character.h"
 
+#include "Utils/Bitmask/BitmaskOperators.h"
 namespace tomato::Serialization
 {
 	void ComponentRegistry::Init()

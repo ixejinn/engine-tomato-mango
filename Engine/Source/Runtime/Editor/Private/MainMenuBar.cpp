@@ -14,6 +14,7 @@
 
 #include "Serialization/ComponentSerializer.h"
 
+#include "Utils/Bitmask/BitmaskOperators.h"
 #include "Utils/FileDialog.h"
 #include "Resource/PathManager.h"
 #include <iostream>
@@ -32,7 +33,7 @@ namespace tomato
 			//Editor mode Start Button
 			if (ImGui::Button(playModeBtn))
 			{
-				if (mode == RunMode::Game)
+				if (HasFlag(mode, RunMode::Game))
 				{
 					playModeBtn = "▶";
 					mode = RunMode::Editor;
@@ -48,7 +49,7 @@ namespace tomato
 			}
 
 			//Editor mode Pause Button
-			ImGui::BeginDisabled(mode == RunMode::Editor);
+			ImGui::BeginDisabled(HasFlag(mode, RunMode::Editor));
 			if (ImGui::Button("■"))
 			{
 				playModeBtn = "▶";
@@ -110,15 +111,7 @@ namespace tomato
 
 	void MainMenuBar::NewScene(EditorContext& eCtx)
 	{
-		/*eCtx.currentState->GetRegistry().clear();
-		eCtx.currentState->GetEntityMap().clear();
-		eCtx.selectedEntity = entt::null;
-
-		eCtx.currentScenePath = "";
-		eCtx.sceneDirty = false;*/
-
 		Serialization::NewStateScene(eCtx.currentState->GetEngine(), eCtx.currentState);
-
 	}
 
 	void MainMenuBar::OpenScene(EditorContext& eCtx)
@@ -158,7 +151,7 @@ namespace tomato
 			"Save Scene",
 			"scene",
 			"Scene Files (*.scene)\0*.scene\0""All Files (*.*)\0*.*\0",
-			"Resources/Contents/Scenes");
+			"Resources\\Contents\\Scenes");
 
 		if (path)
 		{

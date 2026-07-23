@@ -18,6 +18,8 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Camera.h"
 
+#include "Utils/Bitmask/BitmaskOperators.h"
+
 namespace tomato
 {
 	InspectorPanel::InspectorPanel(bool open) : EditorPanel(open)
@@ -46,7 +48,8 @@ namespace tomato
 				if (!comp.Has(editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity))
 					continue;
 
-				if (HasFlag<Serialization::ComponentFlags>(comp.flags, Serialization::ComponentFlags::Hidden))
+				//if (HasFlag<Serialization::ComponentFlags>(comp.flags, Serialization::ComponentFlags::Hidden))
+				if (HasFlag(comp.flags, Serialization::ComponentFlags::Hidden))
 					continue;
 
 				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_AllowOverlap;
@@ -145,7 +148,8 @@ namespace tomato
 		auto& componentInfo = Serialization::ComponentRegistry::GetInstance().GetComponentInfo();
 		for (const auto& comp : componentInfo)
 		{
-			if (HasFlag<Serialization::ComponentFlags>(comp.flags, Serialization::ComponentFlags::Hidden))
+			//if (HasFlag<Serialization::ComponentFlags>(comp.flags, Serialization::ComponentFlags::Hidden))
+			if (HasFlag(comp.flags, Serialization::ComponentFlags::Hidden))
 				continue;
 
 			if (comp.category == category)
@@ -174,7 +178,8 @@ namespace tomato
 		{
 			if (ImGui::MenuItem("Remove Component"))
 			{
-				if (!HasFlag<Serialization::ComponentFlags>(comp.flags, Serialization::ComponentFlags::Essential))
+				//if (!HasFlag<Serialization::ComponentFlags>(comp.flags, Serialization::ComponentFlags::Essential))
+				if (!HasFlag(comp.flags, Serialization::ComponentFlags::Essential))
 				{
 					comp.editor.Remove(editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
 					editorCtx.sceneDirty = true;

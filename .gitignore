@@ -2,3 +2,5 @@ cmake-build-*/
 .idea/
 out/
 .vs/
+Engine/Resources/Scenes/
+Contents/Resources/Scenes/

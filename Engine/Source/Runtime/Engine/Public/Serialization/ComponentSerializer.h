@@ -6,7 +6,7 @@
 #include "Serialization/Json.h"
 #include "UUID.h"
 #include "State/StateFwd.h"
-#include "../ECS/Forward/ComponentFwd.h"
+#include "ECS/Forward/ComponentFwd.h"
 
 namespace tomato
 {

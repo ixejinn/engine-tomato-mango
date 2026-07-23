@@ -166,9 +166,10 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Utils/PassKey.h
 		Source/Runtime/Engine/Public/Particle/ParticleEmitterPool.h
 		Source/Runtime/Engine/Public/Particle/ParticleType.h
-        Source/Runtime/Core/Public/EnumFlags.h
+        
 		Source/Runtime/Engine/Public/Resource/Render/ParticleEffect.h
 		Source/Runtime/Engine/Public/ECS/Forward/ParticleCompFwd.h
+
 		Source/Runtime/Engine/Public/Utils/RandomNumberGenerator.h
         Source/Runtime/Engine/Private/Utils/FileDialog.h
 		Source/Runtime/Engine/Public/State/StateRegistry.h

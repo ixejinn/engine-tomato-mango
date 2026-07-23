@@ -5,7 +5,6 @@
 #include <functional>
 #include <entt/fwd.hpp>
 #include "Serialization/Json.h"
-#include "EnumFlags.h"
 
 namespace tomato
 {
@@ -56,7 +55,6 @@ namespace tomato::Serialization
 #undef X
 		COUNT
 	};
-	TMT_ENABLE_ENUM_FLAGS(ComponentFlags)
 
 	struct ComponentFlagsMeta
 	{
