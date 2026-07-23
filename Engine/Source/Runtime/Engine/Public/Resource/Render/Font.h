@@ -31,7 +31,7 @@ namespace tomato {
     class Font {
     public:
         constexpr static const char* PrimitiveName = "SpoqaHanSansNeo-Medium";
-        constexpr static const char* defaultFontPath = "Resources/Engine/Assets/Fonts/SpoqaHanSansNeo-Medium.ttf";
+        constexpr static const char* defaultFontPath = "Resources\\Engine\\Assets\\Fonts\\SpoqaHanSansNeo-Medium.ttf";
 
     private:
         //Font(const char* path = defaultPath);

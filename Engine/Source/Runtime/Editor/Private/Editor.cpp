@@ -41,7 +41,8 @@ namespace tomato
 		io.Fonts->AddFontDefault();
 
 		io.Fonts->AddFontFromFileTTF(
-			"Resources/Engine/Assets/Fonts/Pretendard-SemiBold.ttf",
+			//"Resources/Engine/Assets/Fonts/Pretendard-SemiBold.ttf",
+			PathManager::Font("Pretendard-SemiBold.ttf").string().c_str(),
 			0,
 			&config,
 			io.Fonts->GetGlyphRangesKorean());
@@ -109,9 +110,6 @@ namespace tomato
 		Texture::Create(PathManager::Icon("visibility_on.png"));
 		Texture::Create(PathManager::Icon("visibility_off.png"));
 		Texture::Create(PathManager::Icon("more_vert.png"));
-		//Texture::Create("Resources/Engine/Assets/img/visibility_on.png");
-		//Texture::Create("Resources/Engine/Assets/img/visibility_off.png");
-		//Texture::Create("Resources/Engine/Assets/img/more_vert.png");
 	}
 
 	void Editor::ResetEditorContext(State* newState)
