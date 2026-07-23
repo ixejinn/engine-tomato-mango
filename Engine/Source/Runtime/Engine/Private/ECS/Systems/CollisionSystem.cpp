@@ -2,7 +2,6 @@
 #include <entt/entt.hpp>
 #include "ECS/Systems/CollisionSystem.h"
 #include "ECS/Components/ComponentsPhys.h"
-#include "ECS/Components/Movement.h"
 #include "ECS/Components/Character.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
@@ -33,9 +32,112 @@ namespace tomato
         RunNarrowPhase(simCtx);
 
         EventDispatcher::GetInstance().Update<PenetrationEvent>();
+        if (!events_.empty())
+            std::cout << "     ##### " << simCtx.tick << "\n";
         ResolveCollision(simCtx.state->GetRegistry());
 
         EventDispatcher::GetInstance().Update<ChangeMovementModeEvent>();
+    }
+
+    void CollisionSystem::RunBroadPhase(SimContext& simCtx)
+    {
+        auto& registry = simCtx.state->GetRegistry();
+
+        UpdateAABB(registry);
+
+        candidates_.clear();
+        broadPhase_->FindCollisionCandidates(registry, candidates_);
+    }
+
+    void CollisionSystem::RunNarrowPhase(SimContext& simCtx)
+    {
+        events_.clear();
+
+        auto& registry = simCtx.state->GetRegistry();
+        auto& collisionPairs = registry.ctx().get<CollisionContext>().collisionPairs;
+
+        auto& eventDispatcher = EventDispatcher::GetInstance();
+
+        for (const auto& candidate : candidates_)
+        {
+            if (!simCtx.state->GetRegistry().valid(candidate.a) ||
+                !simCtx.state->GetRegistry().valid(candidate.a)) continue;
+            auto& col1 = registry.get<ColliderComponent>(candidate.a);
+            auto& col2 = registry.get<ColliderComponent>(candidate.b);
+
+            if (auto result = narrowPhase_->EvaluateCollision(registry, candidate.a, candidate.b)) {
+                // std::cout << "     COLLISION: " << (int)candidate.a << " " << (int)candidate.b << "\n";
+                // Collision detected
+                if (!collisionPairs.contains(candidate))
+                {
+                    // Enter
+                    if (col1.isTrigger || col2.isTrigger)
+                    {
+                        std::cout << "          enter " << collisionPairs.size() << "\n";
+                        eventDispatcher.Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
+
+                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, candidate.a)))
+                            eventDispatcher.Enqueue(ChangeMovementModeEvent{candidate.a, simCtx.state, Walking});
+                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, candidate.b)))
+                            eventDispatcher.Enqueue(ChangeMovementModeEvent{candidate.b, simCtx.state, Walking});
+                    }
+                    else
+                    {
+                        events_.emplace_back(candidate.a, candidate.b, result.value());
+                        eventDispatcher.Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &registry, result.value()});
+                    }
+                }
+                else
+                {
+                    // Stay
+                    if (col1.isTrigger || col2.isTrigger)
+                    {
+                        std::cout << "          stay " << collisionPairs.size() << "\n";
+                        eventDispatcher.Enqueue(TriggerStayEvent{candidate.a, candidate.b, &registry});
+                    }
+                    else
+                    {
+                        events_.emplace_back(candidate.a, candidate.b, result.value());
+                        eventDispatcher.Enqueue(CollisionStayEvent{candidate.a, candidate.b, &registry, result.value()});
+                    }
+                }
+
+                collisionPairs[candidate] = true;
+            }
+        }
+
+        for (auto it = collisionPairs.begin(); it != collisionPairs.end(); )
+        {
+            if (!it->second)
+            {
+                // Exit
+                auto* col1 = registry.try_get<ColliderComponent>(it->first.a);
+                auto* col2 = registry.try_get<ColliderComponent>(it->first.b);
+
+                if (col1 && col2)
+                {
+                    if (col1->isTrigger || col2->isTrigger)
+                    {
+                        std::cout << "          exit " << collisionPairs.size() << "\n";
+                        EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{ it->first.a, it->first.b, &registry });
+
+                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.a)))
+                            eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.a, simCtx.state, Falling });
+                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.b)))
+                            eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.b, simCtx.state, Falling });
+                    }
+                    else
+                        EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{ it->first.a, it->first.b, &registry });
+                }
+
+                it = collisionPairs.erase(it);
+            }
+            else
+            {
+                it->second = false;
+                ++it;
+            }
+        }
     }
 
     void CollisionSystem::UpdateAABB(entt::registry& reg)
@@ -122,7 +224,6 @@ namespace tomato
             glm::vec3 remainingMove = (1 - info.depth * weight) * vel->velocity;
 
             trfRoot2.AddPosition((vel->velocity * FIXED_DELTA_TIME * info.depth + info.normal * COLLISION_SKIN) * weight);
-            // trfRoot2.AddPosition(vel->velocity * FIXED_DELTA_TIME * info.depth + vel->velocity * COLLISION_SKIN);
             vel->velocity = remainingMove + glm::dot(remainingMove, -info.normal) * info.normal;
 
             constexpr float epsilon = 0.001f;
@@ -161,101 +262,6 @@ namespace tomato
         // aft = trfRoot2.GetLocalPosition();
         // TMT_INFO << (int)root2 << " bef: " << bef.x << " " << bef.y << " " << bef.z;
         // TMT_INFO << (int)root2 << " aft: " << aft.x << " " << aft.y << " " << aft.z;
-    }
-
-    void CollisionSystem::RunBroadPhase(SimContext& simCtx)
-    {
-        auto& registry = simCtx.state->GetRegistry();
-
-        UpdateAABB(registry);
-
-        candidates_.clear();
-        broadPhase_->FindCollisionCandidates(registry, candidates_);
-    }
-
-    void CollisionSystem::RunNarrowPhase(SimContext& simCtx)
-    {
-        events_.clear();
-
-        auto& registry = simCtx.state->GetRegistry();
-        auto& collisionPairs = registry.ctx().get<CollisionContext>().collisionPairs;
-
-        auto& eventDispatcher = EventDispatcher::GetInstance();
-
-        for (const auto& candidate : candidates_)
-        {
-            if (!simCtx.state->GetRegistry().valid(candidate.a) ||
-                !simCtx.state->GetRegistry().valid(candidate.a)) continue;
-            auto& col1 = registry.get<ColliderComponent>(candidate.a);
-            auto& col2 = registry.get<ColliderComponent>(candidate.b);
-
-            if (auto result = narrowPhase_->EvaluateCollision(registry, candidate.a, candidate.b)) {
-                // Collision detected
-                if (!collisionPairs.contains(candidate))
-                {
-                    // Enter
-                    if (col1.isTrigger || col2.isTrigger)
-                    {
-                        eventDispatcher.Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
-
-                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, candidate.a)))
-                            eventDispatcher.Enqueue(ChangeMovementModeEvent{candidate.a, simCtx.state, Walking});
-                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, candidate.b)))
-                            eventDispatcher.Enqueue(ChangeMovementModeEvent{candidate.b, simCtx.state, Walking});
-                    }
-                    else
-                    {
-                        events_.emplace_back(candidate.a, candidate.b, result.value());
-                        eventDispatcher.Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &registry, result.value()});
-                    }
-                }
-                else
-                {
-                    // Stay
-                    if (col1.isTrigger || col2.isTrigger)
-                        eventDispatcher.Enqueue(TriggerStayEvent{candidate.a, candidate.b, &registry});
-                    else
-                    {
-                        events_.emplace_back(candidate.a, candidate.b, result.value());
-                        eventDispatcher.Enqueue(CollisionStayEvent{candidate.a, candidate.b, &registry, result.value()});
-                    }
-                }
-
-                collisionPairs[candidate] = true;
-            }
-        }
-
-        for (auto it = collisionPairs.begin(); it != collisionPairs.end(); )
-        {
-            if (!it->second)
-            {
-                // Exit
-                auto* col1 = registry.try_get<ColliderComponent>(it->first.a);
-                auto* col2 = registry.try_get<ColliderComponent>(it->first.b);
-
-                if (col1 && col2)
-                {
-                    if (col1->isTrigger || col2->isTrigger)
-                    {
-                        EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{ it->first.a, it->first.b, &registry });
-
-                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.a)))
-                            eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.a, simCtx.state, Falling });
-                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.b)))
-                            eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.b, simCtx.state, Falling });
-                    }
-                    else
-                        EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{ it->first.a, it->first.b, &registry });
-                }
-
-                it = collisionPairs.erase(it);
-            }
-            else
-            {
-                it->second = false;
-                ++it;
-            }
-        }
     }
 
     void CollisionSystem::ResolveCollision(entt::registry& reg)

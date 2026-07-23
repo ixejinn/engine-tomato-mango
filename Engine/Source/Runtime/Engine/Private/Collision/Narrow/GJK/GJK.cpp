@@ -237,6 +237,20 @@ namespace tomato
             // TMT_INFO << "(" << iteration << ")   length2: " << glm::length2(searchDir);
         }
 
+        /////////
+        if (glm::length2(searchDir) <= 1e-6f * maxDistSq)
+        {
+            // glm::vec3 supportP = GetSupportPoint(searchDir, col1, trf1, col2, trf2);
+            // glm::vec3 supportToRay = curRayPos - supportP;
+            // float dotVW = glm::dot(searchDir, supportToRay);
+            // TMT_INFO << "(" << iteration << ") dotVW: " << dotVW;
+            // if (dotVW > 0)
+            //     hitNormal = searchDir;
+
+            if (!penetrated)
+                hitNormal = searchDir;
+        }
+
         if (hitFraction <= 1) {
             float hitNormalLenSq = glm::length2(hitNormal);
             if (hitNormalLenSq > 1e-6f) {
