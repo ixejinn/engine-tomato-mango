@@ -544,4 +544,7 @@ namespace tomato::Serialization
 
 	void Save(json& data, const MainCameraTag& camTag) {}
 	void Load(const json& data, MainCameraTag& camTag) {}
+
+	void Save(json& data, const CharacterTag& charTag) {}
+	void Load(const json& data, CharacterTag& charTag) {}
 }

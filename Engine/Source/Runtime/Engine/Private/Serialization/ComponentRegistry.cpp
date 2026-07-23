@@ -11,6 +11,7 @@
 #include "ECS/Components/UIEvents.h"
 #include "ECS/Components/Text.h"
 #include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/Character.h"
 
 namespace tomato::Serialization
 {
@@ -40,6 +41,7 @@ namespace tomato::Serialization
 		RegisterComponent<HierarchyComponent>("Hierarchy", ComponentCategory::Common, ComponentFlags::Hidden);
 		RegisterComponent<RootEntityTag>("TagRoot", ComponentCategory::Tag);
 		RegisterComponent<MainCameraTag>("TagMainCam", ComponentCategory::Tag);
+		RegisterComponent<CharacterTag>("TagCharacter", ComponentCategory::Tag);
 
 
 		initialized = true;

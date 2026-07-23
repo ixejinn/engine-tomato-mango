@@ -89,6 +89,9 @@ namespace tomato::Serialization
 
 	void Save(json&, const MainCameraTag&);
 	void Load(const json&, MainCameraTag&);
+
+	void Save(json&, const CharacterTag&);
+	void Load(const json&, CharacterTag&);
 }
 
 #endif // !MANGO_COMPONENTSERIALIZER_H
