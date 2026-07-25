@@ -22,41 +22,12 @@ namespace tomato
 {
 	void MainMenuBar::Draw(EditorContext& eCtx, RunMode& mode)
 	{
+		ProcessShortcuts(eCtx);
 		if (ImGui::BeginMainMenuBar())
 		{
 			MenuFile(eCtx);
 
-			float buttonX = ImGui::GetContentRegionAvail().x;
-			ImGui::SetCursorPosX(buttonX / 2.f);
-
-			static const char* playModeBtn = "▶";
-			//Editor mode Start Button
-			if (ImGui::Button(playModeBtn))
-			{
-				if (HasFlag(mode, RunMode::Game))
-				{
-					playModeBtn = "▶";
-					mode = RunMode::Editor;
-				}
-				else
-				{
-					if (eCtx.sceneDirty)
-						SaveAs(eCtx);
-					
-					playModeBtn = "||";
-					mode = RunMode::Game;
-				}
-			}
-
-			//Editor mode Pause Button
-			ImGui::BeginDisabled(HasFlag(mode, RunMode::Editor));
-			if (ImGui::Button("■"))
-			{
-				playModeBtn = "▶";
-				ReLoadScene(eCtx);
-				mode = RunMode::Editor;
-			}
-			ImGui::EndDisabled();
+			EditModeButton(eCtx, mode);
 
 			ImGui::EndMainMenuBar();
 		}
@@ -73,33 +44,15 @@ namespace tomato
 	{
 		if(ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("New Scene"))
-			{
-				// If current scene is not saved yet
-				if (eCtx.sceneDirty)
-				{
-					pendingAction_ = PendingAction::NewScene;
-					openNotSavedPopup = true;
-				}
-				
-				else
-					NewScene(eCtx);
-			}
+			if (ImGui::MenuItem("New Scene", "Ctrl+N"))
+				NewScene(eCtx);
 
-			if (ImGui::MenuItem("Open Scene"))
-			{
-				// If current scene is not saved yet, open popup
-				if (eCtx.sceneDirty)
-				{
-					pendingAction_ = PendingAction::OpenScene;
-					openNotSavedPopup = true;
-				}
-				else
-					OpenScene(eCtx);
-			}
+			if (ImGui::MenuItem("Open Scene", "Ctrl+O"))
+				OpenScene(eCtx);
 
 			ImGui::Separator();
-			if (ImGui::MenuItem("Save"))
+
+			if (ImGui::MenuItem("Save", "Ctrl+S"))
 				Save(eCtx);
 
 			if (ImGui::MenuItem("Save As..."))
@@ -109,26 +62,82 @@ namespace tomato
 		}
 	}
 
+	void MainMenuBar::EditModeButton(EditorContext& eCtx, RunMode& mode)
+	{
+		float buttonX = ImGui::GetContentRegionAvail().x;
+		ImGui::SetCursorPosX(buttonX / 2.f);
+
+		static const char* playModeBtn = "▶";
+		//Editor mode Start Button
+		if (ImGui::Button(playModeBtn))
+		{
+			if (HasFlag(mode, RunMode::Game))
+			{
+				playModeBtn = "▶";
+				mode = RunMode::Editor;
+			}
+			else
+			{
+				if (eCtx.sceneDirty)
+					Save(eCtx);
+
+				playModeBtn = "||";
+				mode = RunMode::Game;
+			}
+		}
+
+		//Editor mode Pause Button
+		ImGui::BeginDisabled(HasFlag(mode, RunMode::Editor));
+		if (ImGui::Button("■"))
+		{
+			playModeBtn = "▶";
+			ReLoadScene(eCtx);
+			mode = RunMode::Editor;
+		}
+		ImGui::EndDisabled();
+	}
+
 	void MainMenuBar::NewScene(EditorContext& eCtx)
 	{
-		Serialization::NewStateScene(eCtx.currentState->GetEngine(), eCtx.currentState);
+		// If current scene is not saved yet
+		if (eCtx.sceneDirty)
+		{
+			pendingAction_ = PendingAction::NewScene;
+			openNotSavedPopup = true;
+		}
+
+		else
+		{
+			Serialization::NewStateScene(eCtx.currentState->GetEngine(), eCtx.currentState);
+			eCtx.sceneDirty = false;
+			eCtx.currentScenePath = "";
+		}
 	}
 
 	void MainMenuBar::OpenScene(EditorContext& eCtx)
 	{
-		auto path = FileDialog::OpenFile("Open Scene");
-		if (path)
+		// If current scene is not saved yet, open popup
+		if (eCtx.sceneDirty)
 		{
-			Serialization::LoadStateScene(
-				eCtx.currentState->GetEngine(),
-				eCtx.currentState,
-				path.value().string().c_str()
-			);
+			pendingAction_ = PendingAction::OpenScene;
+			openNotSavedPopup = true;
+		}
+		else
+		{
+			auto path = FileDialog::OpenFile("Open Scene");
+			if (path)
+			{
+				Serialization::LoadStateScene(
+					eCtx.currentState->GetEngine(),
+					eCtx.currentState,
+					path.value().string().c_str()
+				);
 
-			eCtx.currentScenePath = path.value();
-			eCtx.sceneDirty = false;
+				eCtx.currentScenePath = path.value();
+				eCtx.sceneDirty = false;
 
-			std::cout << eCtx.currentScenePath << '\n';
+				std::cout << eCtx.currentScenePath << '\n';
+			}
 		}
 	}
 
@@ -205,25 +214,41 @@ namespace tomato
 
 	void MainMenuBar::ExecutePendingAction(EditorContext& eCtx, bool saved)
 	{
+		if (saved)
+			Save(eCtx);
+
+		ImGui::CloseCurrentPopup();
+		eCtx.sceneDirty = false;
+		eCtx.currentScenePath = "";
+
 		switch (pendingAction_)
 		{
+
 			case PendingAction::NewScene:
-				if (saved)
-					Save(eCtx);
 				
-				ImGui::CloseCurrentPopup();
-				NewScene(eCtx);
 				pendingAction_ = PendingAction::None;
+				NewScene(eCtx);
 				break;
 
 			case PendingAction::OpenScene:
-				if(saved)
-					Save(eCtx);
 
-				ImGui::CloseCurrentPopup();
-				OpenScene(eCtx);
 				pendingAction_ = PendingAction::None;
+				OpenScene(eCtx);
 				break;
 		}
+	}
+	void MainMenuBar::ProcessShortcuts(EditorContext& eCtx)
+	{
+		ImGuiInputFlags shortcutFlags = ImGuiInputFlags_RouteGlobal | ImGuiInputFlags_RouteOverFocused;
+
+		if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_N, shortcutFlags))
+			NewScene(eCtx);
+		
+		if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_O, shortcutFlags))
+			OpenScene(eCtx);
+
+		if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, shortcutFlags))
+			Save(eCtx);
+
 	}
 }
