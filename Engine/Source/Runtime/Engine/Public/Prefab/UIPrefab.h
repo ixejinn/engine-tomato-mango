@@ -22,12 +22,14 @@ namespace tomato::UIPrefab
 		std::string		inText = "Text",
 		glm::vec4		color = { 1.f, 1.f, 1.f, 1.f },
 		float			size = 12.f,
-		const char*		fontName = Font::defaultFontPath
+		//const char*		fontName = Font::defaultFontPath
+		const std::filesystem::path&		fontName = Font::defaultFontPath
 	);
 
 	entt::entity CreateImage(
 		entt::registry& reg,
-		const char*		textureName = Texture::PrimitiveName,
+		//const char*		textureName = Texture::PrimitiveName,
+		const std::filesystem::path& textureName = Texture::PrimitiveName,
 		glm::vec2		pos = { 0.f, 0.f },
 		glm::vec2		size = { 0.f, 0.f }
 	);

@@ -124,7 +124,7 @@ namespace tomato
 		}
 		else
 		{
-			auto path = FileDialog::OpenFile("Open Scene");
+			auto path = FileDialog::OpenFile("Open Scene", "Scene Files (*.scene)\0*.scene*\0\0", PathManager::ContentScene(""));
 			if (path)
 			{
 				Serialization::LoadStateScene(
@@ -160,7 +160,7 @@ namespace tomato
 			"Save Scene",
 			"scene",
 			"Scene Files (*.scene)\0*.scene\0""All Files (*.*)\0*.*\0",
-			"Resources\\Contents\\Scenes");
+			PathManager::ContentScene(""));
 
 		if (path)
 		{

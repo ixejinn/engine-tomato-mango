@@ -9,13 +9,15 @@
 #include "Prefab/UIPrefab.h"
 #include "TestState.h"
 #include "Utils/RegistryEntry.h"
+
+#include "Resource/PathManager.h"
 REGISTER_STATE(LoadState)
 
 using namespace tomato;
 
 void LoadState::Init()
 {
-	Texture::Create("Resources/Contents/WATER_GAME_LOGO.png");
+	/*Texture::Create(PathManager::ContentImage("WATER_GAME_LOGO.png"));*/
 	/*Texture::Create("Resources\\Contents\\WATER_GAME_LOGO.png");*/
 	//Serialization::LoadScene(registry_, "Resources/Engine/Scenes/default.scene", entityMap_);
 	

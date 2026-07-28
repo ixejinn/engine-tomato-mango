@@ -6,6 +6,7 @@
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
 #include "Resource/Render/ParticleEffect.h"
+#include "Resource/PathManager.h"
 #include "Input/InputRecorder.h"
 #include "Input/InputConstants.h"
 #include "Input/KeyConstants.h"
@@ -29,16 +30,16 @@ using namespace std::chrono_literals;
 
 void TestState::Init() {
     //// Audio test
-    auto id = Audio::Create("Resources/Contents/sfx_get_heart.mp3", 8);
+    auto id = Audio::Create(PathManager::ContentSound("sfx_get_heart.mp3"), 8);
     audioPtr_ = AssetRegistry<Audio>::GetInstance().Get(id);
-    Texture::Create("Resources/Contents/WATER_GAME_LOGO.png");
-    Texture::Create("Resources/Contents/heart.png");
-    Font::Create("Resources/Engine/Assets/Fonts/D2Coding.ttf");
-    Font::Create("Resources/Engine/Assets/Fonts/Pretendard-SemiBold.ttf");
+    Texture::Create(PathManager::ContentImage("WATER_GAME_LOGO.png"));
+    Texture::Create(PathManager::ContentImage("heart.png"));
+    Font::Create(PathManager::Font("D2Coding.ttf"));
+    Font::Create(PathManager::Font("Pretendard-SemiBold.ttf"));
 
-    ParticleEffect::Create("Resources/Contents/burst_test.tmt.ptc");
-    ParticleEffect::Create("Resources/Contents/ribbon_particle.tmt.ptc");
-    ParticleEffect::Create("Resources/Contents/jump.tmt.ptc");
+    ParticleEffect::Create(PathManager::ContentParticle("burst_test.tmt.ptc"));
+    ParticleEffect::Create(PathManager::ContentParticle("ribbon_particle.tmt.ptc"));
+    ParticleEffect::Create(PathManager::ContentParticle("jump.tmt.ptc"));
 
     EventDispatcher::GetInstance().Connect<LandingEvent, TestState::CallbackJump>();
 
@@ -142,7 +143,7 @@ void TestState::Init() {
 
 
     UIPrefab::CreateText(registry_, { 100.f, 0.f });
-    UIPrefab::CreateImage(registry_, "Resources/Contents/WATER_GAME_LOGO.png", { 200.f, 300.f });
+    UIPrefab::CreateImage(registry_, PathManager::ContentImage("WATER_GAME_LOGO.png"), {200.f, 300.f});
     //UIPrefab::CreateCanvas(registry_);
     //UIPrefab::CreateCanvas(registry_);
     //UIPrefab::CreateCanvas(registry_);
@@ -204,7 +205,7 @@ void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
 void TestState::CallbackJump(const tomato::LandingEvent& event)
 {
     auto e = event.state->particlePool_.Acquire(
-        GetAssetID("Resources/Contents/jump.tmt.ptc"),
+        GetAssetID(PathManager::ContentParticle("jump.tmt.ptc")),
         event.position);
     // std::cout << "Callback Jump " << (int)e.value() << "\n";
 }

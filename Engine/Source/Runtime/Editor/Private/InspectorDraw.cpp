@@ -6,10 +6,13 @@
 
 #include "EditorPanel.h"
 #include "Resource/AssetRegistry.h"
+#include "Resource/Audio/Audio.h"
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
 #include "Resource/Render/Font.h"
+#include "Resource/Render/ParticleEffect.h"
+#include "Resource/PathManager.h"
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
@@ -32,6 +35,7 @@
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/Entity/Entity.h"
 
+#include "Utils/FileDialog.h"
 namespace tomato
 {
 	bool DrawCameraInspcetor(EditorContext& eCtx, entt::registry& reg, CameraComponent& camera)
@@ -252,6 +256,8 @@ namespace tomato
 			}
 			ImGui::EndCombo();
 		}
+
+		DrawLoadResourceButton("Open File", "All Images \0*.png;*.jpg;*.jpeg\0\0", PathManager::ContentImage());
 
 		ImGui::NewLine();
 
@@ -495,6 +501,8 @@ namespace tomato
 			ImGui::EndCombo();
 		}
 
+		DrawLoadResourceButton("Open File", "Font files \0*.ttf\0\0", PathManager::ContentFont());
+
 		ImGui::NewLine();
 
 		return changed;
@@ -554,6 +562,40 @@ namespace tomato
 		ImGui::NewLine();
 
 		return changed;
+	}
+
+	bool DrawLoadResourceButton(const char* title, const char* filter, const std::filesystem::path& initDir)
+	{
+		ImGui::SameLine();
+
+		if (ImGui::Button("@"))
+		{
+			auto path = FileDialog::OpenFile(title, filter, initDir);
+
+			if (path.has_value())
+			{
+				auto extension = path.value().extension();
+				auto dest = initDir / path.value().filename().string();
+				FileUtils::CopyAsset(path.value(), dest);
+
+				if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
+					Texture::Create(dest);
+
+				else if (extension == ".ptc")
+					ParticleEffect::Create(dest);
+				
+				else if (extension == ".ttf")
+					Font::Create(dest);
+
+				/*else if (extension == ".mp3")
+					Audio::Create(dest);*/
+
+				else
+					TMT_ERR << "Invalid file extension" << extension;
+			}
+		}
+
+		return true;
 	}
 
 	bool DrawVec3Control(const char* label, float* vec, int flags)

@@ -1,6 +1,7 @@
 ﻿#include <filesystem>
 #include <optional>
 #include "Resource/PathManager.h"
+#include "Utils/Logger.h"
 
 namespace tomato::FileDialog
 {
@@ -14,4 +15,9 @@ namespace tomato::FileDialog
 		const char* extention,
 		const char* filter = "All Files (*.*)\0*.*\0\0",
 		const std::filesystem::path& initialDir = "Resources/");
+}
+
+namespace tomato::FileUtils
+{
+	bool CopyAsset(const std::filesystem::path& source, const std::filesystem::path& destination);
 }
