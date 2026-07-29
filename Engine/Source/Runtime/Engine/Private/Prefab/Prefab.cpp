@@ -125,17 +125,17 @@ namespace tomato::Prefab
 
     entt::entity AttachCharacterCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
         const entt::entity col = AttachCollider(reg, parent, type);
-        const entt::entity ground = AttachCollider(reg, col, type);
-
         TransformComponent& trfP = reg.get<TransformComponent>(parent);
-        TransformComponent& trfC = reg.get<TransformComponent>(ground);
 
-        trfC.SetScale(trfP.GetLocalScale() * 0.8f);
-        trfC.AddPosition({0.f, -(trfP.GetLocalScale().y * 0.1 + COLLISION_SKIN + 0.001f), 0.f});
-
-        reg.get<ColliderComponent>(ground).isTrigger = true;
-
-        TMT_INFO << "Create character collider, ground: " << (int)col << ", " << (int)ground;
+        // const entt::entity ground = AttachCollider(reg, col, type);
+        // TransformComponent& trfC = reg.get<TransformComponent>(ground);
+        //
+        // trfC.SetScale(trfP.GetLocalScale() * 0.8f);
+        // trfC.AddPosition({0.f, -(trfP.GetLocalScale().y * 0.1 + COLLISION_SKIN + 0.001f), 0.f});
+        //
+        // reg.get<ColliderComponent>(ground).isTrigger = true;
+        //
+        // TMT_INFO << "Create character collider, ground: " << (int)col << ", " << (int)ground;
         return col;
     }
 }

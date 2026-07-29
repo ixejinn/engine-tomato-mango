@@ -10,6 +10,7 @@ namespace tomato
         glm::vec3 normal;
         float depth;
         float weight;
+        bool skin{false};
     };
 }
 

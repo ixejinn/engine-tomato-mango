@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <entt/entt.hpp>
+#include <glm/vec3.hpp>
 #include "State/State.h"
 #include "Network/ClientNetwork.h"
 #include "Collision/CollisionFwd.h"
@@ -20,6 +21,7 @@ namespace tomato
     struct CollisionContext
     {
         std::unordered_map<CollisionPair, bool> collisionPairs;
+        std::unordered_map<CollisionPair, glm::vec3> normalCache;
     };
 
     struct RenderContext

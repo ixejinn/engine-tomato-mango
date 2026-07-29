@@ -54,7 +54,9 @@ namespace tomato
         events_.clear();
 
         auto& registry = simCtx.state->GetRegistry();
-        auto& collisionPairs = registry.ctx().get<CollisionContext>().collisionPairs;
+        auto& collisionCtx = registry.ctx().get<CollisionContext>();
+        auto& collisionPairs = collisionCtx.collisionPairs;
+        auto& normalCache = collisionCtx.normalCache;
 
         auto& eventDispatcher = EventDispatcher::GetInstance();
 
@@ -70,10 +72,15 @@ namespace tomato
                 // Collision detected
                 if (!collisionPairs.contains(candidate))
                 {
+                    if (result->skin)
+                        result->normal = normalCache[candidate];
+                    else
+                        normalCache[candidate] = result->normal;
+
                     // Enter
                     if (col1.isTrigger || col2.isTrigger)
                     {
-                        std::cout << "          enter " << collisionPairs.size() << "\n";
+                        std::cout << "          enter " << (int)candidate.a << " " << (int)candidate.b << "\n";
                         eventDispatcher.Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
 
                         if (registry.all_of<CharacterTag>(GetRootEntity(registry, candidate.a)))
@@ -83,16 +90,22 @@ namespace tomato
                     }
                     else
                     {
+                        std::cout << "          enter " << (int)candidate.a << " " << (int)candidate.b << "\n";
                         events_.emplace_back(candidate.a, candidate.b, result.value());
                         eventDispatcher.Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &registry, result.value()});
                     }
                 }
                 else
                 {
+                    if (result->skin)
+                        result->normal = normalCache[candidate];
+                    else
+                        normalCache[candidate] = result->normal;
+
                     // Stay
                     if (col1.isTrigger || col2.isTrigger)
                     {
-                        std::cout << "          stay " << collisionPairs.size() << "\n";
+                        //std::cout << "          stay " << collisionPairs.size() << "\n";
                         eventDispatcher.Enqueue(TriggerStayEvent{candidate.a, candidate.b, &registry});
                     }
                     else
@@ -116,9 +129,10 @@ namespace tomato
 
                 if (col1 && col2)
                 {
+                    std::cout << "          exit " << (int)it->first.a << " " << (int)it->first.b << "\n";
                     if (col1->isTrigger || col2->isTrigger)
                     {
-                        std::cout << "          exit " << collisionPairs.size() << "\n";
+                        //std::cout << "          exit " << (int)it->first.a << " " << (int)it->first.b << "\n";
                         EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{ it->first.a, it->first.b, &registry });
 
                         if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.a)))
@@ -127,7 +141,9 @@ namespace tomato
                             eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.b, simCtx.state, Falling });
                     }
                     else
+                    {
                         EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{ it->first.a, it->first.b, &registry });
+                    }
                 }
 
                 it = collisionPairs.erase(it);
@@ -180,24 +196,33 @@ namespace tomato
 
     void CollisionSystem::SolveCollision(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info)
     {
-        // TMT_INFO << "=========== Solve collision " << (int)e1 << " " << (int)e2;
+         TMT_INFO << "=========== Solve collision " << (int)e1 << " " << (int)e2;
         entt::entity root1 = GetRootEntity(reg, e1);
         entt::entity root2 = GetRootEntity(reg, e2);
 
         auto& trfRoot1 = reg.get<TransformComponent>(root1);
         auto& trfRoot2 = reg.get<TransformComponent>(root2);
 
-        // TMT_INFO << " normal: " << info.normal.x << " " << info.normal.y << " " << info.normal.z;
+         TMT_INFO << " normal: " << info.normal.x << " " << info.normal.y << " " << info.normal.z;
         if (auto* vel = reg.try_get<VelocityComponent>(root1))
         {
-            // TMT_INFO << "========== " << (int)root1 << "의 " << (int)e1 << " collider ==========";
-            // TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
-            // auto pos = trfRoot1.GetLocalPosition();
-            // TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
+             //TMT_INFO << "========== " << (int)root1 << "의 " << (int)e1 << " collider ==========";
+             ////TMT_INFO << " velocity: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+             //auto pos = trfRoot1.GetLocalPosition();
+             //TMT_INFO << " position1: " << pos.x << " " << pos.y << " " << pos.z;
 
             glm::vec3 remainingMove = (1 - info.depth * info.weight) * vel->velocity;
+            //TMT_INFO << " remaining: " << remainingMove.x << " " << remainingMove.y << " " << remainingMove.z;
+            //auto dot = glm::dot(remainingMove, info.normal);
+            //TMT_INFO << "       dot: " << dot;
 
             trfRoot1.AddPosition((vel->velocity * FIXED_DELTA_TIME * info.depth - info.normal * COLLISION_SKIN) * info.weight);
+            //trfRoot1.AddPosition((vel->velocity * FIXED_DELTA_TIME * info.depth) * info.weight);
+            //pos = trfRoot1.GetLocalPosition();
+            //TMT_INFO << " position2: " << pos.x << " " << pos.y << " " << pos.z;
+            //trfRoot1.AddPosition((- info.normal * COLLISION_SKIN) * info.weight);
+            //pos = trfRoot1.GetLocalPosition();
+            //TMT_INFO << " position3: " << pos.x << " " << pos.y << " " << pos.z;
             vel->velocity = remainingMove - glm::dot(remainingMove, info.normal) * info.normal;
 
             constexpr float epsilon = 0.001f;
@@ -208,17 +233,17 @@ namespace tomato
             if (-epsilon < vel->velocity.z && vel->velocity.z < epsilon)
                 vel->velocity.z = 0.f;
 
-            // TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
-            // pos = trfRoot1.GetLocalPosition();
-            // TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
+             //TMT_INFO << " velocity: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
+             //pos = trfRoot1.GetLocalPosition();
+             //TMT_INFO << " position: " << pos.x << " " << pos.y << " " << pos.z;
         }
 
         if (auto* vel = reg.try_get<VelocityComponent>(root2))
         {
-            // TMT_INFO << "========== " << (int)root2 << "의 " << (int)e2 << " collider ==========";
+             //TMT_INFO << "========== " << (int)root2 << "의 " << (int)e2 << " collider ==========";
             // TMT_INFO << " 속도: " << vel->velocity.x << " " << vel->velocity.y << " " << vel->velocity.z;
-            // auto pos = trfRoot2.GetLocalPosition();
-            // TMT_INFO << " 위치: " << pos.x << " " << pos.y << " " << pos.z;
+             //auto pos = trfRoot2.GetLocalPosition();
+             //TMT_INFO << " position1: " << pos.x << " " << pos.y << " " << pos.z;
 
             float weight = 1 - info.weight;
             glm::vec3 remainingMove = (1 - info.depth * weight) * vel->velocity;

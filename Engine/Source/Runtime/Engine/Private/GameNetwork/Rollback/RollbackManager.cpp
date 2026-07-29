@@ -7,7 +7,7 @@
 
 namespace tomato {
     RollbackManager::RollbackManager() {
-        timelines_.emplace_back(std::make_unique<ComponentTimeline<CollisionPair>>());
+        // timelines_.emplace_back(std::make_unique<ComponentTimeline<CollisionPair>>());
 
         timelines_.emplace_back(std::make_unique<ComponentTimeline<LifetimeComponent>>());
         registered_.insert(typeid(LifetimeComponent));
