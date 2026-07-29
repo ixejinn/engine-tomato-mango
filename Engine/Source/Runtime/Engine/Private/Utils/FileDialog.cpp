@@ -2,6 +2,7 @@
 #include <commdlg.h>
 #include <string>
 #include "FileDialog.h"
+#include "Utils/Logger.h"
 
 namespace tomato::FileDialog
 {
@@ -52,14 +53,14 @@ namespace tomato::FileDialog
 
 namespace tomato::FileUtils
 {
-	bool CopyAsset(const std::filesystem::path& source, const std::filesystem::path& destination)
+	bool CopyAsset(const std::filesystem::path& source, const std::filesystem::path& destination, std::filesystem::copy_options option)
 	{
 		try
 		{
 			if (destination.parent_path().empty())
 				std::filesystem::create_directories(destination.parent_path());
 
-			std::filesystem::copy_file(source, destination, std::filesystem::copy_options::none);
+			std::filesystem::copy_file(source, destination, option);
 
 			return true;
 		}

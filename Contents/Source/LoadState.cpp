@@ -1,16 +1,19 @@
 ﻿#include "LoadState.h"
-#include "Resource/AssetRegistry.h"
-#include "Resource/Render/Texture.h"
-#include "ECS/Components/Nametag.h"
-#include "Serialization/ComponentSerializer.h"
 
 #include "Engine.h"
+
+#include "Resource/AssetRegistry.h"
+#include "Resource/Render/Texture.h"
+#include "Resource/PathManager.h"
+
+#include "Serialization/ComponentSerializer.h"
+
 #include "Prefab/Prefab.h"
 #include "Prefab/UIPrefab.h"
-#include "TestState.h"
 #include "Utils/RegistryEntry.h"
 
-#include "Resource/PathManager.h"
+#include "TestState.h"
+
 REGISTER_STATE(LoadState)
 
 using namespace tomato;

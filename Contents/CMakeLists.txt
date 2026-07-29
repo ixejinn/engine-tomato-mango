@@ -24,6 +24,11 @@ target_link_libraries(contents
         project_options
 )
 
+target_compile_definitions(contents
+		PRIVATE
+		TMT_PROJECT_ROOT="${CMAKE_SOURCE_DIR}"
+)
+
 add_custom_command(TARGET contents POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_LIST_DIR}/Resources

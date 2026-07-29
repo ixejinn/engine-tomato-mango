@@ -1,7 +1,5 @@
 ﻿#include <filesystem>
 #include <optional>
-#include "Resource/PathManager.h"
-#include "Utils/Logger.h"
 
 namespace tomato::FileDialog
 {
@@ -19,5 +17,7 @@ namespace tomato::FileDialog
 
 namespace tomato::FileUtils
 {
-	bool CopyAsset(const std::filesystem::path& source, const std::filesystem::path& destination);
+	bool CopyAsset(const std::filesystem::path& source,
+				const std::filesystem::path& destination,
+				std::filesystem::copy_options option = std::filesystem::copy_options::none);
 }

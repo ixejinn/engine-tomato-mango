@@ -24,7 +24,7 @@ namespace tomato
 	bool DrawSelectableInspector(EditorContext&, entt::registry&, SelectableComponent&);
 
 	
-	bool DrawLoadResourceButton(const char* title, const char* filter, const std::filesystem::path& initDir);
+	std::filesystem::path DrawLoadResourceButton(const char* title, const char* filter, const std::filesystem::path& initDir);
 	bool DrawVec3Control(const char* label, float* vec, int flags = 0);
 }
 

@@ -14,6 +14,7 @@ namespace tomato
 
 		// Scene
 		std::filesystem::path currentScenePath;
+		std::filesystem::path currentSceneRuntimePath;
 		bool sceneDirty = false;
 	};
 

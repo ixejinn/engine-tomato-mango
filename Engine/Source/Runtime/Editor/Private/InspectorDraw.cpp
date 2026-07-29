@@ -1,6 +1,5 @@
 ﻿#include "InspectorDraw.h"
 
-#include <limits>
 #include <entt/entt.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -60,7 +59,7 @@ namespace tomato
 			changed = true;
 		}
 
-		float fov{ camera.degree }, near{ camera.zNear }, far{ camera.zFar };
+		float fov{ camera.degree }, nearClip{ camera.zNear }, farClip{ camera.zFar };
 		if (camera.mode == ProjectionMode::Perspective)
 		{
 			if(ImGui::SliderFloat("Field Of View", &fov, 1.f, 179.f, "%.2f"))
@@ -70,20 +69,20 @@ namespace tomato
 			}
 		}
 			
-		if(ImGui::DragFloat("Near Clip", &near, 0.1f, 0.01f, 100.f, "%.2f"))
+		if(ImGui::DragFloat("Near Clip", &nearClip, 0.1f, 0.01f, 100.f, "%.2f"))
 		{
 			camera.dirty = true;
 			changed = true;
 		}
-		if(ImGui::DragFloat("Far Clip", &far, 0.1f, near, 10000.f, "%.2f"))
+		if(ImGui::DragFloat("Far Clip", &farClip, 0.1f, nearClip, 10000.f, "%.2f"))
 		{
 			camera.dirty = true;
 			changed = true;
 		}
 
 		camera.degree = std::clamp(fov, 1.0f, 179.0f);
-		camera.zNear = std::max(0.01f, near);
-		camera.zFar = std::max(camera.zNear + 0.01f, far);
+		camera.zNear = std::max(0.01f, nearClip);
+		camera.zFar = std::max(camera.zNear + 0.01f, farClip);
 
 		ImGui::NewLine();
 
@@ -257,7 +256,9 @@ namespace tomato
 			ImGui::EndCombo();
 		}
 
-		DrawLoadResourceButton("Open File", "All Images \0*.png;*.jpg;*.jpeg\0\0", PathManager::ContentImage());
+		auto loadSrc = DrawLoadResourceButton("Open File", "All Images \0*.png;*.jpg;*.jpeg\0\0", PathManager::ProjectResource() / "Img");
+		if (!loadSrc.empty())
+			render.texture = GetAssetID(loadSrc);
 
 		ImGui::NewLine();
 
@@ -501,7 +502,9 @@ namespace tomato
 			ImGui::EndCombo();
 		}
 
-		DrawLoadResourceButton("Open File", "Font files \0*.ttf\0\0", PathManager::ContentFont());
+		auto loadFont = DrawLoadResourceButton("Open File", "Font files \0*.ttf\0\0", PathManager::ProjectResource() / "Fonts");
+		if (!loadFont.empty())
+			text.font = GetAssetID(loadFont);
 
 		ImGui::NewLine();
 
@@ -564,38 +567,49 @@ namespace tomato
 		return changed;
 	}
 
-	bool DrawLoadResourceButton(const char* title, const char* filter, const std::filesystem::path& initDir)
+	std::filesystem::path DrawLoadResourceButton(const char* title, const char* filter, const std::filesystem::path& initDir)
 	{
 		ImGui::SameLine();
 
-		if (ImGui::Button("@"))
+		// Loads files by converting the project path (source path)
+		// to the runtime path and copying the file.
+		//
+		// @Note:
+		// The file must be located under project path/Contents/Resources.
+		if (ImGui::Button("+"))
 		{
 			auto path = FileDialog::OpenFile(title, filter, initDir);
 
 			if (path.has_value())
 			{
 				auto extension = path.value().extension();
-				auto dest = initDir / path.value().filename().string();
-				FileUtils::CopyAsset(path.value(), dest);
+				auto runtimePath = PathManager::ToRuntime(path.value());
+				
+				FileUtils::CopyAsset(path.value(), runtimePath);
 
 				if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
-					Texture::Create(dest);
+					Texture::Create(runtimePath);
 
 				else if (extension == ".ptc")
-					ParticleEffect::Create(dest);
-				
-				else if (extension == ".ttf")
-					Font::Create(dest);
+					ParticleEffect::Create(runtimePath);
 
-				/*else if (extension == ".mp3")
-					Audio::Create(dest);*/
+				else if (extension == ".ttf")
+					Font::Create(runtimePath);
+
+				else if (extension == ".mp3")
+					Audio::Create(runtimePath);
 
 				else
+				{
 					TMT_ERR << "Invalid file extension" << extension;
+					return "";
+				}
+
+				return runtimePath;
 			}
 		}
 
-		return true;
+		return "";
 	}
 
 	bool DrawVec3Control(const char* label, float* vec, int flags)

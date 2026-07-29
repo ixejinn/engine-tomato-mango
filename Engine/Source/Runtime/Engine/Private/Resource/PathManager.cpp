@@ -1,36 +1,35 @@
-﻿#include <windows.h>
-#include <commdlg.h>
-
+﻿
+#include <iostream>
 #include "Resource/PathManager.h"
 
 namespace tomato
 {
-	std::filesystem::path PathManager::ExecutableDir()
+	std::filesystem::path PathManager::projectRoot_;
+
+	void PathManager::SetProjectRoot(const std::filesystem::path& path)
 	{
-		return "Resources";
+		projectRoot_ = path;
+		projectRoot_.make_preferred(); // the path foo/bar will be converted to foo\bar.
 	}
 
-	std::filesystem::path PathManager::GetExecutableDir()
+	const std::filesystem::path& PathManager::ProjectRoot()
 	{
-		char buffer[MAX_PATH];
-		GetModuleFileNameA(nullptr, buffer, MAX_PATH);
-
-		return std::filesystem::path(buffer).parent_path();
+		return projectRoot_;
 	}
 
 	std::filesystem::path PathManager::EngineResource()
 	{
-		return ExecutableDir() / "Engine";
+		return RuntimeResource() / "Engine";
 	}
 	std::filesystem::path PathManager::ContentResource()
 	{
-		return ExecutableDir() / "Contents";
+		return RuntimeResource() / "Contents";
 	}
 
 	std::filesystem::path PathManager::ToRuntime(const std::filesystem::path& projectPath)
 	{
 		auto relative =
-			std::filesystem::relative(projectPath, "Contents\\Resouces");
+			std::filesystem::relative(projectPath, projectRoot_ / "Contents\\Resources");
 
 		return ContentResource() / relative;
 	}
@@ -38,40 +37,50 @@ namespace tomato
 	std::filesystem::path PathManager::ToProject(const std::filesystem::path& runtimePath)
 	{
 		auto project =
-			std::filesystem::
-
+			std::filesystem::relative(runtimePath, "Resources\\Contents");
+		return ProjectRoot() / "Contents\\Resources" / project;
 	}
 
-	std::filesystem::path PathManager::Font(const std::string& file)
+	std::filesystem::path PathManager::RuntimeFont(const std::string& file)
 	{
 		return EngineResource() / "Assets" / "Fonts" / file;
 	}
-	std::filesystem::path PathManager::Icon(const std::string& file)
+	std::filesystem::path PathManager::RuntimeIcon(const std::string& file)
 	{
 		return EngineResource() / "Assets" / "Icon" / file;
 	}
-	std::filesystem::path PathManager::Shader(const std::string& file)
+	std::filesystem::path PathManager::RuntimeShader(const std::string& file)
 	{
 		return EngineResource() / "Shaders" / file;
 	}
-	std::filesystem::path PathManager::ContentScene(const std::string& file)
+
+	std::filesystem::path PathManager::RuntimeResource()
 	{
-		return ContentResource() / "Scenes" / file;
+		return "Resources";
 	}
-	std::filesystem::path PathManager::ContentImage(const std::string& file)
+
+	std::filesystem::path PathManager::ProjectResource()
 	{
-		return ContentResource() / "Img" / file;
+		return projectRoot_ / "Contents\\Resources";
 	}
-	std::filesystem::path PathManager::ContentParticle(const std::string& file)
+
+	std::filesystem::path PathManager::ProjectFont(const std::string& file)
 	{
-		return ContentResource() / "Particle" / file;
+		return ToRuntime(ProjectResource() / "Fonts" / file);
 	}
-	std::filesystem::path PathManager::ContentSound(const std::string& file)
+
+	std::filesystem::path PathManager::ProjectImage(const std::string& file)
 	{
-		return ContentResource() / "Sound" / file;
+		return ToRuntime(ProjectResource() / "Img" / file);
 	}
-	std::filesystem::path PathManager::ContentFont(const std::string& file)
+
+	std::filesystem::path PathManager::ProjectSound(const std::string& file)
 	{
-		return ContentResource() / "Fonts" / file;
+		return ToRuntime(ProjectResource() / "Sound" / file);
+	}
+
+	std::filesystem::path PathManager::ProjectParticle(const std::string& file)
+	{
+		return ToRuntime(ProjectResource() / "Particle" / file);
 	}
 }

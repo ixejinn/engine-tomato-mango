@@ -111,6 +111,7 @@ namespace tomato
 			Serialization::NewStateScene(eCtx.currentState->GetEngine(), eCtx.currentState);
 			eCtx.sceneDirty = false;
 			eCtx.currentScenePath = "";
+			eCtx.currentSceneRuntimePath = "";
 		}
 	}
 
@@ -122,21 +123,27 @@ namespace tomato
 			pendingAction_ = PendingAction::OpenScene;
 			openNotSavedPopup = true;
 		}
-		else
+		else // From project root to runtime root
 		{
-			auto path = FileDialog::OpenFile("Open Scene", "Scene Files (*.scene)\0*.scene*\0\0", PathManager::ContentScene(""));
-			if (path)
+			auto path = FileDialog::OpenFile("Open Scene", "Scene Files (*.scene)\0*.scene*\0\0", PathManager::ProjectResource() / "Scenes");
+			if (!path.has_value())
+				return;
+
+			auto runtimePath = PathManager::ToRuntime(path.value());
+			if (!runtimePath.empty())
 			{
+				FileUtils::CopyAsset(path.value(), runtimePath, std::filesystem::copy_options::overwrite_existing);
 				Serialization::LoadStateScene(
 					eCtx.currentState->GetEngine(),
 					eCtx.currentState,
-					path.value().string().c_str()
+					runtimePath.string().c_str()
 				);
 
 				eCtx.currentScenePath = path.value();
+				eCtx.currentSceneRuntimePath = runtimePath;
 				eCtx.sceneDirty = false;
 
-				std::cout << eCtx.currentScenePath << '\n';
+				std::cout << "Load Scene: " << eCtx.currentScenePath << '\n';
 			}
 		}
 	}
@@ -148,8 +155,11 @@ namespace tomato
 			SaveAs(eCtx);
 
 		else
+		{
 			Serialization::SaveScene(eCtx.currentState,
 				eCtx.currentScenePath.string().c_str());
+			FileUtils::CopyAsset(eCtx.currentScenePath, eCtx.currentSceneRuntimePath, std::filesystem::copy_options::overwrite_existing);
+		}
 
 		eCtx.sceneDirty = false;
 	}
@@ -160,14 +170,18 @@ namespace tomato
 			"Save Scene",
 			"scene",
 			"Scene Files (*.scene)\0*.scene\0""All Files (*.*)\0*.*\0",
-			PathManager::ContentScene(""));
+			PathManager::ProjectResource() / "Scenes");
 
 		if (path)
 		{
+			auto runtimePath = PathManager::ToRuntime(path.value());
+
 			Serialization::SaveScene(eCtx.currentState,
 				path.value().string().c_str());
+			FileUtils::CopyAsset(path.value(), runtimePath, std::filesystem::copy_options::overwrite_existing);
 
 			eCtx.currentScenePath = path.value();
+			eCtx.currentSceneRuntimePath = runtimePath;
 			eCtx.sceneDirty = false;
 		}
 	}
@@ -220,6 +234,7 @@ namespace tomato
 		ImGui::CloseCurrentPopup();
 		eCtx.sceneDirty = false;
 		eCtx.currentScenePath = "";
+		eCtx.currentSceneRuntimePath = "";
 
 		switch (pendingAction_)
 		{
