@@ -7,6 +7,7 @@
 #include "State/State.h"
 #include "Network/ClientNetwork.h"
 #include "Collision/CollisionFwd.h"
+#include "Collision/CollisionCache.h"
 
 namespace tomato
 {
@@ -20,8 +21,7 @@ namespace tomato
 
     struct CollisionContext
     {
-        std::unordered_map<CollisionPair, bool> collisionPairs;
-        std::unordered_map<CollisionPair, glm::vec3> normalCache;
+        std::unordered_map<CollisionPair, CollisionCache> pairs;
     };
 
     struct RenderContext

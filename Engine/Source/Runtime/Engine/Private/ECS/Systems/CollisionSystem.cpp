@@ -54,16 +54,15 @@ namespace tomato
         events_.clear();
 
         auto& registry = simCtx.state->GetRegistry();
-        auto& collisionCtx = registry.ctx().get<CollisionContext>();
-        auto& collisionPairs = collisionCtx.collisionPairs;
-        auto& normalCache = collisionCtx.normalCache;
+        auto& collisionPairs = registry.ctx().get<CollisionContext>().pairs;
 
         auto& eventDispatcher = EventDispatcher::GetInstance();
 
         for (const auto& candidate : candidates_)
         {
-            if (!simCtx.state->GetRegistry().valid(candidate.a) ||
-                !simCtx.state->GetRegistry().valid(candidate.a)) continue;
+            if (!registry.valid(candidate.a) || !registry.valid(candidate.b))
+                continue;
+
             auto& col1 = registry.get<ColliderComponent>(candidate.a);
             auto& col2 = registry.get<ColliderComponent>(candidate.b);
 
@@ -72,10 +71,7 @@ namespace tomato
                 // Collision detected
                 if (!collisionPairs.contains(candidate))
                 {
-                    if (result->skin)
-                        result->normal = normalCache[candidate];
-                    else
-                        normalCache[candidate] = result->normal;
+                    collisionPairs[candidate].normal = result->normal;
 
                     // Enter
                     if (col1.isTrigger || col2.isTrigger)
@@ -98,9 +94,9 @@ namespace tomato
                 else
                 {
                     if (result->skin)
-                        result->normal = normalCache[candidate];
+                        result->normal = collisionPairs[candidate].normal;
                     else
-                        normalCache[candidate] = result->normal;
+                        collisionPairs[candidate].normal = result->normal;
 
                     // Stay
                     if (col1.isTrigger || col2.isTrigger)
@@ -115,13 +111,13 @@ namespace tomato
                     }
                 }
 
-                collisionPairs[candidate] = true;
+                collisionPairs[candidate].curr = true;
             }
         }
 
         for (auto it = collisionPairs.begin(); it != collisionPairs.end(); )
         {
-            if (!it->second)
+            if (!(it->second.curr))
             {
                 // Exit
                 auto* col1 = registry.try_get<ColliderComponent>(it->first.a);
@@ -150,7 +146,7 @@ namespace tomato
             }
             else
             {
-                it->second = false;
+                it->second.curr = false;
                 ++it;
             }
         }

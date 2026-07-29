@@ -176,6 +176,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Core/Public/Collision/CollisionConstantsFwd.h
 		Source/Runtime/Engine/Public/Input/InputConstantsFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/Systems.h
+		Source/Runtime/Engine/Public/Collision/CollisionCache.h
 )
 
 set(ENGINE_SOURCES

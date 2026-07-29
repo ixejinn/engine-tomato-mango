@@ -109,6 +109,11 @@ namespace tomato
             if (auto result = FindClosestPointOnSimplex(simplex))
                 closestP = *result;
             else {
+                if (auto info = EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2)) {
+                    TMT_INFO << "(d)penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
+                    if (info->depth > 0)
+                        EventDispatcher::GetInstance().Enqueue(PenetrationEvent{e1, e2, &reg, info.value()});
+                }
 
                 //return EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2);
                  return CollisionInfo{glm::vec3{0.f}, 0.f};
@@ -122,7 +127,17 @@ namespace tomato
 
         auto length = glm::length(closestP);
         if (length > 1e-4f)
-            return CollisionInfo{closestP, length};
+        {
+            constexpr float epsilon = 0.0001f;
+            if (-epsilon < closestP.x && closestP.x < epsilon)
+                closestP.x = 0.f;
+            if (-epsilon < closestP.z && closestP.z < epsilon)
+                closestP.z = 0.f;
+            if (-epsilon < closestP.y && closestP.y < epsilon)
+                closestP.y = 0.f;
+
+            return CollisionInfo{closestP / length, length};
+        }
         //return EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2);
          return CollisionInfo{glm::vec3{0.f}, 0.f};
     }
