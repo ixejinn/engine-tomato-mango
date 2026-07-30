@@ -1,0 +1,389 @@
+{
+    "State": 8803379955403324458,
+    "State Name": "class LoadState",
+    "Resource": [
+        {
+            "Font": [
+                "Resources\\Engine\\Assets\\Fonts\\SpoqaHanSansNeo-Medium.ttf"
+            ]
+        },
+        {
+            "Texture": [
+                "Resources\\Engine\\Assets\\icon\\visibility_on.png",
+                "Resources\\Engine\\Assets\\icon\\more_vert.png",
+                "Resources\\Engine\\Assets\\icon\\visibility_off.png",
+                "Texture::Primitive",
+                "Resources/Contents/WATER_GAME_LOGO.png"
+            ]
+        }
+    ],
+    "Entities": [
+        {
+            "ID": 2837404099669579534,
+            "Name": "Collider (3)",
+            "Components": {
+                "Visibility": {
+                    "visible": true
+                },
+                "Transform": {
+                    "position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "degree": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scale": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Collider": {
+                    "layer": "Default",
+                    "type": "Sphere",
+                    "trigger": false
+                },
+                "Render": {
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "mesh": 13924353133570344919,
+                    "shader": 15270300196414287997,
+                    "texture": 1055259141834019825
+                },
+                "Hierarchy": {
+                    "parent": 1697599000661889405,
+                    "children": []
+                }
+            }
+        },
+        {
+            "ID": 1697599000661889405,
+            "Name": "Object (1)",
+            "Components": {
+                "Visibility": {
+                    "visible": true
+                },
+                "Transform": {
+                    "position": [
+                        -4.0,
+                        0.0,
+                        0.0
+                    ],
+                    "degree": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scale": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Render": {
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "mesh": 13924353133570344919,
+                    "shader": 15270300196414287997,
+                    "texture": 1055259141834019825
+                },
+                "Hierarchy": {
+                    "parent": 0,
+                    "children": [
+                        2837404099669579534
+                    ]
+                },
+                "TagRoot": null
+            }
+        },
+        {
+            "ID": 15705146095773323883,
+            "Name": "Character",
+            "Components": {
+                "Visibility": {
+                    "visible": true
+                },
+                "InputChannel": {
+                    "channel": 0,
+                    "1P": true
+                },
+                "Transform": {
+                    "position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "degree": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scale": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Movement": {
+                    "speed": 2.0
+                },
+                "Velocity": {
+                    "velocity": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                },
+                "Render": {
+                    "color": [
+                        1.0,
+                        0.8823529481887817,
+                        0.0,
+                        1.0
+                    ],
+                    "mesh": 16414395844376222343,
+                    "shader": 15270300196414287997,
+                    "texture": 1055259141834019825
+                },
+                "Hierarchy": {
+                    "parent": 0,
+                    "children": [
+                        12854461042034847344
+                    ]
+                },
+                "TagRoot": null,
+                "TagCharacter": null
+            }
+        },
+        {
+            "ID": 13130687275200227254,
+            "Name": "Collider",
+            "Components": {
+                "Visibility": {
+                    "visible": true
+                },
+                "Transform": {
+                    "position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "degree": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scale": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Collider": {
+                    "layer": "Default",
+                    "type": "Cube",
+                    "trigger": false
+                },
+                "Render": {
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "mesh": 16414395844376222343,
+                    "shader": 15270300196414287997,
+                    "texture": 1055259141834019825
+                },
+                "Hierarchy": {
+                    "parent": 8610591593055515781,
+                    "children": []
+                }
+            }
+        },
+        {
+            "ID": 4723089054114646751,
+            "Name": "Collider (2)",
+            "Components": {
+                "Visibility": {
+                    "visible": true
+                },
+                "Transform": {
+                    "position": [
+                        0.0,
+                        -0.11100000143051147,
+                        0.0
+                    ],
+                    "degree": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scale": [
+                        0.800000011920929,
+                        0.800000011920929,
+                        0.800000011920929
+                    ]
+                },
+                "Collider": {
+                    "layer": "Default",
+                    "type": "Cube",
+                    "trigger": true
+                },
+                "Render": {
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "mesh": 16414395844376222343,
+                    "shader": 15270300196414287997,
+                    "texture": 1055259141834019825
+                },
+                "Hierarchy": {
+                    "parent": 12854461042034847344,
+                    "children": []
+                }
+            }
+        },
+        {
+            "ID": 12854461042034847344,
+            "Name": "Collider (1)",
+            "Components": {
+                "Visibility": {
+                    "visible": true
+                },
+                "Transform": {
+                    "position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "degree": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scale": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Collider": {
+                    "layer": "Default",
+                    "type": "Cube",
+                    "trigger": false
+                },
+                "Render": {
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "mesh": 16414395844376222343,
+                    "shader": 15270300196414287997,
+                    "texture": 1055259141834019825
+                },
+                "Hierarchy": {
+                    "parent": 15705146095773323883,
+                    "children": [
+                        4723089054114646751
+                    ]
+                }
+            }
+        },
+        {
+            "ID": 1491639362855173140,
+            "Name": "Camera",
+            "Components": {
+                "Visibility": {
+                    "visible": true
+                },
+                "Camera": {
+                    "mode": "Perspective",
+                    "degree": 45.0,
+                    "zNear": 0.10000000149011612,
+                    "zFar": 100.0
+                },
+                "Transform": {
+                    "position": [
+                        0.0,
+                        7.5,
+                        15.0
+                    ],
+                    "degree": [
+                        -30.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scale": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                },
+                "TagRoot": null,
+                "TagMainCam": null
+            }
+        },
+        {
+            "ID": 8610591593055515781,
+            "Name": "Object",
+            "Components": {
+                "Visibility": {
+                    "visible": true
+                },
+                "Transform": {
+                    "position": [
+                        0.0,
+                        -5.0,
+                        0.0
+                    ],
+                    "degree": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scale": [
+                        26.0,
+                        0.10000000149011612,
+                        12.0
+                    ]
+                },
+                "Render": {
+                    "color": [
+                        0.6764705777168274,
+                        0.6764705777168274,
+                        0.6764705777168274,
+                        1.0
+                    ],
+                    "mesh": 16414395844376222343,
+                    "shader": 15270300196414287997,
+                    "texture": 1055259141834019825
+                },
+                "Hierarchy": {
+                    "parent": 0,
+                    "children": [
+                        13130687275200227254
+                    ]
+                },
+                "TagRoot": null
+            }
+        }
+    ]
+}

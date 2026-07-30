@@ -14,9 +14,9 @@ int main() {
 #if 1
      // Engine engine(1600, 900, "TOMATO", NetMode::NM_Client);
      // engine.SetNextState(std::make_unique<LoadState>(engine));
-     PathManager::SetProjectRoot(TMT_PROJECT_ROOT);
+     PathManager::SetProjectRoot(TMT_PROJECT_ROOT);/*
     std::cout << PathManager::ToProject("Resources\\Contents\\Img\\apple.jpg") << '\n';
-    std::cout << PathManager::ToRuntime("C:\\yj\\engine-tomato-mango\\Contents\\Resources\\Img\\apple.jpg") << '\n';
+    std::cout << PathManager::ToRuntime("C:\\yj\\engine-tomato-mango\\Contents\\Resources\\Img\\apple.jpg") << '\n';*/
 
      Engine engine(1600, 900, "TOMATO", NetMode::NM_Alone);
      engine.SetNextState(std::make_unique<TestState>(engine));

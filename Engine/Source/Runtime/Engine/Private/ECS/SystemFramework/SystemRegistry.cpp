@@ -37,8 +37,9 @@ namespace tomato
         for (const auto& factory : frameFactories_[FramePhase::PreRender])
             manager.AddSystem(FramePhase::PreRender, factory.mode, factory.factory());
         // TODO: Register particle logic system
+        manager.AddSystem(FramePhase::PreRender, RunMode::Game | RunMode::Editor,
+            std::make_unique<ParticleEmissionSystem>());
 
-        // Render
         manager.AddSystem(FramePhase::Render, RunMode::Game | RunMode::Editor,
             std::make_unique<RenderSystem>());
         manager.AddSystem(FramePhase::Render, RunMode::Game | RunMode::Editor,
