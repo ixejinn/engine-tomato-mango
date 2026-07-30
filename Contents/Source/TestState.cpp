@@ -207,5 +207,5 @@ void TestState::CallbackJump(const tomato::LandingEvent& event)
     auto e = event.state->particlePool_.Acquire(
         GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
         event.position);
-    // std::cout << "Callback Jump " << (int)e.value() << "\n";
+     std::cout << "Callback Jump " << (int)e.value() << "\n";
 }

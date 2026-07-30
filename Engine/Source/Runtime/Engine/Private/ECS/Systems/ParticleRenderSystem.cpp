@@ -1,4 +1,4 @@
-#include "ECS/Systems/ParticleRenderSystem.h"
+﻿#include "ECS/Systems/ParticleRenderSystem.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Particle.h"
@@ -57,31 +57,33 @@ namespace tomato
          glm::normalize(glm::vec3(viewProjMat[0][1], viewProjMat[1][1], viewProjMat[2][1])));
 
         // 컴포넌트 업데이트
-        auto view = registry.view<TransformComponent, ParticleComponent>();
-        for (auto [e, trf, pc] : view.each())
+        auto view = registry.view<TransformComponent,
+            ParticleEmitterComponent, ParticleRuntimeComponent,
+            ParticleBufferComponent, ParticleRenderComponent>();
+        for (auto [e, trf, emitter, runtime, buffer, render] : view.each())
         {
-            if (!pc.active)
+            if (!runtime.active)
                 continue;
 
             // 이미터 lifetime 확인
             auto now = std::chrono::steady_clock::now();
             auto activeDuration =
-                    std::chrono::duration_cast<std::chrono::milliseconds>(now - pc.emitter.start);
-            if (activeDuration >= pc.emitter.duration)
+                    std::chrono::duration_cast<std::chrono::milliseconds>(now - emitter.emitter.start);
+            if (activeDuration >= emitter.emitter.duration)
             {
-                if (pc.looping)
+                if (emitter.looping)
                 {
                     // std::cout << "   LOOPING(" << simCtx.tick << ") ----------\n";
-                    pc.emitter.start = now;
+                    emitter.emitter.start = now;
 
-                    if (pc.burst.has_value())
+                    if (emitter.burst.has_value())
                     {
-                        pc.burst->adder = std::chrono::milliseconds::zero();
-                        pc.burst->latest = now;
-                        pc.burst->finishedCycles = 0;
+                        emitter.burst->adder = std::chrono::milliseconds::zero();
+                        emitter.burst->latest = now;
+                        emitter.burst->finishedCycles = 0;
                     }
                 }
-                else if (pc.activeCnt == 0) // 루프 아닌데 활성화된 파티클이 없으면 풀에 반납(완전 종료)
+                else if (runtime.activeCnt == 0) // 루프 아닌데 활성화된 파티클이 없으면 풀에 반납(완전 종료)
                 {
                     simCtx.state->particlePool_.Release(e);
                     continue;
@@ -89,84 +91,91 @@ namespace tomato
             }
 
             // lifetime 지난 파티클 제거
-            for (int i = 0; i < pc.activeCnt; )
+            for (int i = 0; i < runtime.activeCnt; )
             {
-                if (std::chrono::duration_cast<std::chrono::milliseconds>(now - pc.lifetimes[i].start)
-                    >= pc.lifetimes[i].duration)
+                if (std::chrono::duration_cast<std::chrono::milliseconds>(now - buffer.lifetimes[i].start)
+                    >= buffer.lifetimes[i].duration)
                 {
-                    int backIdx = pc.activeCnt - 1;
+                    int backIdx = runtime.activeCnt - 1;
                     if (i == backIdx)
                     {
-                        pc.activeCnt = 0;
+                        runtime.activeCnt = 0;
                         break;
                     }
 
-                    std::swap(pc.positions[i], pc.positions[backIdx]);
-                    std::swap(pc.velocities[i], pc.velocities[backIdx]);
-                    std::swap(pc.lifetimes[i], pc.lifetimes[backIdx]);
+                    std::swap(buffer.positions[i], buffer.positions[backIdx]);
+                    std::swap(buffer.velocities[i], buffer.velocities[backIdx]);
+                    std::swap(buffer.lifetimes[i], buffer.lifetimes[backIdx]);
 
-                    --pc.activeCnt;
+                    --runtime.activeCnt;
                 }
                 else
                     ++i;
             }
 
+            ParticleData pData{
+                .emitter = emitter,
+                .runtime = runtime,
+                .buffer = buffer,
+                .render = render
+            };
+
             // rate over time 의한 파티클 생성
-            if (pc.emitPeriod > 0ms)
+            if (emitter.emitPeriod > 0ms)
             {
-                pc.adder += std::chrono::duration_cast<std::chrono::milliseconds>(now - pc.latestTP);
-                pc.latestTP = now;
+                runtime.adder += std::chrono::duration_cast<std::chrono::milliseconds>(now - runtime.latestTP);
+                runtime.latestTP = now;
 
-                if (pc.adder >= pc.emitPeriod)
+                if (runtime.adder >= emitter.emitPeriod)
                 {
-                    pc.adder -= pc.emitPeriod;
+                    runtime.adder -= emitter.emitPeriod;
 
-                    if (pc.space == World)
-                        InitializeParticles(pc, trf);
+                    if (emitter.space == World)
+                        InitializeParticles(pData, trf);
                     else
-                        InitializeParticles(pc);
+                        InitializeParticles(pData);
                 }
             }
 
             // burst 의한 파티클 생성
-            if (pc.burst.has_value())
+            if (emitter.burst.has_value())
             {
-                pc.burst->adder += std::chrono::duration_cast<std::chrono::milliseconds>(now - pc.burst->latest);
-                pc.burst->latest = now;
+                emitter.burst->adder += std::chrono::duration_cast<std::chrono::milliseconds>(now - emitter.burst->latest);
+                emitter.burst->latest = now;
 
-                if (pc.burst->finishedCycles < pc.burst->cycles && pc.burst->adder >= pc.burst->period)
+                if (emitter.burst->finishedCycles < emitter.burst->cycles && emitter.burst->adder >= emitter.burst->period)
                 {
-                    ++pc.burst->finishedCycles;
+                    ++emitter.burst->finishedCycles;
 
-                    pc.burst->adder -= pc.burst->period;
-                    if (pc.space == World)
-                        InitializeParticles(pc, trf, pc.burst->count);
+                    emitter.burst->adder -= emitter.burst->period;
+                    if (emitter.space == World)
+                        InitializeParticles(pData, trf, emitter.burst->count);
                     else
-                        InitializeParticles(pc, pc.burst->count);
+                        InitializeParticles(pData, emitter.burst->count);
                     // std::cout << "   BURST(" << simCtx.tick << ") ---------- " << pc.activeCnt << "\n";
                 }
             }
 
             // 파티클 그리기
-            if (curTexture_ != pc.texture)
+            if (curTexture_ != render.texture)
             {
-                curTexture_ = pc.texture;
+                curTexture_ = render.texture;
                 AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
             }
 
-            for (int i = 0; i < pc.activeCnt; )
+            for (int i = 0; i < runtime.activeCnt; )
             {
-                pc.positions[i] += pc.velocities[i] * FIXED_DELTA_TIME;
-                auto position = trf.GetLocalQuaternion() * pc.positions[i];
-                if (pc.space == Local)
+                buffer.positions[i] += buffer.velocities[i] * FIXED_DELTA_TIME;
+                auto position = trf.GetLocalQuaternion() * buffer.positions[i];
+                if (emitter.space == Local)
                     position += trf.GetWorldPosition();
 
                 auto T = glm::translate(glm::mat4(1.f), position);
-                auto S = glm::scale(glm::mat4(1.f), glm::vec3(pc.size));
+                auto S = glm::scale(glm::mat4(1.f), glm::vec3(render.size));
                 shader_->SetUniformMat4("uModel", T * S);
 
                 shader_->SetUniformInt("uTexture", 0);
-                shader_->SetUniformVec4("uColor", pc.color);
+                shader_->SetUniformVec4("uColor", render.color);
 
                 mesh2D_->Draw();
                 ++i;
@@ -174,21 +183,21 @@ namespace tomato
         }
     }
 
-    void ParticleRenderSystem::InitializeParticles(ParticleComponent& comp, int num)
+    void ParticleRenderSystem::InitializeParticles(ParticleData& comp, int num)
     {
-        int initCnt = std::min(comp.activeCnt + num, ParticleComponent::MAX_PARTICLE);
+        int initCnt = std::min(comp.runtime.activeCnt + num, MAX_PARTICLE_NUM);
 
         auto now = std::chrono::steady_clock::now();
-        for (int i = comp.activeCnt; i < initCnt; ++i)
+        for (int i = comp.runtime.activeCnt; i < initCnt; ++i)
         {
-            comp.positions[i] = {0, 0, 0};
-            comp.lifetimes[i] = {comp.lifetime, now};
+            comp.buffer.positions[i] = {0, 0, 0};
+            comp.buffer.lifetimes[i] = {comp.emitter.particleLifetime, now};
         }
 
-        switch (comp.shape)
+        switch (comp.emitter.shape)
         {
             case ParticleEffectShape::Sphere:
-                for (int i = comp.activeCnt; i < initCnt; ++i)
+                for (int i = comp.runtime.activeCnt; i < initCnt; ++i)
                 {
                     int lambda = RandomNumberGenerator::GetUniformIntDistribution(0, 359);
                     int phi = RandomNumberGenerator::GetUniformIntDistribution(-90, 90);
@@ -196,61 +205,61 @@ namespace tomato
                     auto lambdaR = glm::radians(static_cast<float>(lambda));
                     auto phiR = glm::radians(static_cast<float>(phi));
 
-                    comp.velocities[i] =
+                    comp.buffer.velocities[i] =
                             {glm::cos(phiR) * glm::cos(lambdaR),
                              glm::sin(phiR),
                              glm::cos(phiR) * glm::sin(lambdaR)};
-                    comp.velocities[i] *= comp.startSpeed;
+                    comp.buffer.velocities[i] *= comp.emitter.startSpeed;
                 }
                 break;
 
             case ParticleEffectShape::Circle:
-                for (int i = comp.activeCnt; i < initCnt; ++i)
+                for (int i = comp.runtime.activeCnt; i < initCnt; ++i)
                 {
                     int lambda = RandomNumberGenerator::GetUniformIntDistribution(0, 359);
                     auto lambdaR = glm::radians(static_cast<float>(lambda));
 
-                    comp.velocities[i] = {glm::cos(lambdaR), 0, glm::sin(lambdaR)};
-                    comp.velocities[i] *= comp.startSpeed;
+                    comp.buffer.velocities[i] = {glm::cos(lambdaR), 0, glm::sin(lambdaR)};
+                    comp.buffer.velocities[i] *= comp.emitter.startSpeed;
                 }
                 break;
 
             case ParticleEffectShape::Cone:
-                for (int i = comp.activeCnt; i < initCnt; ++i)
+                for (int i = comp.runtime.activeCnt; i < initCnt; ++i)
                 {
                     int lambda = RandomNumberGenerator::GetUniformIntDistribution(0, 359);
-                    float phi = RandomNumberGenerator::GetUniformRealDistribution(0.f, comp.angle);
+                    float phi = RandomNumberGenerator::GetUniformRealDistribution(0.f, comp.emitter.angle);
 
                     auto lambdaR = glm::radians(static_cast<float>(lambda));
                     auto phiR = glm::radians(phi);
 
-                    comp.velocities[i] =
+                    comp.buffer.velocities[i] =
                             {glm::cos(phiR) * glm::cos(lambdaR),
                              glm::sin(phiR),
                              glm::cos(phiR) * glm::sin(lambdaR)};
-                    comp.velocities[i] *= comp.startSpeed;
+                    comp.buffer.velocities[i] *= comp.emitter.startSpeed;
                 }
                 break;
         }
 
-        comp.activeCnt = initCnt;
+        comp.runtime.activeCnt = initCnt;
     }
 
-    void ParticleRenderSystem::InitializeParticles(ParticleComponent& comp, TransformComponent& trf, int num)
+    void ParticleRenderSystem::InitializeParticles(ParticleData& comp, TransformComponent& trf, int num)
     {
-        int initCnt = std::min(comp.activeCnt + num, ParticleComponent::MAX_PARTICLE);
+        int initCnt = std::min(comp.runtime.activeCnt + num, MAX_PARTICLE_NUM);
 
         auto now = std::chrono::steady_clock::now();
-        for (int i = comp.activeCnt; i < initCnt; ++i)
+        for (int i = comp.runtime.activeCnt; i < initCnt; ++i)
         {
-            comp.positions[i] = trf.GetWorldPosition();
-            comp.lifetimes[i] = {comp.lifetime, now};
+            comp.buffer.positions[i] = trf.GetWorldPosition();
+            comp.buffer.lifetimes[i] = {comp.emitter.particleLifetime, now};
         }
 
-        switch (comp.shape)
+        switch (comp.emitter.shape)
         {
             case ParticleEffectShape::Sphere:
-                for (int i = comp.activeCnt; i < initCnt; ++i)
+                for (int i = comp.runtime.activeCnt; i < initCnt; ++i)
                 {
                     int lambda = RandomNumberGenerator::GetUniformIntDistribution(0, 359);
                     int phi = RandomNumberGenerator::GetUniformIntDistribution(-90, 90);
@@ -258,43 +267,43 @@ namespace tomato
                     auto lambdaR = glm::radians(static_cast<float>(lambda));
                     auto phiR = glm::radians(static_cast<float>(phi));
 
-                    comp.velocities[i] =
+                    comp.buffer.velocities[i] =
                             {glm::cos(phiR) * glm::cos(lambdaR),
                              glm::sin(phiR),
                              glm::cos(phiR) * glm::sin(lambdaR)};
-                    comp.velocities[i] *= comp.startSpeed;
+                    comp.buffer.velocities[i] *= comp.emitter.startSpeed;
                 }
                 break;
 
             case ParticleEffectShape::Circle:
-                for (int i = comp.activeCnt; i < initCnt; ++i)
+                for (int i = comp.runtime.activeCnt; i < initCnt; ++i)
                 {
                     int lambda = RandomNumberGenerator::GetUniformIntDistribution(0, 359);
                     auto lambdaR = glm::radians(static_cast<float>(lambda));
 
-                    comp.velocities[i] = {glm::cos(lambdaR), 0, glm::sin(lambdaR)};
-                    comp.velocities[i] *= comp.startSpeed;
+                    comp.buffer.velocities[i] = {glm::cos(lambdaR), 0, glm::sin(lambdaR)};
+                    comp.buffer.velocities[i] *= comp.emitter.startSpeed;
                 }
                 break;
 
             case ParticleEffectShape::Cone:
-                for (int i = comp.activeCnt; i < initCnt; ++i)
+                for (int i = comp.runtime.activeCnt; i < initCnt; ++i)
                 {
                     int lambda = RandomNumberGenerator::GetUniformIntDistribution(0, 359);
-                    float phi = RandomNumberGenerator::GetUniformRealDistribution(0.f, comp.angle);
+                    float phi = RandomNumberGenerator::GetUniformRealDistribution(0.f, comp.emitter.angle);
 
                     auto lambdaR = glm::radians(static_cast<float>(lambda));
                     auto phiR = glm::radians(90.f - phi);
 
-                    comp.velocities[i] =
+                    comp.buffer.velocities[i] =
                             {glm::cos(phiR) * glm::cos(lambdaR),
                              glm::sin(phiR),
                              glm::cos(phiR) * glm::sin(lambdaR)};
-                    comp.velocities[i] *= comp.startSpeed;
+                    comp.buffer.velocities[i] *= comp.emitter.startSpeed;
                 }
                 break;
         }
 
-        comp.activeCnt = initCnt;
+        comp.runtime.activeCnt = initCnt;
     }
 }

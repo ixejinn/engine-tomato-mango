@@ -30,7 +30,7 @@ namespace tomato
         //static void Create(const char* filename);
         static void Create(const std::filesystem::path& path);
 
-        void InitializeParticleComponent(ParticleComponent& comp) const;
+        void InitializeParticleComponent(ParticleData& comp) const;
 
     private:
         float duration_;

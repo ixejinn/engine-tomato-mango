@@ -84,35 +84,38 @@ namespace tomato
     {
         std::unique_ptr<ParticleEffect> ptr{ new ParticleEffect(path) };
         AssetRegistry<ParticleEffect>::GetInstance().Register(path.string(), std::move(ptr));
+
+        TMT_INFO << "Particle Registered " << path;
     }
 
-    void ParticleEffect::InitializeParticleComponent(ParticleComponent& comp) const
+    void ParticleEffect::InitializeParticleComponent(ParticleData& comp) const
     {
         auto now = std::chrono::steady_clock::now();
 
+        /*Set Particle Emitter Component Values*/
+        auto& emitter = comp.emitter;
         const std::chrono::duration<float> durationFSec(duration_);
-        comp.emitter.duration = std::chrono::duration_cast<std::chrono::milliseconds>(durationFSec);
-        comp.emitter.start = now;
-        comp.looping = looping_;
+        emitter.emitter.duration = std::chrono::duration_cast<std::chrono::milliseconds>(durationFSec);
+        emitter.emitter.start = now;
 
-        comp.shape = shape_;
-        comp.angle = angle_;
-        comp.space = space_;
+        emitter.looping = looping_;
+
+        emitter.shape = shape_;
+        emitter.angle = angle_;
+        emitter.space = space_;
 
         if (rateOverTime_ != 0)
         {
             const std::chrono::duration<float> emitPeriodFSec(1.f / rateOverTime_);
-            comp.emitPeriod = std::chrono::duration_cast<std::chrono::milliseconds>(emitPeriodFSec);
+            emitter.emitPeriod = std::chrono::duration_cast<std::chrono::milliseconds>(emitPeriodFSec);
         }
         else
-            comp.emitPeriod = std::chrono::milliseconds::zero();
-        comp.adder = std::chrono::milliseconds::zero();
-        comp.latestTP = now;
+            emitter.emitPeriod = std::chrono::milliseconds::zero();
 
         if (burst_.has_value())
         {
             const std::chrono::duration<float> burstPeriodFSec(burst_->period);
-            comp.burst.emplace(
+            emitter.burst.emplace(
                     std::chrono::duration_cast<std::chrono::milliseconds>(burstPeriodFSec),
                     std::chrono::milliseconds::zero(),
                     now,
@@ -122,25 +125,34 @@ namespace tomato
         }
 
         std::chrono::duration<float> startDelayFSec(startDelay_);
-        comp.startDelay = std::chrono::duration_cast<std::chrono::milliseconds>(startDelayFSec);
-        comp.startSpeed = startSpeed_;
-
-        comp.texture = texture_;
-        comp.size = size_;
-        comp.color = color_;
+        emitter.startDelay = std::chrono::duration_cast<std::chrono::milliseconds>(startDelayFSec);
+        emitter.startSpeed = startSpeed_;
 
         startDelayFSec = std::chrono::duration<float>(lifetime_);
-        comp.lifetime = std::chrono::duration_cast<std::chrono::milliseconds>(startDelayFSec);
+        emitter.particleLifetime = std::chrono::duration_cast<std::chrono::milliseconds>(startDelayFSec);
 
-        comp.positions.clear();
-        comp.velocities.clear();
-        comp.lifetimes.clear();
+        emitter.maxParticles = maxParticles_;
 
-        comp.positions.resize(maxParticles_);
-        comp.velocities.resize(maxParticles_);
-        comp.lifetimes.resize(maxParticles_);
 
-        comp.activeCnt = 0;
-        comp.maxParticles = maxParticles_;
+        /*Set Particle Runtime Component Values*/
+        comp.runtime.adder = std::chrono::milliseconds::zero();
+        comp.runtime.latestTP = now;
+        comp.runtime.activeCnt = 0;
+
+
+        /*Set Particle Buffer Component Values*/
+        comp.buffer.positions.clear();
+        comp.buffer.velocities.clear();
+        comp.buffer.lifetimes.clear();
+
+        comp.buffer.positions.resize(maxParticles_);
+        comp.buffer.velocities.resize(maxParticles_);
+        comp.buffer.lifetimes.resize(maxParticles_);
+
+
+        /*Set Particle Render Component Values*/
+        comp.render.texture = texture_;
+        comp.render.size = size_;
+        comp.render.color = color_;
     }
 }
