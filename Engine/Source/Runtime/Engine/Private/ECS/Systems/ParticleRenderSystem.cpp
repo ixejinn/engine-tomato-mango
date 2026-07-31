@@ -2,6 +2,7 @@
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 
 #include "ECS/Components/Camera.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Particle.h"
 
@@ -60,12 +61,16 @@ namespace tomato
          glm::normalize(glm::vec3(viewProjMat[0][1], viewProjMat[1][1], viewProjMat[2][1])));
 
         // 컴포넌트 업데이트
-        auto view = registry.view<TransformComponent,
+        auto view = registry.view
+            <TransformComponent, VisibilityComponent,
             ParticleEmitterComponent, ParticleRuntimeComponent,
             ParticleBufferComponent, ParticleRenderComponent>();
-        for (auto [e, trf, emitter, runtime, buffer, render] : view.each())
+        for (auto [e, trf, visibiliy, emitter, runtime, buffer, render] : view.each())
         {
             if (!runtime.active)
+                continue;
+
+            if (!visibiliy.visible)
                 continue;
 
             // 파티클 그리기

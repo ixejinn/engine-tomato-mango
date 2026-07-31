@@ -1,4 +1,4 @@
-#include "ECS/Systems/ParticleEmissionSystem.h"
+ï»¿#include "ECS/Systems/ParticleEmissionSystem.h"
 
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 
@@ -13,7 +13,7 @@ namespace tomato
 {
 	void ParticleEmissionSystem::Update(SimContext& simCtx)
 	{
-		// È°¼ºÈ­µÈ ÆÄÆ¼Å¬ ¿£Æ¼Æ¼°¡ ¾øÀ¸¸é Á¾·á
+		// í™œì„±í™”ëœ íŒŒí‹°í´ ì—”í‹°í‹°ê°€ ì—†ìœ¼ë©´ ì¢…ë£Œ
 		if (simCtx.state->particlePool_.GetActiveEmitterNum() == 0)
 			return;
 
@@ -44,7 +44,7 @@ namespace tomato
 	}
     bool ParticleEmissionSystem::ProcessEmitterLifeTime(SimContext& simCtx, entt::entity e, ParticleData& particle)
     {
-        // ÀÌ¹ÌÅÍ lifetime È®ÀÎ
+        // ì´ë¯¸í„° lifetime í™•ì¸
         auto now = std::chrono::steady_clock::now();
         auto activeDuration =
             std::chrono::duration_cast<std::chrono::milliseconds>(now - particle.emitter.emitter.start);
@@ -62,7 +62,7 @@ namespace tomato
                     particle.emitter.burst->finishedCycles = 0;
                 }
             }
-            else if (particle.runtime.activeCnt == 0) // ·çÇÁ ¾Æ´Ñµ¥ È°¼ºÈ­µÈ ÆÄÆ¼Å¬ÀÌ ¾øÀ¸¸é Ç®¿¡ ¹İ³³(¿ÏÀü Á¾·á)
+            else if (particle.runtime.activeCnt == 0) // ë£¨í”„ ì•„ë‹Œë° í™œì„±í™”ëœ íŒŒí‹°í´ì´ ì—†ìœ¼ë©´ í’€ì— ë°˜ë‚©(ì™„ì „ ì¢…ë£Œ)
             {
                 simCtx.state->particlePool_.Release(e);
                 return true;
@@ -74,7 +74,7 @@ namespace tomato
 
     void ParticleEmissionSystem::ProcessParticleLifeTime(ParticleData& particle)
     {
-        // lifetime Áö³­ ÆÄÆ¼Å¬ Á¦°Å
+        // lifetime ì§€ë‚œ íŒŒí‹°í´ ì œê±°
         for (int i = 0; i < particle.runtime.activeCnt; )
         {
             auto now = std::chrono::steady_clock::now();
@@ -100,7 +100,7 @@ namespace tomato
     }
     void ParticleEmissionSystem::RateOverTimeParticle(entt::registry& reg, entt::entity e, ParticleData& particle)
     {
-        // rate over time ÀÇÇÑ ÆÄÆ¼Å¬ »ı¼º
+        // rate over time ì˜í•œ íŒŒí‹°í´ ìƒì„±
         if (particle.emitter.emitPeriod > 0ms)
         {
             auto now = std::chrono::steady_clock::now();
@@ -197,7 +197,7 @@ namespace tomato
                 float phi = RandomNumberGenerator::GetUniformRealDistribution(0.f, comp.emitter.angle);
 
                 auto lambdaR = glm::radians(static_cast<float>(lambda));
-                auto phiR = glm::radians(phi);
+                auto phiR = glm::radians(90.f - phi);
 
                 comp.buffer.velocities[i] = {
                     glm::cos(phiR) * glm::cos(lambdaR),

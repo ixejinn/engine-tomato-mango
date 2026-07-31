@@ -567,6 +567,14 @@ namespace tomato
 		return changed;
 	}
 
+	bool DrawParticleInspector(EditorContext& eCtx, entt::registry& reg, ParticleEmitterComponent& particle)
+	{
+		bool changed = false;
+
+
+		return changed;
+	}
+
 	std::filesystem::path DrawLoadResourceButton(const char* title, const char* filter, const std::filesystem::path& initDir)
 	{
 		ImGui::SameLine();

@@ -20,6 +20,11 @@ namespace tomato
         for (int i = 0; i < poolSize; ++i)
         {
             entt::entity e = registry_.create();
+
+            registry_.emplace<NametagComponent>(e,
+                GenerateUUID(), GenerateEntityName(registry_, "ParticleEffect"));
+            registry_.emplace<VisibilityComponent>(e);
+
             registry_.emplace<TransformComponent>(e);
             registry_.emplace<RootEntityTag>(e);
 
@@ -48,6 +53,10 @@ namespace tomato
 
         entt::entity e = freeEmitters_.back();
         freeEmitters_.pop_back();
+
+        /*registry_.emplace<NametagComponent>(e,
+            GenerateUUID(), GenerateEntityName(registry_, "ParticleEffect"));
+        registry_.emplace<VisibilityComponent>(e);*/
 
         auto& transform = registry_.get<TransformComponent>(e);
         transform.SetPosition(pos);
@@ -80,6 +89,10 @@ namespace tomato
         entt::entity e = freeEmitters_.back();
         freeEmitters_.pop_back();
 
+        /*registry_.emplace<NametagComponent>(e,
+            GenerateUUID(), GenerateEntityName(registry_, "ParticleEffect"));
+        registry_.emplace<VisibilityComponent>(e);*/
+
         SetHierarchy(registry_, parent, e);
 
         auto& pRuntime = registry_.get<ParticleRuntimeComponent>(e);
@@ -104,6 +117,9 @@ namespace tomato
             return false;
 
         SetHierarchy(registry_, entt::null, e);
+
+        /*registry_.remove<NametagComponent>(e);
+        registry_.remove<VisibilityComponent>(e);*/
 
         particle->active = false;
 

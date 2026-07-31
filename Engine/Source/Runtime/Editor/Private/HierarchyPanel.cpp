@@ -21,6 +21,7 @@
 #include "ECS/Components/Visibility.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Camera.h"
+#include "ECS/Components/Particle.h"
 
 #include "ECS/Entity/Hierarchy.h"
 #include <iostream>
@@ -79,6 +80,10 @@ namespace tomato
 	void HierarchyPanel::DrawEntity(EditorContext& editorCtx, entt::entity e)
 	{
 		auto& r = editorCtx.currentState->GetRegistry();
+
+		if (auto* runtime = r.try_get<ParticleRuntimeComponent>(e);
+			runtime != nullptr && !runtime->active) return;
+
 		auto* hierarchy = r.try_get<HierarchyComponent>(e);
 
 		bool opened = DrawRow(editorCtx, e);

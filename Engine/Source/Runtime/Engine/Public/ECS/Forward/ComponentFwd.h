@@ -22,6 +22,9 @@ namespace tomato
 	struct SelectableComponent;
 
 	struct HierarchyComponent;
+	
+	struct ParticleEmitterComponent;
+
 	struct RootEntityTag;
 	struct MainCameraTag;
 	struct CharacterTag;

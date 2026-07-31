@@ -22,6 +22,7 @@ namespace tomato
 	bool DrawTextInspector(EditorContext&, entt::registry&, TextComponent&);
 	bool DrawTargetInspector(EditorContext&, entt::registry&, TargetComponent&);
 	bool DrawSelectableInspector(EditorContext&, entt::registry&, SelectableComponent&);
+	bool DrawParticleInspector(EditorContext&, entt::registry&, ParticleEmitterComponent&);
 
 	
 	std::filesystem::path DrawLoadResourceButton(const char* title, const char* filter, const std::filesystem::path& initDir);
