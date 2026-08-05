@@ -8,6 +8,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "imgui_stdlib.h"
 
 #include <entt/entt.hpp>
 #include "State/State.h"
@@ -124,7 +125,9 @@ namespace tomato
 
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("%s", nametag.name.c_str());
+			if (ImGui::InputText("##input text", &nametag.name, ImGuiInputTextFlags_ElideLeft))
+				editorCtx.sceneDirty = true;
+			//ImGui::Text("%s", nametag.name.c_str());
 
 			ImGui::TableSetColumnIndex(1);
 			ImGui::Text("%d", entt::to_entity(editorCtx.selectedEntity));

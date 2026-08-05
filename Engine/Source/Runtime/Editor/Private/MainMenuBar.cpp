@@ -85,7 +85,6 @@ namespace tomato
 				mode = RunMode::Game;
 			}
 		}
-
 		//Editor mode Pause Button
 		ImGui::BeginDisabled(HasFlag(mode, RunMode::Editor));
 		if (ImGui::Button("■"))

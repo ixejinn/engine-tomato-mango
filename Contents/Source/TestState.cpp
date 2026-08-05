@@ -67,9 +67,9 @@ void TestState::Init() {
     renderp0.color = { 1.f, 1.f, 0.f, 1.f };
     auto& channelp0 = registry_.get<InputChannelComponent>(player0);
     channelp0.channel = 0;
-    // registry_.emplace<CollisionTestComponent>(player0);
-    // particlePool_.Acquire(GetAssetID("Resources/Contents/burst_test.tmt.ptc"), player0);
-    // particlePool_.Acquire(GetAssetID("Resources/Contents/ribbon_particle.tmt.ptc"), player0);
+     registry_.emplace<CollisionTestComponent>(player0);
+     particlePool_.Acquire(GetAssetID("Resources\\Contents\\Particle\\burst_test.tmt.ptc"), player0);
+     particlePool_.Acquire(GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), player0);
 
     //// Player1 character
     entt::entity player1 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { -1, 2, 0 });

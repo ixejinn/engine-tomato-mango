@@ -12,6 +12,7 @@
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Font.h"
 #include "Resource/Render/Texture.h"
+#include "Resource/Render/ParticleEffect.h"
 
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Visibility.h"
@@ -224,7 +225,7 @@ namespace tomato::Serialization
 		auto itBegin = AssetRegistry<Font>::GetInstance().GetNameMapBegin();
 		auto itEnd = AssetRegistry<Font>::GetInstance().GetNameMapEnd();
 
-		json font, tex;
+		json font, tex, particle;
 		for (itBegin; itBegin != itEnd; ++itBegin)
 			font["Font"].push_back(itBegin->second);
 		
@@ -235,6 +236,12 @@ namespace tomato::Serialization
 
 		for (itBegin; itBegin != itEnd; ++itBegin)
 			tex["Texture"].push_back(itBegin->second);
+
+		itBegin = AssetRegistry<ParticleEffect>::GetInstance().GetNameMapBegin();
+		itEnd = AssetRegistry<ParticleEffect>::GetInstance().GetNameMapEnd();
+
+		for (itBegin; itBegin != itEnd; ++itBegin)
+			tex["Particle"].push_back(itBegin->second);
 
 		data["Resource"].push_back(tex);
 	}
