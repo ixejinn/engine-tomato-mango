@@ -8,6 +8,8 @@
 #include "Simulation/SimulationConfig.h"
 #include "Utils/RandomNumberGenerator.h"
 
+#include "ECS/Entity/Entity.h"
+
 using namespace std::chrono_literals;
 namespace tomato
 {
@@ -42,6 +44,23 @@ namespace tomato
             BurstParticle(registry, e, pData);
 		}
 	}
+
+    void ParticleEmissionSystem::UpdateTransform(entt::registry& reg, entt::entity cur, const glm::quat& pQuat, const glm::vec3& pScale, const glm::mat4& pMatrix, bool pDirty)
+    {
+        auto rootView = reg.view<TransformComponent, ParticleRuntimeComponent>();
+
+        for (auto [e, trf, runtime] : rootView.each())
+        {
+            if (runtime.target == 0) continue;
+            auto& targetTrf = reg.get<TransformComponent>(GetEntityByUUID(reg, runtime.target));
+
+            auto T = glm::translate(glm::mat4(1.f), trf.GetLocalPosition());
+            auto R = glm::toMat4(trf.GetLocalQuaternion());
+            auto S = glm::scale(glm::mat4(1.f), trf.GetLocalScale());
+
+        }
+    }
+
     bool ParticleEmissionSystem::ProcessEmitterLifeTime(SimContext& simCtx, entt::entity e, ParticleData& particle)
     {
         // 이미터 lifetime 확인

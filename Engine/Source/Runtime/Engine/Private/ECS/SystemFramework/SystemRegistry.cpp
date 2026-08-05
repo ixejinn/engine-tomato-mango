@@ -1,4 +1,4 @@
-#include "ECS/SystemFramework/SystemRegistry.h"
+﻿#include "ECS/SystemFramework/SystemRegistry.h"
 #include "ECS/SystemFramework/SystemManager.h"
 #include "ECS/Systems/Systems.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
@@ -36,6 +36,7 @@ namespace tomato
             std::make_unique<CameraSystem>());
         for (const auto& factory : frameFactories_[FramePhase::PreRender])
             manager.AddSystem(FramePhase::PreRender, factory.mode, factory.factory());
+
         // TODO: Register particle logic system
         manager.AddSystem(FramePhase::PreRender, RunMode::Game | RunMode::Editor,
             std::make_unique<ParticleEmissionSystem>());

@@ -60,6 +60,8 @@ namespace tomato
         std::chrono::steady_clock::time_point latestTP;
 
         int activeCnt = 0;
+
+        UUID target = 0;
     };
 
     struct ParticleBufferComponent // Actual Particles data for simulation
@@ -82,6 +84,12 @@ namespace tomato
         ParticleRuntimeComponent& runtime;
         ParticleBufferComponent& buffer;
         ParticleRenderComponent& render;
+    };
+
+    struct ParticleAttachmentComponent
+    {
+        UUID target{ 0 };
+        AssetID particle;
     };
 }
 

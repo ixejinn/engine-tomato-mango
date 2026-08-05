@@ -64,6 +64,9 @@ namespace tomato
         auto& pRuntime = registry_.get<ParticleRuntimeComponent>(e);
         pRuntime.active = true;
 
+        auto& attach = registry_.emplace<ParticleAttachmentComponent>(e);
+        attach.particle = ptcID;
+
         ParticleData pData{
             .emitter = registry_.get<ParticleEmitterComponent>(e),
             .runtime = pRuntime,
@@ -76,7 +79,7 @@ namespace tomato
         return e;
     }
 
-    std::optional<entt::entity> ParticleEmitterPool::Acquire(AssetID ptcID, entt::entity parent)
+    std::optional<entt::entity> ParticleEmitterPool::Acquire(AssetID ptcID, UUID target)
     {
         if (freeEmitters_.empty())
         {
@@ -93,10 +96,15 @@ namespace tomato
             GenerateUUID(), GenerateEntityName(registry_, "ParticleEffect"));
         registry_.emplace<VisibilityComponent>(e);*/
 
-        SetHierarchy(registry_, parent, e);
+        //SetHierarchy(registry_, parent, e);
 
         auto& pRuntime = registry_.get<ParticleRuntimeComponent>(e);
         pRuntime.active = true;
+        pRuntime.target = target;
+
+        auto& attach = registry_.emplace<ParticleAttachmentComponent>(e);
+        attach.particle = ptcID;
+        attach.target = target;
 
         ParticleData pData{
             .emitter = registry_.get<ParticleEmitterComponent>(e),
@@ -116,12 +124,14 @@ namespace tomato
         if (!particle)
             return false;
 
-        SetHierarchy(registry_, entt::null, e);
+        //SetHierarchy(registry_, entt::null, e);
 
         /*registry_.remove<NametagComponent>(e);
         registry_.remove<VisibilityComponent>(e);*/
+        registry_.remove<ParticleAttachmentComponent>(e);
 
         particle->active = false;
+        particle->target = 0;
 
         freeEmitters_.push_back(e);
         return true;

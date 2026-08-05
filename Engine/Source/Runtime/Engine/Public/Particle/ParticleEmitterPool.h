@@ -1,4 +1,4 @@
-#ifndef MANGO_PARTICLEEMITTERPOOL_H
+﻿#ifndef MANGO_PARTICLEEMITTERPOOL_H
 #define MANGO_PARTICLEEMITTERPOOL_H
 
 #include <vector>
@@ -9,6 +9,7 @@
 #include "State/StateFwd.h"
 #include "Particle/ParticleType.h"
 #include "Resource/ResourceFwd.h"
+#include "UUID.h"
 
 namespace tomato
 {
@@ -18,7 +19,7 @@ namespace tomato
         ParticleEmitterPool(const PassKey<State>& key, entt::registry& reg, uint8_t poolSize = 32);
 
         std::optional<entt::entity> Acquire(AssetID ptcID, glm::vec3 pos);
-        std::optional<entt::entity> Acquire(AssetID ptcID, entt::entity parent);
+        std::optional<entt::entity> Acquire(AssetID ptcID, UUID target);
         bool Release(entt::entity e);
 
         uint8_t GetActiveEmitterNum() const { return poolSize_ - freeEmitters_.size(); }
