@@ -119,8 +119,8 @@ namespace tomato::Serialization
 			json entityJson;
 
 			SaveEntity(entityJson, reg, entity);
-
-			root["Entities"].push_back(entityJson);
+			if(!entityJson.empty())
+				root["Entities"].push_back(entityJson);
 		}
 
 		std::ofstream ofs(path);
@@ -235,12 +235,10 @@ namespace tomato::Serialization
 	{
 		for (auto& particle : particleData["Particle"])
 		{
-			std::cout << particle.items().begin().key() << '\n';
-			/*AssetID asset = particle["particle"];
+			AssetID asset = particle["particle"];
 			UUID target = particle["target"];
-			state->particlePool_.Acquire(asset, target);*/
-			//particlePool_.Acquire(GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
-			
+
+			state->particlePool_.Acquire(asset, target);
 		}
 	}
 
@@ -262,13 +260,15 @@ namespace tomato::Serialization
 		for (itBegin; itBegin != itEnd; ++itBegin)
 			tex["Texture"].push_back(itBegin->second);
 
+		data["Resource"].push_back(tex);
+
 		itBegin = AssetRegistry<ParticleEffect>::GetInstance().GetNameMapBegin();
 		itEnd = AssetRegistry<ParticleEffect>::GetInstance().GetNameMapEnd();
 
 		for (itBegin; itBegin != itEnd; ++itBegin)
-			tex["Particle"].push_back(itBegin->second);
+			particle["Particle"].push_back(itBegin->second);
 
-		data["Resource"].push_back(tex);
+		data["Resource"].push_back(particle);
 	}
 
 	void SaveParticlesInfo(json& data, entt::registry& reg)
@@ -289,7 +289,7 @@ namespace tomato::Serialization
 	void SaveEntity(json& data, entt::registry& reg, entt::entity entity)
 	{
 		// particle
-		if (reg.any_of<ParticleEmitterComponent>(entity))
+		if (reg.all_of<ParticleEmitterComponent>(entity))
 			return;
 
 		auto& tag = reg.get<NametagComponent>(entity);
