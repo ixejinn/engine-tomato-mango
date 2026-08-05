@@ -5,10 +5,10 @@
 
 namespace tomato
 {
-    struct CollisionCache
+    struct ContactCache
     {
         glm::vec3 normal;
-        bool curr;
+        int curr;
     };
 }
 

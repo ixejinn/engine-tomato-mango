@@ -49,7 +49,7 @@ namespace tomato
 
     bool GJK::GJKBool(
             entt::registry& reg, entt::entity e1, entt::entity e2) {
-        // TMT_INFO << "GJK bool " << (int)e1 << " " << (int)e2;
+         //TMT_INFO << "GJK bool " << (int)e1 << " " << (int)e2;
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
         auto& trf1 = reg.get<TransformComponent>(e1);
@@ -83,7 +83,7 @@ namespace tomato
 
     CollisionInfo GJK::GJKDistance(
             entt::registry& reg, entt::entity e1, entt::entity e2) {
-        // TMT_INFO << "========== GJK distance " << (int)e1 << " " << (int)e2;
+         TMT_INFO << "========== GJK distance " << (int)e1 << " " << (int)e2;
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
         auto& trf1 = reg.get<TransformComponent>(e1);
@@ -101,29 +101,20 @@ namespace tomato
         auto lowerLimit = glm::dot(closestP, supportP);
         int iteration = 0;
         // while (glm::length2(closestP) - glm::dot(closestP, supportP) > 1e-6f) {
-        while (upperLimit - lowerLimit > 1e-6f && iteration < 20) {
+        while (upperLimit - lowerLimit > 1e-6f && iteration < 10) {
             ++iteration;
 
             simplex.push_back(supportP);
 
             if (auto result = FindClosestPointOnSimplex(simplex))
                 closestP = *result;
-            else {
-                if (auto info = EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2)) {
-                    TMT_INFO << "(d)penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
-                    if (info->depth > 0)
-                        EventDispatcher::GetInstance().Enqueue(PenetrationEvent{e1, e2, &reg, info.value()});
-                }
-
-                //return EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2);
-                 return CollisionInfo{glm::vec3{0.f}, 0.f};
-            }
 
             supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
 
             upperLimit = glm::length2(closestP);
             lowerLimit = glm::dot(closestP, supportP);
         }
+        //std::cout << "simplex size: " << simplex.size() << "\n";
 
         auto length = glm::length(closestP);
         if (length > 1e-4f)
@@ -136,7 +127,18 @@ namespace tomato
             if (-epsilon < closestP.y && closestP.y < epsilon)
                 closestP.y = 0.f;
 
-            return CollisionInfo{closestP / length, length};
+            return CollisionInfo{-closestP / length, length};
+        }
+        else
+        {
+            if (auto info = EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2)) {
+                //TMT_INFO << "(d)penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
+                if (info->depth > 0)
+                {
+                    EventDispatcher::GetInstance().Enqueue(PenetrationEvent{ e1, e2, &reg, info.value() });
+                    return CollisionInfo{ info->normal, -info->depth };
+                }
+            }
         }
         //return EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2);
          return CollisionInfo{glm::vec3{0.f}, 0.f};
@@ -147,11 +149,11 @@ namespace tomato
         auto info = GJKDistance(reg, e1, e2);
         TMT_INFO << "GJK raycast " << (int)e1 << " " << (int)e2;
         TMT_INFO << "distance depth: " << info.depth;
-        if (info.depth < COLLISION_SKIN)
+        /*if (info.depth < COLLISION_SKIN)
         {
             info.skin = true;
             return info;
-        }
+        }*/
 
         auto& col1 = reg.get<ColliderComponent>(e1);
         auto& col2 = reg.get<ColliderComponent>(e2);
@@ -165,23 +167,47 @@ namespace tomato
             v1 = vel1->velocity;
         if (auto vel2 = reg.try_get<VelocityComponent>(GetRootEntity(reg, e2)))
             v2 = vel2->velocity;
+        std::cout << "velocity: " << v1.x << " " << v1.y << " " << v1.z << "\n";
+        std::cout << "velocity: " << v2.x << " " << v2.y << " " << v2.z << "\n";
 
         float lenV1 = glm::length(v1);
         float lenV2 = glm::length(v2);
         float sumV = lenV1 + lenV2;
-        if (sumV < 1e-6f)
-            return std::nullopt;
-        float weight = lenV1 / sumV;
-
-         //TMT_INFO << "GJK raycast " << (int)e1 << " " << (int)e2 << " " << sumV;
-
         glm::vec3 relVel = v1 - v2;
-        if (glm::length2(relVel) < 1e-6f) {
-//            return GJKDistance(reg, e1, e2);
-            return std::nullopt;
+        //if (sumV < 1e-6f || glm::length2(relVel) < 1e-6f)
+        //{
+        //    info.weight = 0.5f;
+        //    //return std::nullopt;
+        //    return info;
+        //}
+        float weight = lenV1 / sumV;
+        if (info.depth < COLLISION_SKIN + 1e-4f)
+        {
+            info.skin = true;
+            //info.weight = weight;
+            //return info;
         }
+        if (sumV < 1e-6f || glm::length2(relVel) < 1e-6f)
+        {
+            info.weight = 0.5f;
+            //return std::nullopt;
+            return info;
+        }
+        if (info.depth < COLLISION_SKIN + 1e-4f)
+        {
+            info.weight = weight;
+            return info;
+        }
+
+         TMT_INFO << "GJK raycast " << (int)e1 << " " << (int)e2 << " " << sumV;
+
+        //glm::vec3 relVel = v1 - v2;
+//        if (glm::length2(relVel) < 1e-6f) {
+////            return GJKDistance(reg, e1, e2);
+//            return std::nullopt;
+//        }
         glm::vec3 ray = -relVel * FIXED_DELTA_TIME;
-         TMT_INFO << "GJK raycast " << (int)e1 << " " << (int)e2 << " relVel: " << relVel.x << " " << relVel.y << " " << relVel.z;
+         //TMT_INFO << "GJK raycast " << (int)e1 << " " << (int)e2 << " relVel: " << relVel.x << " " << relVel.y << " " << relVel.z;
 
         float hitFraction = 0.f;
         glm::vec3 rayOrigin{0.f};
@@ -243,8 +269,8 @@ namespace tomato
 
                     if (auto info = EPA::GetPenetrationInfo(simplex, col1, col2, trf1, trf2)) {
                         penetrated = true;
-                         TMT_INFO << " penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
-                         TMT_INFO << " penetration depth : " << info->depth << ", weight: " << weight;
+                         //TMT_INFO << " penetration normal: " << info->normal.x << " " << info->normal.y << " " << info->normal.z;
+                         //TMT_INFO << " penetration depth : " << info->depth << ", weight: " << weight;
                         if (info->depth > 0)
                         {
                             info->weight = weight;
@@ -252,7 +278,7 @@ namespace tomato
                         }
                     }
                 }
-                TMT_INFO << "simplex break";
+                //TMT_INFO << "simplex break";
                 break;
             }
 

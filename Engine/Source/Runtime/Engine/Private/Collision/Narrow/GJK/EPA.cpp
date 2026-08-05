@@ -29,10 +29,56 @@ namespace tomato
         const ColliderComponent& col1, const ColliderComponent& col2,
         TransformComponent& trf1, TransformComponent& trf2)
     {
-        if (points.size() != 4)
+        // 심플렉스 확장
+        while (points.size() < 4)
         {
-            TMT_ERR << "Invalid simplex size: " << points.size();
-            return std::nullopt;
+            switch (points.size())
+            {
+            case 1:
+                points.emplace_back(GJK::GetSupportPoint(-points[0], col1, trf1, col2, trf2));
+                break;
+            case 2:
+            {
+                const auto ao = -points[0];
+                const auto ab = points[1] - points[0];
+
+                auto t = glm::dot(ao, ab);
+                if (t <= 0) {
+                    points.pop_back();
+                    points.emplace_back(GJK::GetSupportPoint(-points[0], col1, trf1, col2, trf2));
+                }
+                else {
+                    float denom = glm::length2(ab);
+
+                    if (t >= denom) {
+                        points.erase(points.begin());
+                        points.emplace_back(GJK::GetSupportPoint(-points[0], col1, trf1, col2, trf2));
+                    }
+                    else {
+                        t /= denom;
+                        auto p = points[0] + t * ab;
+                        points.emplace_back(GJK::GetSupportPoint(-p, col1, trf1, col2, trf2));
+                    }
+                }
+            }
+                break;
+            case 3:
+            {
+                const glm::vec3 a = points[0];
+                const glm::vec3 b = points[1];
+                const glm::vec3 c = points[2];
+
+                const glm::vec3 ab = b - a;
+                const glm::vec3 ac = c - a;
+
+                glm::vec3 normal = glm::cross(ab, ac);
+                if (glm::dot(-a, normal) < 0)
+                    normal = -normal;
+
+                points.emplace_back(GJK::GetSupportPoint(normal, col1, trf1, col2, trf2));
+            }
+            break;
+            }
         }
 
         std::vector<Plain> polytope;

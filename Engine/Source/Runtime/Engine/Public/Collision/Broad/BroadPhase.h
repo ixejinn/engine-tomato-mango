@@ -12,7 +12,7 @@ namespace tomato
     public:
         virtual ~BroadPhase() = default;
 
-        virtual void FindCollisionCandidates(entt::registry& reg, std::vector<CollisionPair>& candidates) = 0;
+        virtual void FindCollisionCandidates(entt::registry& reg, std::vector<ContactPair>& candidates) = 0;
 
     protected:
         inline static CollisionLayerMatrix layerMatrix_;

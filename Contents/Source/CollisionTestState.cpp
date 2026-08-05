@@ -20,8 +20,8 @@ void CollisionTestState::Init()
         );
 
     //// Player0 character
-    entt::entity player0 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, 1, 0 });
-    // entt::entity player0 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, 0.510121, 0 });
+    //entt::entity player0 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, 1, 0 });
+     entt::entity player0 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, 0.510121, 0 });
     auto& renderp0 = registry_.get<RenderComponent>(player0);
     renderp0.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
     renderp0.color = { 1.f, 1.f, 0.f, 1.f };

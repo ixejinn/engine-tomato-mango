@@ -7,6 +7,7 @@
 namespace tomato
 {
     static constexpr float COLLISION_SKIN = 1e-2f;
+    static constexpr float HALF_COLLISION_SKIN = 0.5e-2f;
 
 #define TMT_COLLISION_LAYER_LIST(X) \
     X(Default, 1 << 0, "Default")           

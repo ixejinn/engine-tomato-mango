@@ -62,7 +62,7 @@ namespace tomato {
         SystemRegistry::GetInstance().RegisterSystems(systemManager_);
 
         TickClock tickClock;
-        RunMode runMode{RunMode::Editor};
+        RunMode runMode{ RunMode::Editor };
         //RunMode runMode{RunMode::Game}; // TODO: remove this line
 
         window_.SetWindowUserPointer(input_, tickClock);
@@ -86,7 +86,7 @@ namespace tomato {
             {
                 // std::cout << "       Rollback " << lateT << "~" << currT << "\n";
 
-                SimContext rbSimCtx{currState_.get(), lateT};
+                SimContext rbSimCtx{ currState_.get(), lateT };
                 Rollback(rbSimCtx);
                 Resimulate(rbSimCtx, currT);
                 // std::cout << "       Rollback finish\n";
@@ -96,7 +96,7 @@ namespace tomato {
             ProcessInputEvents(tickClock.GetTick());
 
             // *---------- Simulate and render
-            SimContext simCtx{currState_.get(), tickClock.GetTick()};
+            SimContext simCtx{ currState_.get(), tickClock.GetTick() };
             garbageCollectionSystem.Update(simCtx);
 
             FixedUpdate(tickClock, simCtx, runMode);
@@ -134,7 +134,7 @@ namespace tomato {
         while (cnt--)
         {
             simCtx.tick = tc.GetTick();
-            // std::cout << "       *--------- " << simCtx.tick << " ---------*\n";
+            std::cout << "\n       *--------- " << simCtx.tick << " ---------*\n";
 
             systemManager_.FixedUpdate(simCtx, mode);
 
@@ -188,7 +188,7 @@ namespace tomato {
         inputUI_.SetState(currState_.get());
 
         tc.ResetTick();
-        SimContext simCtx{currState_.get(), tc.GetTick()};
+        SimContext simCtx{ currState_.get(), tc.GetTick() };
         systemManager_.Update(TickPhase::PostUpdate, simCtx, RunMode::Game | RunMode::Editor);
 
         if (netMode_ == NetMode::NM_Client)

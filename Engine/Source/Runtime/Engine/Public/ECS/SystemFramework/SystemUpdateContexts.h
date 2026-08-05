@@ -21,7 +21,7 @@ namespace tomato
 
     struct CollisionContext
     {
-        std::unordered_map<CollisionPair, CollisionCache> pairs;
+        std::unordered_map<ContactPair, ContactCache> pairs;
     };
 
     struct RenderContext

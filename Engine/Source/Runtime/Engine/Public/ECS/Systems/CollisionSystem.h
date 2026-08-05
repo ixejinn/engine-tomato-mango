@@ -25,14 +25,14 @@ namespace tomato
 
         static void UpdateAABB(entt::registry& reg);
 
-        static void SolveCollision(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info);
+        static void ResolveContact(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info);
 
         static void OnPenetration(const PenetrationEvent& e);
 
         std::unique_ptr<BroadPhase> broadPhase_;
         std::unique_ptr<NarrowPhase> narrowPhase_;
 
-        std::vector<CollisionPair> candidates_;
+        std::vector<ContactPair> candidates_;
 
         void ResolveCollision(entt::registry& reg);
 

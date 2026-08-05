@@ -6,7 +6,7 @@
 
 namespace tomato
 {
-    using CollisionPair = UnorderedPair<entt::entity>;
+    using ContactPair = UnorderedPair<entt::entity>;
 
     class BroadPhase;
     class NarrowPhase;
