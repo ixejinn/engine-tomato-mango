@@ -209,10 +209,11 @@ namespace tomato
         float lenV2 = glm::length(v2);
         float sumV = lenV1 + lenV2;
 
-        float weight = 0.5f;
+        float weight1 = 0.5f;
         if (sumV >= 1e-6f)
-            weight = lenV1 / sumV;
-        std::cout << "       weight: " << weight << "\n";
+            weight1 = lenV1 / sumV;
+        std::cout << "       weight1: " << weight1 << "\n";
+        float weight2 = 1 - weight1;
 
         auto& trfRoot1 = reg.get<TransformComponent>(root1);
         auto& trfRoot2 = reg.get<TransformComponent>(root2);
@@ -223,16 +224,17 @@ namespace tomato
         {
             // CCD contact data
             const float ht = data.hitTime.value();
+            std::cout << "       hit time: " << ht << "\n";
 
             if (vel1)
             {
                 std::cout << "         [" << (int)e1 << "]\n";
                 std::cout << "          position 1: " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
 
-                trfRoot1.AddPosition((vel1->velocity * FIXED_DELTA_TIME * ht - data.normal * COLLISION_SKIN) * weight);
+                trfRoot1.AddPosition((vel1->velocity * FIXED_DELTA_TIME * ht - data.normal * COLLISION_SKIN) * weight1);
                 std::cout << "          position C: " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
 
-                glm::vec3 remainingMove = (1 - ht * weight) * vel1->velocity;
+                glm::vec3 remainingMove = (1 - ht * weight1) * vel1->velocity;
                 vel1->velocity = remainingMove - glm::dot(remainingMove, data.normal) * data.normal;
 
                 if (-epsilon < vel1->velocity.x && vel1->velocity.x < epsilon)
@@ -241,7 +243,7 @@ namespace tomato
                     vel1->velocity.y = 0.f;
                 if (-epsilon < vel1->velocity.z && vel1->velocity.z < epsilon)
                     vel1->velocity.z = 0.f;
-                std::cout << "         velocity C: " << glm::to_string(vel1->velocity) << "\n";
+                std::cout << "          velocity C: " << glm::to_string(vel1->velocity) << "\n";
             }
 
             if (vel2)
@@ -249,10 +251,10 @@ namespace tomato
                 std::cout << "         [" << (int)e2 << "]\n";
                 std::cout << "          position 1: " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
 
-                trfRoot2.AddPosition((vel2->velocity * FIXED_DELTA_TIME * ht + data.normal * COLLISION_SKIN) * weight);
-                std::cout << "         position C: " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
+                trfRoot2.AddPosition((vel2->velocity * FIXED_DELTA_TIME * ht + data.normal * COLLISION_SKIN) * weight2);
+                std::cout << "          position C: " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
 
-                glm::vec3 remainingMove = (1 - ht * weight) * vel2->velocity;
+                glm::vec3 remainingMove = (1 - ht * weight2) * vel2->velocity;
                 vel2->velocity = remainingMove + glm::dot(remainingMove, -data.normal) * data.normal;
 
                 if (-epsilon < vel2->velocity.x && vel2->velocity.x < epsilon)
@@ -261,19 +263,20 @@ namespace tomato
                     vel2->velocity.y = 0.f;
                 if (-epsilon < vel2->velocity.z && vel2->velocity.z < epsilon)
                     vel2->velocity.z = 0.f;
-                std::cout << "         velocity C: " << glm::to_string(vel2->velocity) << "\n";
+                std::cout << "          velocity C: " << glm::to_string(vel2->velocity) << "\n";
             }
         }
-        else
+        else if (data.distance >= 0)
         {
             // COLLISION_SKIN 만큼만 떨어져 있어서 GJK Distance로부터 받은 충돌 정보
+            std::cout << "       distance: " << data.distance << "\n";
 
             if (vel1)
             {
                 std::cout << "         [" << (int)e1 << "]\n";
                 std::cout << "         position 1: " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
 
-                trfRoot1.AddPosition(-data.normal * (COLLISION_SKIN - data.distance) * weight);
+                trfRoot1.AddPosition(-data.normal * (COLLISION_SKIN - data.distance) * weight1);
                 std::cout << "         position -: " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
 
                 vel1->velocity -= glm::dot(vel1->velocity, data.normal) * data.normal;
@@ -292,7 +295,7 @@ namespace tomato
                 std::cout << "         [" << (int)e2 << "]\n";
                 std::cout << "          position 1: " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
 
-                trfRoot2.AddPosition(data.normal * (COLLISION_SKIN - data.distance) * weight);
+                trfRoot2.AddPosition(data.normal * (COLLISION_SKIN - data.distance) * weight2);
                 std::cout << "         position -: " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
 
                 vel2->velocity += glm::dot(vel2->velocity, -data.normal) * data.normal;
@@ -305,6 +308,20 @@ namespace tomato
                     vel2->velocity.z = 0.f;
                 std::cout << "         velocity -: " << glm::to_string(vel2->velocity) << "\n";
             }
+        }
+        else
+        {
+            // 겹침 보정
+
+            std::cout << "         [" << (int)e1 << "]\n";
+            std::cout << "         position 1: " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
+            trfRoot1.AddPosition(-data.normal * -data.distance * weight1 * FIXED_DELTA_TIME * CORRECTION_SPEED);
+            std::cout << "         position P: " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
+
+            std::cout << "         [" << (int)e2 << "]\n";
+            std::cout << "         position 1: " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
+            trfRoot2.AddPosition(data.normal * -data.distance * weight2 * FIXED_DELTA_TIME * CORRECTION_SPEED);
+            std::cout << "         position P: " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
         }
     }
 
@@ -337,9 +354,6 @@ namespace tomato
 
         auto& trfRoot1 = e.reg->get<TransformComponent>(root1);
         auto& trfRoot2 = e.reg->get<TransformComponent>(root2);
-
-        //constexpr float CORRECTION_SPEED = 3.5f;
-        constexpr float CORRECTION_SPEED = 5.f;
 
         std::cout << "         position 1- " << (int)e.e1 << ": " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
         trfRoot1.AddPosition(-e.info.normal * e.info.distance * weight * FIXED_DELTA_TIME * CORRECTION_SPEED);

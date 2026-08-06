@@ -136,7 +136,9 @@ namespace tomato
             if (-EPSILON < closestP.y && closestP.y < EPSILON)
                 closestP.y = 0.f;
 
-            return DistanceResult{closestP / length, length};
+            auto normal = closestP / length;
+            std::cout << " *** GJK *** " << glm::to_string(normal) << " " << length << "\n";
+            return DistanceResult{-normal, length};
         }
 
         return RunEPA(simplex, col1, trf1, col2, trf2);
@@ -246,7 +248,7 @@ namespace tomato
 
                 // std::cout << "     eps normalize: " << glm::to_string(hitNormal) << "\n";
                 hitNormal = glm::normalize(hitNormal);
-                // std::cout << "     aft normalize: " << glm::to_string(hitNormal) << "\n";
+                std::cout << "     aft normalize: " << glm::to_string(hitNormal) << "\n";
             }
 
             return ContactData{hitNormal, hitFraction, 0.f};

@@ -14,6 +14,10 @@ namespace tomato
         EPAPlain(
             const std::vector<glm::vec3>& points,
             uint32_t idx0, uint32_t idx1, uint32_t idx2);
+        EPAPlain(
+            const std::vector<glm::vec3>& points,
+            uint32_t ref,
+            uint32_t idx0, uint32_t idx1, uint32_t idx2);
 
         UnorderedPair<uint32_t> edges[3]{}; /// saves points indices.
         glm::vec3 normal{};

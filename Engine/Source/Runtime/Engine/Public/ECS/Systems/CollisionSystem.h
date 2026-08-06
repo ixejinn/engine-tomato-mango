@@ -21,6 +21,7 @@ namespace tomato
 
     private:
         static constexpr int EXIT_CNT = 2;
+        static constexpr float CORRECTION_SPEED = 5.f;
 
         void RunBroadPhase(SimContext& simCtx);
         void RunNarrowPhase(SimContext& simCtx);
