@@ -35,8 +35,6 @@ namespace tomato
         void ResolveContacts(entt::registry& reg);
         std::vector<CollisionEvent> contacts_;
         static void ResolveContact(entt::registry& reg, entt::entity e1, entt::entity e2, const ContactData& data);
-
-        static void CorrectPenetration(const PenetrationEvent& e);
     };
 }
 

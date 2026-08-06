@@ -19,12 +19,7 @@ namespace tomato
 {
     CollisionSystem::CollisionSystem()
     : broadPhase_(std::make_unique<SAP>())
-    , narrowPhase_(std::make_unique<GJK>())
-    {
-        auto& eventDispatcher = EventDispatcher::GetInstance();
-        eventDispatcher.Connect<PenetrationEvent, &CollisionSystem::CorrectPenetration>();
-        eventDispatcher.Connect<ChangeMovementModeEvent, &CharacterMovement::ChangeMovementMode>();
-    }
+    , narrowPhase_(std::make_unique<GJK>()) {}
 
     CollisionSystem::~CollisionSystem() = default;
 
@@ -33,10 +28,7 @@ namespace tomato
         RunBroadPhase(simCtx);
         RunNarrowPhase(simCtx);
 
-        EventDispatcher::GetInstance().Update<PenetrationEvent>();
         ResolveContacts(simCtx.state->GetRegistry());
-
-        EventDispatcher::GetInstance().Update<ChangeMovementModeEvent>();
     }
 
     void CollisionSystem::RunBroadPhase(SimContext& simCtx)
@@ -160,8 +152,8 @@ namespace tomato
             {
                 const glm::vec3 radius{halfExtents.x};
 
-                col.max = wPos + radius + HALF_COLLISION_SKIN;
-                col.min = wPos - radius - HALF_COLLISION_SKIN;
+                col.max = wPos + radius + HALF_COLLISION_SKIN + 1e-6f;
+                col.min = wPos - radius - HALF_COLLISION_SKIN - 1e-6f;
             }
             else
             {
@@ -174,8 +166,8 @@ namespace tomato
                     glm::abs(R[0][2]) * halfExtents.x + glm::abs(R[1][2]) * halfExtents.y + glm::abs(R[2][2]) * halfExtents.z
                 };
 
-                col.max = wPos + aabbHalfExtents + HALF_COLLISION_SKIN;
-                col.min = wPos - aabbHalfExtents - HALF_COLLISION_SKIN;
+                col.max = wPos + aabbHalfExtents + HALF_COLLISION_SKIN + 1e-6f;
+                col.min = wPos - aabbHalfExtents - HALF_COLLISION_SKIN - 1e-6f;
             }
         }
     }
@@ -323,44 +315,5 @@ namespace tomato
             trfRoot2.AddPosition(data.normal * -data.distance * weight2 * FIXED_DELTA_TIME * CORRECTION_SPEED);
             std::cout << "         position P: " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
         }
-    }
-
-    void CollisionSystem::CorrectPenetration(const PenetrationEvent& e)
-    {
-        std::cout << " ===== SOLVE PENETRATION " << (int)e.e1 << " " << (int)e.e2 << "\n";
-        std::cout << "       normal: " << e.info.normal.x << " " << e.info.normal.y << " " << e.info.normal.z << "\n";
-        entt::entity root1 = GetRootEntity(*e.reg, e.e1);
-        entt::entity root2 = GetRootEntity(*e.reg, e.e2);
-
-        glm::vec3 v1{0.f};
-        glm::vec3 v2{0.f};
-
-        auto vel1 = e.reg->try_get<VelocityComponent>(root1);
-        if (vel1)
-            v1 = vel1->velocity;
-
-        auto vel2 = e.reg->try_get<VelocityComponent>(root2);
-        if (vel2)
-            v2 = vel2->velocity;
-
-        float lenV1 = glm::length(v1);
-        float lenV2 = glm::length(v2);
-        float sumV = lenV1 + lenV2;
-
-        float weight = 0.5f;
-        if (sumV >= 1e-6f)
-            weight = lenV1 / sumV;
-        std::cout << "       weight: " << weight << "\n";
-
-        auto& trfRoot1 = e.reg->get<TransformComponent>(root1);
-        auto& trfRoot2 = e.reg->get<TransformComponent>(root2);
-
-        std::cout << "         position 1- " << (int)e.e1 << ": " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
-        trfRoot1.AddPosition(-e.info.normal * e.info.distance * weight * FIXED_DELTA_TIME * CORRECTION_SPEED);
-        std::cout << "         position 2- " << (int)e.e1 << ": " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
-
-        std::cout << "         position 1- " << (int)e.e2 << ": " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
-        trfRoot2.AddPosition(e.info.normal * e.info.distance * (1 - weight) * FIXED_DELTA_TIME * CORRECTION_SPEED);
-        std::cout << "         position 2- " << (int)e.e2 << ": " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
     }
 }
