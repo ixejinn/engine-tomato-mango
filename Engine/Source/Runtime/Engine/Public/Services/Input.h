@@ -1,6 +1,7 @@
 ﻿#ifndef MANGO_INPUT_H
 #define MANGO_INPUT_H
 
+#include "glm/fwd.hpp"
 #include "Input/InputEvent.h"
 #include "Event/EventSignal.h"
 #include "ServiceFwd.h"
@@ -28,6 +29,8 @@ namespace tomato
 
         static bool IsKeyPressed(Key key);
         static bool IsKeyReleased(Key key);
+
+        static glm::vec2 GetMousePosition();
 
         explicit Input(Window& window, InputRecorder& recorder, InputUI& inputUI);
 

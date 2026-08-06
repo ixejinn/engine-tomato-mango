@@ -26,6 +26,9 @@ namespace tomato
         float degree;
         float zNear;
         float zFar;
+
+        glm::mat4 view;
+        glm::mat4 projection;
         glm::mat4 viewProjMat;
 
         bool dirty{true};

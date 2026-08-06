@@ -2,7 +2,12 @@
 
 #include <entt/entt.hpp>
 #include "Resource/PathManager.h"
+#include "Resource/AssetRegistry.h"
+#include "Resource/Render/Mesh.h"
 #include "Resource/Render/Texture.h"
+
+#include "ECS/Components/Render.h"
+#include "ECS/Components/Transform.h"
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
@@ -10,10 +15,13 @@
 #include "imgui_impl_opengl3.h"
 
 #include "Services/Input.h"
+#include "State/State.h"
 
 #include "EditorPanel.h"
 #include "HierarchyPanel.h"
 #include "InspectorPanel.h"
+
+#include "Math/Geometry.h"
 
 namespace tomato
 {
@@ -23,7 +31,7 @@ namespace tomato
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 		
 		// Setup Platform/Renderer backends
 		ImGui_ImplGlfw_InitForOpenGL(wnd, false);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
@@ -82,6 +90,8 @@ namespace tomato
 		for (auto& panel : panels)
 			panel->Draw(eCtx);
 		
+		/*if (Input::IsKeyPressed(Key::LeftMouseButton))
+			PickObject(eCtx.currentState->GetRegistry(), Input::GetMousePosition());*/
 #elif 1
 #endif
 	}
@@ -102,6 +112,33 @@ namespace tomato
 		cb.character = ImGui_ImplGlfw_CharCallback;
 
 		Input::SetExternalInputCallbacks(cb);
+	}
+
+	void Editor::PickObject(entt::registry& reg, glm::vec2 mousePos)
+	{
+		Ray ray = ScreenPointToRay(reg, mousePos);
+
+		float nearest = FLT_MAX;
+		entt::entity selected = entt::null;
+
+		auto view = reg.view<TransformComponent, RenderComponent>();
+		for (auto [e, transform, render] : view.each())
+		{
+			auto mesh = AssetRegistry<Mesh>::GetInstance().Get(render.mesh);
+			AABB worldAABB = TransformAABB(mesh->GetLocalAABB(), transform.GetTransformMatrix());
+
+			float distance;
+			if (IntersectRayAABB(ray, worldAABB, distance))
+			{
+				if (distance < nearest)
+				{
+					nearest = distance;
+					selected = e;
+				}
+			}
+		}
+
+		eCtx.selectedEntity = selected;
 	}
 
 	void Editor::LoadResources()

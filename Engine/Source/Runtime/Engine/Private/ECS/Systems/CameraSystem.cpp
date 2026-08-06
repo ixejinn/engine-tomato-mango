@@ -24,7 +24,7 @@ namespace tomato
             glm::vec3 u = quaternion * glm::vec3(0, 1, 0);
 
             auto pos = trf.GetWorldPosition();
-            glm::mat4 viewMtx
+            cam.view = glm::mat4
             {
                 r.x, u.x, b.x, 0,   // column 0
                 r.y, u.y, b.y, 0,   // column 1
@@ -35,11 +35,10 @@ namespace tomato
             const float width = static_cast<float>(Window::GetWidth());
             const float height = static_cast<float>(Window::GetHeight());
 
-            glm::mat4 projection{1.f};
             switch (cam.mode)
             {
             case Perspective:
-                projection = glm::perspective(
+                cam.projection = glm::perspective(
                     glm::radians(cam.degree),
                     width / height,
                     cam.zNear, cam.zFar);
@@ -48,7 +47,7 @@ namespace tomato
             case Orthogonal:
             {
                 float w = width / height * 10;
-                projection = glm::ortho(
+                cam.projection = glm::ortho(
                     -w, w,
                     -10.f, 10.f,
                     cam.zNear, cam.zFar);
@@ -56,7 +55,7 @@ namespace tomato
             break;
             }
 
-            cam.viewProjMat = projection * viewMtx;
+            cam.viewProjMat = cam.projection * cam.view;
 
             cam.dirty = false;
         }
