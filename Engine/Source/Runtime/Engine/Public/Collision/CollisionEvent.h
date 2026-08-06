@@ -2,14 +2,14 @@
 #define MANGO_COLLISIONEVENT_H
 
 #include <entt/entt.hpp>
-#include "Collision/CollisionInfo.h"
+#include "Collision/ContactData.h"
 
 namespace tomato
 {
     struct CollisionEvent
     {
         entt::entity e1, e2;
-        CollisionInfo info;
+        ContactData info;
     };
 
     struct PenetrationEvent
@@ -17,7 +17,7 @@ namespace tomato
         entt::entity e1, e2;
         entt::registry* reg;
 
-        CollisionInfo info;
+        ContactData info;
     };
 
     struct CollisionEnterEvent
@@ -25,7 +25,7 @@ namespace tomato
         entt::entity e1, e2;
         entt::registry* reg;
 
-        CollisionInfo info;
+        ContactData info;
     };
 
     struct CollisionStayEvent
@@ -33,7 +33,7 @@ namespace tomato
         entt::entity e1, e2;
         entt::registry* reg;
 
-        CollisionInfo info;
+        ContactData info;
     };
 
     struct CollisionExitEvent

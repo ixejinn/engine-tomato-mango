@@ -20,23 +20,22 @@ namespace tomato
         void Update(SimContext& simCtx) override;
 
     private:
+        static constexpr int EXIT_CNT = 2;
+
         void RunBroadPhase(SimContext& simCtx);
         void RunNarrowPhase(SimContext& simCtx);
-
-        static void UpdateAABB(entt::registry& reg);
-
-        static void ResolveContact(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info);
-
-        static void OnPenetration(const PenetrationEvent& e);
-
         std::unique_ptr<BroadPhase> broadPhase_;
         std::unique_ptr<NarrowPhase> narrowPhase_;
 
         std::vector<ContactPair> candidates_;
 
-        void ResolveCollision(entt::registry& reg);
+        static void UpdateAABB(entt::registry& reg);
 
-        std::vector<CollisionEvent> events_;
+        void ResolveContacts(entt::registry& reg);
+        std::vector<CollisionEvent> contacts_;
+        static void ResolveContact(entt::registry& reg, entt::entity e1, entt::entity e2, const ContactData& data);
+
+        static void CorrectPenetration(const PenetrationEvent& e);
     };
 }
 

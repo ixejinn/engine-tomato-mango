@@ -1,8 +1,10 @@
 ﻿#include <glm/vec3.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 #include <entt/entt.hpp>
 #include "ECS/Systems/CollisionSystem.h"
 #include "ECS/Components/ComponentsPhys.h"
-#include "ECS/Components/Character.h"
+#include "ECS/Components/Movement.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Collision/CollisionEvent.h"
@@ -19,9 +21,9 @@ namespace tomato
     : broadPhase_(std::make_unique<SAP>())
     , narrowPhase_(std::make_unique<GJK>())
     {
-        EventDispatcher::GetInstance().Connect<PenetrationEvent, &CollisionSystem::OnPenetration>();
-
-        EventDispatcher::GetInstance().Connect<ChangeMovementModeEvent, &CharacterMovement::ChangeMovementMode>();
+        auto& eventDispatcher = EventDispatcher::GetInstance();
+        eventDispatcher.Connect<PenetrationEvent, &CollisionSystem::CorrectPenetration>();
+        eventDispatcher.Connect<ChangeMovementModeEvent, &CharacterMovement::ChangeMovementMode>();
     }
 
     CollisionSystem::~CollisionSystem() = default;
@@ -32,90 +34,84 @@ namespace tomato
         RunNarrowPhase(simCtx);
 
         EventDispatcher::GetInstance().Update<PenetrationEvent>();
-        ResolveCollision(simCtx.state->GetRegistry());
+        ResolveContacts(simCtx.state->GetRegistry());
 
         EventDispatcher::GetInstance().Update<ChangeMovementModeEvent>();
     }
 
     void CollisionSystem::RunBroadPhase(SimContext& simCtx)
     {
+        candidates_.clear();
+
         auto& registry = simCtx.state->GetRegistry();
 
         UpdateAABB(registry);
-
-        candidates_.clear();
-        broadPhase_->FindCollisionCandidates(registry, candidates_);
+        broadPhase_->FindContactPairCandidates(registry, candidates_);
     }
 
     void CollisionSystem::RunNarrowPhase(SimContext& simCtx)
     {
-        events_.clear();
+        contacts_.clear();
 
         auto& registry = simCtx.state->GetRegistry();
-        auto& collisionPairs = registry.ctx().get<CollisionContext>().pairs;
-
+        auto& contactPairs = registry.ctx().get<CollisionContext>().pairs;
         auto& eventDispatcher = EventDispatcher::GetInstance();
 
+        // Check contact pair candidates
         for (const auto& candidate : candidates_)
         {
             if (!registry.valid(candidate.a) || !registry.valid(candidate.b))
                 continue;
 
-            auto& col1 = registry.get<ColliderComponent>(candidate.a);
-            auto& col2 = registry.get<ColliderComponent>(candidate.b);
-
-            if (auto result = narrowPhase_->EvaluateCollision(registry, candidate.a, candidate.b)) {
-                // std::cout << "     COLLISION: " << (int)candidate.a << " " << (int)candidate.b << "\n";
+            if (auto result = narrowPhase_->EvaluateContactPair(registry, candidate))
+            {
                 // Collision detected
-                if (!collisionPairs.contains(candidate))
+                if (!contactPairs.contains(candidate))
                 {
-                    collisionPairs[candidate].normal = result->normal;
+                    contactPairs[candidate].normal = result->normal;
 
                     // Enter
-                    if (col1.isTrigger || col2.isTrigger)
+                    if (result->trigger)
                     {
-                        std::cout << "          enter " << (int)candidate.a << " " << (int)candidate.b << "\n";
+                        std::cout << "      trg ENTER " << candidate << "\n";
                         eventDispatcher.Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
-
-                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, candidate.a)))
-                            eventDispatcher.Enqueue(ChangeMovementModeEvent{candidate.a, simCtx.state, Walking});
-                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, candidate.b)))
-                            eventDispatcher.Enqueue(ChangeMovementModeEvent{candidate.b, simCtx.state, Walking});
                     }
                     else
                     {
-                        std::cout << "          enter " << (int)candidate.a << " " << (int)candidate.b << "\n";
-                        events_.emplace_back(candidate.a, candidate.b, result.value());
+                        std::cout << "      col ENTER " << candidate << "\n";
                         eventDispatcher.Enqueue(CollisionEnterEvent{candidate.a, candidate.b, &registry, result.value()});
+                        contacts_.emplace_back(candidate.a, candidate.b, result.value());
                     }
                 }
                 else
                 {
-                    if (result->skin)
-                        result->normal = collisionPairs[candidate].normal;
+                    if (result->distance < COLLISION_SKIN + 1e-4f)
+                        result->normal = contactPairs[candidate].normal;
                     else
-                        collisionPairs[candidate].normal = result->normal;
+                        contactPairs[candidate].normal = result->normal;
 
                     // Stay
-                    if (col1.isTrigger || col2.isTrigger)
+                    if (result->trigger)
                     {
-                        //std::cout << "          stay " << collisionPairs.size() << "\n";
+                        // std::cout << "      trg STAY " << candidate << "\n";
                         eventDispatcher.Enqueue(TriggerStayEvent{candidate.a, candidate.b, &registry});
                     }
                     else
                     {
-                        events_.emplace_back(candidate.a, candidate.b, result.value());
+                        // std::cout << "      col STAY " << candidate << "\n";
                         eventDispatcher.Enqueue(CollisionStayEvent{candidate.a, candidate.b, &registry, result.value()});
+                        contacts_.emplace_back(candidate.a, candidate.b, result.value());
                     }
                 }
 
-                collisionPairs[candidate].curr = 2;
+                contactPairs[candidate].exitCnt = EXIT_CNT;
             }
         }
 
-        for (auto it = collisionPairs.begin(); it != collisionPairs.end(); )
+        // Check exit of contact pairs
+        for (auto it = contactPairs.begin(); it != contactPairs.end(); )
         {
-            if (it->second.curr <= 0)
+            if (it->second.exitCnt <= 0)
             {
                 // Exit
                 auto* col1 = registry.try_get<ColliderComponent>(it->first.a);
@@ -123,28 +119,23 @@ namespace tomato
 
                 if (col1 && col2)
                 {
-                    std::cout << "          exit " << (int)it->first.a << " " << (int)it->first.b << "\n";
                     if (col1->isTrigger || col2->isTrigger)
                     {
-                        //std::cout << "          exit " << (int)it->first.a << " " << (int)it->first.b << "\n";
+                        std::cout << "      trg EXIT " << it->first << "\n";
                         EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{ it->first.a, it->first.b, &registry });
-
-                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.a)))
-                            eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.a, simCtx.state, Falling });
-                        if (registry.all_of<CharacterTag>(GetRootEntity(registry, it->first.b)))
-                            eventDispatcher.Enqueue(ChangeMovementModeEvent{ it->first.b, simCtx.state, Falling });
                     }
                     else
                     {
+                        std::cout << "      col EXIT " << it->first << "\n";
                         EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{ it->first.a, it->first.b, &registry });
                     }
                 }
 
-                it = collisionPairs.erase(it);
+                it = contactPairs.erase(it);
             }
             else
             {
-                --it->second.curr;
+                --it->second.exitCnt;
                 ++it;
             }
         }
@@ -157,6 +148,7 @@ namespace tomato
         {
             if (!col.aabbDirty)
                 continue;
+            col.aabbDirty = false;
 
             glm::vec3 wPos = trf.GetWorldPosition();
             // Sweep AABB
@@ -188,19 +180,22 @@ namespace tomato
         }
     }
 
-    void CollisionSystem::ResolveContact(entt::registry& reg, entt::entity e1, entt::entity e2, const CollisionInfo& info)
+    void CollisionSystem::ResolveContacts(entt::registry& reg)
     {
+        for (auto& contact : contacts_)
+            ResolveContact(reg, contact.e1, contact.e2, contact.info);
+    }
+
+    void CollisionSystem::ResolveContact(entt::registry& reg, entt::entity e1, entt::entity e2, const ContactData& data)
+    {
+        std::cout << " ===== SOLVE COLLISION " << (int)e1 << " " << (int)e2 << "\n";
+        std::cout << "       normal: " << data.normal.x << " " << data.normal.y << " " << data.normal.z << "\n";
+
         entt::entity root1 = GetRootEntity(reg, e1);
         entt::entity root2 = GetRootEntity(reg, e2);
 
-        auto& trfRoot1 = reg.get<TransformComponent>(root1);
-        auto& trfRoot2 = reg.get<TransformComponent>(root2);
-
-        std::cout << " ===== SOLVE COLLISION " << (int)e1 << " " << (int)e2 << "\n";
-        std::cout << "       normal: " << info.normal.x << " " << info.normal.y << " " << info.normal.z << "\n";
-
-        glm::vec3 v1{ 0.f };
-        glm::vec3 v2{ 0.f };
+        glm::vec3 v1{0.f};
+        glm::vec3 v2{0.f};
 
         auto vel1 = reg.try_get<VelocityComponent>(root1);
         if (vel1)
@@ -219,87 +214,126 @@ namespace tomato
             weight = lenV1 / sumV;
         std::cout << "       weight: " << weight << "\n";
 
+        auto& trfRoot1 = reg.get<TransformComponent>(root1);
+        auto& trfRoot2 = reg.get<TransformComponent>(root2);
+
         constexpr float epsilon = 1e-4f;
 
-        if (vel1)
+        if (data.hitTime.has_value())
         {
-            auto pos = trfRoot1.GetLocalPosition();
-            std::cout << "         position 1: " << pos.x << " " << pos.y << " " << pos.z << " " << trfRoot1.GetLocalEulerDegree().y << "\n";
-            //auto rot = trfRoot1.GetLocalEulerDegree();
-            //std::cout << "         rotation 1: " << rot.x << " " << rot.y << " " << rot.z << " " << "\n";
-            std::cout << "         velocity 1: " << vel1->velocity.x << " " << vel1->velocity.y << " " << vel1->velocity.z << "\n";
+            // CCD contact data
+            const float ht = data.hitTime.value();
 
-            if (!info.skin)
+            if (vel1)
             {
-                trfRoot1.AddPosition((vel1->velocity * FIXED_DELTA_TIME * info.depth - info.normal * COLLISION_SKIN) * weight);
-                pos = trfRoot1.GetLocalPosition();
-                std::cout << "         position 2: " << pos.x << " " << pos.y << " " << pos.z << "\n";
+                std::cout << "         [" << (int)e1 << "]\n";
+                std::cout << "          position 1: " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
 
-                glm::vec3 remainingMove = (1 - info.depth * weight) * vel1->velocity;
-                vel1->velocity = remainingMove - glm::dot(remainingMove, info.normal) * info.normal;
-            }
-            else
-            {
-                // COLLISION_SKIN 만큼만 떨어져 있어서 GJK Distance로부터 받은 충돌 정보
-                trfRoot1.AddPosition(-info.normal * (COLLISION_SKIN - info.depth) * weight);
-                pos = trfRoot1.GetLocalPosition();
-                std::cout << "         position S: " << pos.x << " " << pos.y << " " << pos.z << "\n";
+                trfRoot1.AddPosition((vel1->velocity * FIXED_DELTA_TIME * ht - data.normal * COLLISION_SKIN) * weight);
+                std::cout << "          position C: " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
 
-                vel1->velocity -= glm::dot(vel1->velocity, info.normal) * info.normal;
+                glm::vec3 remainingMove = (1 - ht * weight) * vel1->velocity;
+                vel1->velocity = remainingMove - glm::dot(remainingMove, data.normal) * data.normal;
+
+                if (-epsilon < vel1->velocity.x && vel1->velocity.x < epsilon)
+                    vel1->velocity.x = 0.f;
+                if (-epsilon < vel1->velocity.y && vel1->velocity.y < epsilon)
+                    vel1->velocity.y = 0.f;
+                if (-epsilon < vel1->velocity.z && vel1->velocity.z < epsilon)
+                    vel1->velocity.z = 0.f;
+                std::cout << "         velocity C: " << glm::to_string(vel1->velocity) << "\n";
             }
 
-            if (-epsilon < vel1->velocity.x && vel1->velocity.x < epsilon)
-                vel1->velocity.x = 0.f;
-            if (-epsilon < vel1->velocity.y && vel1->velocity.y < epsilon)
-                vel1->velocity.y = 0.f;
-            if (-epsilon < vel1->velocity.z && vel1->velocity.z < epsilon)
-                vel1->velocity.z = 0.f;
+            if (vel2)
+            {
+                std::cout << "         [" << (int)e2 << "]\n";
+                std::cout << "          position 1: " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
 
-            std::cout << "         velocity _: " << vel1->velocity.x << " " << vel1->velocity.y << " " << vel1->velocity.z << "\n";
+                trfRoot2.AddPosition((vel2->velocity * FIXED_DELTA_TIME * ht + data.normal * COLLISION_SKIN) * weight);
+                std::cout << "         position C: " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
+
+                glm::vec3 remainingMove = (1 - ht * weight) * vel2->velocity;
+                vel2->velocity = remainingMove + glm::dot(remainingMove, -data.normal) * data.normal;
+
+                if (-epsilon < vel2->velocity.x && vel2->velocity.x < epsilon)
+                    vel2->velocity.x = 0.f;
+                if (-epsilon < vel2->velocity.y && vel2->velocity.y < epsilon)
+                    vel2->velocity.y = 0.f;
+                if (-epsilon < vel2->velocity.z && vel2->velocity.z < epsilon)
+                    vel2->velocity.z = 0.f;
+                std::cout << "         velocity C: " << glm::to_string(vel2->velocity) << "\n";
+            }
         }
-
-        if (vel2)
+        else
         {
-            auto pos = trfRoot2.GetLocalPosition();
-            std::cout << "         position 1: " << pos.x << " " << pos.y << " " << pos.z << "\n";
-            std::cout << "         velocity 1: " << vel2->velocity.x << " " << vel2->velocity.y << " " << vel2->velocity.z << "\n";
+            // COLLISION_SKIN 만큼만 떨어져 있어서 GJK Distance로부터 받은 충돌 정보
 
-            if (!info.skin)
+            if (vel1)
             {
-                trfRoot2.AddPosition((vel2->velocity * FIXED_DELTA_TIME * info.depth + info.normal * COLLISION_SKIN) * weight);
-                pos = trfRoot2.GetLocalPosition();
-                std::cout << "         position 2: " << pos.x << " " << pos.y << " " << pos.z << "\n";
+                std::cout << "         [" << (int)e1 << "]\n";
+                std::cout << "         position 1: " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
 
-                glm::vec3 remainingMove = (1 - info.depth * weight) * vel2->velocity;
-                vel2->velocity = remainingMove + glm::dot(remainingMove, -info.normal) * info.normal;
-            }
-            else
-            {
-                // COLLISION_SKIN 만큼만 떨어져 있어서 GJK Distance로부터 받은 충돌 정보
-                trfRoot2.AddPosition(info.normal * (COLLISION_SKIN - info.depth) * weight);
-                pos = trfRoot2.GetLocalPosition();
-                std::cout << "         position S: " << pos.x << " " << pos.y << " " << pos.z << "\n";
+                trfRoot1.AddPosition(-data.normal * (COLLISION_SKIN - data.distance) * weight);
+                std::cout << "         position -: " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
 
-                vel2->velocity += glm::dot(vel2->velocity, -info.normal) * info.normal;
+                vel1->velocity -= glm::dot(vel1->velocity, data.normal) * data.normal;
+
+                if (-epsilon < vel1->velocity.x && vel1->velocity.x < epsilon)
+                    vel1->velocity.x = 0.f;
+                if (-epsilon < vel1->velocity.y && vel1->velocity.y < epsilon)
+                    vel1->velocity.y = 0.f;
+                if (-epsilon < vel1->velocity.z && vel1->velocity.z < epsilon)
+                    vel1->velocity.z = 0.f;
+                std::cout << "         velocity -: " << glm::to_string(vel1->velocity) << "\n";
             }
 
-            if (-epsilon < vel2->velocity.x && vel2->velocity.x < epsilon)
-                vel2->velocity.x = 0.f;
-            if (-epsilon < vel2->velocity.y && vel2->velocity.y < epsilon)
-                vel2->velocity.y = 0.f;
-            if (-epsilon < vel2->velocity.z && vel2->velocity.z < epsilon)
-                vel2->velocity.z = 0.f;
+            if (vel2)
+            {
+                std::cout << "         [" << (int)e2 << "]\n";
+                std::cout << "          position 1: " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
 
-            std::cout << "         velocity _: " << vel2->velocity.x << " " << vel2->velocity.y << " " << vel2->velocity.z << "\n";
+                trfRoot2.AddPosition(data.normal * (COLLISION_SKIN - data.distance) * weight);
+                std::cout << "         position -: " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
+
+                vel2->velocity += glm::dot(vel2->velocity, -data.normal) * data.normal;
+
+                if (-epsilon < vel2->velocity.x && vel2->velocity.x < epsilon)
+                    vel2->velocity.x = 0.f;
+                if (-epsilon < vel2->velocity.y && vel2->velocity.y < epsilon)
+                    vel2->velocity.y = 0.f;
+                if (-epsilon < vel2->velocity.z && vel2->velocity.z < epsilon)
+                    vel2->velocity.z = 0.f;
+                std::cout << "         velocity -: " << glm::to_string(vel2->velocity) << "\n";
+            }
         }
     }
 
-    void CollisionSystem::OnPenetration(const PenetrationEvent& e)
+    void CollisionSystem::CorrectPenetration(const PenetrationEvent& e)
     {
         std::cout << " ===== SOLVE PENETRATION " << (int)e.e1 << " " << (int)e.e2 << "\n";
         std::cout << "       normal: " << e.info.normal.x << " " << e.info.normal.y << " " << e.info.normal.z << "\n";
         entt::entity root1 = GetRootEntity(*e.reg, e.e1);
         entt::entity root2 = GetRootEntity(*e.reg, e.e2);
+
+        glm::vec3 v1{0.f};
+        glm::vec3 v2{0.f};
+
+        auto vel1 = e.reg->try_get<VelocityComponent>(root1);
+        if (vel1)
+            v1 = vel1->velocity;
+
+        auto vel2 = e.reg->try_get<VelocityComponent>(root2);
+        if (vel2)
+            v2 = vel2->velocity;
+
+        float lenV1 = glm::length(v1);
+        float lenV2 = glm::length(v2);
+        float sumV = lenV1 + lenV2;
+
+        float weight = 0.5f;
+        if (sumV >= 1e-6f)
+            weight = lenV1 / sumV;
+        std::cout << "       weight: " << weight << "\n";
 
         auto& trfRoot1 = e.reg->get<TransformComponent>(root1);
         auto& trfRoot2 = e.reg->get<TransformComponent>(root2);
@@ -307,24 +341,12 @@ namespace tomato
         //constexpr float CORRECTION_SPEED = 3.5f;
         constexpr float CORRECTION_SPEED = 5.f;
 
-        // auto bef = trfRoot1.GetLocalPosition();
-        trfRoot1.AddPosition(-e.info.normal * e.info.depth * e.info.weight * FIXED_DELTA_TIME * CORRECTION_SPEED);
-        // auto aft = trfRoot1.GetLocalPosition();
-        // TMT_INFO << (int)root1 << " bef: " << bef.x << " " << bef.y << " " << bef.z;
-        // TMT_INFO << (int)root1 << " aft: " << aft.x << " " << aft.y << " " << aft.z;
+        std::cout << "         position 1- " << (int)e.e1 << ": " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
+        trfRoot1.AddPosition(-e.info.normal * e.info.distance * weight * FIXED_DELTA_TIME * CORRECTION_SPEED);
+        std::cout << "         position 2- " << (int)e.e1 << ": " << glm::to_string(trfRoot1.GetLocalPosition()) << "\n";
 
-        // bef = trfRoot2.GetLocalPosition();
-        trfRoot2.AddPosition(e.info.normal * e.info.depth * (1 - e.info.weight) * FIXED_DELTA_TIME * CORRECTION_SPEED);
-        // aft = trfRoot2.GetLocalPosition();
-        // TMT_INFO << (int)root2 << " bef: " << bef.x << " " << bef.y << " " << bef.z;
-        // TMT_INFO << (int)root2 << " aft: " << aft.x << " " << aft.y << " " << aft.z;
-    }
-
-    void CollisionSystem::ResolveCollision(entt::registry& reg)
-    {
-        for (auto& event : events_)
-        {
-            ResolveContact(reg, event.e1, event.e2, event.info);
-        }
+        std::cout << "         position 1- " << (int)e.e2 << ": " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
+        trfRoot2.AddPosition(e.info.normal * e.info.distance * (1 - weight) * FIXED_DELTA_TIME * CORRECTION_SPEED);
+        std::cout << "         position 2- " << (int)e.e2 << ": " << glm::to_string(trfRoot2.GetLocalPosition()) << "\n";
     }
 }

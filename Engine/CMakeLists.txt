@@ -93,7 +93,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Collision/CollisionFwd.h
         Source/Runtime/Engine/Public/Collision/Broad/SAP.h
         Source/Runtime/Engine/Public/Collision/Narrow/NarrowPhase.h
-        Source/Runtime/Engine/Public/Collision/CollisionInfo.h
+        Source/Runtime/Engine/Public/Collision/ContactData.h
         Source/Runtime/Engine/Public/Math/Normal.h
         Source/Runtime/Engine/Public/Network/NetworkFwd.h
         Source/Runtime/Engine/Public/Network/NetConnection.h
@@ -177,6 +177,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Input/InputConstantsFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/Systems.h
 		Source/Runtime/Engine/Public/Collision/CollisionCache.h
+		Source/Runtime/Engine/Public/Collision/Narrow/GJK/GJKResult.h
 )
 
 set(ENGINE_SOURCES

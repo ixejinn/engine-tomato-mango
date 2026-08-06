@@ -1,17 +1,18 @@
 #include <unordered_set>
 #include <glm/glm.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Collision.h"
 #include "Collision/Narrow/GJK/EPA.h"
 #include "Collision/Narrow/GJK/GJK.h"
 #include "Collision/CollisionEvent.h"
-#include "Event/EventDispatcher.h"
 #include "Math/Normal.h"
 #include "Utils/Logger.h"
 
 namespace tomato
 {
-    EPA::Plain::Plain(
+    EPAPlain::EPAPlain(
         const std::vector<glm::vec3>& points,
         uint32_t idx0, uint32_t idx1, uint32_t idx2)
     {
@@ -24,10 +25,10 @@ namespace tomato
         distance = glm::dot(normal, points[idx0]);
     }
 
-    std::optional<CollisionInfo> EPA::GetPenetrationInfo(
-        std::vector<glm::vec3>& points,
-        const ColliderComponent& col1, const ColliderComponent& col2,
-        TransformComponent& trf1, TransformComponent& trf2)
+    std::optional<DistanceResult> RunEPA(
+    std::vector<glm::vec3>& points,
+        const ColliderComponent& col1, TransformComponent& trf1,
+        const ColliderComponent& col2, TransformComponent& trf2)
     {
         // 심플렉스 확장
         while (points.size() < 4)
@@ -81,7 +82,7 @@ namespace tomato
             }
         }
 
-        std::vector<Plain> polytope;
+        std::vector<EPAPlain> polytope;
         polytope.emplace_back(points, 0, 1, 2);
         polytope.emplace_back(points, 0, 1, 3);
         polytope.emplace_back(points, 0, 2, 3);
@@ -90,7 +91,7 @@ namespace tomato
         int iteration = 0;
         while (true)
         {
-            Plain* nearest{nullptr};
+            EPAPlain* nearest{nullptr};
             for (auto& plain : polytope)
             {
                 if (!nearest || nearest->distance > plain.distance)
@@ -108,8 +109,15 @@ namespace tomato
             // Check termination condition
             float dist = glm::dot(nearest->normal, points.back());
             float diff = dist - nearest->distance;
-            if (dist < 0 || (diff < 1e-3f && diff > -1e-3f) || ++iteration >= 20)
-                return CollisionInfo{nearest->normal, nearest->distance};
+            // if (dist < 0 || (diff < 1e-3f && diff > -1e-3f) || ++iteration >= 20)
+            if (dist < 0 ||
+                (diff < GJK::EPSILON && diff > -GJK::EPSILON) ||
+                iteration++ > 20)
+            {
+                // return DistanceResult{nearest->normal, nearest->distance};
+                std::cout << " ********** " << glm::to_string(nearest->normal) << " " << nearest->distance;
+                return DistanceResult{ nearest->normal, -nearest->distance };
+            }
 
             // Expand polytope
             std::unordered_set<UnorderedPair<uint32_t>> edgesToExpand;
