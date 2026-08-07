@@ -14,9 +14,6 @@ namespace tomato
     class GJK : public NarrowPhase
     {
     public:
-        static constexpr float EPSILON_SQ = 1e-6f;
-        static constexpr float EPSILON = 1e-4f;
-
         std::optional<ContactData> EvaluateContactPair(entt::registry& reg, const ContactPair& pair) override;
 
         static glm::vec3 GetSupportPoint(

@@ -32,9 +32,21 @@ namespace tomato
 
         static void UpdateAABB(entt::registry& reg);
 
-        void ResolveContacts(entt::registry& reg);
-        std::vector<CollisionEvent> contacts_;
-        static void ResolveContact(entt::registry& reg, entt::entity e1, entt::entity e2, const ContactData& data);
+        void ResolveContacts();
+        std::vector<ContactEvent> contacts_;
+        static void ResolveContact(ContactEvent& event);
+
+        static void ResolveContinuousContact(
+            TransformComponent& trf, VelocityComponent& vel,
+            const glm::vec3& normal, float weight, float hitTime);
+
+        static void ResolveDiscreteContact(
+            TransformComponent& trf, VelocityComponent& vel,
+            const glm::vec3& normal, float weight, float distance);
+
+        static void ResolvePenetration(
+            TransformComponent& trf,
+            const glm::vec3& normal, float weight, float distance);
     };
 }
 

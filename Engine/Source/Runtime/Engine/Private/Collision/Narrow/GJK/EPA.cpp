@@ -6,7 +6,7 @@
 #include "ECS/Components/Collision.h"
 #include "Collision/Narrow/GJK/EPA.h"
 #include "Collision/Narrow/GJK/GJK.h"
-#include "Collision/CollisionEvent.h"
+#include "Collision/CollisionConfig.h"
 #include "Math/Normal.h"
 #include "Utils/Logger.h"
 
@@ -133,7 +133,7 @@ namespace tomato
             float diff = dist - nearest->distance;
             // if (dist < 0 || (diff < 1e-3f && diff > -1e-3f) || ++iteration >= 20)
             if (dist < 0 ||
-                (diff < GJK::EPSILON && diff > -GJK::EPSILON) ||
+                (diff < EPSILON && diff > -EPSILON) ||
                 iteration++ > 20)
             {
                 // return DistanceResult{nearest->normal, nearest->distance};

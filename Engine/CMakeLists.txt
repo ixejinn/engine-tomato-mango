@@ -178,6 +178,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Systems/Systems.h
 		Source/Runtime/Engine/Public/Collision/CollisionCache.h
 		Source/Runtime/Engine/Public/Collision/Narrow/GJK/GJKResult.h
+		Source/Runtime/Engine/Public/Collision/CollisionConfig.h
 )
 
 set(ENGINE_SOURCES

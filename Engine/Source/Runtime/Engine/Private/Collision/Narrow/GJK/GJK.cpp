@@ -5,6 +5,7 @@
 #include "Collision/ColliderSupport.h"
 #include "Collision/CollisionEvent.h"
 #include "Collision/CollisionConstants.h"
+#include "Collision/CollisionConfig.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"

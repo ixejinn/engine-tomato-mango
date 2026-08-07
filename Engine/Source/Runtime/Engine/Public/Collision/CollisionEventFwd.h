@@ -3,9 +3,8 @@
 
 namespace tomato
 {
-    struct CollisionEvent;
-
-    struct PenetrationEvent;
+    struct TriggerEvent;
+    struct ContactEvent;
 
     struct CollisionEnterEvent;
     struct CollisionStayEvent;
