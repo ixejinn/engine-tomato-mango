@@ -20,7 +20,7 @@ namespace tomato {
             if (registered_.contains(typeid(Component)))
                 return;
 
-            timelines_.emplace_back(std::make_unique<ComponentTimeline<Component>>());
+            timelines_.emplace_back(std::make_unique<SnapshotTimeline<Component>>());
             registered_.insert(typeid(Component));
         }
 
@@ -28,7 +28,7 @@ namespace tomato {
         void Capture(const SimContext& ctx);
 
     private:
-        std::vector<std::unique_ptr<ComponentTimelineBase>> timelines_;
+        std::vector<std::unique_ptr<SnapshotTimelineBase>> timelines_;
 
         std::unordered_set<std::type_index> registered_;
     };
