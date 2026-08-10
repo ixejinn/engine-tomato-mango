@@ -1,5 +1,7 @@
 ﻿#include "HierarchyPanel.h"
 
+#include "Services/Window.h"
+
 #include "Prefab/Prefab.h"
 #include "Prefab/UIPrefab.h"
 #include "ECS/Entity/Entity.h"
@@ -27,7 +29,7 @@
 #include <iostream>
 namespace tomato
 {
-	HierarchyPanel::HierarchyPanel(bool open) : EditorPanel(open)
+	HierarchyPanel::HierarchyPanel(float width, float height, float x, float y) : EditorPanel(width, height, x, y)
 	{
 		LoadResources();
 	}
@@ -45,10 +47,8 @@ namespace tomato
 
 	void HierarchyPanel::Draw(EditorContext& editorCtx)
 	{
-		float width{ 400.f }, height{ 300.f };
-		
-		ImGui::SetNextWindowPos(ImVec2(1600.f, height + 20.f), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
-		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowPos(ImVec2(posX_, posY_), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
+		ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_FirstUseEver);
 
 		std::string sceneName =
 			editorCtx.currentScenePath.empty() == true ?
@@ -56,6 +56,7 @@ namespace tomato
 
 		if (ImGui::Begin("Hierarchy", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus))
 		{
+			SetPos({ImGui::GetWindowPos().x, ImGui::GetWindowPos().y});
 			MenuBar(editorCtx);
 
 			if (editorCtx.sceneDirty)

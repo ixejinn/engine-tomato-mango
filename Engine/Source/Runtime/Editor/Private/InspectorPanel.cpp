@@ -23,7 +23,7 @@
 
 namespace tomato
 {
-	InspectorPanel::InspectorPanel(bool open) : EditorPanel(open)
+	InspectorPanel::InspectorPanel(float width, float height, float x, float y) : EditorPanel(width, height, x, y)
 	{
 		LoadResources();
 	}
@@ -33,13 +33,13 @@ namespace tomato
 		if (editorCtx.selectedEntity == entt::null)
 			return;
 
-		float width{ 300.f }, height{ 600.f };
-
-		ImGui::SetNextWindowPos(ImVec2(1600.f, 300.f + height), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
-		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowPos(ImVec2(posX_, posY_), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
+		ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_FirstUseEver);
 		
 		if (ImGui::Begin("Inspector", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize))
 		{
+			SetPos({ ImGui::GetWindowPos().x, ImGui::GetWindowPos().y });
+
 			MenuBar(editorCtx);
 			ShowEntityUID(editorCtx);
 
@@ -59,7 +59,7 @@ namespace tomato
 
 				bool is_open = ImGui::CollapsingHeader(comp.name.c_str(), flags);
 
-				MoreButton(editorCtx, comp);
+				MoreButton(editorCtx, comp, is_open);
 
 				if (is_open && comp.editor.Draw)
 				{
@@ -166,7 +166,7 @@ namespace tomato
 		}
 	}
 
-	void InspectorPanel::MoreButton(EditorContext& editorCtx, const Serialization::ComponentInfo& comp)
+	void InspectorPanel::MoreButton(EditorContext& editorCtx, const Serialization::ComponentInfo& comp, bool& isOpen)
 	{
 		ImGui::SameLine();
 
@@ -185,6 +185,7 @@ namespace tomato
 				if (!HasFlag(comp.flags, Serialization::ComponentFlags::Essential))
 				{
 					comp.editor.Remove(editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
+					isOpen = false;
 					editorCtx.sceneDirty = true;
 				}
 			}

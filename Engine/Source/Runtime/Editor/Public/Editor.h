@@ -30,6 +30,10 @@ namespace tomato
 	private:
 		void LoadResources();
 		void ResetEditorContext(State*);
+
+		bool IsMouseOverPanel(glm::vec2 mousePos);
+		bool TrySelectUI(entt::registry& reg, glm::vec2 mousePos);
+
 	private:
 		std::vector<std::unique_ptr<EditorPanel>> panels;
 		MainMenuBar mainMenu_;

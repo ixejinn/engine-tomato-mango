@@ -8,13 +8,18 @@
 
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Transform.h"
+#include "ECS/Components/UI.h"
+#include "ECS/Components/Visibility.h"
+#include "ECS/Components/Hierarchy.h"
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Services/Input.h"
+#include "Services/Window.h"
 #include "State/State.h"
 
 #include "EditorPanel.h"
@@ -57,8 +62,8 @@ namespace tomato
 		LoadResources();
 
 		eCtx.selectedEntity = entt::null;
-		panels.push_back(std::make_unique<HierarchyPanel>(true));
-		panels.push_back(std::make_unique<InspectorPanel>(true));
+		panels.push_back(std::make_unique<HierarchyPanel>(400.f, 300.f, Window::GetWidth(), 320.f));
+		panels.push_back(std::make_unique<InspectorPanel>(300.f, 600.f, Window::GetWidth(), 900.f));
 	}
 
 	void Editor::ShutdownImGui()
@@ -90,8 +95,8 @@ namespace tomato
 		for (auto& panel : panels)
 			panel->Draw(eCtx);
 		
-		/*if (Input::IsKeyPressed(Key::LeftMouseButton))
-			PickObject(eCtx.currentState->GetRegistry(), Input::GetMousePosition());*/
+		if (Input::IsKeyPressed(Key::LeftMouseButton))
+			PickObject(eCtx.currentState->GetRegistry(), Input::GetMousePosition());
 #elif 1
 #endif
 	}
@@ -116,14 +121,25 @@ namespace tomato
 
 	void Editor::PickObject(entt::registry& reg, glm::vec2 mousePos)
 	{
+		// 1. Check the first click position and exclude ImGui window areas
+		// Note: Calculated using a top-left coordinate system and assuming the pivot is (1, 1)
+		if (IsMouseOverPanel(mousePos))
+			return;
+
+		// 2-0 Check UI
+		if (TrySelectUI(reg, glm::vec2(mousePos.x, Window::GetHeight() - mousePos.y)))
+			return;
+
 		Ray ray = ScreenPointToRay(reg, mousePos);
 
 		float nearest = FLT_MAX;
 		entt::entity selected = entt::null;
 
-		auto view = reg.view<TransformComponent, RenderComponent>();
-		for (auto [e, transform, render] : view.each())
+		auto view = reg.view<VisibilityComponent, TransformComponent, RenderComponent, RootEntityTag>();
+		for (auto [e, visib, transform, render] : view.each())
 		{
+			if (!visib.visible) continue;
+
 			auto mesh = AssetRegistry<Mesh>::GetInstance().Get(render.mesh);
 			AABB worldAABB = TransformAABB(mesh->GetLocalAABB(), transform.GetTransformMatrix());
 
@@ -154,5 +170,43 @@ namespace tomato
 		eCtx.currentState = newState;
 		eCtx.sceneDirty = false;
 		eCtx.selectedEntity = entt::null;
+	}
+
+	bool Editor::IsMouseOverPanel(glm::vec2 mousePos)
+	{
+		for (auto& panel : panels)
+		{
+			glm::vec2 panelTopLeft = panel.get()->GetPos();
+			glm::vec2 panelBotRight = panelTopLeft + panel.get()->GetSize();
+
+			if (mousePos.x < panelTopLeft.x || mousePos.x > panelBotRight.x ||
+				mousePos.y < panelTopLeft.y || mousePos.y > panelBotRight.y)
+				continue;
+
+			return true;
+		}
+		return false;
+	}
+
+	bool Editor::TrySelectUI(entt::registry& reg, glm::vec2 mousePos)
+	{
+		auto& uiCtx = reg.ctx().get<UIContext>();
+
+		if (!uiCtx.drawList.empty())
+		{
+			for (auto entity : uiCtx.drawList)
+			{
+				auto& rect = reg.get<RectTransformComponent>(entity);
+
+				if (mousePos.x >= rect.screenRect.min.x && mousePos.x <= rect.screenRect.max.x &&
+					mousePos.y >= rect.screenRect.min.y && mousePos.y <= rect.screenRect.max.y)
+				{
+					eCtx.selectedEntity = entity;
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }

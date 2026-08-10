@@ -28,6 +28,7 @@
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
 #include "ECS/Components/Text.h"
+#include "ECS/Components/Particle.h"
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Hierarchy.h"
 
@@ -570,6 +571,8 @@ namespace tomato
 	bool DrawParticleInspector(EditorContext& eCtx, entt::registry& reg, ParticleEmitterComponent& particle)
 	{
 		bool changed = false;
+
+		ImGui::Checkbox("loop", &particle.looping);
 
 
 		return changed;

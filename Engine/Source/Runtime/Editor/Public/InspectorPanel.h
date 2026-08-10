@@ -15,7 +15,7 @@ namespace tomato
 	class InspectorPanel : public EditorPanel
 	{
 	public:
-		InspectorPanel(bool open);
+		InspectorPanel(float width, float height, float x, float y);
 
 		void Draw(EditorContext&) override;
 
@@ -28,7 +28,7 @@ namespace tomato
 
 		void MenuBar(EditorContext&);
 		void ShowAddComponent(EditorContext&, Serialization::ComponentCategory);
-		void MoreButton(EditorContext&, const Serialization::ComponentInfo&);
+		void MoreButton(EditorContext&, const Serialization::ComponentInfo&, bool&);
 
 	private:
 		unsigned int more_vert;
