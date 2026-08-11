@@ -144,7 +144,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Editor/Public/EditorPanel.h
         Source/Runtime/Editor/Public/HierarchyPanel.h
         Source/Runtime/Editor/Public/EditorFwd.h
-		Source/Runtime/Engine/Public/GameObjects/Character/MovementMode.h
+		Source/Runtime/Engine/Public/GameObject/Character/MovementMode.h
         Source/Runtime/Engine/Public/Server/MatchServerNetwork.h
         Source/Runtime/Engine/Public/Server/MatchTypes.h
         Source/Runtime/Engine/Public/Server/Session.h

@@ -22,8 +22,8 @@ namespace tomato::CharacterMovement
 
         if (move1 && vel1 && event.reg->get<ColliderComponent>(event.e1).isTrigger)
         {
-            EventDispatcher::GetInstance().Enqueue(LandingEvent{
-                event.e1, event.reg->, registry.get<TransformComponent>(event.e).GetWorldPosition()});
+//            EventDispatcher::GetInstance().Enqueue(LandingEvent{
+//                event.e1, event.reg->, registry.get<TransformComponent>(event.e).GetWorldPosition()});
             Land(*move1, *vel1);
         }
 
@@ -83,17 +83,18 @@ namespace tomato::CharacterMovement
             break;
         case Walking:
             {
-                entt::entity root = GetRootEntity(registry, event.e);
-                auto& move = registry.get<MovementComponent>(root);
-                ++move.gndStayCnt;
-
-                EventDispatcher::GetInstance().Enqueue(LandingEvent{event.e, event.state, registry.get<TransformComponent>(event.e).GetWorldPosition()});
-
-                move.mode = Walking;
-                move.jumpCnt = 0;
-
-                registry.get<VelocityComponent>(root).velocity.y = 0;
-                TMT_INFO << "Walking " << (int)event.e;
+                TMT_DEBUG << "WORK IN PROGRESS :: CharacterMovement";
+//                entt::entity root = GetRootEntity(registry, event.e);
+//                auto& move = registry.get<MovementComponent>(root);
+//                ++move.gndStayCnt;
+//
+//                EventDispatcher::GetInstance().Enqueue(LandingEvent{event.e, event.state, registry.get<TransformComponent>(event.e).GetWorldPosition()});
+//
+//                move.mode = Walking;
+//                move.jumpCnt = 0;
+//
+//                registry.get<VelocityComponent>(root).velocity.y = 0;
+//                TMT_INFO << "Walking " << (int)event.e;
             }
             break;
         }
