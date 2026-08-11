@@ -28,6 +28,8 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Particle.h"
 
+#include "Particle/ParticleEmitterPool.h"
+
 #include "Utils/Logger.h"
 
 namespace tomato::Serialization
@@ -136,17 +138,18 @@ namespace tomato::Serialization
 		AssetID stateID = root["State"];
 
 		auto newState = StateRegistry::GetInstance().GetStateFactory(stateID)(engine);
+        auto& registry = newState->GetRegistry();
 
 		//Load Resources
 		LoadResources(root);
 
-		CreateEntity(root, newState->GetRegistry(), newState->GetEntityMap());
+		CreateEntity(root, registry, newState->GetEntityMap());
 
-		LoadComponents(root, newState->GetRegistry(), newState->GetEntityMap());
+		LoadComponents(root, registry, newState->GetEntityMap());
 
-		ResolveHierarchy(newState->GetRegistry(), newState->GetEntityMap());
+		ResolveHierarchy(registry, newState->GetEntityMap());
 
-		AttachParticles(root, newState.get());
+		AttachParticles(root, registry.ctx().get<ParticleEmitterPool>());
 
 		engine.SetNextState(std::move(newState));
 	}
@@ -231,14 +234,14 @@ namespace tomato::Serialization
 		}
 	}
 
-	void AttachParticles(const json& particleData, State* state)
+	void AttachParticles(const json& particleData, ParticleEmitterPool& particlePool)
 	{
 		for (auto& particle : particleData["Particle"])
 		{
 			AssetID asset = particle["particle"];
 			UUID target = particle["target"];
 
-			state->particlePool_.Acquire(asset, target);
+			particlePool.Acquire(asset, target);
 		}
 	}
 

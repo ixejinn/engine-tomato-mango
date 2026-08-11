@@ -1,0 +1,9 @@
+#ifndef MANGO_PARTICLEEMITTERPOOLFWD_H
+#define MANGO_PARTICLEEMITTERPOOLFWD_H
+
+namespace tomato
+{
+    class ParticleEmitterPool;
+}
+
+#endif //MANGO_PARTICLEEMITTERPOOLFWD_H

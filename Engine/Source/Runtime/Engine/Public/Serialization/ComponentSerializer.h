@@ -7,6 +7,7 @@
 #include "UUID.h"
 #include "State/StateFwd.h"
 #include "ECS/Forward/ComponentFwd.h"
+#include "Particle/ParticleEmitterPoolFwd.h"
 
 namespace tomato
 {
@@ -34,7 +35,7 @@ namespace tomato::Serialization
 	void LoadComponents(const json&, entt::registry&, std::unordered_map<UUID, entt::entity>&);
 	void LoadEntityComponents(const json&, entt::registry&, entt::entity);
 	void ResolveHierarchy(entt::registry&, std::unordered_map<UUID, entt::entity>&);
-	void AttachParticles(const json&, State*);
+	void AttachParticles(const json&, ParticleEmitterPool&);
 
 	//Component Save & Load Func
 	void Save(json&, const VisibilityComponent&);

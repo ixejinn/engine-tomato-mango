@@ -6,7 +6,6 @@
 #include <typeindex>
 #include <entt/entity/registry.hpp>
 #include "State/StateFwd.h"
-#include "Particle/ParticleEmitterPool.h"
 #include "UUID.h"
 #include "TomatoFwd.h"
 
@@ -36,9 +35,6 @@ namespace tomato
         std::unordered_map<UUID, entt::entity> entityMap_;
 
         PlayerInputTimelines playerInputs_;
-
-    public:
-        ParticleEmitterPool particlePool_;
     };
 }
 

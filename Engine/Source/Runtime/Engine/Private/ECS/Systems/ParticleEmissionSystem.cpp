@@ -8,6 +8,8 @@
 #include "Simulation/SimulationConfig.h"
 #include "Utils/RandomNumberGenerator.h"
 
+#include "Particle/ParticleEmitterPool.h"
+
 #include "ECS/Entity/Entity.h"
 
 using namespace std::chrono_literals;
@@ -15,11 +17,11 @@ namespace tomato
 {
 	void ParticleEmissionSystem::Update(SimContext& simCtx)
 	{
-		// 활성화된 파티클 엔티티가 없으면 종료
-		if (simCtx.state->particlePool_.GetActiveEmitterNum() == 0)
-			return;
+        auto& registry = simCtx.state->GetRegistry();
 
-		auto& registry = simCtx.state->GetRegistry();
+		// 활성화된 파티클 엔티티가 없으면 종료
+		if (registry.ctx().get<ParticleEmitterPool>().GetActiveEmitterNum() == 0)
+			return;
 
 		auto view = registry.view<ParticleEmitterComponent, ParticleRuntimeComponent,
 			ParticleBufferComponent, ParticleRenderComponent>();
@@ -83,7 +85,7 @@ namespace tomato
             }
             else if (particle.runtime.activeCnt == 0) // 루프 아닌데 활성화된 파티클이 없으면 풀에 반납(완전 종료)
             {
-                simCtx.state->particlePool_.Release(e);
+                simCtx.state->GetRegistry().ctx().get<ParticleEmitterPool>().Release(e);
                 return true;
             }
         }

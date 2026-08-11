@@ -67,9 +67,11 @@ void TestState::Init() {
     renderp0.color = { 1.f, 1.f, 0.f, 1.f };
     auto& channelp0 = registry_.get<InputChannelComponent>(player0);
     channelp0.channel = 0;
-     registry_.emplace<CollisionTestComponent>(player0);
-     particlePool_.Acquire(GetAssetID("Resources\\Contents\\Particle\\burst_test.tmt.ptc"), GetUUID(registry_, player0));
-     particlePool_.Acquire(GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
+    registry_.emplace<CollisionTestComponent>(player0);
+
+    auto& particlePool = registry_.ctx().get<ParticleEmitterPool>();
+    particlePool.Acquire(GetAssetID("Resources\\Contents\\Particle\\burst_test.tmt.ptc"), GetUUID(registry_, player0));
+    particlePool.Acquire(GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
 
     //// Player1 character
     entt::entity player1 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { -1, 2, 0 });
@@ -204,7 +206,7 @@ void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
 
 void TestState::CallbackJump(const tomato::LandingEvent& event)
 {
-    auto e = event.state->particlePool_.Acquire(
+    auto e = event.state->GetRegistry().ctx().get<ParticleEmitterPool>().Acquire(
         GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
         event.position);
      std::cout << "Callback Jump " << (int)e.value() << "\n";

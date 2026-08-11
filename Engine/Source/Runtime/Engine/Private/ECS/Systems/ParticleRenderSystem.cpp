@@ -14,6 +14,8 @@
 #include "Resource/Render/Texture.h"
 #include "Resource/Render/ParticleEffect.h"
 
+#include "Particle/ParticleEmitterPool.h"
+
 #include "Simulation/SimulationConfig.h"
 
 using namespace std::chrono_literals;
@@ -31,8 +33,10 @@ namespace tomato
 
     void ParticleRenderSystem::Update(SimContext& simCtx)
     {
+        auto& registry = simCtx.state->GetRegistry();
+
         // 활성화된 파티클 엔티티가 없으면 종료
-        if (simCtx.state->particlePool_.GetActiveEmitterNum() == 0)
+        if (registry.ctx().get<ParticleEmitterPool>().GetActiveEmitterNum() == 0)
             return;
 
         if (!mesh2D_ || !shader_)
@@ -43,8 +47,6 @@ namespace tomato
         mesh2D_->Bind();
         shader_->Use();
         AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
-
-        auto& registry = simCtx.state->GetRegistry();
 
         // 카메라 축 설정
         auto& [mainCam] = registry.ctx().get<RenderContext>();

@@ -185,7 +185,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Math/Geometry.h
         Source/Runtime/Engine/Public/Math/AABB.h
         Source/Runtime/Engine/Public/Math/Ray.h
- )
+		Source/Runtime/Engine/Public/Particle/ParticleEmitterPoolFwd.h
+)
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
