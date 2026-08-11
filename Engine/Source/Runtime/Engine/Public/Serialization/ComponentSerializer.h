@@ -82,8 +82,12 @@ namespace tomato::Serialization
 	void Save(json&, const MouseEventComponent&);
 	void Load(const json&, MouseEventComponent&);
 
+	void Save(json&, const ParticleEmitterComponent&);
+	void Load(const json&, ParticleEmitterComponent&);
+
 	void Save(json&, const HierarchyComponent&);
 	void Load(const json&, HierarchyComponent&);
+
 
 	// For Tag
 	void Save(json&, const RootEntityTag&);

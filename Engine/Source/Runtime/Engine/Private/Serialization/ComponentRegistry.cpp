@@ -41,7 +41,7 @@ namespace tomato::Serialization
 		RegisterComponent<SelectableComponent>("Selectable", ComponentCategory::UI);
 		RegisterComponent<MouseEventComponent>("Mouse Event", ComponentCategory::UI);
 		RegisterComponent<HierarchyComponent>("Hierarchy", ComponentCategory::Common, ComponentFlags::Hidden);
-		//RegisterComponent<ParticleEmitterComponent>("Particle Effect", ComponentCategory::Common);
+		RegisterComponent<ParticleEmitterComponent>("Particle Effect", ComponentCategory::Common);
 		
 		//Tag
 		RegisterComponent<RootEntityTag>("TagRoot", ComponentCategory::Tag);
@@ -69,7 +69,7 @@ namespace tomato::Serialization
 		RegisterInspector<TextComponent>("Text", DrawTextInspector);
 		RegisterInspector<TargetComponent>("Target", DrawTargetInspector);
 		RegisterInspector<SelectableComponent>("Selectable", DrawSelectableInspector);
-		//RegisterInspector<ParticleEmitterComponent>("Particle Effect", DrawParticleInspector);
+		RegisterInspector<ParticleEmitterComponent>("Particle Effect", DrawParticleInspector);
 	}
 
 	const ComponentInfo* ComponentRegistry::FindComponentInfo(const std::string& name) const

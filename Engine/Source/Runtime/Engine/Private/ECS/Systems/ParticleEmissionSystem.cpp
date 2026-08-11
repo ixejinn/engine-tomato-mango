@@ -67,11 +67,11 @@ namespace tomato
         auto now = std::chrono::steady_clock::now();
         auto activeDuration =
             std::chrono::duration_cast<std::chrono::milliseconds>(now - particle.emitter.emitter.start);
-        if (activeDuration >= particle.emitter.emitter.duration)
+        if (activeDuration > particle.emitter.emitter.duration)
         {
             if (particle.emitter.looping)
             {
-                // std::cout << "   LOOPING(" << simCtx.tick << ") ----------\n";
+                std::cout << "   LOOPING(" << simCtx.tick << ") ----------\n";
                 particle.emitter.emitter.start = now;
 
                 if (particle.emitter.burst.has_value())
@@ -120,7 +120,11 @@ namespace tomato
     void ParticleEmissionSystem::RateOverTimeParticle(entt::registry& reg, entt::entity e, ParticleData& particle)
     {
         // rate over time 의한 파티클 생성
-        if (particle.emitter.emitPeriod > 0ms)
+        auto now = std::chrono::steady_clock::now();
+        auto activeDuration =
+            std::chrono::duration_cast<std::chrono::milliseconds>(now - particle.emitter.emitter.start);
+        
+        if (activeDuration <= particle.emitter.emitter.duration && particle.emitter.emitPeriod > 0ms)
         {
             auto now = std::chrono::steady_clock::now();
             particle.runtime.adder += std::chrono::duration_cast<std::chrono::milliseconds>(now - particle.runtime.latestTP);

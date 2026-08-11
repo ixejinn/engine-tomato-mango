@@ -576,6 +576,9 @@ namespace tomato::Serialization
 		};
 	}
 
+	void Save(json& data, const ParticleEmitterComponent& particle) {}
+	void Load(const json& data, ParticleEmitterComponent& particle) {}
+
 	void Save(json& data, const HierarchyComponent& hierarchy)
 	{
 		data["parent"] = hierarchy.parentID;

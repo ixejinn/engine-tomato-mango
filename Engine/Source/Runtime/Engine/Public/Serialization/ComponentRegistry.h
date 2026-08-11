@@ -68,7 +68,7 @@ namespace tomato::Serialization
 		info.editor.Add =
 			[](entt::registry& reg, entt::entity e)
 			{
-				reg.get_or_emplace<T>(e);	
+				static_cast<void>(reg.get_or_emplace<T>(e));	
 			};
 
 		info.editor.Remove =

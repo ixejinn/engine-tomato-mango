@@ -575,6 +575,7 @@ namespace tomato
 		ImGui::Checkbox("loop", &particle.looping);
 
 
+
 		return changed;
 	}
 
