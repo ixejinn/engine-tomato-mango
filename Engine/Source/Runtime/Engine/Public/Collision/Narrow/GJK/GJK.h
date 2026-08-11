@@ -3,7 +3,9 @@
 
 #include <glm/vec3.hpp>
 #include "Collision/Narrow/NarrowPhase.h"
+#include "Collision/Narrow/GJK/GJKResult.h"
 #include "Collision/CollisionConstants.h"
+#include "ECS/Forward/PhysCompFwd.h"
 #include "Containers/EnumArray.h"
 #include "Event/EventSignal.h"
 
@@ -12,8 +14,7 @@ namespace tomato
     class GJK : public NarrowPhase
     {
     public:
-        std::optional<CollisionInfo> EvaluateCollision(
-            entt::registry& reg, entt::entity e1, entt::entity e2) override;
+        std::optional<ContactData> EvaluateContactPair(entt::registry& reg, const ContactPair& pair) override;
 
         static glm::vec3 GetSupportPoint(
             const glm::vec3& worldDir,
@@ -22,13 +23,13 @@ namespace tomato
 
     private:
         static bool GJKBool(
-                entt::registry& reg, entt::entity e1, entt::entity e2);
+                entt::registry& reg, const ContactPair& pair);
 
-        static std::optional<CollisionInfo> GJKDistance(
-                entt::registry& reg, entt::entity e1, entt::entity e2);
+        static std::optional<DistanceResult> GJKDistance(
+                entt::registry& reg, const ContactPair& pair);
 
-        static std::optional<CollisionInfo> GJKRaycast(
-                entt::registry& reg, entt::entity e1, entt::entity e2);
+        static std::optional<ContactData> GJKRaycast(
+                entt::registry& reg, const ContactPair& pair);
 
         static glm::vec3 Support(
             const glm::vec3& worldDir,

@@ -3,9 +3,11 @@
 
 #include <unordered_map>
 #include <entt/entt.hpp>
+#include <glm/vec3.hpp>
 #include "State/State.h"
 #include "Network/ClientNetwork.h"
 #include "Collision/CollisionFwd.h"
+#include "Collision/CollisionCache.h"
 
 namespace tomato
 {
@@ -19,7 +21,7 @@ namespace tomato
 
     struct CollisionContext
     {
-        std::unordered_map<CollisionPair, bool> collisionPairs;
+        std::unordered_map<ContactPair, ContactCache> pairs;
     };
 
     struct RenderContext

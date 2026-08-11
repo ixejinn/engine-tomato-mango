@@ -2,63 +2,28 @@
 #define MANGO_COLLISIONEVENT_H
 
 #include <entt/entt.hpp>
-#include "Collision/CollisionInfo.h"
+#include "Collision/ContactData.h"
 
 namespace tomato
 {
-    struct CollisionEvent
-    {
-        entt::entity e1, e2;
-        CollisionInfo info;
-    };
-
-    struct PenetrationEvent
-    {
-        entt::entity e1, e2;
-        entt::registry* reg;
-
-        CollisionInfo info;
-    };
-
-    struct CollisionEnterEvent
-    {
-        entt::entity e1, e2;
-        entt::registry* reg;
-
-        CollisionInfo info;
-    };
-
-    struct CollisionStayEvent
-    {
-        entt::entity e1, e2;
-        entt::registry* reg;
-
-        CollisionInfo info;
-    };
-
-    struct CollisionExitEvent
+    struct TriggerEvent
     {
         entt::entity e1, e2;
         entt::registry* reg;
     };
 
-    struct TriggerEnterEvent
+    struct ContactEvent : TriggerEvent
     {
-        entt::entity e1, e2;
-        entt::registry* reg;
+        ContactData data;
     };
 
-    struct TriggerStayEvent
-    {
-        entt::entity e1, e2;
-        entt::registry* reg;
-    };
+    struct CollisionEnterEvent : ContactEvent {};
+    struct CollisionStayEvent  : ContactEvent {};
+    struct CollisionExitEvent  : TriggerEvent {};
 
-    struct TriggerExitEvent
-    {
-        entt::entity e1, e2;
-        entt::registry* reg;
-    };
+    struct TriggerEnterEvent : TriggerEvent {};
+    struct TriggerStayEvent  : TriggerEvent {};
+    struct TriggerExitEvent  : TriggerEvent {};
 }
 
 #endif //MANGO_COLLISIONEVENT_H

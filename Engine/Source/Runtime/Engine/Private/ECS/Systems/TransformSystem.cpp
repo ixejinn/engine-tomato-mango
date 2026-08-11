@@ -3,9 +3,10 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Camera.h"
+#include "ECS/Components/Collision.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Event/EventDispatcher.h"
-#include "GameObjects/Character/MovementMode.h"
+#include "GameObject/Character/MovementMode.h"
 
 namespace tomato
 {
@@ -46,6 +47,9 @@ namespace tomato
 
             if (auto* cam = reg.try_get<CameraComponent>(cur))
                 cam->dirty = true;
+
+            if (auto* col = reg.try_get<ColliderComponent>(cur))
+                col->aabbDirty = true;
         }
 
         if (auto* hierarchy = reg.try_get<HierarchyComponent>(cur))

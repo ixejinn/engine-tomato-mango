@@ -6,7 +6,7 @@
 #include "Resource/ResourceFwd.h"
 #include "Collision/CollisionEventFwd.h"
 #include "UIController.h"
-#include "GameObjects/Character/MovementMode.h"
+#include "GameObject/Character/MovementMode.h"
 
 class TestState : public tomato::State {
 public:

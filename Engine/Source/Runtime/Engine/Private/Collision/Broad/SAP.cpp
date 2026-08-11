@@ -6,7 +6,7 @@
 #include "ECS/Systems/CollisionSystem.h"
 
 namespace tomato {
-    void SAP::FindCollisionCandidates(entt::registry &reg, std::vector<CollisionPair> &candidates) {
+    void SAP::FindContactPairCandidates(entt::registry &reg, std::vector<ContactPair> &candidates) {
         auto group = reg.group<ColliderComponent>();
 
         // Sort by AABB.min.x for x-axis SAP

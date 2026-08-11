@@ -3,8 +3,8 @@
 
 #include <optional>
 #include <entt/fwd.hpp>
-#include "ECS/Forward/PhysCompFwd.h"
-#include "Collision/CollisionInfo.h"
+#include "Collision/CollisionFwd.h"
+#include "Collision/ContactData.h"
 
 namespace tomato
 {
@@ -13,8 +13,7 @@ namespace tomato
     public:
         virtual ~NarrowPhase() = default;
 
-        virtual std::optional<CollisionInfo> EvaluateCollision(
-            entt::registry& reg, entt::entity e1, entt::entity e2) = 0;
+        virtual std::optional<ContactData> EvaluateContactPair(entt::registry& reg, const ContactPair& pair) = 0;
     };
 }
 
