@@ -6,7 +6,7 @@
 #include "ECS/Components/Collision.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Event/EventDispatcher.h"
-#include "GameObjects/Character/MovementMode.h"
+#include "GameObject/Character/MovementMode.h"
 
 namespace tomato
 {

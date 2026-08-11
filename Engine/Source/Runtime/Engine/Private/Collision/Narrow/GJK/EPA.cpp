@@ -131,13 +131,11 @@ namespace tomato
             // Check termination condition
             float dist = glm::dot(nearest->normal, points.back());
             float diff = dist - nearest->distance;
-            // if (dist < 0 || (diff < 1e-3f && diff > -1e-3f) || ++iteration >= 20)
             if (dist < 0 ||
                 (diff < EPSILON && diff > -EPSILON) ||
                 iteration++ > 20)
             {
-                // return DistanceResult{nearest->normal, nearest->distance};
-                std::cout << " *** EPA(" << iteration << ") ***" << glm::to_string(nearest->normal) << " " << nearest->distance << "\n";
+                std::cout << " *** EPA *** " << glm::to_string(nearest->normal) << " " << nearest->distance << "\n";
                 return DistanceResult{ nearest->normal, -nearest->distance };
             }
 

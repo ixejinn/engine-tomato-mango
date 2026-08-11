@@ -2,7 +2,7 @@
 #define MANGO_MOVEMENT_H
 
 #include <cstdint>
-#include "GameObjects/Character/MovementMode.h"
+#include "GameObject/Character/MovementMode.h"
 
 namespace tomato
 {

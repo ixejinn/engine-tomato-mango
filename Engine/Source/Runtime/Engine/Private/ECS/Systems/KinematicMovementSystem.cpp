@@ -6,6 +6,7 @@
 #include "ECS/Components/Movement.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
+#include "GameObject/Character/CharacterMovement.h"
 
 namespace tomato {
     void KinematicMovementSystem::Update(SimContext &simCtx)
@@ -71,10 +72,11 @@ namespace tomato {
             {
                 // std::cout << (int)e << " J\n";
                 // Start move
-                move.jumpCnt++;
-                velocity.velocity.y = std::max(velocity.velocity.y, 0.f) + JUMP_SPEED;
-
-                move.mode = MovementMode::Falling;
+                // move.jumpCnt++;
+                // velocity.velocity.y = std::max(velocity.velocity.y, 0.f) + JUMP_SPEED;
+                //
+                // move.mode = MovementMode::Falling;
+                CharacterMovement::Jump(move, velocity, JUMP_SPEED);
             }
 
             // std::cout << (int)e << " kine velocity: " << velocity.velocity.x << " " << velocity.velocity.y << " " << velocity.velocity.z << "\n";

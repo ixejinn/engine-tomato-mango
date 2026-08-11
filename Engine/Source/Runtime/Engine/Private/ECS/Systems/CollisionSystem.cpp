@@ -276,7 +276,7 @@ namespace tomato
             vel.velocity.y = 0.f;
         if (-EPSILON < vel.velocity.z && vel.velocity.z < EPSILON)
             vel.velocity.z = 0.f;
-        std::cout << "         velocity D: " << glm::to_string(vel.velocity) << "\n";
+        std::cout << "          velocity D: " << glm::to_string(vel.velocity) << "\n";
     }
 
     void CollisionSystem::ResolvePenetration(
