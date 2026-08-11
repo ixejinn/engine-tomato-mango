@@ -41,7 +41,7 @@ namespace tomato::Serialization
 		RegisterComponent<SelectableComponent>("Selectable", ComponentCategory::UI);
 		RegisterComponent<MouseEventComponent>("Mouse Event", ComponentCategory::UI);
 		RegisterComponent<HierarchyComponent>("Hierarchy", ComponentCategory::Common, ComponentFlags::Hidden);
-		RegisterComponent<ParticleEmitterComponent>("Particle Effect", ComponentCategory::Common);
+		RegisterComponent<ParticleEmitterComponent>("Particle Effect", ComponentCategory::Particle);
 		
 		//Tag
 		RegisterComponent<RootEntityTag>("TagRoot", ComponentCategory::Tag);

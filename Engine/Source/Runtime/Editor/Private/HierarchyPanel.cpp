@@ -265,6 +265,14 @@ namespace tomato
 			ImGui::EndMenu();
 		}
 
+		if (ImGui::MenuItem("Particle"))
+		{
+			//@TODO : Change default particle asset
+			auto newParticle = editorCtx.currentState->particlePool_.Acquire(GetAssetID(PathManager::ProjectParticle("burst_test.tmt.ptc")), glm::vec3(0));
+			if (newParticle.has_value())
+				selected = newParticle.value();
+		}
+
 		editorCtx.selectedEntity = selected;
 	}
 

@@ -37,7 +37,7 @@ namespace tomato
         Lifetime emitter;
 
         ParticleEffectShape shape;
-        float angle; // cone shape
+        float angle{ 0.f }; // cone shape
         ParticleSimulationSpace space;
 
         std::chrono::milliseconds emitPeriod;

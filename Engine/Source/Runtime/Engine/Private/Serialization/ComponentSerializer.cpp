@@ -304,6 +304,9 @@ namespace tomato::Serialization
 			if (!info.Has(reg, entity))
 				continue;
 
+			if (info.category == Serialization::ComponentCategory::Particle)
+				continue;
+
 			json componentJson;
 			info.serialization.Save(componentJson, reg, entity);
 
@@ -576,7 +579,22 @@ namespace tomato::Serialization
 		};
 	}
 
-	void Save(json& data, const ParticleEmitterComponent& particle) {}
+	void Save(json& data, const ParticleEmitterComponent& particle)
+	{
+		data["duration"] = std::chrono::duration<float>(particle.emitter.duration).count();
+		data["looping"] = particle.looping;
+
+		data["startDelay"] = std::chrono::duration<float>(particle.startDelay).count();
+		data["startSpeed"] = particle.startSpeed;
+
+		data["maxParticles"] = particle.maxParticles;
+		data["shape"] = particle.shape;
+		data["angle"] = particle.angle;
+		data["space"] = particle.space;
+
+		data["lifetime"] = std::chrono::duration<float>(particle.particleLifetime).count();
+	}
+
 	void Load(const json& data, ParticleEmitterComponent& particle) {}
 
 	void Save(json& data, const HierarchyComponent& hierarchy)
