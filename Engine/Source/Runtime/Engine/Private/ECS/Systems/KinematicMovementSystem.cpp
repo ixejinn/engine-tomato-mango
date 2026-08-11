@@ -69,15 +69,7 @@ namespace tomato {
 
             // Jump
             if (HasFlag(keydown, ch.is1P ? InputIntent::Jump : InputIntent::Jump2) && move.jumpCnt < JUMP_COUNT_MAX)
-            {
-                // std::cout << (int)e << " J\n";
-                // Start move
-                // move.jumpCnt++;
-                // velocity.velocity.y = std::max(velocity.velocity.y, 0.f) + JUMP_SPEED;
-                //
-                // move.mode = MovementMode::Falling;
-                CharacterMovement::Jump(move, velocity, JUMP_SPEED);
-            }
+                CharacterMovement::Jump(registry, e, move, velocity, JUMP_SPEED);
 
             // std::cout << (int)e << " kine velocity: " << velocity.velocity.x << " " << velocity.velocity.y << " " << velocity.velocity.z << "\n";
         }

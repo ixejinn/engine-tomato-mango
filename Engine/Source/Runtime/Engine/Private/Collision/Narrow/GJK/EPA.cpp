@@ -44,7 +44,7 @@ namespace tomato
         const ColliderComponent& col1, TransformComponent& trf1,
         const ColliderComponent& col2, TransformComponent& trf2)
     {
-        std::cout << "========== EPA\n";
+//        std::cout << "========== EPA\n";
 
         // 심플렉스 확장
         while (points.size() < 4)
@@ -120,12 +120,6 @@ namespace tomato
                 return std::nullopt;
             }
 
-            //if (nearest->distance == 0)
-            //{
-            //    std::cout << " *** EPA(" << iteration << ")***" << glm::to_string(nearest->normal) << " " << nearest->distance << "\n";
-            //    return DistanceResult{ nearest->normal, 0.f };
-            //}
-
             points.push_back(GJK::GetSupportPoint(nearest->normal, col1, trf1, col2, trf2));
 
             // Check termination condition
@@ -135,7 +129,7 @@ namespace tomato
                 (diff < EPSILON && diff > -EPSILON) ||
                 iteration++ > 20)
             {
-                std::cout << " *** EPA *** " << glm::to_string(nearest->normal) << " " << nearest->distance << "\n";
+//                std::cout << " *** EPA *** " << glm::to_string(nearest->normal) << " " << nearest->distance << "\n";
                 return DistanceResult{ nearest->normal, -nearest->distance };
             }
 

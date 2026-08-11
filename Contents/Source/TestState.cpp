@@ -206,8 +206,8 @@ void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
 
 void TestState::CallbackJump(const tomato::LandingEvent& event)
 {
-    auto e = event.state->GetRegistry().ctx().get<ParticleEmitterPool>().Acquire(
+    auto e = event.reg->ctx().get<ParticleEmitterPool>().Acquire(
         GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
         event.position);
-     std::cout << "Callback Jump " << (int)e.value() << "\n";
+     std::cout << "Jump particle " << (int)e.value() << "\n";
 }

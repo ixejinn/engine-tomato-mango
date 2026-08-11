@@ -14,61 +14,84 @@ namespace tomato::CharacterMovement
 {
     void OnTriggerEnter_UpdateMovementMode(const TriggerEnterEvent& event)
     {
-        auto* move1 = event.reg->try_get<MovementComponent>(event.e1);
-        auto* move2 = event.reg->try_get<MovementComponent>(event.e2);
+        auto root1 = GetRootEntity(event.reg, event.e1);
+        auto root2 = GetRootEntity(event.reg, event.e2);
 
-        auto* vel1 = event.reg->try_get<VelocityComponent>(event.e1);
-        auto* vel2 = event.reg->try_get<VelocityComponent>(event.e2);
+        auto* move1 = event.reg->try_get<MovementComponent>(root1);
+        auto* move2 = event.reg->try_get<MovementComponent>(root2);
+
+        auto* vel1 = event.reg->try_get<VelocityComponent>(root1);
+        auto* vel2 = event.reg->try_get<VelocityComponent>(root2);
 
         if (move1 && vel1 && event.reg->get<ColliderComponent>(event.e1).isTrigger)
         {
-//            EventDispatcher::GetInstance().Enqueue(LandingEvent{
-//                event.e1, event.reg->, registry.get<TransformComponent>(event.e).GetWorldPosition()});
-            Land(*move1, *vel1);
+            EventDispatcher::GetInstance().Enqueue(
+                    LandingEvent{
+                        root1, event.reg, event.reg->get<TransformComponent>(root1).GetWorldPosition()});
+            Land(*event.reg, root1, *move1, *vel1);
         }
 
         if (move2 && vel2 && event.reg->get<ColliderComponent>(event.e2).isTrigger)
-            ChangeMovementMode(*move2, Walking);
+        {
+            EventDispatcher::GetInstance().Enqueue(
+                    LandingEvent{
+                        root2, event.reg, event.reg->get<TransformComponent>(root2).GetWorldPosition()});
+            Land(*event.reg, root2, *move2, *vel2);
+        }
     }
 
     void OnTriggerExit_UpdateMovementMode(const TriggerExitEvent& event)
     {
-        auto* move1 = event.reg->try_get<MovementComponent>(event.e1);
-        auto* move2 = event.reg->try_get<MovementComponent>(event.e2);
+        auto root1 = GetRootEntity(event.reg, event.e1);
+        auto root2 = GetRootEntity(event.reg, event.e2);
+
+        auto* move1 = event.reg->try_get<MovementComponent>(root1);
+        auto* move2 = event.reg->try_get<MovementComponent>(root2);
 
         if (move1 && event.reg->get<ColliderComponent>(event.e1).isTrigger)
-            ChangeMovementMode(*move1, Falling);
+            ChangeMovementMode(*event.reg, root1, *move1, Falling);
 
         if (move2 && event.reg->get<ColliderComponent>(event.e2).isTrigger)
-            ChangeMovementMode(*move2, Falling);
+            ChangeMovementMode(*event.reg, root2, *move2, Falling);
     }
 
-    void Jump(entt::registry& reg, entt::entity e, float jumpSpeed)
+    void Jump(
+            entt::registry& reg, entt::entity e,
+            float jumpSpeed)
     {
         auto* move = reg.try_get<MovementComponent>(e);
         auto* vel = reg.try_get<VelocityComponent>(e);
 
         if (move && vel)
-            Jump(*move, *vel, jumpSpeed);
+            Jump(reg, e, *move, *vel, jumpSpeed);
     }
 
-    void Jump(MovementComponent& move, VelocityComponent& vel, float jumpSpeed)
+    void Jump(
+            entt::registry& reg, entt::entity e,
+            MovementComponent& move, VelocityComponent& vel, float jumpSpeed)
     {
+        TMT_INFO << "Jump";
+
         vel.velocity.y = std::max(vel.velocity.y, 0.f) + jumpSpeed;
 
         ++move.jumpCnt;
-        ChangeMovementMode(move, Falling);
+        move.mode = Falling;
     }
 
-    void Land(MovementComponent& move, VelocityComponent& vel)
+    void Land(
+            entt::registry& reg, entt::entity e,
+            MovementComponent& move, VelocityComponent& vel)
     {
-        ++move.gndStayCnt;
-        move.jumpCnt = 0;
+        TMT_INFO << "Land";
 
-        ChangeMovementMode(move, Walking);
+        vel.velocity.y = 0;
+
+        ChangeMovementMode(reg, e, move, Walking);
     }
 
-    void ChangeMovementMode(MovementComponent& move, MovementMode mode)
+    void ChangeMovementMode(
+            entt::registry& reg, entt::entity e,
+            MovementComponent& move, MovementMode mode)
     {
         switch (mode)
         {
@@ -77,26 +100,22 @@ namespace tomato::CharacterMovement
                 if (--move.gndStayCnt == 0)
                 {
                     move.mode = Falling;
-                    // TMT_INFO << "Falling";
+//                    TMT_INFO << "Falling " << (int)e;
                 }
             }
             break;
         case Walking:
             {
-                TMT_DEBUG << "WORK IN PROGRESS :: CharacterMovement";
-//                entt::entity root = GetRootEntity(registry, event.e);
-//                auto& move = registry.get<MovementComponent>(root);
-//                ++move.gndStayCnt;
-//
-//                EventDispatcher::GetInstance().Enqueue(LandingEvent{event.e, event.state, registry.get<TransformComponent>(event.e).GetWorldPosition()});
-//
-//                move.mode = Walking;
-//                move.jumpCnt = 0;
-//
-//                registry.get<VelocityComponent>(root).velocity.y = 0;
-//                TMT_INFO << "Walking " << (int)event.e;
+                ++move.gndStayCnt;
+                move.mode = Walking;
+                move.jumpCnt = 0;
+//                TMT_INFO << "Walking " << (int)e;
             }
             break;
         }
+
+        EventDispatcher::GetInstance().Enqueue(
+                ChangeMovementModeEvent{
+                    e, &reg, mode});
     }
 }

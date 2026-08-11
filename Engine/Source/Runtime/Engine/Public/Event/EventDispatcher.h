@@ -19,6 +19,12 @@ namespace tomato {
             return instance;
         }
 
+        template<typename E>
+        void Connect()
+        {
+            dispatcher_->sink<E>();
+        }
+
         template<typename E, auto Candidate>
         void Connect()
         {

@@ -42,7 +42,7 @@ namespace tomato
             if (distanceRes->distance <= COLLISION_SKIN + EPSILON_SQ)
                 return ContactData{distanceRes->normal, distanceRes->distance};
 
-            std::cout << "           dist: " << distanceRes->distance << "\n";
+//            std::cout << "           dist: " << distanceRes->distance << "\n";
             return GJKRaycast(reg, pair);
         }
 
@@ -60,7 +60,7 @@ namespace tomato
     bool GJK::GJKBool(
             entt::registry& reg, const ContactPair& pair)
     {
-        std::cout << "========== GJK bool " << pair << "\n";
+//        std::cout << "========== GJK bool " << pair << "\n";
 
         auto& col1 = reg.get<ColliderComponent>(pair.a);
         auto& col2 = reg.get<ColliderComponent>(pair.b);
@@ -96,7 +96,7 @@ namespace tomato
     std::optional<DistanceResult> GJK::GJKDistance(
             entt::registry& reg, const ContactPair& pair)
     {
-        std::cout << "========== GJK distance " << pair << "\n";
+//        std::cout << "========== GJK distance " << pair << "\n";
 
         auto& col1 = reg.get<ColliderComponent>(pair.a);
         auto& col2 = reg.get<ColliderComponent>(pair.b);
@@ -138,7 +138,7 @@ namespace tomato
                 closestP.y = 0.f;
 
             auto normal = closestP / length;
-            std::cout << " *** GJK *** " << glm::to_string(normal) << " " << length << "\n";
+//            std::cout << " *** GJK *** " << glm::to_string(normal) << " " << length << "\n";
             return DistanceResult{-normal, length};
         }
 
@@ -148,7 +148,7 @@ namespace tomato
     std::optional<ContactData> GJK::GJKRaycast(
             entt::registry& reg, const ContactPair& pair)
     {
-        std::cout << "========== GJK raycast " << pair << "\n";
+//        std::cout << "========== GJK raycast " << pair << "\n";
 
         auto& col1 = reg.get<ColliderComponent>(pair.a);
         auto& col2 = reg.get<ColliderComponent>(pair.b);
@@ -169,7 +169,6 @@ namespace tomato
         glm::vec3 rayOrigin{0.f};
         glm::vec3 curRayPos = rayOrigin;
         glm::vec3 searchDir = curRayPos - GetSupportPoint(ray, col1, trf1, col2, trf2);  // CSO → curRayPos
-        // glm::vec3 hitNormal{0.f};
         glm::vec3 hitNormal = searchDir;
         std::vector<glm::vec3> simplex;
 
@@ -221,7 +220,6 @@ namespace tomato
             else
             {
                 TMT_WARN << "Incorrect simplex";
-                //return std::nullopt;
                 break;
             }
 
@@ -229,16 +227,16 @@ namespace tomato
             for (auto& p : simplex)
                 maxDistSq = std::max(maxDistSq, glm::length2(curRayPos - p));
 
-             // std::cout << "     (" << iteration << ") hitNormal: " << glm::to_string(hitNormal) << "\n";
-             // std::cout << "     (" << iteration << ") searchDir: " << glm::to_string(searchDir) << "\n";
-             // std::cout << "     (" << iteration << ")   length2: " << glm::length2(searchDir) << "\n";
+//             std::cout << "     (" << iteration << ") hitNormal: " << glm::to_string(hitNormal) << "\n";
+//             std::cout << "     (" << iteration << ") searchDir: " << glm::to_string(searchDir) << "\n";
+//             std::cout << "     (" << iteration << ")   length2: " << glm::length2(searchDir) << "\n";
         }
 
         if (hitFraction <= 1)
         {
             if (glm::length2(hitNormal) > EPSILON_SQ)
             {
-                // std::cout << "     bef normalize: " << glm::to_string(hitNormal) << "\n";
+//                std::cout << "     bef normalize: " << glm::to_string(hitNormal) << "\n";
 
                 if (-EPSILON < hitNormal.x && hitNormal.x < EPSILON)
                     hitNormal.x = 0.f;
@@ -247,9 +245,9 @@ namespace tomato
                 if (-EPSILON < hitNormal.y && hitNormal.y < EPSILON)
                     hitNormal.y = 0.f;
 
-                // std::cout << "     eps normalize: " << glm::to_string(hitNormal) << "\n";
+//                std::cout << "     eps normalize: " << glm::to_string(hitNormal) << "\n";
                 hitNormal = glm::normalize(hitNormal);
-                std::cout << "     aft normalize: " << glm::to_string(hitNormal) << "\n";
+//                std::cout << "     aft normalize: " << glm::to_string(hitNormal) << "\n";
             }
 
             return ContactData{hitNormal, hitFraction, 0.f};

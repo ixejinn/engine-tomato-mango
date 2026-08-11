@@ -35,6 +35,7 @@ namespace tomato
         }
 
         void RegisterSystems(SystemManager& manager);
+        void RegisterEventCallbacks();
 
         void RegisterFactory(TickPhase  phase, RunMode mode, SystemFactory&& factory);
         void RegisterFactory(FramePhase phase, RunMode mode, SystemFactory&& factory);

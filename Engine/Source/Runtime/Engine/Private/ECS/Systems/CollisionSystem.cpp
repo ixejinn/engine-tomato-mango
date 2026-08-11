@@ -18,7 +18,17 @@ namespace tomato
 {
     CollisionSystem::CollisionSystem()
     : broadPhase_(std::make_unique<SAP>())
-    , narrowPhase_(std::make_unique<GJK>()) {}
+    , narrowPhase_(std::make_unique<GJK>())
+    {
+        auto& eventDispatcher = EventDispatcher::GetInstance();
+        eventDispatcher.Connect<CollisionEnterEvent>();
+        eventDispatcher.Connect<CollisionStayEvent>();
+        eventDispatcher.Connect<CollisionExitEvent>();
+
+        eventDispatcher.Connect<TriggerEnterEvent>();
+        eventDispatcher.Connect<TriggerStayEvent>();
+        eventDispatcher.Connect<TriggerExitEvent>();
+    }
 
     CollisionSystem::~CollisionSystem() = default;
 
@@ -28,6 +38,8 @@ namespace tomato
         RunNarrowPhase(simCtx);
 
         ResolveContacts();
+
+        UpdateCollisionEvents();
     }
 
     void CollisionSystem::RunBroadPhase(SimContext& simCtx)
@@ -179,8 +191,8 @@ namespace tomato
 
     void CollisionSystem::ResolveContact(ContactEvent& event)
     {
-        std::cout << " ===== SOLVE COLLISION " << (int)event.e1 << " " << (int)event.e2 << "\n";
-        std::cout << "       normal: " << event.data.normal.x << " " << event.data.normal.y << " " << event.data.normal.z << "\n";
+//        std::cout << " ===== SOLVE COLLISION " << (int)event.e1 << " " << (int)event.e2 << "\n";
+//        std::cout << "       normal: " << event.data.normal.x << " " << event.data.normal.y << " " << event.data.normal.z << "\n";
 
         auto& reg = *(event.reg);
         entt::entity root1 = GetRootEntity(reg, event.e1);
@@ -204,7 +216,7 @@ namespace tomato
         float weight1 = 0.5f;
         if (sumV >= 1e-6f)
             weight1 = lenV1 / sumV;
-        std::cout << "       weight1: " << weight1 << "\n";
+//        std::cout << "       weight1: " << weight1 << "\n";
         float weight2 = 1 - weight1;
 
         auto& trfRoot1 = reg.get<TransformComponent>(root1);
@@ -242,10 +254,10 @@ namespace tomato
         TransformComponent& trf, VelocityComponent& vel,
         const glm::vec3& normal, const float weight, const float hitTime)
     {
-        std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+//        std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         trf.AddPosition((vel.velocity * FIXED_DELTA_TIME * hitTime + normal * COLLISION_SKIN) * weight);
-        std::cout << "          position C: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+//        std::cout << "          position C: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         glm::vec3 remainingMove = (1 - hitTime * weight) * vel.velocity;
         vel.velocity = remainingMove + glm::dot(remainingMove, -normal) * normal;
@@ -256,17 +268,17 @@ namespace tomato
             vel.velocity.y = 0.f;
         if (-EPSILON < vel.velocity.z && vel.velocity.z < EPSILON)
             vel.velocity.z = 0.f;
-        std::cout << "          velocity C: " << glm::to_string(vel.velocity) << "\n";
+//        std::cout << "          velocity C: " << glm::to_string(vel.velocity) << "\n";
     }
 
     void CollisionSystem::ResolveDiscreteContact(
         TransformComponent& trf, VelocityComponent& vel,
         const glm::vec3& normal, const float weight, const float distance)
     {
-        std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+//        std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         trf.AddPosition(normal * (COLLISION_SKIN - distance) * weight);
-        std::cout << "          position D: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+//        std::cout << "          position D: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         vel.velocity += glm::dot(vel.velocity, -normal) * normal;
 
@@ -276,15 +288,27 @@ namespace tomato
             vel.velocity.y = 0.f;
         if (-EPSILON < vel.velocity.z && vel.velocity.z < EPSILON)
             vel.velocity.z = 0.f;
-        std::cout << "          velocity D: " << glm::to_string(vel.velocity) << "\n";
+//        std::cout << "          velocity D: " << glm::to_string(vel.velocity) << "\n";
     }
 
     void CollisionSystem::ResolvePenetration(
         TransformComponent& trf,
         const glm::vec3& normal, const float weight, const float distance)
     {
-        std::cout << "         position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+//        std::cout << "         position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
         trf.AddPosition(normal * -distance * weight * FIXED_DELTA_TIME * CORRECTION_SPEED);
-        std::cout << "         position P: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+//        std::cout << "         position P: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+    }
+
+    void CollisionSystem::UpdateCollisionEvents()
+    {
+        auto& eventDispatcher = EventDispatcher::GetInstance();
+        eventDispatcher.Update<CollisionEnterEvent>();
+        eventDispatcher.Update<CollisionStayEvent>();
+        eventDispatcher.Update<CollisionExitEvent>();
+
+        eventDispatcher.Update<TriggerEnterEvent>();
+        eventDispatcher.Update<TriggerStayEvent>();
+        eventDispatcher.Update<TriggerExitEvent>();
     }
 }

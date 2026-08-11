@@ -59,7 +59,9 @@ namespace tomato {
 
     void Engine::Run()
     {
-        SystemRegistry::GetInstance().RegisterSystems(systemManager_);
+        auto& systemRegistry = SystemRegistry::GetInstance();
+        systemRegistry.RegisterSystems(systemManager_);
+        systemRegistry.RegisterEventCallbacks();
 
         TickClock tickClock;
         RunMode runMode{ RunMode::Editor };
@@ -134,7 +136,7 @@ namespace tomato {
         while (cnt--)
         {
             simCtx.tick = tc.GetTick();
-            std::cout << "\n       *--------- " << simCtx.tick << " ---------*\n";
+//            std::cout << "\n       *--------- " << simCtx.tick << " ---------*\n";
 
             systemManager_.FixedUpdate(simCtx, mode);
 

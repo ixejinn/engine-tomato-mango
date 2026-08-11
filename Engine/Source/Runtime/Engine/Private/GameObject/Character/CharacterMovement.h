@@ -8,15 +8,23 @@
 
 namespace tomato::CharacterMovement
 {
-    void OnTriggerEnter_UpdateMovementMode(TriggerEnterEvent& event);
-    void OnTriggerExit_UpdateMovementMode(TriggerExitEvent& event);
+    void OnTriggerEnter_UpdateMovementMode(const TriggerEnterEvent& event);
+    void OnTriggerExit_UpdateMovementMode(const TriggerExitEvent& event);
 
-    void Jump(entt::registry& reg, entt::entity e, float jumpSpeed); // move to public?
-    void Jump(MovementComponent& move, VelocityComponent& vel, float jumpSpeed);
+    void Jump(
+            entt::registry& reg, entt::entity e,
+            float jumpSpeed); // move to public?
+    void Jump(
+            entt::registry& reg, entt::entity e,
+            MovementComponent& move, VelocityComponent& vel, float jumpSpeed);
 
-    void Land(MovementComponent& move, VelocityComponent& vel);
+    void Land(
+            entt::registry& reg, entt::entity e,
+            MovementComponent& move, VelocityComponent& vel);
 
-    void ChangeMovementMode(MovementComponent& move, MovementMode mode);
+    void ChangeMovementMode(
+            entt::registry& reg, entt::entity e,
+            MovementComponent& move, MovementMode mode);
 }
 
 #endif //MANGO_CHARACTERMOVEMENT_H

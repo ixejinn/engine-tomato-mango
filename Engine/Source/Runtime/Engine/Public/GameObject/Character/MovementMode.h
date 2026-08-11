@@ -16,14 +16,14 @@ namespace tomato
     struct ChangeMovementModeEvent
     {
         entt::entity e;
-        State* state;
+        entt::registry* reg;
         MovementMode mode;
     };
 
     struct LandingEvent
     {
         entt::entity e;
-        State* state;
+        entt::registry* reg;
         glm::vec3 position;
     };
 }

@@ -2,6 +2,9 @@
 #include "ECS/SystemFramework/SystemManager.h"
 #include "ECS/Systems/Systems.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
+#include "Event/EventDispatcher.h"
+#include "Collision/CollisionEvent.h"
+#include "GameObject/Character/CharacterMovement.h"
 
 namespace tomato
 {
@@ -61,6 +64,16 @@ namespace tomato
         // Post
         for (const auto& factory : frameFactories_[FramePhase::PostRender])
             manager.AddSystem(FramePhase::PostRender, factory.mode, factory.factory());
+    }
+
+    void SystemRegistry::RegisterEventCallbacks()
+    {
+        auto& eventDispatcher = EventDispatcher::GetInstance();
+        eventDispatcher.Connect<TriggerEnterEvent, &CharacterMovement::OnTriggerEnter_UpdateMovementMode>();
+        eventDispatcher.Connect<TriggerExitEvent, &CharacterMovement::OnTriggerExit_UpdateMovementMode>();
+
+        eventDispatcher.Connect<LandingEvent>();
+        eventDispatcher.Connect<ChangeMovementModeEvent>();
     }
 
     void SystemRegistry::RegisterFactory(TickPhase phase, RunMode mode, SystemFactory&& factory)
