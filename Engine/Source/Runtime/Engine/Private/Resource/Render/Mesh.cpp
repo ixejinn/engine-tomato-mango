@@ -35,6 +35,15 @@ namespace tomato {
                 break;
         }
 
+        localAABB_.min = vertices[0].position;
+        localAABB_.max = vertices[0].position;
+
+        for (auto& v : vertices)
+        {
+            localAABB_.min = glm::min(localAABB_.min, v.position);
+            localAABB_.max = glm::max(localAABB_.max, v.position);
+        }
+
         SetMesh(vertices, indices);
     }
 

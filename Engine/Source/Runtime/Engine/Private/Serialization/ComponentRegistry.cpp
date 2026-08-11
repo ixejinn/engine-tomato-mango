@@ -12,6 +12,7 @@
 #include "ECS/Components/Text.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Character.h"
+#include "ECS/Components/Particle.h"
 
 #include "Utils/Bitmask/BitmaskOperators.h"
 namespace tomato::Serialization
@@ -34,12 +35,15 @@ namespace tomato::Serialization
 		RegisterComponent<RenderComponent>("Render", ComponentCategory::Common);
 		RegisterComponent<UIComponent>("UI", ComponentCategory::UI);
 		RegisterComponent<CanvasComponent>("Canvas", ComponentCategory::UI);
-		RegisterComponent<RectTransformComponent>("RectTransform", ComponentCategory::UI, ComponentFlags::Essential);
+		RegisterComponent<RectTransformComponent>("Rect Transform", ComponentCategory::UI, ComponentFlags::Essential);
 		RegisterComponent<TextComponent>("Text", ComponentCategory::UI);
 		RegisterComponent<TargetComponent>("Target", ComponentCategory::UI);
 		RegisterComponent<SelectableComponent>("Selectable", ComponentCategory::UI);
-		RegisterComponent<MouseEventComponent>("MouseEvent", ComponentCategory::UI);
+		RegisterComponent<MouseEventComponent>("Mouse Event", ComponentCategory::UI);
 		RegisterComponent<HierarchyComponent>("Hierarchy", ComponentCategory::Common, ComponentFlags::Hidden);
+		RegisterComponent<ParticleEmitterComponent>("Particle Effect", ComponentCategory::Common);
+		
+		//Tag
 		RegisterComponent<RootEntityTag>("TagRoot", ComponentCategory::Tag);
 		RegisterComponent<MainCameraTag>("TagMainCam", ComponentCategory::Tag);
 		RegisterComponent<CharacterTag>("TagCharacter", ComponentCategory::Tag);
@@ -61,10 +65,11 @@ namespace tomato::Serialization
 		RegisterInspector<RenderComponent>("Render", DrawRenderInspector);
 		RegisterInspector<UIComponent>("UI", DrawUIInspector);
 		RegisterInspector<CanvasComponent>("Canvas", DrawCanvasInspector);
-		RegisterInspector<RectTransformComponent>("RectTransform", DrawRectTransformInspector);
+		RegisterInspector<RectTransformComponent>("Rect Transform", DrawRectTransformInspector);
 		RegisterInspector<TextComponent>("Text", DrawTextInspector);
 		RegisterInspector<TargetComponent>("Target", DrawTargetInspector);
 		RegisterInspector<SelectableComponent>("Selectable", DrawSelectableInspector);
+		RegisterInspector<ParticleEmitterComponent>("Particle Effect", DrawParticleInspector);
 	}
 
 	const ComponentInfo* ComponentRegistry::FindComponentInfo(const std::string& name) const

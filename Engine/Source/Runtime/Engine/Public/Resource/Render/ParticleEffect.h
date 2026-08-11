@@ -1,8 +1,9 @@
-#ifndef MANGO_PARTICLEEFFECT_H
+﻿#ifndef MANGO_PARTICLEEFFECT_H
 #define MANGO_PARTICLEEFFECT_H
 
 #include <optional>
 #include <glm/vec4.hpp>
+#include <filesystem>
 #include "ECS/Forward/ParticleCompFwd.h"
 #include "Resource/ResourceFwd.h"
 #include "Serialization/Json.h"
@@ -21,13 +22,15 @@ namespace tomato
         };
 
     private:
-        ParticleEffect(const char* filename);
+        //ParticleEffect(const char* filename);
+        ParticleEffect(const std::filesystem::path& path);
 
     public:
         static void Cleanup() {};
-        static void Create(const char* filename);
+        //static void Create(const char* filename);
+        static void Create(const std::filesystem::path& path);
 
-        void InitializeParticleComponent(ParticleComponent& comp) const;
+        void InitializeParticleComponent(ParticleData& comp) const;
 
     private:
         float duration_;

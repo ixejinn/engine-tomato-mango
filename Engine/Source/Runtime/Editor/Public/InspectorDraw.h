@@ -2,8 +2,9 @@
 #define MANGO_INSPECTORDRAW_H
 
 #include <glm/vec3.hpp>
+#include <filesystem>
 #include <entt/fwd.hpp>
-#include "../../Engine/Public/ECS/Forward/ComponentFwd.h"
+#include "ECS/Forward/ComponentFwd.h"
 
 namespace tomato
 {
@@ -21,9 +22,10 @@ namespace tomato
 	bool DrawTextInspector(EditorContext&, entt::registry&, TextComponent&);
 	bool DrawTargetInspector(EditorContext&, entt::registry&, TargetComponent&);
 	bool DrawSelectableInspector(EditorContext&, entt::registry&, SelectableComponent&);
+	bool DrawParticleInspector(EditorContext&, entt::registry&, ParticleEmitterComponent&);
 
 	
-	
+	std::filesystem::path DrawLoadResourceButton(const char* title, const char* filter, const std::filesystem::path& initDir);
 	bool DrawVec3Control(const char* label, float* vec, int flags = 0);
 }
 

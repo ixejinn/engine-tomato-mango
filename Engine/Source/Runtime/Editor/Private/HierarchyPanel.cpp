@@ -1,5 +1,7 @@
 ﻿#include "HierarchyPanel.h"
 
+#include "Services/Window.h"
+
 #include "Prefab/Prefab.h"
 #include "Prefab/UIPrefab.h"
 #include "ECS/Entity/Entity.h"
@@ -21,12 +23,13 @@
 #include "ECS/Components/Visibility.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Camera.h"
+#include "ECS/Components/Particle.h"
 
 #include "ECS/Entity/Hierarchy.h"
 #include <iostream>
 namespace tomato
 {
-	HierarchyPanel::HierarchyPanel(bool open) : EditorPanel(open)
+	HierarchyPanel::HierarchyPanel(float width, float height, float x, float y) : EditorPanel(width, height, x, y)
 	{
 		LoadResources();
 	}
@@ -35,19 +38,17 @@ namespace tomato
 	{
 		icon_visibility[0] =
 			AssetRegistry<Texture>::GetInstance().
-			Get(GetAssetID(PathManager::Icon("visibility_off.png").string().c_str()))->GetTexture();
+			Get(GetAssetID(PathManager::RuntimeIcon("visibility_off.png").string().c_str()))->GetTexture();
 
 		icon_visibility[1] =
 			AssetRegistry<Texture>::GetInstance().
-			Get(GetAssetID(PathManager::Icon("visibility_on.png").string().c_str()))->GetTexture();
+			Get(GetAssetID(PathManager::RuntimeIcon("visibility_on.png").string().c_str()))->GetTexture();
 	}
 
 	void HierarchyPanel::Draw(EditorContext& editorCtx)
 	{
-		float width{ 400.f }, height{ 300.f };
-		
-		ImGui::SetNextWindowPos(ImVec2(1600.f, height + 20.f), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
-		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowPos(ImVec2(posX_, posY_), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
+		ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_FirstUseEver);
 
 		std::string sceneName =
 			editorCtx.currentScenePath.empty() == true ?
@@ -55,6 +56,7 @@ namespace tomato
 
 		if (ImGui::Begin("Hierarchy", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus))
 		{
+			SetPos({ImGui::GetWindowPos().x, ImGui::GetWindowPos().y});
 			MenuBar(editorCtx);
 
 			if (editorCtx.sceneDirty)
@@ -79,6 +81,10 @@ namespace tomato
 	void HierarchyPanel::DrawEntity(EditorContext& editorCtx, entt::entity e)
 	{
 		auto& r = editorCtx.currentState->GetRegistry();
+
+		if (auto* runtime = r.try_get<ParticleRuntimeComponent>(e);
+			runtime != nullptr && !runtime->active) return;
+
 		auto* hierarchy = r.try_get<HierarchyComponent>(e);
 
 		bool opened = DrawRow(editorCtx, e);

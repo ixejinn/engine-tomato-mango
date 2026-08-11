@@ -1,8 +1,10 @@
-﻿#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include "ECS/Systems/ScreenUIRenderSystem.h"
+﻿#include "ECS/Systems/ScreenUIRenderSystem.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
+
+#include "Services/Window.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Render.h"
@@ -17,8 +19,6 @@
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
 #include "Resource/Render/Font.h"
-
-#include "Services/Window.h"
 
 namespace tomato
 {

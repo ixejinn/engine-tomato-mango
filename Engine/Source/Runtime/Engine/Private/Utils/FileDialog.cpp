@@ -2,12 +2,13 @@
 #include <commdlg.h>
 #include <string>
 #include "FileDialog.h"
+#include "Utils/Logger.h"
 
 namespace tomato::FileDialog
 {
 	std::optional<std::filesystem::path> OpenFile(const char* title, const char* filter, const std::filesystem::path& initialDir)
 	{
-		char filePath[260] = "";
+		char filePath[MAX_PATH] = "";
 		
 		OPENFILENAMEA ofn{};
 		ofn.lStructSize = sizeof(ofn);
@@ -47,5 +48,26 @@ namespace tomato::FileDialog
 			return std::filesystem::path(filePath);
 
 		return std::nullopt;
+	}
+}
+
+namespace tomato::FileUtils
+{
+	bool CopyAsset(const std::filesystem::path& source, const std::filesystem::path& destination, std::filesystem::copy_options option)
+	{
+		try
+		{
+			if (destination.parent_path().empty())
+				std::filesystem::create_directories(destination.parent_path());
+
+			std::filesystem::copy_file(source, destination, option);
+
+			return true;
+		}
+		catch (const std::filesystem::filesystem_error& e)
+		{
+			TMT_ERR << e.what();
+			return false;
+		}
 	}
 }

@@ -15,6 +15,8 @@ namespace tomato {
             entt::registry& reg, entt::entity cur,
             const glm::quat& pQuat, const glm::vec3& pScale,
             const glm::mat4& pMatrix, bool pDirty);
+
+        void UpdateParticleTransform(entt::registry& reg);
     };
 }
 

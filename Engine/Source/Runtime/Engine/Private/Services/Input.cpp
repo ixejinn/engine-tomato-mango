@@ -157,6 +157,14 @@ namespace tomato
         return latestKeyAction_[key] == KeyAction::Release;
     }
 
+    glm::vec2 Input::GetMousePosition()
+    {
+        double xPos(0), yPos(0);
+        glfwGetCursorPos(glfwGetCurrentContext(), &xPos, &yPos);
+
+        return glm::vec2{ xPos, yPos };
+    }
+
     Input::Input(Window& window, InputRecorder& recorder, InputUI& inputUI) {
         glfwSetKeyCallback(window.GetHandle(), OnKeyEvent);
         glfwSetMouseButtonCallback(window.GetHandle(), OnMouseButtonEvent);

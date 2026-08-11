@@ -6,7 +6,10 @@
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
 
+#include "Math/AABB.h"
+
 namespace tomato {
+    
     struct Vertex {
         glm::vec3 position;
         glm::vec3 normal;
@@ -81,6 +84,8 @@ namespace tomato {
         void Bind() const;
         void Draw(bool drawLine = false) const;
 
+        const AABB& GetLocalAABB() const { return localAABB_; }
+
     private:
         static void Plain(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
         static void LBPlain(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
@@ -118,6 +123,7 @@ namespace tomato {
 
         void SetMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
 
+    private:
         /// Stores the state related to vertex attribute settings.
         GLuint vao_{0};
 
@@ -128,6 +134,8 @@ namespace tomato {
         GLuint ebo_{0};
 
         int vertexCnt_{0};
+
+        AABB localAABB_;
     };
 }
 

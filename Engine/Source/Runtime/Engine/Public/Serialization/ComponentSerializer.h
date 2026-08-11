@@ -26,6 +26,7 @@ namespace tomato::Serialization
 	void NewStateScene(Engine&, State*);
 
 	void SaveResourcesInfo(json&);
+	void SaveParticlesInfo(json&, entt::registry&);
 	void SaveEntity(json&, entt::registry&, entt::entity);
 
 	void LoadResources(const json&);
@@ -33,7 +34,8 @@ namespace tomato::Serialization
 	void LoadComponents(const json&, entt::registry&, std::unordered_map<UUID, entt::entity>&);
 	void LoadEntityComponents(const json&, entt::registry&, entt::entity);
 	void ResolveHierarchy(entt::registry&, std::unordered_map<UUID, entt::entity>&);
-	
+	void AttachParticles(const json&, State*);
+
 	//Component Save & Load Func
 	void Save(json&, const VisibilityComponent&);
 	void Load(const json&, VisibilityComponent&);
@@ -80,8 +82,12 @@ namespace tomato::Serialization
 	void Save(json&, const MouseEventComponent&);
 	void Load(const json&, MouseEventComponent&);
 
+	void Save(json&, const ParticleEmitterComponent&);
+	void Load(const json&, ParticleEmitterComponent&);
+
 	void Save(json&, const HierarchyComponent&);
 	void Load(const json&, HierarchyComponent&);
+
 
 	// For Tag
 	void Save(json&, const RootEntityTag&);

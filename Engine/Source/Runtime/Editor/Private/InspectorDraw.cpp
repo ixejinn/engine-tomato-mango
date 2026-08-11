@@ -1,15 +1,17 @@
 ﻿#include "InspectorDraw.h"
 
-#include <limits>
 #include <entt/entt.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "EditorPanel.h"
 #include "Resource/AssetRegistry.h"
+#include "Resource/Audio/Audio.h"
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
 #include "Resource/Render/Font.h"
+#include "Resource/Render/ParticleEffect.h"
+#include "Resource/PathManager.h"
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
@@ -26,12 +28,14 @@
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
 #include "ECS/Components/Text.h"
+#include "ECS/Components/Particle.h"
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Hierarchy.h"
 
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/Entity/Entity.h"
 
+#include "Utils/FileDialog.h"
 namespace tomato
 {
 	bool DrawCameraInspcetor(EditorContext& eCtx, entt::registry& reg, CameraComponent& camera)
@@ -56,7 +60,7 @@ namespace tomato
 			changed = true;
 		}
 
-		float fov{ camera.degree }, near{ camera.zNear }, far{ camera.zFar };
+		float fov{ camera.degree }, nearClip{ camera.zNear }, farClip{ camera.zFar };
 		if (camera.mode == ProjectionMode::Perspective)
 		{
 			if(ImGui::SliderFloat("Field Of View", &fov, 1.f, 179.f, "%.2f"))
@@ -66,20 +70,20 @@ namespace tomato
 			}
 		}
 			
-		if(ImGui::DragFloat("Near Clip", &near, 0.1f, 0.01f, 100.f, "%.2f"))
+		if(ImGui::DragFloat("Near Clip", &nearClip, 0.1f, 0.01f, 100.f, "%.2f"))
 		{
 			camera.dirty = true;
 			changed = true;
 		}
-		if(ImGui::DragFloat("Far Clip", &far, 0.1f, near, 10000.f, "%.2f"))
+		if(ImGui::DragFloat("Far Clip", &farClip, 0.1f, nearClip, 10000.f, "%.2f"))
 		{
 			camera.dirty = true;
 			changed = true;
 		}
 
 		camera.degree = std::clamp(fov, 1.0f, 179.0f);
-		camera.zNear = std::max(0.01f, near);
-		camera.zFar = std::max(camera.zNear + 0.01f, far);
+		camera.zNear = std::max(0.01f, nearClip);
+		camera.zFar = std::max(camera.zNear + 0.01f, farClip);
 
 		ImGui::NewLine();
 
@@ -252,6 +256,10 @@ namespace tomato
 			}
 			ImGui::EndCombo();
 		}
+
+		auto loadSrc = DrawLoadResourceButton("Open File", "All Images \0*.png;*.jpg;*.jpeg\0\0", PathManager::ProjectResource() / "Img");
+		if (!loadSrc.empty())
+			render.texture = GetAssetID(loadSrc);
 
 		ImGui::NewLine();
 
@@ -495,6 +503,10 @@ namespace tomato
 			ImGui::EndCombo();
 		}
 
+		auto loadFont = DrawLoadResourceButton("Open File", "Font files \0*.ttf\0\0", PathManager::ProjectResource() / "Fonts");
+		if (!loadFont.empty())
+			text.font = GetAssetID(loadFont);
+
 		ImGui::NewLine();
 
 		return changed;
@@ -554,6 +566,62 @@ namespace tomato
 		ImGui::NewLine();
 
 		return changed;
+	}
+
+	bool DrawParticleInspector(EditorContext& eCtx, entt::registry& reg, ParticleEmitterComponent& particle)
+	{
+		bool changed = false;
+
+		ImGui::Checkbox("loop", &particle.looping);
+
+
+
+		return changed;
+	}
+
+	std::filesystem::path DrawLoadResourceButton(const char* title, const char* filter, const std::filesystem::path& initDir)
+	{
+		ImGui::SameLine();
+
+		// Loads files by converting the project path (source path)
+		// to the runtime path and copying the file.
+		//
+		// @Note:
+		// The file must be located under project path/Contents/Resources.
+		if (ImGui::Button("+"))
+		{
+			auto path = FileDialog::OpenFile(title, filter, initDir);
+
+			if (path.has_value())
+			{
+				auto extension = path.value().extension();
+				auto runtimePath = PathManager::ToRuntime(path.value());
+				
+				FileUtils::CopyAsset(path.value(), runtimePath);
+
+				if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
+					Texture::Create(runtimePath);
+
+				else if (extension == ".ptc")
+					ParticleEffect::Create(runtimePath);
+
+				else if (extension == ".ttf")
+					Font::Create(runtimePath);
+
+				else if (extension == ".mp3")
+					Audio::Create(runtimePath);
+
+				else
+				{
+					TMT_ERR << "Invalid file extension" << extension;
+					return "";
+				}
+
+				return runtimePath;
+			}
+		}
+
+		return "";
 	}
 
 	bool DrawVec3Control(const char* label, float* vec, int flags)

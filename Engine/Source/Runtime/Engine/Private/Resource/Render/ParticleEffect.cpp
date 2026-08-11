@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <string>
 #include "Resource/Render/ParticleEffect.h"
 #include "Resource/Render/Texture.h"
@@ -8,11 +8,44 @@
 
 namespace tomato
 {
-    ParticleEffect::ParticleEffect(const char* filename)
+//    ParticleEffect::ParticleEffect(const char* filename)
+//    {
+////        const std::string path = "Resource/Contents/";
+////        const std::string file = path + filename;
+//        auto data = Serialization::LoadJsonData(filename);
+//
+//        duration_ = data["duration"];
+//        looping_ = data["looping"];
+//
+//        startDelay_ = data["startDelay"];
+//        startSpeed_ = data["startSpeed"];
+//
+//        maxParticles_ = data["maxParticles"];
+//
+//        shape_ = data["shape"];
+//        if (shape_ == ParticleEffectShape::Cone)
+//            angle_ = data["angle"];
+//        space_ = data["space"];
+//
+//        lifetime_ = data["lifetime"];
+//
+//        texture_ = data["texture"];
+//        size_ = data["size"];
+//        color_ = {data["color"][0], data["color"][1], data["color"][2], data["color"][3]};
+//
+//        rateOverTime_ = data["rateOverTime"];
+//
+//        if (!data["burst"].is_null())
+//            burst_.emplace(data["burst"]["period"], data["burst"]["cycles"], data["burst"]["count"]);
+//        else
+//            burst_ = std::nullopt;
+//    }
+
+    ParticleEffect::ParticleEffect(const std::filesystem::path& path)
     {
-//        const std::string path = "Resource/Contents/";
-//        const std::string file = path + filename;
-        auto data = Serialization::LoadJsonData(filename);
+        //        const std::string path = "Resource/Contents/";
+        //        const std::string file = path + filename;
+        auto data = Serialization::LoadJsonData(path.string().c_str());
 
         duration_ = data["duration"];
         looping_ = data["looping"];
@@ -31,7 +64,7 @@ namespace tomato
 
         texture_ = data["texture"];
         size_ = data["size"];
-        color_ = {data["color"][0], data["color"][1], data["color"][2], data["color"][3]};
+        color_ = { data["color"][0], data["color"][1], data["color"][2], data["color"][3] };
 
         rateOverTime_ = data["rateOverTime"];
 
@@ -41,39 +74,48 @@ namespace tomato
             burst_ = std::nullopt;
     }
 
-    void ParticleEffect::Create(const char* filename)
+    //void ParticleEffect::Create(const char* filename)
+    //{
+    //    std::unique_ptr<ParticleEffect> ptr{new ParticleEffect(filename)};
+    //    AssetRegistry<ParticleEffect>::GetInstance().Register(filename, std::move(ptr));
+    //}
+
+    void ParticleEffect::Create(const std::filesystem::path& path)
     {
-        std::unique_ptr<ParticleEffect> ptr{new ParticleEffect(filename)};
-        AssetRegistry<ParticleEffect>::GetInstance().Register(filename, std::move(ptr));
+        std::unique_ptr<ParticleEffect> ptr{ new ParticleEffect(path) };
+        AssetRegistry<ParticleEffect>::GetInstance().Register(path.string(), std::move(ptr));
+
+        TMT_INFO << "Particle Registered " << path;
     }
 
-    void ParticleEffect::InitializeParticleComponent(ParticleComponent& comp) const
+    void ParticleEffect::InitializeParticleComponent(ParticleData& comp) const
     {
         auto now = std::chrono::steady_clock::now();
 
+        /*Set Particle Emitter Component Values*/
+        auto& emitter = comp.emitter;
         const std::chrono::duration<float> durationFSec(duration_);
-        comp.emitter.duration = std::chrono::duration_cast<std::chrono::milliseconds>(durationFSec);
-        comp.emitter.start = now;
-        comp.looping = looping_;
+        emitter.emitter.duration = std::chrono::duration_cast<std::chrono::milliseconds>(durationFSec);
+        emitter.emitter.start = now;
 
-        comp.shape = shape_;
-        comp.angle = angle_;
-        comp.space = space_;
+        emitter.looping = looping_;
+
+        emitter.shape = shape_;
+        emitter.angle = angle_;
+        emitter.space = space_;
 
         if (rateOverTime_ != 0)
         {
             const std::chrono::duration<float> emitPeriodFSec(1.f / rateOverTime_);
-            comp.emitPeriod = std::chrono::duration_cast<std::chrono::milliseconds>(emitPeriodFSec);
+            emitter.emitPeriod = std::chrono::duration_cast<std::chrono::milliseconds>(emitPeriodFSec);
         }
         else
-            comp.emitPeriod = std::chrono::milliseconds::zero();
-        comp.adder = std::chrono::milliseconds::zero();
-        comp.latestTP = now;
+            emitter.emitPeriod = std::chrono::milliseconds::zero();
 
         if (burst_.has_value())
         {
             const std::chrono::duration<float> burstPeriodFSec(burst_->period);
-            comp.burst.emplace(
+            emitter.burst.emplace(
                     std::chrono::duration_cast<std::chrono::milliseconds>(burstPeriodFSec),
                     std::chrono::milliseconds::zero(),
                     now,
@@ -83,25 +125,34 @@ namespace tomato
         }
 
         std::chrono::duration<float> startDelayFSec(startDelay_);
-        comp.startDelay = std::chrono::duration_cast<std::chrono::milliseconds>(startDelayFSec);
-        comp.startSpeed = startSpeed_;
-
-        comp.texture = texture_;
-        comp.size = size_;
-        comp.color = color_;
+        emitter.startDelay = std::chrono::duration_cast<std::chrono::milliseconds>(startDelayFSec);
+        emitter.startSpeed = startSpeed_;
 
         startDelayFSec = std::chrono::duration<float>(lifetime_);
-        comp.lifetime = std::chrono::duration_cast<std::chrono::milliseconds>(startDelayFSec);
+        emitter.particleLifetime = std::chrono::duration_cast<std::chrono::milliseconds>(startDelayFSec);
 
-        comp.positions.clear();
-        comp.velocities.clear();
-        comp.lifetimes.clear();
+        emitter.maxParticles = maxParticles_;
 
-        comp.positions.resize(maxParticles_);
-        comp.velocities.resize(maxParticles_);
-        comp.lifetimes.resize(maxParticles_);
 
-        comp.activeCnt = 0;
-        comp.maxParticles = maxParticles_;
+        /*Set Particle Runtime Component Values*/
+        comp.runtime.adder = std::chrono::milliseconds::zero();
+        comp.runtime.latestTP = now;
+        comp.runtime.activeCnt = 0;
+
+
+        /*Set Particle Buffer Component Values*/
+        comp.buffer.positions.clear();
+        comp.buffer.velocities.clear();
+        comp.buffer.lifetimes.clear();
+
+        comp.buffer.positions.resize(maxParticles_);
+        comp.buffer.velocities.resize(maxParticles_);
+        comp.buffer.lifetimes.resize(maxParticles_);
+
+
+        /*Set Particle Render Component Values*/
+        comp.render.texture = texture_;
+        comp.render.size = size_;
+        comp.render.color = color_;
     }
 }

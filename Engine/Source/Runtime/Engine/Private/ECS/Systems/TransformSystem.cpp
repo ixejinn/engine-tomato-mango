@@ -4,6 +4,7 @@
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Collision.h"
+#include "ECS/Components/Particle.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Event/EventDispatcher.h"
 #include "GameObject/Character/MovementMode.h"
@@ -23,6 +24,8 @@ namespace tomato
 
         for (auto [e, trf] : rootView.each())
             UpdateFrom(registry, e, ROOT_QUAT, ROOT_SCL, ROOT_MAT, false);
+
+        UpdateParticleTransform(registry);
     }
 
     void TransformSystem::UpdateFrom(
@@ -61,6 +64,28 @@ namespace tomato
 
                 UpdateFrom(reg, child, trf.wRotation, trf.wScale, trf.transformMatrix, bUpdated);
             }
+        }
+    }
+    void TransformSystem::UpdateParticleTransform(entt::registry& reg)
+    {
+        auto rootView = reg.view<TransformComponent, ParticleRuntimeComponent>();
+
+        for (auto [e, trf, runtime] : rootView.each())
+        {
+            if (runtime.target == 0) continue;
+            if (!reg.valid(GetEntityByUUID(reg, runtime.target)))
+                continue;
+
+            auto& targetTrf = reg.get<TransformComponent>(GetEntityByUUID(reg, runtime.target));
+
+            auto T = glm::translate(glm::mat4(1.f), trf.position);
+            auto R = glm::toMat4(trf.lRotation);
+            auto S = glm::scale(glm::mat4(1.f), trf.scale);
+
+            trf.wRotation = targetTrf.wRotation * trf.lRotation;
+            trf.wScale = targetTrf.wScale * trf.scale;
+            trf.transformMatrix = targetTrf.transformMatrix * (T * R * S);
+            trf.dirty = false;
         }
     }
 }

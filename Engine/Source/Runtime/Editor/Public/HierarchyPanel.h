@@ -8,7 +8,7 @@ namespace tomato
 	class HierarchyPanel : public EditorPanel
 	{
 	public:
-		HierarchyPanel(bool open);
+		HierarchyPanel(float width, float height, float x, float y);
 
 		void Draw(EditorContext&) override;
 

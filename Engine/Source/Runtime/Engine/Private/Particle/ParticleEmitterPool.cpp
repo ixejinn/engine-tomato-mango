@@ -20,17 +20,22 @@ namespace tomato
         for (int i = 0; i < poolSize; ++i)
         {
             entt::entity e = registry_.create();
-            //registry_.emplace<NametagComponent>(e,
-            //    GenerateUUID(), GenerateEntityName(registry_, "ParticleEffect"));
+
+            registry_.emplace<NametagComponent>(e,
+                GenerateUUID(), GenerateEntityName(registry_, "ParticleEffect"));
+            registry_.emplace<VisibilityComponent>(e);
+
             registry_.emplace<TransformComponent>(e);
             registry_.emplace<RootEntityTag>(e);
-            //registry_.emplace<VisibilityComponent>(e);
 
-            auto& ptc = registry_.emplace<ParticleComponent>(e);
-            ptc.active = false;
-            ptc.positions.reserve(ParticleComponent::MAX_PARTICLE);
-            ptc.velocities.reserve(ParticleComponent::MAX_PARTICLE);
-            ptc.lifetimes.reserve(ParticleComponent::MAX_PARTICLE);
+            registry_.emplace<ParticleEmitterComponent>(e);
+            registry_.emplace<ParticleRuntimeComponent>(e);
+            registry_.emplace<ParticleRenderComponent>(e);
+
+            auto& particleBuf = registry_.emplace<ParticleBufferComponent>(e);
+            particleBuf.positions.reserve(MAX_PARTICLE_NUM);
+            particleBuf.velocities.reserve(MAX_PARTICLE_NUM);
+            particleBuf.lifetimes.reserve(MAX_PARTICLE_NUM);
 
             freeEmitters_.push_back(e);
         }
@@ -52,14 +57,25 @@ namespace tomato
         auto& transform = registry_.get<TransformComponent>(e);
         transform.SetPosition(pos);
 
-        auto& particle = registry_.get<ParticleComponent>(e);
-        particle.active = true;
-        ptcEffect->InitializeParticleComponent(particle);
+        auto& pRuntime = registry_.get<ParticleRuntimeComponent>(e);
+        pRuntime.active = true;
+
+        auto& attach = registry_.emplace<ParticleAttachmentComponent>(e);
+        attach.particle = ptcID;
+
+        ParticleData pData{
+            .emitter = registry_.get<ParticleEmitterComponent>(e),
+            .runtime = pRuntime,
+            .buffer = registry_.get<ParticleBufferComponent>(e),
+            .render = registry_.get<ParticleRenderComponent>(e)
+        };
+
+        ptcEffect->InitializeParticleComponent(pData);
 
         return e;
     }
 
-    std::optional<entt::entity> ParticleEmitterPool::Acquire(AssetID ptcID, entt::entity parent)
+    std::optional<entt::entity> ParticleEmitterPool::Acquire(AssetID ptcID, UUID target)
     {
         if (freeEmitters_.empty())
         {
@@ -72,24 +88,36 @@ namespace tomato
         entt::entity e = freeEmitters_.back();
         freeEmitters_.pop_back();
 
-        SetHierarchy(registry_, parent, e);
+        auto& pRuntime = registry_.get<ParticleRuntimeComponent>(e);
+        pRuntime.active = true;
+        pRuntime.target = target;
 
-        auto& particle = registry_.get<ParticleComponent>(e);
-        particle.active = true;
-        ptcEffect->InitializeParticleComponent(particle);
+        auto& attach = registry_.emplace<ParticleAttachmentComponent>(e);
+        attach.particle = ptcID;
+        attach.target = target;
+
+        ParticleData pData{
+            .emitter = registry_.get<ParticleEmitterComponent>(e),
+            .runtime = pRuntime,
+            .buffer = registry_.get<ParticleBufferComponent>(e),
+            .render = registry_.get<ParticleRenderComponent>(e)
+        };
+
+        ptcEffect->InitializeParticleComponent(pData);
 
         return e;
     }
 
     bool ParticleEmitterPool::Release(entt::entity e)
     {
-        auto* particle = registry_.try_get<ParticleComponent>(e);
+        auto* particle = registry_.try_get<ParticleRuntimeComponent>(e);
         if (!particle)
             return false;
 
-        SetHierarchy(registry_, entt::null, e);
+        registry_.remove<ParticleAttachmentComponent>(e);
 
         particle->active = false;
+        particle->target = 0;
 
         freeEmitters_.push_back(e);
         return true;

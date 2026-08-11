@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <glm/fwd.hpp>
 #include <entt/fwd.hpp>
 #include <State/StateFwd.h>
 
@@ -24,15 +25,21 @@ namespace tomato
 
 		void SetInputCallbacks();
 
+		void PickObject(entt::registry& reg, glm::vec2 mousePos);
+
 	private:
 		void LoadResources();
 		void ResetEditorContext(State*);
+
+		bool IsMouseOverPanel(glm::vec2 mousePos);
+		bool TrySelectUI(entt::registry& reg, glm::vec2 mousePos);
+
 	private:
 		std::vector<std::unique_ptr<EditorPanel>> panels;
 		MainMenuBar mainMenu_;
 
 		EditorContext eCtx;
-		entt::entity selectedEntity;
+		//entt::entity selectedEntity;
 	};
 }
 

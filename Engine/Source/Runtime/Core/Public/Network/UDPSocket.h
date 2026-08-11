@@ -1,4 +1,4 @@
-#ifndef MANGO_SOCKET_H
+ï»¿#ifndef MANGO_SOCKET_H
 #define MANGO_SOCKET_H
 
 #include "Network/NetworkFwd.h"
@@ -6,34 +6,34 @@
 namespace tomato
 {
 	/**
-	 * Windows WinSock API¸¦ °¨½Î´Â UDP Socket ·¡ÆÛ
-	 * ÀÚ¿ø ÇØÁ¦ ¾ÈÁ¤¼ºÀ» À§ÇØ RAII ÇüÅÂ·Î ¼³°è
-	 * non-blocking mode¸¦ ±âº» ÀüÁ¦
+	 * Windows WinSock APIë¥¼ ê°ì‹¸ëŠ” UDP Socket ë˜í¼
+	 * ìì› í•´ì œ ì•ˆì •ì„±ì„ ìœ„í•´ RAII í˜•íƒœë¡œ ì„¤ê³„
+	 * non-blocking modeë¥¼ ê¸°ë³¸ ì „ì œ
 	 */
 	class UDPSocket
 	{
 	public:
 		/**
-		 * UDP ¼ÒÄÏ »ı¼º
-		 * ½ÇÆĞ ½Ã nullptr ¹İÈ¯
+		 * UDP ì†Œì¼“ ìƒì„±
+		 * ì‹¤íŒ¨ ì‹œ nullptr ë°˜í™˜
 		 */
 		static UDPSocketPtr CreateSocket();
 
-		// ¼ÒÄÏ ÇÚµé Á¤¸® (closesocket)
+		// ì†Œì¼“ í•¸ë“¤ ì •ë¦¬ (closesocket)
 		~UDPSocket();
 
 		int Bind(const SocketAddress& inBindAddress);
 
 		/**
-		 * Æ¯Á¤ ÁÖ¼Ò·Î µ¥ÀÌÅÍ Àü¼Û
-		 * non-blocking ¸ğµå ±âÁØÀÌ¹Ç·Î, EWOULDBLOCK ¹ß»ı °¡´É
+		 * íŠ¹ì • ì£¼ì†Œë¡œ ë°ì´í„° ì „ì†¡
+		 * non-blocking ëª¨ë“œ ê¸°ì¤€ì´ë¯€ë¡œ, EWOULDBLOCK ë°œìƒ ê°€ëŠ¥
 		 */
 		int SendTo(const void* inToSend, int inLength, const SocketAddress& inToAddress);
 		int ReceiveFrom(void* inToReceive, int inMaxLength, SocketAddress& outFromAddress);
 
 		/**
-		 * ¼ÒÄÏÀ» non-blocking / blocking ¸ğµå·Î ÀüÈ¯
-		 * ÇÁ·¹ÀÓ Á¤Áö ¹æÁö¸¦ À§ÇØ non-blocking ¸ğµå »ç¿ë ±ÇÀå
+		 * ì†Œì¼“ì„ non-blocking / blocking ëª¨ë“œë¡œ ì „í™˜
+		 * í”„ë ˆì„ ì •ì§€ ë°©ì§€ë¥¼ ìœ„í•´ non-blocking ëª¨ë“œ ì‚¬ìš© ê¶Œì¥
 		 */
 		int SetNonBlockingMode(bool nonBlocking);
 

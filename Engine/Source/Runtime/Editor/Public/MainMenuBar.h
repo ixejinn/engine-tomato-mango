@@ -22,6 +22,7 @@ namespace tomato
 
 	private:
 		void MenuFile(EditorContext&);
+		void EditModeButton(EditorContext&, RunMode&);
 
 		void NewScene(EditorContext&);
 		void OpenScene(EditorContext&);
@@ -31,6 +32,7 @@ namespace tomato
 
 		void OpenPopupModal(EditorContext&);
 		void ExecutePendingAction(EditorContext&, bool);
+		void ProcessShortcuts(EditorContext&);
 
 	private:
 		PendingAction pendingAction_ = PendingAction::None;

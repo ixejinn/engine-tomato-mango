@@ -1,6 +1,5 @@
-﻿#include <GLFW/glfw3.h>
+﻿#include "Input/InputUI.h"
 
-#include "Input/InputUI.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Services/Input.h"
 #include "Services/Window.h"
@@ -8,6 +7,8 @@
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
 #include "State/State.h"
+
+#include <GLFW/glfw3.h>
 
 namespace tomato
 {

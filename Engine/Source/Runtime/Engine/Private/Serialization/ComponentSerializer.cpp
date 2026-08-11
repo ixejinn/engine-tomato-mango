@@ -12,6 +12,7 @@
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Font.h"
 #include "Resource/Render/Texture.h"
+#include "Resource/Render/ParticleEffect.h"
 
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Visibility.h"
@@ -25,6 +26,7 @@
 #include "ECS/Components/UIEvents.h"
 #include "ECS/Components/Text.h"
 #include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/Particle.h"
 
 #include "Utils/Logger.h"
 
@@ -94,28 +96,31 @@ namespace tomato::Serialization
 		LoadComponents(root, reg, entityMap);
 
 		ResolveHierarchy(reg, entityMap);
+
+		//AttachParticles(root, reg);
 	}
 
 	void SaveScene(State* state, const char* path)
 	{
 		json root;
+		auto& reg = state->GetRegistry();
 
 		root["State"] = StateRegistry::GetInstance().GetStateID(typeid(*state));
 		root["State Name"] = std::type_index(typeid(*state)).name();
 
 		SaveResourcesInfo(root);
+		SaveParticlesInfo(root, reg);
 
 		root["Entities"] = json::array();
 
-		auto& reg = state->GetRegistry();
 		auto view = reg.view<NametagComponent>();
 		for (auto entity : view)
 		{
 			json entityJson;
 
 			SaveEntity(entityJson, reg, entity);
-
-			root["Entities"].push_back(entityJson);
+			if(!entityJson.empty())
+				root["Entities"].push_back(entityJson);
 		}
 
 		std::ofstream ofs(path);
@@ -141,6 +146,8 @@ namespace tomato::Serialization
 
 		ResolveHierarchy(newState->GetRegistry(), newState->GetEntityMap());
 
+		AttachParticles(root, newState.get());
+
 		engine.SetNextState(std::move(newState));
 	}
 
@@ -155,7 +162,7 @@ namespace tomato::Serialization
 	{
 		for (auto& src : root["Resource"])
 		{
-			std::cout << src.items().begin().key() << '\n';
+			//std::cout << src.items().begin().key() << '\n';
 			if (src.items().begin().key() == "Font")
 			{
 				for(auto& font : src["Font"])
@@ -166,6 +173,12 @@ namespace tomato::Serialization
 			{
 				for(auto& tex : src["Texture"])
 					Texture::Create(tex);
+			}
+
+			if (src.items().begin().key() == "Particle")
+			{
+				for (auto& particle : src["Particle"])
+					ParticleEffect::Create(particle);
 			}
 		}
 	}
@@ -218,13 +231,24 @@ namespace tomato::Serialization
 		}
 	}
 
+	void AttachParticles(const json& particleData, State* state)
+	{
+		for (auto& particle : particleData["Particle"])
+		{
+			AssetID asset = particle["particle"];
+			UUID target = particle["target"];
+
+			state->particlePool_.Acquire(asset, target);
+		}
+	}
+
 	void SaveResourcesInfo(json& data)
 	{
 		data["Resource"] = json::array();
 		auto itBegin = AssetRegistry<Font>::GetInstance().GetNameMapBegin();
 		auto itEnd = AssetRegistry<Font>::GetInstance().GetNameMapEnd();
 
-		json font, tex;
+		json font, tex, particle;
 		for (itBegin; itBegin != itEnd; ++itBegin)
 			font["Font"].push_back(itBegin->second);
 		
@@ -237,10 +261,37 @@ namespace tomato::Serialization
 			tex["Texture"].push_back(itBegin->second);
 
 		data["Resource"].push_back(tex);
+
+		itBegin = AssetRegistry<ParticleEffect>::GetInstance().GetNameMapBegin();
+		itEnd = AssetRegistry<ParticleEffect>::GetInstance().GetNameMapEnd();
+
+		for (itBegin; itBegin != itEnd; ++itBegin)
+			particle["Particle"].push_back(itBegin->second);
+
+		data["Resource"].push_back(particle);
+	}
+
+	void SaveParticlesInfo(json& data, entt::registry& reg)
+	{
+		data["Particle"] = json::array();
+		
+		auto view = reg.view<ParticleAttachmentComponent>();
+		for (auto [e, attach] : view.each())
+		{
+			json particle;
+			particle["particle"] = attach.particle;
+			particle["target"] = attach.target;
+
+			data["Particle"].push_back(particle);
+		}
 	}
 
 	void SaveEntity(json& data, entt::registry& reg, entt::entity entity)
 	{
+		// particle
+		if (reg.all_of<ParticleEmitterComponent>(entity))
+			return;
+
 		auto& tag = reg.get<NametagComponent>(entity);
 		data["ID"] = tag.id;
 		data["Name"] = tag.name;
@@ -524,6 +575,9 @@ namespace tomato::Serialization
 			data["pressed"][3]
 		};
 	}
+
+	void Save(json& data, const ParticleEmitterComponent& particle) {}
+	void Load(const json& data, ParticleEmitterComponent& particle) {}
 
 	void Save(json& data, const HierarchyComponent& hierarchy)
 	{

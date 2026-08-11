@@ -181,7 +181,11 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Collision/Narrow/GJK/GJKResult.h
 		Source/Runtime/Engine/Public/Collision/CollisionConfig.h
 		Source/Runtime/Engine/Public/ECS/Forward/CharacterCompFwd.h
-)
+        Source/Runtime/Engine/Public/ECS/Systems/ParticleEmissionSystem.h
+        Source/Runtime/Engine/Public/Math/Geometry.h
+        Source/Runtime/Engine/Public/Math/AABB.h
+        Source/Runtime/Engine/Public/Math/Ray.h
+ )
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -261,6 +265,9 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Utils/FileDialog.cpp
 		Source/Runtime/Engine/Private/State/StateRegistry.cpp
 		Source/Runtime/Engine/Private/State/DefaultState.cpp
+        Source/Runtime/Engine/Private/ECS/Systems/ParticleEmissionSystem.cpp
+        Source/Runtime/Engine/Private/Math/Ray.cpp
+        Source/Runtime/Engine/Private/Math/Geometry.cpp
 )
 
 add_library(engine STATIC

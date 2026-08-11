@@ -8,6 +8,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "imgui_stdlib.h"
 
 #include <entt/entt.hpp>
 #include "State/State.h"
@@ -22,7 +23,7 @@
 
 namespace tomato
 {
-	InspectorPanel::InspectorPanel(bool open) : EditorPanel(open)
+	InspectorPanel::InspectorPanel(float width, float height, float x, float y) : EditorPanel(width, height, x, y)
 	{
 		LoadResources();
 	}
@@ -32,13 +33,13 @@ namespace tomato
 		if (editorCtx.selectedEntity == entt::null)
 			return;
 
-		float width{ 300.f }, height{ 600.f };
-
-		ImGui::SetNextWindowPos(ImVec2(1600.f, 300.f + height), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
-		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowPos(ImVec2(posX_, posY_), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
+		ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_FirstUseEver);
 		
 		if (ImGui::Begin("Inspector", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize))
 		{
+			SetPos({ ImGui::GetWindowPos().x, ImGui::GetWindowPos().y });
+
 			MenuBar(editorCtx);
 			ShowEntityUID(editorCtx);
 
@@ -58,7 +59,7 @@ namespace tomato
 
 				bool is_open = ImGui::CollapsingHeader(comp.name.c_str(), flags);
 
-				MoreButton(editorCtx, comp);
+				MoreButton(editorCtx, comp, is_open);
 
 				if (is_open && comp.editor.Draw)
 				{
@@ -76,7 +77,7 @@ namespace tomato
 	{
 		more_vert =
 			AssetRegistry<Texture>::GetInstance().
-			Get(GetAssetID(PathManager::Icon("more_vert.png").string().c_str()))->GetTexture();
+			Get(GetAssetID(PathManager::RuntimeIcon("more_vert.png").string().c_str()))->GetTexture();
 	}
 
 	void InspectorPanel::MenuBar(EditorContext& editorCtx)
@@ -124,7 +125,9 @@ namespace tomato
 
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("%s", nametag.name.c_str());
+			if (ImGui::InputText("##input text", &nametag.name, ImGuiInputTextFlags_ElideLeft))
+				editorCtx.sceneDirty = true;
+			//ImGui::Text("%s", nametag.name.c_str());
 
 			ImGui::TableSetColumnIndex(1);
 			ImGui::Text("%d", entt::to_entity(editorCtx.selectedEntity));
@@ -163,7 +166,7 @@ namespace tomato
 		}
 	}
 
-	void InspectorPanel::MoreButton(EditorContext& editorCtx, const Serialization::ComponentInfo& comp)
+	void InspectorPanel::MoreButton(EditorContext& editorCtx, const Serialization::ComponentInfo& comp, bool& isOpen)
 	{
 		ImGui::SameLine();
 
@@ -182,6 +185,7 @@ namespace tomato
 				if (!HasFlag(comp.flags, Serialization::ComponentFlags::Essential))
 				{
 					comp.editor.Remove(editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
+					isOpen = false;
 					editorCtx.sceneDirty = true;
 				}
 			}

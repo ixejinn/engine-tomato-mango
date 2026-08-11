@@ -75,7 +75,7 @@ namespace tomato::UIPrefab
         return button;
     }
 
-    entt::entity CreateText(entt::registry& reg, glm::vec2 pos, std::string inText, glm::vec4 color, float size, const char* fontName)
+    entt::entity CreateText(entt::registry& reg, glm::vec2 pos, std::string inText, glm::vec4 color, float size, const std::filesystem::path& fontName)
     {
         entt::entity canvas = GetCanvas(reg);
 
@@ -95,7 +95,7 @@ namespace tomato::UIPrefab
         return text;
     }
 
-    entt::entity CreateImage(entt::registry& reg, const char* textureName, glm::vec2 pos, glm::vec2 size)
+    entt::entity CreateImage(entt::registry& reg, const std::filesystem::path& textureName, glm::vec2 pos, glm::vec2 size)
     {
         entt::entity canvas = GetCanvas(reg);
         

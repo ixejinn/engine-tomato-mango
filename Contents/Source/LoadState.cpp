@@ -1,21 +1,26 @@
 ﻿#include "LoadState.h"
-#include "Resource/AssetRegistry.h"
-#include "Resource/Render/Texture.h"
-#include "ECS/Components/Nametag.h"
-#include "Serialization/ComponentSerializer.h"
 
 #include "Engine.h"
+
+#include "Resource/AssetRegistry.h"
+#include "Resource/Render/Texture.h"
+#include "Resource/PathManager.h"
+
+#include "Serialization/ComponentSerializer.h"
+
 #include "Prefab/Prefab.h"
 #include "Prefab/UIPrefab.h"
-#include "TestState.h"
 #include "Utils/RegistryEntry.h"
+
+#include "TestState.h"
+
 REGISTER_STATE(LoadState)
 
 using namespace tomato;
 
 void LoadState::Init()
 {
-	Texture::Create("Resources/Contents/WATER_GAME_LOGO.png");
+	/*Texture::Create(PathManager::ContentImage("WATER_GAME_LOGO.png"));*/
 	/*Texture::Create("Resources\\Contents\\WATER_GAME_LOGO.png");*/
 	//Serialization::LoadScene(registry_, "Resources/Engine/Scenes/default.scene", entityMap_);
 	

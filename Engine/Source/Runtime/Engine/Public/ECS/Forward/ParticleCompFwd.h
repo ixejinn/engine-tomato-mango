@@ -1,9 +1,14 @@
-#ifndef MANGO_PARTICLECOMPFWD_H
+﻿#ifndef MANGO_PARTICLECOMPFWD_H
 #define MANGO_PARTICLECOMPFWD_H
 
 namespace tomato
 {
-    struct ParticleComponent;
+    struct ParticleEmitterComponent;
+    struct ParticleRuntimeComponent;
+    struct ParticleBufferComponent;
+    struct ParticleRenderComponent;
+
+    struct ParticleData;
 }
 
 #endif //MANGO_PARTICLECOMPFWD_H
