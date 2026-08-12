@@ -60,6 +60,9 @@ namespace tomato
 
 	entt::entity GetEntityByUUID(entt::registry& reg, UUID id)
 	{
+		if (id == 0)
+			return entt::null;
+
 		const auto view = reg.view<NametagComponent>();
 		for (auto [e, tag] : view.each())
 		{

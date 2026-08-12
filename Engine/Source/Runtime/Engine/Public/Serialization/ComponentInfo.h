@@ -17,6 +17,7 @@ namespace tomato::Serialization
 #define TMT_COMPONENT_CATEGORY_LIST(X)	\
 	X(Common, "Common")					\
 	X(UI, "UI")							\
+	X(Particle, "Particle")				\
 	X(Tag, "Tag")
 
 	enum class ComponentCategory

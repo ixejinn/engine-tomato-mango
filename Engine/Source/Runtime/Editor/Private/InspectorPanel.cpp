@@ -11,6 +11,7 @@
 #include "imgui_stdlib.h"
 
 #include <entt/entt.hpp>
+#include <fstream>
 #include "State/State.h"
 
 #include "Serialization/ComponentRegistry.h"
@@ -19,6 +20,7 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Camera.h"
 
+#include "Utils/FileDialog.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 
 namespace tomato
@@ -190,9 +192,32 @@ namespace tomato
 				}
 			}
 
+			if (comp.category == Serialization::ComponentCategory::Particle)
+				SaveParticleButton(editorCtx, comp);
+
 			ImGui::EndPopup();
 		}
 		ImGui::PopID();
+	}
+
+	void InspectorPanel::SaveParticleButton(EditorContext& editorCtx, const Serialization::ComponentInfo& comp)
+	{
+		if (ImGui::MenuItem("Save"))
+		{
+			auto path = FileDialog::SaveFile(
+				"Save Particle",
+				"ptc",
+				"Particle Files (*.ptc)\0*.ptc\0\0",
+				PathManager::ProjectResource() / "Particle");
+
+			if (path)
+			{
+				auto runtimePath = PathManager::ToRuntime(path.value());
+				
+				Serialization::SaveParticle(path.value(), editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
+				FileUtils::CopyAsset(path.value(), runtimePath, std::filesystem::copy_options::overwrite_existing);
+			}
+		}
 	}
 
 }

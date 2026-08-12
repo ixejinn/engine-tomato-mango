@@ -73,7 +73,7 @@ namespace tomato
         {
             if (particle.emitter.looping)
             {
-                std::cout << "   LOOPING(" << simCtx.tick << ") ----------\n";
+                //std::cout << "   LOOPING(" << simCtx.tick << ") ----------\n";
                 particle.emitter.emitter.start = now;
 
                 if (particle.emitter.burst.has_value())

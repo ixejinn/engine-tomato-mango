@@ -29,6 +29,7 @@ namespace tomato
 		void MenuBar(EditorContext&);
 		void ShowAddComponent(EditorContext&, Serialization::ComponentCategory);
 		void MoreButton(EditorContext&, const Serialization::ComponentInfo&, bool&);
+		void SaveParticleButton(EditorContext&, const Serialization::ComponentInfo&);
 
 	private:
 		unsigned int more_vert;

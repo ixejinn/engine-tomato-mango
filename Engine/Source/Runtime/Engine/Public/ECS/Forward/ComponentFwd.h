@@ -24,6 +24,7 @@ namespace tomato
 	struct HierarchyComponent;
 	
 	struct ParticleEmitterComponent;
+	struct ParticleRenderComponent;
 
 	struct RootEntityTag;
 	struct MainCameraTag;

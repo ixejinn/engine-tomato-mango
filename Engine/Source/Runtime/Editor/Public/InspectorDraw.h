@@ -26,7 +26,7 @@ namespace tomato
 
 	
 	std::filesystem::path DrawLoadResourceButton(const char* title, const char* filter, const std::filesystem::path& initDir);
-	bool DrawVec3Control(const char* label, float* vec, int flags = 0);
+	bool DrawVec3Control(const char* label, float* vec, float min = 0.f, float max = 0.f, int flags = 0);
 }
 
 
