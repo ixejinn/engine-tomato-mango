@@ -242,7 +242,7 @@ namespace tomato {
 
     void Mesh::OpenCylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices)
     {
-        constexpr int sectorCnt = 10;
+        constexpr int sectorCnt = 50;
 
         vertices.resize(4 * sectorCnt);
         indices.resize(6 * sectorCnt);

@@ -838,9 +838,18 @@ namespace tomato
 
 				ImGui::TableSetColumnIndex(1);
 				int burstCount = (int)particle.burst.value().count;
-				if (ImGui::DragInt("##count", &burstCount, 1.f, 0, 100, "%d", ImGuiSliderFlags_AlwaysClamp))
+				if (ImGui::DragInt("##count", &burstCount, 1.f, 0, MAX_PARTICLE_NUM, "%d", ImGuiSliderFlags_AlwaysClamp))
+				{
 					particle.burst.value().count = burstCount;
-
+					if (particle.maxParticles < burstCount)
+					{
+						int newSize = std::min(MAX_PARTICLE_NUM, burstCount);
+						auto& buffer = reg.get<ParticleBufferComponent>(eCtx.selectedEntity);
+						buffer.positions.resize(newSize + 1);
+						buffer.velocities.resize(newSize + 1);
+						buffer.lifetimes.resize(newSize + 1);
+					}
+				}
 				ImGui::TableSetColumnIndex(2);
 				ImGui::DragInt("##cycles", &particle.burst.value().cycles);
 			}
