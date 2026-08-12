@@ -112,7 +112,7 @@ namespace tomato
 
 		glm::vec3 scale = transform.GetLocalScale();
 		float scaleVec3[3] = { scale.x, scale.y, scale.z };
-		if (DrawVec3Control("Scale", scaleVec3, 1.f, 0.f, ImGuiSliderFlags_ClampOnInput))
+		if (DrawVec3Control("Scale", scaleVec3, 1e-4f, 0.f, ImGuiSliderFlags_ClampOnInput))
 		{
 			transform.SetScale(scaleVec3[0], scaleVec3[1], scaleVec3[2]);
 			changed = true;

@@ -24,6 +24,7 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Particle.h"
+#include "Particle/ParticleEmitterPool.h"
 
 #include "ECS/Entity/Hierarchy.h"
 #include <iostream>
@@ -268,7 +269,8 @@ namespace tomato
 		if (ImGui::MenuItem("Particle"))
 		{
 			//@TODO : Change default particle asset
-			auto newParticle = editorCtx.currentState->particlePool_.Acquire(GetAssetID(PathManager::ProjectParticle("burst_test.tmt.ptc")), glm::vec3(0));
+			auto& particlePool = editorCtx.currentState->GetRegistry().ctx().get<ParticleEmitterPool>();
+			auto newParticle = particlePool.Acquire(GetAssetID(PathManager::ProjectParticle("burst_test.tmt.ptc")), glm::vec3(0));
 			if (newParticle.has_value())
 				selected = newParticle.value();
 		}
