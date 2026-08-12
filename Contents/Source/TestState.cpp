@@ -36,6 +36,7 @@ void TestState::Init() {
     Texture::Create(PathManager::ProjectImage("heart.png"));
     Font::Create(PathManager::ProjectFont("D2Coding.ttf"));
     Font::Create(PathManager::ProjectFont("Pretendard-SemiBold.ttf"));
+    Mesh::Create(Mesh::Primitive::Sphere, 20, 10);
 
     ParticleEffect::Create(PathManager::ProjectParticle("burst_test.tmt.ptc"));
     ParticleEffect::Create(PathManager::ProjectParticle("ribbon_particle.tmt.ptc"));
@@ -63,7 +64,8 @@ void TestState::Init() {
     //// Player0 character
     entt::entity player0 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, 2, 0 });
     auto& renderp0 = registry_.get<RenderComponent>(player0);
-    renderp0.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+//    renderp0.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    renderp0.mesh = GetAssetID("Primitive::Sphere20_10");
     renderp0.color = { 1.f, 1.f, 0.f, 1.f };
     auto& channelp0 = registry_.get<InputChannelComponent>(player0);
     channelp0.channel = 0;

@@ -4,12 +4,15 @@
 #include "Resource/AssetRegistry.h"
 #include "Utils/Logger.h"
 
-namespace tomato {
-    Mesh::Mesh(Primitive type) {
+namespace tomato
+{
+    Mesh::Mesh(Primitive type)
+    {
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
 
-        switch (type) {
+        switch (type)
+        {
             case Primitive::Plain:
                 Plain(vertices, indices);
                 break;
@@ -52,6 +55,43 @@ namespace tomato {
         SetMesh(vertices, indices);
     }
 
+    Mesh::Mesh(Primitive type, int sectorCnt, int stackCnt)
+    {
+        std::vector<Vertex> vertices;
+        std::vector<unsigned int> indices;
+
+        switch (type)
+        {
+            case Primitive::Sphere:
+                Sphere(vertices, indices, sectorCnt, stackCnt);
+                break;
+
+            case Primitive::Cylinder:
+                Cylinder(vertices, indices, sectorCnt);
+                break;
+
+            case Primitive::OpenCylinder:
+                OpenCylinder(vertices, indices, sectorCnt);
+                cullface_ = false;
+                break;
+
+            default:
+                TMT_WARN << "Invalid mesh type";
+                break;
+        }
+
+        localAABB_.min = vertices[0].position;
+        localAABB_.max = vertices[0].position;
+
+        for (auto& v : vertices)
+        {
+            localAABB_.min = glm::min(localAABB_.min, v.position);
+            localAABB_.max = glm::max(localAABB_.max, v.position);
+        }
+
+        SetMesh(vertices, indices);
+    }
+
     Mesh::~Mesh() {
         glDeleteVertexArrays(1, &vao_);
         glDeleteBuffers(1, &vbo_);
@@ -67,6 +107,21 @@ namespace tomato {
             std::unique_ptr<Mesh> ptr{new Mesh(type)};
             registry.Register(GetPrimitiveName(type), std::move(ptr));
         }
+    }
+
+    void Mesh::Create(Primitive type, int sectorCnt, int stackCnt)
+    {
+        if ((type == Primitive::Sphere && stackCnt == 0) || sectorCnt == 0)
+        {
+            TMT_ERR << "Invalid mesh";
+            return;
+        }
+
+        std::unique_ptr<Mesh> ptr{new Mesh(type, sectorCnt, stackCnt)};
+        std::string name = GetPrimitiveName(type) + std::to_string(sectorCnt) + "_" + std::to_string(stackCnt);
+        AssetRegistry<Mesh>::GetInstance().Register(name, std::move(ptr));
+
+        TMT_INFO << "Create mesh: " << name;
     }
 
     void Mesh::Bind() const {
@@ -131,11 +186,10 @@ namespace tomato {
         FillMeshData(v5, v4, v7, v6, vertices, indices); // bottom
     }
 
-    void Mesh::Sphere(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices)
+    void Mesh::Sphere(
+            std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
+            const int sectorCnt, const int stackCnt)
     {
-        constexpr int sectorCnt = 8;    // divide sphere by longitude
-        constexpr int stackCnt = 6;     // divide sphere by latitude
-
         vertices.resize(4 * sectorCnt * (stackCnt - 2) + 3 * sectorCnt * 2);    // pole consists of triangles
         indices.resize(6 * sectorCnt * (stackCnt - 2) + 3 * sectorCnt * 2);
 
@@ -147,8 +201,8 @@ namespace tomato {
         float lat = 0.5f * pi;  // latitude
 
         glm::vec3 northPole{0.f, 0.5f, 0.f};
-        glm::vec3 coords[stackCnt - 1][sectorCnt];
         glm::vec3 southPole{0.f, -0.5f, 0.f};
+        std::vector<std::vector<glm::vec3>> coords(stackCnt - 1, std::vector<glm::vec3>(sectorCnt));
         for (auto& row : coords) {
             lat -= stackStep;
             lon = 0.f;
@@ -189,14 +243,14 @@ namespace tomato {
         FillMeshData(southPole, southRow[0], southRow[sectorCnt - 1], vertices, indices);
     }
 
-    void Mesh::Capsule(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices) {
+    void Mesh::Capsule(
+            std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
+            const int sectorCnt, const int stackCnt) {}
 
-    }
-
-    void Mesh::Cylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices)
+    void Mesh::Cylinder(
+            std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
+            const int sectorCnt)
     {
-        constexpr int sectorCnt = 10;
-
         vertices.resize(4 * sectorCnt + 3 * sectorCnt * 2); // top and bottom consist of triangles
         indices.resize(6 * sectorCnt + 3 * sectorCnt * 2);
 
@@ -207,7 +261,7 @@ namespace tomato {
 
         glm::vec3 topCenter{0.f, 0.5f, 0.f};
         glm::vec3 bottomCenter{0.f, -0.5f, 0.f};
-        glm::vec3 coords[2][sectorCnt];
+        std::vector<std::vector<glm::vec3>> coords(2, std::vector<glm::vec3>(sectorCnt));
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < sectorCnt; j++) {
                 coords[i][j] = {
@@ -240,10 +294,8 @@ namespace tomato {
                      vertices, indices);
     }
 
-    void Mesh::OpenCylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices)
+    void Mesh::OpenCylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, const int sectorCnt)
     {
-        constexpr int sectorCnt = 10;
-
         vertices.resize(4 * sectorCnt);
         indices.resize(6 * sectorCnt);
 
@@ -252,7 +304,7 @@ namespace tomato {
 
         float lon = 0.f;
 
-        glm::vec3 coords[2][sectorCnt];
+        std::vector<std::vector<glm::vec3>> coords(2, std::vector<glm::vec3>(sectorCnt));
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < sectorCnt; j++) {
                 coords[i][j] = {
