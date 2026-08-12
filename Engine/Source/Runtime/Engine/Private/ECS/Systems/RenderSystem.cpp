@@ -28,7 +28,8 @@ namespace tomato
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glEnable(GL_CULL_FACE);
+        if (cullface_)
+            glEnable(GL_CULL_FACE);
 
         AssetRegistry<Mesh>::GetInstance().CreatePrimitives();
         AssetRegistry<Texture>::GetInstance().CreatePrimitives();
@@ -53,6 +54,7 @@ namespace tomato
 
         Mesh* mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
         mesh->Bind();
+        UpdateCullface(mesh->GetCullface());
 
         Shader* shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
         shader->Use();
@@ -84,6 +86,7 @@ namespace tomato
                 curMesh_ = render.mesh;
                 mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
                 mesh->Bind();
+                UpdateCullface(mesh->GetCullface());
             }
 
             const auto& mtx = trf.GetTransformMatrix();
@@ -99,6 +102,19 @@ namespace tomato
                 mesh->Draw();
             else
                 mesh->Draw(true);
+        }
+    }
+
+    void RenderSystem::UpdateCullface(bool meshCullface)
+    {
+        if (cullface_ ^ meshCullface)
+        {
+            if (meshCullface)
+                glEnable(GL_CULL_FACE);
+            else
+                glDisable(GL_CULL_FACE);
+
+            cullface_ = meshCullface;
         }
     }
 }
