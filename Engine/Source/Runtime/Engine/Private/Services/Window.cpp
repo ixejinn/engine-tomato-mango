@@ -89,6 +89,14 @@ namespace tomato {
             glfwSetWindowShouldClose(handle_, true);
     }
 
+    void Window::SetCursorMode(bool disable)
+    {
+        if (disable)
+            glfwSetInputMode(handle_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        else
+            glfwSetInputMode(handle_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
     void Window::OnFramebufferSizeChanged(GLFWwindow* window, int width, int height)
     {
         width_ = width;

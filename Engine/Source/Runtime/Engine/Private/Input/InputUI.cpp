@@ -48,6 +48,7 @@ namespace tomato
 
 	bool InputUI::OnHover(const MouseMoveEvent& moveEvent)
 	{
+		std::cout << "OnHover: " << moveEvent.xPos << " " << moveEvent.yPos << "\n";
 		if (currentStatePtr_ == nullptr)
 			return true;
 

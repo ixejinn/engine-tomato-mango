@@ -31,6 +31,7 @@ namespace tomato
         const InputRecord& GetCurrInputRecord() const { return curr_; }
 
         bool IsPress(InputIntent intent) const;
+        bool IsHeld(InputIntent intent) const;
 
     private:
         void InitKeyIntents();

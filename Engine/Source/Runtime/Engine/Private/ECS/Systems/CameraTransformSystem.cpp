@@ -1,5 +1,5 @@
 ﻿#include <entt/entt.hpp>
-#include "ECS/Systems/CameraSystem.h"
+#include "ECS/Systems/CameraTransformSystem.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
@@ -8,7 +8,7 @@
 
 namespace tomato
 {
-    void CameraSystem::Update(SimContext& simCtx)
+    void CameraTransformSystem::Update(SimContext& simCtx)
     {
         auto& registry = simCtx.state->GetRegistry();
         auto& renderCtx = registry.ctx().get<RenderContext>();

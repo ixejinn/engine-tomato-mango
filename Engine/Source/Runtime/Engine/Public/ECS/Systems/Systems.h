@@ -1,7 +1,7 @@
 #ifndef MANGO_SYSTEMS_H
 #define MANGO_SYSTEMS_H
 
-#include "ECS/Systems/CameraSystem.h"
+#include "ECS/Systems/CameraTransformSystem.h"
 #include "ECS/Systems/CollisionSystem.h"
 #include "ECS/Systems/GravitySystem.h"
 #include "ECS/Systems/IntegrationSystem.h"

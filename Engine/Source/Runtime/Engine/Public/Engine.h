@@ -27,6 +27,7 @@ namespace tomato
 
         void Run();
 
+        Window& GetWindow() { return window_;}
         InputRecorder& GetInputRecorder() { return inputRecorder_; }
 
         template<typename Component>

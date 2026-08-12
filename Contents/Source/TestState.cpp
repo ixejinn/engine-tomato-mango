@@ -45,6 +45,7 @@ void TestState::Init() {
     EventDispatcher::GetInstance().Connect<LandingEvent, TestState::CallbackJump>();
 
     engine_.GetInputRecorder().BindInputIntent(Key::J, InputIntent::Test_1);
+    engine_.GetInputRecorder().BindInputIntent(Key::LeftMouseButton, InputIntent::Test_2);
 
     //// Set rollback
     engine_.SetRollbackComponent<MovementComponent>();
@@ -162,6 +163,11 @@ void TestState::Init() {
 void TestState::Update() {
     if (engine_.GetInputRecorder().IsPress(InputIntent::Test_1))
         audioPtr_->Start();
+
+    if (engine_.GetInputRecorder().IsPress(InputIntent::Test_2))
+        engine_.GetWindow().SetCursorMode(true);
+    else if (!engine_.GetInputRecorder().IsHeld(InputIntent::Test_2))
+        engine_.GetWindow().SetCursorMode(false);
 }
 
 void TestState::Exit() {}

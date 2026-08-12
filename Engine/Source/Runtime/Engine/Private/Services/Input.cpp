@@ -2,6 +2,7 @@
 #include "Services/Window.h"
 #include "Input/InputRecorder.h"
 #include "Input/InputUI.h"
+#include "ECS/Systems/EditorCameraSystem.h"
 #include "Simulation/Tick/TickClock.h"
 #include "Utils/Logger.h"
 #include <GLFW/glfw3.h>
@@ -173,7 +174,9 @@ namespace tomato
         glfwSetCharCallback(window.GetHandle(), OnCharacterEvent);
 
         keySignal_.Connect<&InputRecorder::UpdateInputKey>(recorder);
+
         moveSignal_.Connect<&InputUI::OnHover>(inputUI);
+
         mouseSignal_.Connect<&InputRecorder::UpdateInputMouse>(recorder);
         mouseSignal_.Connect<&InputUI::OnClick>(inputUI);
     }
@@ -228,7 +231,9 @@ namespace tomato
         glfwGetCursorPos(window, &xPos, &yPos);
 
         input->mouseSignal_.Collect(input->collector_,
-                                   MouseEvent{k, a, a == KeyAction::Release ? 0.f : 1.f, tickClock->GetTick(), static_cast<float>(xPos), static_cast<float>(yPos)});
+            MouseEvent{
+                k, a, a == KeyAction::Release ? 0.f : 1.f, tickClock->GetTick(),
+                static_cast<float>(xPos), static_cast<float>(yPos)});
     
         if (externalCallbacks_.mouseButton)
             externalCallbacks_.mouseButton(window, button, action, mods);
@@ -240,8 +245,8 @@ namespace tomato
         auto* input = winData->input;
         auto* tickClock = winData->tickClock;
 
-        input->moveSignal_.Collect(input->collector_,
-            MouseMoveEvent{ tickClock->GetTick(), static_cast<float>(xpos), static_cast<float>(ypos) });
+        input->moveSignal_.Publish(
+            MouseMoveEvent{tickClock->GetTick(), static_cast<float>(xpos), static_cast<float>(ypos)});
 
         if (externalCallbacks_.mouseMove)
             externalCallbacks_.mouseMove(window, xpos, ypos);

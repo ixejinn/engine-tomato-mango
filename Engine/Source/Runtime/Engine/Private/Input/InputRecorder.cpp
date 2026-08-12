@@ -64,6 +64,11 @@ namespace tomato
         return HasFlag(curr_.down, intent) ? true : false;
     }
 
+    bool InputRecorder::IsHeld(InputIntent intent) const
+    {
+        return HasFlag(curr_.held, intent) ? true : false;
+    }
+
     void InputRecorder::InitKeyIntents() {
         keyIntents_[Key::W] = InputIntent::Up;
         keyIntents_[Key::S] = InputIntent::Down;

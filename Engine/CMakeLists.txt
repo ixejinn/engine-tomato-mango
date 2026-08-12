@@ -41,7 +41,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Components/Transform.h
         Source/Runtime/Engine/Public/ECS/Components/UI.h
         Source/Runtime/Engine/Public/ECS/Components/UIEvents.h
-        Source/Runtime/Engine/Public/ECS/Systems/CameraSystem.h
+		Source/Runtime/Engine/Public/ECS/Systems/CameraTransformSystem.h
         Source/Runtime/Engine/Public/ECS/Systems/System.h
         Source/Runtime/Engine/Public/Engine.h
 		Source/Runtime/Engine/Public/Simulation/SimulationConfig.h
@@ -186,12 +186,14 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Math/AABB.h
         Source/Runtime/Engine/Public/Math/Ray.h
 		Source/Runtime/Engine/Public/Particle/ParticleEmitterPoolFwd.h
+		Source/Runtime/Engine/Public/ECS/Systems/EditorCameraSystem.h
+		Source/Runtime/Engine/Public/ECS/Systems/PlayerCameraSystem.h
 )
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
         Source/Runtime/Core/Private/Collision/ColliderSupport.cpp
-        Source/Runtime/Engine/Private/ECS/Systems/CameraSystem.cpp
+		Source/Runtime/Engine/Private/ECS/Systems/CameraTransformSystem.cpp
         Source/Runtime/Engine/Private/Engine.cpp
         Source/Runtime/Engine/Private/Services/Window.cpp
         Source/Runtime/Engine/Private/Input/InputRecorder.cpp
@@ -269,6 +271,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Systems/ParticleEmissionSystem.cpp
         Source/Runtime/Engine/Private/Math/Ray.cpp
         Source/Runtime/Engine/Private/Math/Geometry.cpp
+		Source/Runtime/Engine/Private/ECS/Systems/EditorCameraSystem.cpp
 )
 
 add_library(engine STATIC
