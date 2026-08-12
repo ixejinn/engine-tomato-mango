@@ -30,6 +30,11 @@ namespace tomato {
                 Cylinder(vertices, indices);
                 break;
 
+            case Primitive::OpenCylinder:
+                OpenCylinder(vertices, indices);
+                cullface_ = false;
+                break;
+
             default:
                 TMT_WARN << "Invalid primitive mesh type";
                 break;
@@ -229,7 +234,44 @@ namespace tomato {
         FillMeshData(bottomCenter, bottomCircle[0], bottomCircle[sectorCnt - 1], vertices, indices);
 
         for (int j = 0; j < sectorCnt - 1; j++)
-            FillMeshData(topCircle[j], bottomCircle[j], bottomCircle[j + 1], topCircle[j + 1], vertices, indices);
+            FillMeshData(topCircle[j], bottomCircle[j], bottomCircle[j + 1], topCircle[j + 1],
+                         vertices, indices);
+        FillMeshData(topCircle[sectorCnt - 1], bottomCircle[sectorCnt - 1], bottomCircle[0], topCircle[0],
+                     vertices, indices);
+    }
+
+    void Mesh::OpenCylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices)
+    {
+        constexpr int sectorCnt = 10;
+
+        vertices.resize(4 * sectorCnt);
+        indices.resize(6 * sectorCnt);
+
+        const auto pi = glm::pi<float>();
+        const float sectorStep = 2 * pi / sectorCnt;
+
+        float lon = 0.f;
+
+        glm::vec3 coords[2][sectorCnt];
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < sectorCnt; j++) {
+                coords[i][j] = {
+                        glm::cos(lon),
+                        -2 * i + 1,
+                        -glm::sin(lon)
+                };
+                coords[i][j] *= 0.5f;
+
+                lon += sectorStep;
+            }
+        }
+
+        auto& topCircle = coords[0];
+        auto& bottomCircle = coords[1];
+
+        for (int j = 0; j < sectorCnt - 1; j++)
+            FillMeshData(topCircle[j], bottomCircle[j], bottomCircle[j + 1], topCircle[j + 1],
+                         vertices, indices);
         FillMeshData(topCircle[sectorCnt - 1], bottomCircle[sectorCnt - 1], bottomCircle[0], topCircle[0],
                      vertices, indices);
     }

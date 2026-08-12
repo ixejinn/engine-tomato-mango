@@ -17,6 +17,9 @@ namespace tomato
         AssetID curMesh_;
         AssetID curShader_;
         AssetID curTexture_;
+
+        void UpdateCullface(bool meshCullface);
+        bool cullface_{true};
     };
 }
 
