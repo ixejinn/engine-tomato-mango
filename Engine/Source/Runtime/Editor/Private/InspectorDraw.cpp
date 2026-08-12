@@ -112,7 +112,7 @@ namespace tomato
 
 		glm::vec3 scale = transform.GetLocalScale();
 		float scaleVec3[3] = { scale.x, scale.y, scale.z };
-		if (DrawVec3Control("Scale", scaleVec3))
+		if (DrawVec3Control("Scale", scaleVec3, 1.f, 0.f, ImGuiSliderFlags_ClampOnInput))
 		{
 			transform.SetScale(scaleVec3[0], scaleVec3[1], scaleVec3[2]);
 			changed = true;
@@ -678,14 +678,27 @@ namespace tomato
 				ImGui::EndCombo();
 			}
 
+			auto& runtimeParticle = reg.get<ParticleRuntimeComponent>(eCtx.selectedEntity);
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Text("Custom");
+
+			ImGui::TableSetColumnIndex(1);
+			static bool bTarget = true;
+			if (ImGui::Checkbox("##check", &bTarget))
+				runtimeParticle.target = bTarget ? runtimeParticle.target : 0;
+
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
 			ImGui::Text("Target");
 
 			ImGui::TableSetColumnIndex(1);
-			auto& runtimeParticle = reg.get<ParticleRuntimeComponent>(eCtx.selectedEntity);
+			
+			ImGui::BeginDisabled(!bTarget);
 			entt::entity targetEntity = GetEntityByUUID(reg, runtimeParticle.target);
-			const char* namePreview = reg.try_get<NametagComponent>(targetEntity)->name.c_str();
+			const char* namePreview = targetEntity == entt::null ?
+				"None" : reg.try_get<NametagComponent>(targetEntity)->name.c_str();
+			
 			if (ImGui::BeginCombo("##entityCombo", namePreview))
 			{
 				auto view = reg.view<NametagComponent, TransformComponent>();
@@ -696,6 +709,7 @@ namespace tomato
 				}
 				ImGui::EndCombo();
 			}
+			ImGui::EndDisabled();
 
 			ImGui::EndTable();
 		}
@@ -883,7 +897,7 @@ namespace tomato
 		return "";
 	}
 
-	bool DrawVec3Control(const char* label, float* vec, int flags)
+	bool DrawVec3Control(const char* label, float* vec, float min, float max, int flags)
 	{
 		ImGui::SeparatorText(label);
 
@@ -907,7 +921,9 @@ namespace tomato
 		std::string tmpLabel = "##";
 		tmpLabel += label;
 
-		if (ImGui::DragFloat3(tmpLabel.c_str(), vec, 1.f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), "%g", flags))
+		float v_min = min == 0 ? std::numeric_limits<float>::lowest() : min;
+		float v_max = max == 0 ? std::numeric_limits<float>::max() : max;
+		if (ImGui::DragFloat3(tmpLabel.c_str(), vec, 1.f, v_min, v_max, "%g", flags))
 			return true;
 
 		ImGui::PopItemWidth();

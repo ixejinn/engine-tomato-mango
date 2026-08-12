@@ -316,6 +316,21 @@ namespace tomato::Serialization
 		data["Components"] = components;
 	}
 
+	void SaveParticle(std::filesystem::path& path, entt::registry& reg, entt::entity entity)
+	{
+		json root;
+
+		auto& componentInfo = ComponentRegistry::GetInstance().GetComponentInfo();
+		for (auto& info : componentInfo)
+		{
+			if (info.category == Serialization::ComponentCategory::Particle)
+				info.serialization.Save(root, reg, entity);
+		}
+
+		std::ofstream ofs(path);
+		ofs << root.dump(4);
+	}
+
 	void Save(json& data, const VisibilityComponent& visibility)
 	{
 		data["visible"] = visibility.visible;
@@ -593,9 +608,30 @@ namespace tomato::Serialization
 		data["space"] = particle.space;
 
 		data["lifetime"] = std::chrono::duration<float>(particle.particleLifetime).count();
+		data["rateOverTime"] = std::chrono::duration<float>(particle.emitPeriod).count();
+		if (particle.burst.has_value())
+		{
+			data["burst"]["period"] = std::chrono::duration<float>(particle.burst.value().period).count();
+			data["burst"]["cycles"] = particle.burst.value().cycles;
+			data["burst"]["count"] = particle.burst.value().count;
+		}
 	}
 
 	void Load(const json& data, ParticleEmitterComponent& particle) {}
+
+	void Save(json& data, const ParticleRenderComponent& particle)
+	{
+		data["texture"] = particle.texture;
+		data["size"] = particle.size;
+		data["color"] = {
+			particle.color.x,
+			particle.color.y,
+			particle.color.z,
+			particle.color.w
+		};
+	}
+
+	void Load(const json& data, ParticleRenderComponent& particle) {}
 
 	void Save(json& data, const HierarchyComponent& hierarchy)
 	{

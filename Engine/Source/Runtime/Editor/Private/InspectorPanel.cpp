@@ -192,8 +192,8 @@ namespace tomato
 				}
 			}
 
-			/*if (comp.category == Serialization::ComponentCategory::Particle)
-				SaveParticleButton(editorCtx, comp);*/
+			if (comp.category == Serialization::ComponentCategory::Particle)
+				SaveParticleButton(editorCtx, comp);
 
 			ImGui::EndPopup();
 		}
@@ -208,18 +208,15 @@ namespace tomato
 				"Save Particle",
 				"ptc",
 				"Particle Files (*.ptc)\0*.ptc\0\0",
-				PathManager::ProjectParticle());
+				PathManager::ProjectResource() / "Particle");
 
 			if (path)
 			{
-				json particle;
-				comp.serialization.Save(particle, editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
-
-				std::ofstream ofs(path.value());
-				ofs << particle.dump(4);
+				auto runtimePath = PathManager::ToRuntime(path.value());
+				
+				Serialization::SaveParticle(path.value(), editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
+				FileUtils::CopyAsset(path.value(), runtimePath, std::filesystem::copy_options::overwrite_existing);
 			}
-
-
 		}
 	}
 

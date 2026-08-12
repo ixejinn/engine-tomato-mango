@@ -58,6 +58,8 @@ namespace tomato
         shape_ = data["shape"];
         if (shape_ == ParticleEffectShape::Cone)
             angle_ = data["angle"];
+        else
+            angle_ = 0.f;
         space_ = data["space"];
 
         lifetime_ = data["lifetime"];
