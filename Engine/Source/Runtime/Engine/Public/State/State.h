@@ -27,7 +27,7 @@ namespace tomato
 
         PlayerInputTimelines& GetPlayerInputTimelines() { return playerInputs_; }
 
-        void SetPlayerInput(uint32_t tick, InputRecord input, int playerID);
+        void SetPlayerInput(uint32_t tick, IntentState input, int playerID);
 
     protected:
         Engine& engine_;

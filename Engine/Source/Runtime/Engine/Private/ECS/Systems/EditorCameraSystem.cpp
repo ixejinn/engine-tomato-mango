@@ -9,7 +9,7 @@ namespace tomato
 
     }
 
-    void EditorCameraSystem::TestMouseMoveInput(MouseMoveEvent& e)
+    void EditorCameraSystem::TestMouseMoveInput(CursorPosEvent& e)
     {
         std::cout << e.xPos << " " << e.yPos << "\n";
     }

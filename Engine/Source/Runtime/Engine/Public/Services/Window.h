@@ -2,10 +2,8 @@
 #define MANGO_WINDOW_H
 
 #include <memory>
-#include "ServiceFwd.h"
+#include "Services/ServiceFwd.h"
 #include "Simulation/Tick/TickFwd.h"
-
-struct GLFWwindow;
 
 namespace tomato
 {

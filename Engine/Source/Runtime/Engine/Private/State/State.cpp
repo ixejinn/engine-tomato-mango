@@ -17,7 +17,7 @@ namespace tomato
         editCam = Prefab::CreateCamera(registry_, false);
     }
 
-    void State::SetPlayerInput(uint32_t tick, InputRecord input, int playerID)
+    void State::SetPlayerInput(uint32_t tick, IntentState input, int playerID)
     {
         playerInputs_[playerID].SetData(tick, input);
     }

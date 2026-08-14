@@ -49,9 +49,9 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Services/ServiceFwd.h
         Source/Runtime/Engine/Public/Event/EventDispatcher.h
         Source/Runtime/Engine/Public/Event/EventSignal.h
-        Source/Runtime/Engine/Public/Input/InputConstants.h
-        Source/Runtime/Engine/Public/Input/InputRecord.h
-        Source/Runtime/Engine/Public/Input/InputRecorder.h
+        Source/Runtime/Engine/Public/Input/InputIntent.h
+		Source/Runtime/Engine/Public/Input/IntentState.h
+        Source/Runtime/Engine/Public/Input/IntentTranslator.h
         Source/Runtime/Engine/Public/Input/InputEvent.h
         Source/Runtime/Engine/Public/Input/InputUI.h
         Source/Runtime/Engine/Public/Input/KeyConstants.h
@@ -175,7 +175,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/State/StateRegistry.h
 		Source/Runtime/Engine/Public/ECS/Forward/SystemFrameworkFwd.h
 		Source/Runtime/Core/Public/Collision/CollisionConstantsFwd.h
-		Source/Runtime/Engine/Public/Input/InputConstantsFwd.h
+		Source/Runtime/Engine/Public/Input/InputIntentFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/Systems.h
 		Source/Runtime/Engine/Public/Collision/CollisionCache.h
 		Source/Runtime/Engine/Public/Collision/Narrow/GJK/GJKResult.h
@@ -188,6 +188,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Particle/ParticleEmitterPoolFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/EditorCameraSystem.h
 		Source/Runtime/Engine/Public/ECS/Systems/PlayerCameraSystem.h
+		Source/Runtime/Engine/Public/Input/KeyDeviceState.h
 )
 
 set(ENGINE_SOURCES
@@ -196,7 +197,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/ECS/Systems/CameraTransformSystem.cpp
         Source/Runtime/Engine/Private/Engine.cpp
         Source/Runtime/Engine/Private/Services/Window.cpp
-        Source/Runtime/Engine/Private/Input/InputRecorder.cpp
+        Source/Runtime/Engine/Private/Input/IntentTranslator.cpp
         Source/Runtime/Engine/Private/Services/Input.cpp
 		Source/Runtime/Engine/Private/Simulation/Tick/TickClock.cpp
         Source/Runtime/Engine/Private/ECS/Systems/CollisionSystem.cpp
@@ -272,6 +273,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Math/Ray.cpp
         Source/Runtime/Engine/Private/Math/Geometry.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/EditorCameraSystem.cpp
+		Source/Runtime/Engine/Private/Input/KeyDeviceState.cpp
 )
 
 add_library(engine STATIC

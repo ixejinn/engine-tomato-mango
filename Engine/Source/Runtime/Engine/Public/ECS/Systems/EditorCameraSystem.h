@@ -12,7 +12,7 @@ namespace tomato
         void Update(SimContext& simCtx) override;
 
     private:
-        void TestMouseMoveInput(MouseMoveEvent& e);
+        void TestMouseMoveInput(CursorPosEvent& e);
     };
 }
 
