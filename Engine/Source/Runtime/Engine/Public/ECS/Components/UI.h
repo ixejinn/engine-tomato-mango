@@ -112,11 +112,11 @@ namespace tomato
 		//bool dirty{ true };
 	};
 
-	struct TargetComponent
+	/*struct TargetComponent
 	{
 		UUID target{ 0 };
 		glm::vec3 headOffset{ 0.f, 100.f, 0.f };
-	};
+	};*/
 
 	struct SelectableComponent
 	{

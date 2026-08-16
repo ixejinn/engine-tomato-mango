@@ -15,8 +15,6 @@ namespace tomato
 
     struct MovementComponent
     {
-        float horizontalSpeed{2.f};
-
         MovementMode mode{Falling};
         int gndStayCnt{0};
         unsigned int jumpCnt{0};

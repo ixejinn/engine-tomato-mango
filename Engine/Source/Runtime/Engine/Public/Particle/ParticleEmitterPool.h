@@ -19,7 +19,7 @@ namespace tomato
         ParticleEmitterPool(const PassKey<State>& key, entt::registry& reg, uint8_t poolSize = 32);
 
         std::optional<entt::entity> Acquire(AssetID ptcID, glm::vec3 pos);
-        std::optional<entt::entity> Acquire(AssetID ptcID, UUID target);
+        std::optional<entt::entity> Acquire(AssetID ptcID, UUID target, glm::vec3 offset = {0.f, 0.f, 0.f});
         bool Release(entt::entity e);
 
         uint8_t GetActiveEmitterNum() const { return poolSize_ - freeEmitters_.size(); }

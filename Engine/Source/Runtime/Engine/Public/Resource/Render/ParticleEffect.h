@@ -2,12 +2,14 @@
 #define MANGO_PARTICLEEFFECT_H
 
 #include <optional>
+#include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <filesystem>
 #include "ECS/Forward/ParticleCompFwd.h"
 #include "Resource/ResourceFwd.h"
 #include "Serialization/Json.h"
 #include "Particle/ParticleType.h"
+#include "UUID.h"
 
 namespace tomato
 {
@@ -22,12 +24,10 @@ namespace tomato
         };
 
     private:
-        //ParticleEffect(const char* filename);
         ParticleEffect(const std::filesystem::path& path);
 
     public:
         static void Cleanup() {};
-        //static void Create(const char* filename);
         static void Create(const std::filesystem::path& path);
 
         void InitializeParticleComponent(ParticleData& comp) const;
@@ -54,6 +54,9 @@ namespace tomato
         uint8_t rateOverTime_;
 
         std::optional<Burst> burst_;
+
+        /*UUID target_;
+        glm::vec3 offset_;*/
     };
 }
 

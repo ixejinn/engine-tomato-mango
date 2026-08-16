@@ -8,39 +8,6 @@
 
 namespace tomato
 {
-//    ParticleEffect::ParticleEffect(const char* filename)
-//    {
-////        const std::string path = "Resource/Contents/";
-////        const std::string file = path + filename;
-//        auto data = Serialization::LoadJsonData(filename);
-//
-//        duration_ = data["duration"];
-//        looping_ = data["looping"];
-//
-//        startDelay_ = data["startDelay"];
-//        startSpeed_ = data["startSpeed"];
-//
-//        maxParticles_ = data["maxParticles"];
-//
-//        shape_ = data["shape"];
-//        if (shape_ == ParticleEffectShape::Cone)
-//            angle_ = data["angle"];
-//        space_ = data["space"];
-//
-//        lifetime_ = data["lifetime"];
-//
-//        texture_ = data["texture"];
-//        size_ = data["size"];
-//        color_ = {data["color"][0], data["color"][1], data["color"][2], data["color"][3]};
-//
-//        rateOverTime_ = data["rateOverTime"];
-//
-//        if (!data["burst"].is_null())
-//            burst_.emplace(data["burst"]["period"], data["burst"]["cycles"], data["burst"]["count"]);
-//        else
-//            burst_ = std::nullopt;
-//    }
-
     ParticleEffect::ParticleEffect(const std::filesystem::path& path)
     {
         //        const std::string path = "Resource/Contents/";
@@ -74,13 +41,10 @@ namespace tomato
             burst_.emplace(data["burst"]["period"], data["burst"]["cycles"], data["burst"]["count"]);
         else
             burst_ = std::nullopt;
-    }
 
-    //void ParticleEffect::Create(const char* filename)
-    //{
-    //    std::unique_ptr<ParticleEffect> ptr{new ParticleEffect(filename)};
-    //    AssetRegistry<ParticleEffect>::GetInstance().Register(filename, std::move(ptr));
-    //}
+        /*target_ = data["target"];
+        offset_ = { data["offset"][0], data["offset"][1], data["offset"][2] };*/
+    }
 
     void ParticleEffect::Create(const std::filesystem::path& path)
     {

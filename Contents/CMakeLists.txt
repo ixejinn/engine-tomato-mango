@@ -1,6 +1,7 @@
 ﻿set(CONTENTS_HEADERS
         Source/TestState.h
         Source/LoadState.h
+        Source/MyState.h
         Source/UIController.h
 )
 
@@ -13,7 +14,7 @@ set(CONTENTS_SOURCES
         Source/TimerTestSystem.cpp
         Source/CollisionTestState.h
         Source/CollisionTestState.cpp
-)
+ "Source/jung/MyState.cpp")
 
 add_executable(contents
         ${CONTENTS_SOURCES}

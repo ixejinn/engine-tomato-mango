@@ -90,13 +90,13 @@ void TestState::Init() {
 
     ////UI
     auto targetLabel = UIPrefab::CreateText(registry_, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 20.f);
-    registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0));
+    registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0), glm::vec3{0.f, 100.f, 0.f});
     SetHierarchy(registry_, UIPrefab::GetCanvas(registry_), targetLabel);
     auto& uiCmp = registry_.get<UIComponent>(targetLabel);
     uiCmp.sortOrder = 1;
 
     auto targetLabel1 = UIPrefab::CreateText(registry_, { 0.f, 0.f }, "player1", {1.0f, 1.0f, 0.f, 1.f}, 20.f);
-    registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1));
+    registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1), glm::vec3{ 0.f, 100.f, 0.f });
     SetHierarchy(registry_, UIPrefab::GetCanvas(registry_), targetLabel1);
     auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
     uiCmp1.sortOrder = 1;

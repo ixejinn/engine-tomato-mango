@@ -61,7 +61,7 @@ namespace tomato
 
         int activeCnt = 0;
 
-        UUID target = 0;
+        //UUID target = 0;
     };
 
     struct ParticleBufferComponent // Actual Particles data for simulation

@@ -4,6 +4,7 @@
 
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Particle.h"
+#include "ECS/Components/Target.h"
 
 #include "Simulation/SimulationConfig.h"
 #include "Utils/RandomNumberGenerator.h"
@@ -49,12 +50,12 @@ namespace tomato
 
     void ParticleEmissionSystem::UpdateTransform(entt::registry& reg, entt::entity cur, const glm::quat& pQuat, const glm::vec3& pScale, const glm::mat4& pMatrix, bool pDirty)
     {
-        auto rootView = reg.view<TransformComponent, ParticleRuntimeComponent>();
+        auto rootView = reg.view<TransformComponent, ParticleRuntimeComponent, TargetComponent>();
 
-        for (auto [e, trf, runtime] : rootView.each())
+        for (auto [e, trf, runtime, target] : rootView.each())
         {
-            if (runtime.target == 0) continue;
-            auto& targetTrf = reg.get<TransformComponent>(GetEntityByUUID(reg, runtime.target));
+            if (target.target == 0) continue;
+            auto& targetTrf = reg.get<TransformComponent>(GetEntityByUUID(reg, target.target));
 
             auto T = glm::translate(glm::mat4(1.f), trf.GetLocalPosition());
             auto R = glm::toMat4(trf.GetLocalQuaternion());

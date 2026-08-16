@@ -25,6 +25,7 @@
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
 #include "ECS/Components/Text.h"
+#include "ECS/Components/Target.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Particle.h"
 
@@ -328,6 +329,9 @@ namespace tomato::Serialization
 		{
 			if (info.category == Serialization::ComponentCategory::Particle)
 				info.serialization.Save(root, reg, entity);
+
+			/*if (info.name == "Target")
+				info.serialization.Save(root, reg, entity);*/
 		}
 
 		std::ofstream ofs(path);
@@ -408,12 +412,10 @@ namespace tomato::Serialization
 
 	void Save(json& data, const MovementComponent& movement)
 	{
-		data["speed"] = movement.horizontalSpeed;
 	}
 
 	void Load(const json& data, MovementComponent& movement)
 	{
-		movement.horizontalSpeed = data["speed"];
 	}
 
 	void Save(json& data, const RenderComponent& render)
@@ -444,11 +446,13 @@ namespace tomato::Serialization
 
 	void Save(json& data, const VelocityComponent& velocity)
 	{
+		data["speed"] = velocity.horizontalSpeed;
 		data["velocity"] = { velocity.velocity.x, velocity.velocity.y, velocity.velocity.z };
 	}
 
 	void Load(const json& data, VelocityComponent& velocity)
 	{
+		velocity.horizontalSpeed = data["speed"];
 		velocity.velocity =
 		{
 			data["velocity"][0],
@@ -545,7 +549,7 @@ namespace tomato::Serialization
 
 	void Save(json& data, const TargetComponent& target)
 	{
-		data["taget"] = target.target;
+		data["target"] = target.target;
 		data["offset"] = { target.headOffset.x, target.headOffset.y, target.headOffset.z };
 	}
 

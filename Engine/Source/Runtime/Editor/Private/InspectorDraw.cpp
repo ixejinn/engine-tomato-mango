@@ -19,18 +19,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "ECS/Components/Camera.h"
-#include "ECS/Components/Transform.h"
-#include "ECS/Components/Movement.h"
-#include "ECS/Components/Rigidbody.h"
-#include "ECS/Components/Collision.h"
-#include "ECS/Components/Render.h"
-#include "ECS/Components/UI.h"
-#include "ECS/Components/UIEvents.h"
-#include "ECS/Components/Text.h"
-#include "ECS/Components/Particle.h"
-#include "ECS/Components/Nametag.h"
-#include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/Components.h"
 
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/Entity/Entity.h"
@@ -127,10 +116,6 @@ namespace tomato
 	{
 		bool changed = false;
 
-		ImGui::SeparatorText("Speed");
-		if (ImGui::DragFloat("Speed", &movement.horizontalSpeed, 1.0f, 0.f, 100.f, "%.2f"))
-			changed = true;
-
 		ImGui::NewLine();
 
 		return changed;
@@ -140,14 +125,14 @@ namespace tomato
 	{
 		bool changed = false;
 
-		float velVec3[3] = { vel.velocity.x, vel.velocity.y, vel.velocity.z };
+		ImGui::SeparatorText("Speed");
+		if (ImGui::DragFloat("##Speed", &vel.horizontalSpeed, 1.0f, 0.f, 100.f, "%.2f"))
+			changed = true;
 
 		ImGuiSliderFlags flags = ImGuiSliderFlags_NoInput;
-		if (DrawVec3Control("Velocity", velVec3, flags))
-		{
-			vel.velocity = glm::vec3(velVec3[0], velVec3[1], velVec3[2]);
+		if (DrawVec3Control("Velocity", glm::value_ptr(vel.velocity), flags))
 			changed = true;
-		}
+
 		ImGui::NewLine();
 
 		return changed;
@@ -519,7 +504,7 @@ namespace tomato
 		ImGui::SeparatorText("Target");
 		
 		entt::entity targetEntity = GetEntityByUUID(reg, target.target);
-		const char* namePreview = reg.try_get<NametagComponent>(targetEntity)->name.c_str();
+		const char* namePreview = targetEntity == entt::null ? "None" : reg.try_get<NametagComponent>(targetEntity)->name.c_str();
 		if (ImGui::BeginCombo("##entityCombo", namePreview))
 		{
 			auto view = reg.view<NametagComponent, TransformComponent>();
@@ -530,6 +515,11 @@ namespace tomato
 					target.target = tag.id;
 					changed = true;
 				}
+			}
+			if (ImGui::Selectable("None", target.target == 0))
+			{
+				target.target = 0;
+				changed = true;
 			}
 			ImGui::EndCombo();
 		}
@@ -678,15 +668,16 @@ namespace tomato
 				ImGui::EndCombo();
 			}
 
-			auto& runtimeParticle = reg.get<ParticleRuntimeComponent>(eCtx.selectedEntity);
-			ImGui::TableNextRow();
+			/*auto& runtimeParticle = reg.get<ParticleRuntimeComponent>(eCtx.selectedEntity);
+			auto& targetParticle = reg.get<TargetComponent>(eCtx.selectedEntity);*/
+			/*ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
 			ImGui::Text("Custom");
 
 			ImGui::TableSetColumnIndex(1);
 			static bool bTarget = true;
 			if (ImGui::Checkbox("##check", &bTarget))
-				runtimeParticle.target = bTarget ? runtimeParticle.target : 0;
+				targetParticle.target = bTarget ? targetParticle.target : 0;
 
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
@@ -695,7 +686,7 @@ namespace tomato
 			ImGui::TableSetColumnIndex(1);
 			
 			ImGui::BeginDisabled(!bTarget);
-			entt::entity targetEntity = GetEntityByUUID(reg, runtimeParticle.target);
+			entt::entity targetEntity = GetEntityByUUID(reg, targetParticle.target);
 			const char* namePreview = targetEntity == entt::null ?
 				"None" : reg.try_get<NametagComponent>(targetEntity)->name.c_str();
 			
@@ -704,12 +695,12 @@ namespace tomato
 				auto view = reg.view<NametagComponent, TransformComponent>();
 				for (auto [e, tag, transform] : view.each())
 				{
-					if (ImGui::Selectable(tag.name.c_str(), runtimeParticle.target == tag.id))
-						runtimeParticle.target = tag.id;
+					if (ImGui::Selectable(tag.name.c_str(), targetParticle.target == tag.id))
+						targetParticle.target = tag.id;
 				}
 				ImGui::EndCombo();
 			}
-			ImGui::EndDisabled();
+			ImGui::EndDisabled();*/
 
 			ImGui::EndTable();
 		}

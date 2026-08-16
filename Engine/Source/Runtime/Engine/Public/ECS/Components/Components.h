@@ -13,6 +13,7 @@
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Rollback.h"
 #include "ECS/Components/Text.h"
+#include "ECS/Components/Target.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"

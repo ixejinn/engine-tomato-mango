@@ -2,6 +2,7 @@
 #include "Particle/ParticleEmitterPool.h"
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Transform.h"
+#include "ECS/Components/Target.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Particle.h"
 #include "ECS/Components/Visibility.h"
@@ -31,6 +32,7 @@ namespace tomato
             registry_.emplace<ParticleEmitterComponent>(e);
             registry_.emplace<ParticleRuntimeComponent>(e);
             registry_.emplace<ParticleRenderComponent>(e);
+            registry_.emplace<TargetComponent>(e);
 
             auto& particleBuf = registry_.emplace<ParticleBufferComponent>(e);
             particleBuf.positions.reserve(MAX_PARTICLE_NUM);
@@ -75,7 +77,7 @@ namespace tomato
         return e;
     }
 
-    std::optional<entt::entity> ParticleEmitterPool::Acquire(AssetID ptcID, UUID target)
+    std::optional<entt::entity> ParticleEmitterPool::Acquire(AssetID ptcID, UUID target, glm::vec3 offset)
     {
         if (freeEmitters_.empty())
         {
@@ -90,7 +92,10 @@ namespace tomato
 
         auto& pRuntime = registry_.get<ParticleRuntimeComponent>(e);
         pRuntime.active = true;
-        pRuntime.target = target;
+
+        auto& pTarget = registry_.get<TargetComponent>(e);
+        pTarget.target = target;
+        pTarget.headOffset = offset;
 
         auto& attach = registry_.emplace<ParticleAttachmentComponent>(e);
         attach.particle = ptcID;
@@ -117,7 +122,9 @@ namespace tomato
         registry_.remove<ParticleAttachmentComponent>(e);
 
         particle->active = false;
-        particle->target = 0;
+
+        auto& pTarget = registry_.get<TargetComponent>(e);
+        pTarget.target = 0;
 
         freeEmitters_.push_back(e);
         return true;

@@ -2,6 +2,7 @@
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/UI.h"
+#include "ECS/Components/Target.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Text.h"
 #include "ECS/Components/Render.h"

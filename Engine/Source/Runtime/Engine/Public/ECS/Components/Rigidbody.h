@@ -7,6 +7,7 @@ namespace tomato
 {
     struct VelocityComponent
     {
+        float horizontalSpeed{ 2.f };
         glm::vec3 velocity;
     };
 }

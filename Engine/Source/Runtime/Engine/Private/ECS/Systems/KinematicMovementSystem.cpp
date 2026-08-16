@@ -51,8 +51,8 @@ namespace tomato {
             if (glm::length(dir) > 1)
                 dir = glm::normalize(dir);
 
-            velocity.velocity.x = dir.x * move.horizontalSpeed;
-            velocity.velocity.z = dir.y * move.horizontalSpeed;
+            velocity.velocity.x = dir.x * velocity.horizontalSpeed;
+            velocity.velocity.z = dir.y * velocity.horizontalSpeed;
 
             // Rotation (!!!!TEST!!!!)
             x = 0; y = 0;

@@ -5,6 +5,7 @@
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Particle.h"
+#include "ECS/Components/Target.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Event/EventDispatcher.h"
 #include "GameObject/Character/MovementMode.h"
@@ -68,15 +69,15 @@ namespace tomato
     }
     void TransformSystem::UpdateParticleTransform(entt::registry& reg)
     {
-        auto rootView = reg.view<TransformComponent, ParticleRuntimeComponent>();
+        auto rootView = reg.view<TransformComponent, ParticleRuntimeComponent, TargetComponent>();
 
-        for (auto [e, trf, runtime] : rootView.each())
+        for (auto [e, trf, runtime, target] : rootView.each())
         {
-            if (runtime.target == 0) continue;
-            if (!reg.valid(GetEntityByUUID(reg, runtime.target)))
+            if (target.target == 0) continue;
+            if (!reg.valid(GetEntityByUUID(reg, target.target)))
                 continue;
 
-            auto& targetTrf = reg.get<TransformComponent>(GetEntityByUUID(reg, runtime.target));
+            auto& targetTrf = reg.get<TransformComponent>(GetEntityByUUID(reg, target.target));
 
             auto T = glm::translate(glm::mat4(1.f), trf.position);
             auto R = glm::toMat4(trf.lRotation);
