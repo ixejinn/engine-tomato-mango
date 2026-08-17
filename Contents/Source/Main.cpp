@@ -8,6 +8,7 @@
 
 #include "TestState.h"
 #include "LoadState.h"
+#include "jung/MyState.h"
 #include "CollisionTestState.h"
 using namespace tomato;
 
@@ -20,7 +21,7 @@ int main() {
     std::cout << PathManager::ToRuntime("C:\\yj\\engine-tomato-mango\\Contents\\Resources\\Img\\apple.jpg") << '\n';*/
 
      Engine engine(1600, 900, "TOMATO", NetMode::NM_Alone);
-     engine.SetNextState(std::make_unique<TestState>(engine));
+     engine.SetNextState(std::make_unique<MyState>(engine));
 
      // auto sf = StateRegistry::GetInstance().GetStateFactory(std::type_index(typeid(TestState)));
     // engine.SetNextState(sf(engine));
