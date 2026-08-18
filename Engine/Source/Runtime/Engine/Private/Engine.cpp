@@ -30,7 +30,7 @@ namespace tomato {
 
     Engine::~Engine()
     {
-        editor_.ShutdownImGui();
+        editor_.ShutdownImGui(input_);
     }
 
     void Engine::SetNextState(std::unique_ptr<State>&& newState)
