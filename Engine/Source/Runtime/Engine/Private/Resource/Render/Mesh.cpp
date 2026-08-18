@@ -118,7 +118,7 @@ namespace tomato
         }
 
         std::unique_ptr<Mesh> ptr{new Mesh(type, sectorCnt, stackCnt)};
-        std::string name = GetPrimitiveName(type) + std::to_string(sectorCnt) + "_" + std::to_string(stackCnt);
+        std::string name = std::string(GetPrimitiveName(type)) + "_" + std::to_string(sectorCnt) + "_" + std::to_string(stackCnt);
         AssetRegistry<Mesh>::GetInstance().Register(name, std::move(ptr));
 
         TMT_INFO << "Create mesh: " << name;

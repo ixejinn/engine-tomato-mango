@@ -1,7 +1,7 @@
 ﻿#include <fstream>
 #include <entt/entt.hpp>
 
-#include "Engine.h"
+//#include "Engine.h"
 
 #include "State/State.h"
 #include "State/StateRegistry.h"
@@ -11,6 +11,7 @@
 
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Font.h"
+#include "Resource/Render/Mesh.h"
 #include "Resource/Render/Texture.h"
 #include "Resource/Render/ParticleEffect.h"
 
@@ -129,7 +130,7 @@ namespace tomato::Serialization
 		ofs << root.dump(4);
 	}
 
-	void LoadStateScene(Engine& engine, State* state, const char* path)
+	void LoadStateScene(State* state, const char* path)
 	{
 		json root = LoadJsonData(path);
 		if (root == nullptr)
@@ -137,7 +138,7 @@ namespace tomato::Serialization
 
 		AssetID stateID = root["State"];
 
-		auto newState = StateRegistry::GetInstance().GetStateFactory(stateID)(engine);
+		auto newState = state->GetStateByID(stateID);
         auto& registry = newState->GetRegistry();
 
 		//Load Resources
@@ -151,14 +152,14 @@ namespace tomato::Serialization
 
 		AttachParticles(root, registry.ctx().get<ParticleEmitterPool>());
 
-		engine.SetNextState(std::move(newState));
+		state->SetNextState(std::move(newState));
 	}
 
-	void NewStateScene(Engine& engine, State* state)
+	void NewStateScene(State* state)
 	{
 		AssetID stateID = StateRegistry::GetInstance().GetStateID(typeid(*state));
-		auto newState = StateRegistry::GetInstance().GetStateFactory(stateID)(engine);
-		engine.SetNextState(std::move(newState));
+		auto newState = state->GetStateByID(stateID);
+		state->SetNextState(std::move(newState));
 	}
 
 	void LoadResources(const json& root)
@@ -170,6 +171,30 @@ namespace tomato::Serialization
 			{
 				for(auto& font : src["Font"])
 					Font::Create(font);
+			}
+
+			if (src.items().begin().key() == "Mesh")
+			{
+				for (auto& mesh : src["Mesh"])
+				{
+					std::string meshName{ mesh };
+					
+					auto first = meshName.find("_");
+					auto second = meshName.find("_", first + 1);
+
+					auto sector = meshName.substr(first + 1, second - first - 1);
+					auto stack = meshName.substr(second + 1);
+
+					auto type = meshName.substr(0, first);
+					for (auto meta : Mesh::PrimitiveMetas)
+					{
+						if (Mesh::GetPrimitiveName(meta.primitive) == type)
+						{
+							Mesh::Create(meta.primitive, std::stoi(sector), std::stoi(stack));
+							break;
+						}
+					}
+				}
 			}
 
 			if (src.items().begin().key() == "Texture")
@@ -248,14 +273,37 @@ namespace tomato::Serialization
 	void SaveResourcesInfo(json& data)
 	{
 		data["Resource"] = json::array();
+
+		json font, mesh, tex, particle;
+
 		auto itBegin = AssetRegistry<Font>::GetInstance().GetNameMapBegin();
 		auto itEnd = AssetRegistry<Font>::GetInstance().GetNameMapEnd();
 
-		json font, tex, particle;
 		for (itBegin; itBegin != itEnd; ++itBegin)
 			font["Font"].push_back(itBegin->second);
 		
 		data["Resource"].push_back(font);
+
+		itBegin = AssetRegistry<Mesh>::GetInstance().GetNameMapBegin();
+		itEnd = AssetRegistry<Mesh>::GetInstance().GetNameMapEnd();
+
+		for (itBegin; itBegin != itEnd; ++itBegin)
+		{
+			bool flag = false;
+			for (auto meta : Mesh::PrimitiveMetas)
+			{
+				if (Mesh::GetPrimitiveName(meta.primitive) == itBegin->second)
+				{
+					flag = true;
+					break;
+				}
+			}
+
+			if(!flag)
+				mesh["Mesh"].push_back(itBegin->second);
+		}
+
+		data["Resource"].push_back(mesh);
 
 		itBegin = AssetRegistry<Texture>::GetInstance().GetNameMapBegin();
 		itEnd = AssetRegistry<Texture>::GetInstance().GetNameMapEnd();
