@@ -7,8 +7,8 @@
 #include "Resource/Render/Texture.h"
 #include "Resource/Render/ParticleEffect.h"
 #include "Resource/PathManager.h"
-#include "Input/InputRecorder.h"
-#include "Input/InputConstants.h"
+#include "Input/IntentTranslator.h"
+#include "Input/InputIntent.h"
 #include "Input/KeyConstants.h"
 #include "Utils/Logger.h"
 #include "ECS/Components/Components.h"
@@ -36,6 +36,7 @@ void TestState::Init() {
     Texture::Create(PathManager::ProjectImage("heart.png"));
     Font::Create(PathManager::ProjectFont("D2Coding.ttf"));
     Font::Create(PathManager::ProjectFont("Pretendard-SemiBold.ttf"));
+    Mesh::Create(Mesh::Primitive::Sphere, 20, 10);
 
     ParticleEffect::Create(PathManager::ProjectParticle("burst_test.tmt.ptc"));
     ParticleEffect::Create(PathManager::ProjectParticle("ribbon_particle.tmt.ptc"));
@@ -44,6 +45,7 @@ void TestState::Init() {
     EventDispatcher::GetInstance().Connect<LandingEvent, TestState::CallbackJump>();
 
     engine_.GetInputRecorder().BindInputIntent(Key::J, InputIntent::Test_1);
+    // engine_.GetInputRecorder().BindInputIntent(Key::LeftMouseButton, InputIntent::Test_2);
 
     //// Set rollback
     engine_.SetRollbackComponent<MovementComponent>();
@@ -63,7 +65,8 @@ void TestState::Init() {
     //// Player0 character
     entt::entity player0 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, 2, 0 });
     auto& renderp0 = registry_.get<RenderComponent>(player0);
-    renderp0.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+//    renderp0.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    renderp0.mesh = GetAssetID("Primitive::Sphere20_10");
     renderp0.color = { 1.f, 1.f, 0.f, 1.f };
     auto& channelp0 = registry_.get<InputChannelComponent>(player0);
     channelp0.channel = 0;
@@ -87,6 +90,9 @@ void TestState::Init() {
     trfGnd.SetScale(10, 0.1, 10);
     auto& renderGnd = registry_.get<RenderComponent>(ground);
     renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
+
+    //entt::entity objUp = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, 10, 0 });
+    entt::entity objUp = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0.f, 12.f, 15.f });
 
     ////UI
     auto targetLabel = UIPrefab::CreateText(registry_, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 20.f);
@@ -160,6 +166,11 @@ void TestState::Init() {
 void TestState::Update() {
     if (engine_.GetInputRecorder().IsPress(InputIntent::Test_1))
         audioPtr_->Start();
+
+    // if (engine_.GetInputRecorder().IsPress(InputIntent::Test_2))
+    //     engine_.GetWindow().SetCursorDisable(true);
+    // else if (!engine_.GetInputRecorder().IsHeld(InputIntent::Test_2))
+    //     engine_.GetWindow().SetCursorDisable(false);
 }
 
 void TestState::Exit() {}

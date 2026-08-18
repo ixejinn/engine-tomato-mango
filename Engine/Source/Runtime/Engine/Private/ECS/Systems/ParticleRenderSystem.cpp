@@ -49,7 +49,7 @@ namespace tomato
         AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
 
         // 카메라 축 설정
-        auto& [mainCam] = registry.ctx().get<RenderContext>();
+        auto& mainCam = registry.ctx().get<RenderContext>().mainCam;
         if (mainCam == entt::null)
             return;
         auto& viewProjMat = registry.try_get<CameraComponent>(mainCam)->viewProjMat;

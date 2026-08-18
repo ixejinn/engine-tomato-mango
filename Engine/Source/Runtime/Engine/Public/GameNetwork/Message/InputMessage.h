@@ -4,7 +4,7 @@
 #include "Network/NetworkFwd.h"
 #include "Network/NetTypes.h"
 #include "GameNetwork/Message/NetMessage.h"
-#include "Input/InputRecord.h"
+#include "Input/IntentState.h"
 
 namespace tomato
 {
@@ -25,7 +25,7 @@ namespace tomato
         void Write(NetBitWriter& writer);
 
         PlayerId id;
-        InputRecord inputRecord;
+        IntentState inputRecord;
     };
 }
 

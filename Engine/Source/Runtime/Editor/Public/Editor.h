@@ -9,21 +9,21 @@
 
 #include "EditorPanel.h"
 #include "MainMenuBar.h"
+#include "Services/ServiceFwd.h"
 
-struct GLFWwindow;
 namespace tomato
 {
 	class Editor
 	{
 	public:
-		void InitImGui(GLFWwindow* wnd);
+		void InitImGui(GLFWwindow* wnd, Input& input);
 		void ShutdownImGui();
 
 		void BeginFrame();
 		void Draw(State*, RunMode&);
 		void EndFrame();
 
-		void SetInputCallbacks();
+		void SetInputCallbacks(Input& input);
 
 		void PickObject(entt::registry& reg, glm::vec2 mousePos);
 

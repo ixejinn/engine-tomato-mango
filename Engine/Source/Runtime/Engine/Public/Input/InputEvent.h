@@ -5,6 +5,7 @@
 #include "Input/KeyConstants.h"
 
 namespace tomato {
+
     /**
      * @brief Input event for a single key.
      */
@@ -24,9 +25,9 @@ namespace tomato {
     /**
      * @brief Input event for a mouse.
      */
-    struct MouseEvent : public KeyEvent
+    struct MouseButtonEvent : public KeyEvent
     {
-        MouseEvent(Key k, KeyAction a, float v, int64_t t, float x, float y)
+        MouseButtonEvent(Key k, KeyAction a, float v, int64_t t, float x, float y)
         : KeyEvent(k, a, v, t), xPos(x), yPos(y) {}
 
         float xPos, yPos;
@@ -35,9 +36,9 @@ namespace tomato {
     /**
      * @brief A move event for a mouse.
      */
-    struct MouseMoveEvent
+    struct CursorPosEvent
     {
-        MouseMoveEvent(int64_t t, float x, float y) : xPos(x), yPos(y) {}
+        CursorPosEvent(int64_t t, float x, float y) : xPos(x), yPos(y) {}
         float xPos, yPos;
     };
 }

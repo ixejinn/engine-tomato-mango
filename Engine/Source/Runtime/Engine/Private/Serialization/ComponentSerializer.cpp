@@ -385,7 +385,7 @@ namespace tomato::Serialization
 		};
 
 		data["degree"] = {
-			transform.GetLocalEulerDegree().x, transform.GetLocalEulerDegree().y, transform.GetLocalEulerDegree().z
+			transform.GetLocalRotationDegree().x, transform.GetLocalRotationDegree().y, transform.GetLocalRotationDegree().z
 		};
 
 		data["scale"] = {
@@ -401,7 +401,7 @@ namespace tomato::Serialization
 			glm::vec3(data["position"][0], data["position"][1], data["position"][2])
 		);
 
-		transform.SetEulerDegree(
+		transform.SetRotationDegree(
 			glm::vec3(data["degree"][0], data["degree"][1], data["degree"][2])
 		);
 

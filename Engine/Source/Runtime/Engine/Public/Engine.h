@@ -4,7 +4,7 @@
 #include <memory>
 #include "Services/Window.h"
 #include "Services/Input.h"
-#include "Input/InputRecorder.h"
+#include "Input/IntentTranslator.h"
 #include "Input/InputUI.h"
 #include "ECS/SystemFramework/SystemManager.h"
 #include "State/StateFwd.h"
@@ -27,7 +27,8 @@ namespace tomato
 
         void Run();
 
-        InputRecorder& GetInputRecorder() { return inputRecorder_; }
+        Window& GetWindow() { return window_;}
+        IntentTranslator& GetInputRecorder() { return intentTranslator_; }
 
         template<typename Component>
         void SetRollbackComponent() {
@@ -47,7 +48,7 @@ namespace tomato
 
         void ProcessInputEvents(uint32_t tick);
         Input input_;
-        InputRecorder inputRecorder_;
+        IntentTranslator intentTranslator_;
         InputUI inputUI_;
 
         void ChangeState(TickClock& tc);

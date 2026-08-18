@@ -1,4 +1,4 @@
-#include "ProjectileSystem.h"
+﻿#include "ProjectileSystem.h"
 #include "ECS/Components/Components.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "State/State.h"
@@ -45,7 +45,7 @@ void ProjectileSystem::Update(SimContext& simCtx)
 		}
 		else
 		{
-			velocity.velocity = glm::vec3{ 0 };
+			//velocity.velocity = glm::vec3{ 0 };
 			//std::cout << "pass\n";
 		}
 		//velocity.horizontalSpeed = 0.5f;

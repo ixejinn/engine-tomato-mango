@@ -35,12 +35,12 @@ namespace tomato
 
         ////// Register frame phase systems
         // Pre
+        manager.AddSystem(FramePhase::PreRender, RunMode::Editor, std::make_unique<EditorCameraSystem>());
+        manager.AddSystem(FramePhase::PreRender, RunMode::Game, std::make_unique<PlayerCameraSystem>());
         manager.AddSystem(FramePhase::PreRender, RunMode::Game | RunMode::Editor,
-            std::make_unique<CameraSystem>());
+            std::make_unique<CameraTransformSystem>());
         for (const auto& factory : frameFactories_[FramePhase::PreRender])
             manager.AddSystem(FramePhase::PreRender, factory.mode, factory.factory());
-
-        // TODO: Register particle logic system
         manager.AddSystem(FramePhase::PreRender, RunMode::Game | RunMode::Editor,
             std::make_unique<ParticleEmissionSystem>());
 

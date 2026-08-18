@@ -18,11 +18,11 @@ using namespace std::chrono_literals;
 namespace tomato {
     Engine::Engine(const int width, const int height, const char* title, NetMode netMode)
         : window_(width, height, title)
-        , input_(window_, inputRecorder_, inputUI_)
+        , input_(window_, intentTranslator_, inputUI_)
         , netMode_(netMode)
     {
         InitializeNetwork();
-        editor_.InitImGui(window_.GetHandle());
+        editor_.InitImGui(window_.GetHandle(), input_);
 
         Serialization::ComponentRegistry::GetInstance().Init();
         Serialization::ComponentRegistry::GetInstance().InitInspector();
@@ -108,7 +108,7 @@ namespace tomato {
             window_.SwapBuffers();
             // ----------* Simulate and render
 
-            inputRecorder_.UpdateCurrInputRecord(tickClock.GetTick());
+            intentTranslator_.UpdateIntentState(tickClock.GetTick());
         }
 
         network_->ThreadStop();
@@ -126,7 +126,7 @@ namespace tomato {
         Window::PollEvents();
 
         currState_->SetPlayerInput(
-            tick, inputRecorder_.GetCurrInputRecord(),
+            tick, intentTranslator_.GetCurrInputState(),
             network_->GetMyPlayerID());
     }
 

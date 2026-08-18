@@ -1,0 +1,25 @@
+{
+    "duration": 4.0,
+    "looping": true,
+    "startDelay": 0.0,
+    "startSpeed": 0.5,
+    "maxParticles": 53,
+    "shape": "Sphere",
+    "angle": -431602080.0,
+    "space": "Local",
+    "lifetime": 4.0,
+    "rateOverTime": 0.0,
+    "burst": {
+        "period": 0.0,
+        "cycles": 1,
+        "count": 5
+    },
+    "texture": 9805830134052030737,
+    "size": 0.10000000149011612,
+    "color": [
+        1.0,
+        0.0,
+        0.0,
+        1.0
+    ]
+}

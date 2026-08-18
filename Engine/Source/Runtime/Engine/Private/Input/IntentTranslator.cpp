@@ -1,18 +1,16 @@
-#include "Input/InputRecorder.h"
+#include "Input/IntentTranslator.h"
 #include "Input/InputEvent.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 
 namespace tomato
 {
-    InputRecorder::InputRecorder()
+    IntentTranslator::IntentTranslator()
     {
-        InitKeyIntents();
+        BindInitialInputIntent();
     }
 
-    bool InputRecorder::UpdateInputKey(const KeyEvent& event)
+    bool IntentTranslator::OnKeyEvent(const KeyEvent& event)
     {
-        keyStates_[event.key].value = event.value;
-
         if (keyIntents_[event.key] != InputIntent::None)
         {
             if (event.action == KeyAction::Release)
@@ -28,12 +26,8 @@ namespace tomato
         return true;
     }
 
-    bool InputRecorder::UpdateInputMouse(const MouseEvent& event)
+    bool IntentTranslator::OnMouseButtonEvent(const MouseButtonEvent& event)
     {
-        keyStates_[event.key].value = event.value;
-        keyStates_[Key::MouseX].value = event.xPos;
-        keyStates_[Key::MouseY].value = event.yPos;
-
         if (keyIntents_[event.key] != InputIntent::None)
         {
             if (event.action == KeyAction::Release)
@@ -49,7 +43,7 @@ namespace tomato
         return true;
     }
 
-    void InputRecorder::UpdateCurrInputRecord(uint32_t tick)
+    void IntentTranslator::UpdateIntentState(uint32_t tick)
     {
         if (curr_.tick != tick)
         {
@@ -59,12 +53,17 @@ namespace tomato
         }
     }
 
-    bool InputRecorder::IsPress(InputIntent intent) const
+    bool IntentTranslator::IsPress(InputIntent intent) const
     {
-        return HasFlag(curr_.down, intent) ? true : false;
+        return HasFlag(curr_.down, intent);
     }
 
-    void InputRecorder::InitKeyIntents() {
+    bool IntentTranslator::IsHeld(InputIntent intent) const
+    {
+        return HasFlag(curr_.held, intent);
+    }
+
+    void IntentTranslator::BindInitialInputIntent() {
         keyIntents_[Key::W] = InputIntent::Up;
         keyIntents_[Key::S] = InputIntent::Down;
         keyIntents_[Key::A] = InputIntent::Left;
