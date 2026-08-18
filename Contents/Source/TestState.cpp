@@ -45,7 +45,7 @@ void TestState::Init() {
     EventDispatcher::GetInstance().Connect<LandingEvent, TestState::CallbackJump>();
 
     engine_.GetInputRecorder().BindInputIntent(Key::J, InputIntent::Test_1);
-    engine_.GetInputRecorder().BindInputIntent(Key::LeftMouseButton, InputIntent::Test_2);
+    // engine_.GetInputRecorder().BindInputIntent(Key::LeftMouseButton, InputIntent::Test_2);
 
     //// Set rollback
     engine_.SetRollbackComponent<MovementComponent>();
@@ -90,6 +90,9 @@ void TestState::Init() {
     trfGnd.SetScale(10, 0.1, 10);
     auto& renderGnd = registry_.get<RenderComponent>(ground);
     renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
+
+    //entt::entity objUp = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, 10, 0 });
+    entt::entity objUp = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0.f, 12.f, 15.f });
 
     ////UI
     auto targetLabel = UIPrefab::CreateText(registry_, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 20.f);
@@ -164,10 +167,10 @@ void TestState::Update() {
     if (engine_.GetInputRecorder().IsPress(InputIntent::Test_1))
         audioPtr_->Start();
 
-    if (engine_.GetInputRecorder().IsPress(InputIntent::Test_2))
-        engine_.GetWindow().SetCursorMode(true);
-    else if (!engine_.GetInputRecorder().IsHeld(InputIntent::Test_2))
-        engine_.GetWindow().SetCursorMode(false);
+    // if (engine_.GetInputRecorder().IsPress(InputIntent::Test_2))
+    //     engine_.GetWindow().SetCursorDisable(true);
+    // else if (!engine_.GetInputRecorder().IsHeld(InputIntent::Test_2))
+    //     engine_.GetWindow().SetCursorDisable(false);
 }
 
 void TestState::Exit() {}

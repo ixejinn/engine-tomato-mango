@@ -55,7 +55,7 @@ namespace tomato
         // TODO: UI System 만들면 삭제
         void TMP_CheckEscapeKey();
 
-        void SetCursorMode(bool disable);
+        void SetCursorDisable(bool disable);
 
     private:
         static void OnFramebufferSizeChanged(GLFWwindow* window, int width, int height);

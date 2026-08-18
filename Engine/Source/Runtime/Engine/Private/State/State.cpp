@@ -1,3 +1,4 @@
+#include "Engine.h"
 #include "State/State.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Particle/ParticleEmitterPool.h"
@@ -13,8 +14,13 @@ namespace tomato
         registry_.ctx().emplace<ParticleEmitterPool>(PassKey<State>(), registry_);
 
         // Create editor mode camera
-        entt::entity& editCam = registry_.ctx().get<RenderContext>().editCam;
+        entt::entity& editCam = registry_.ctx().get<RenderContext>().editorCam;
         editCam = Prefab::CreateCamera(registry_, false);
+    }
+
+    Window& State::GetWindow()
+    {
+        return engine_.GetWindow();
     }
 
     void State::SetPlayerInput(uint32_t tick, IntentState input, int playerID)

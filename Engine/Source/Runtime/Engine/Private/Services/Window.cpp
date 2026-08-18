@@ -89,7 +89,7 @@ namespace tomato {
             glfwSetWindowShouldClose(handle_, true);
     }
 
-    void Window::SetCursorMode(bool disable)
+    void Window::SetCursorDisable(bool disable)
     {
         if (disable)
             glfwSetInputMode(handle_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

@@ -47,7 +47,7 @@ namespace tomato {
             // else if (y < 0)
             //     std::cout << (int)e << " ↓\n";
 
-            glm::vec2 dir = glm::vec2{x, -y};
+            glm::vec2 dir{x, -y};
             if (glm::length(dir) > 1)
                 dir = glm::normalize(dir);
 
@@ -64,8 +64,8 @@ namespace tomato {
 //                x += 5;
 //            if (HasFlag(keypress, InputIntent::TurnDown))
 //                x -= 5;
-            glm::vec3 newDegree = trf.GetLocalEulerDegree() + glm::vec3{x, y, 0.f};
-            trf.SetEulerDegree(newDegree);
+            glm::vec3 newDegree = trf.GetLocalRotationDegree() + glm::vec3{x, y, 0.f};
+            trf.SetRotationDegree(newDegree);
 
             // Jump
             if (HasFlag(keydown, ch.is1P ? InputIntent::Jump : InputIntent::Jump2) && move.jumpCnt < JUMP_COUNT_MAX)

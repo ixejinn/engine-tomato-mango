@@ -102,11 +102,11 @@ namespace tomato
 			changed = true;
 		}
 
-		glm::vec3 degree = transform.GetLocalEulerDegree();
+		glm::vec3 degree = transform.GetLocalRotationDegree();
 		float degreeVec3[3] = { degree.x, degree.y, degree.z };
 		if (DrawVec3Control("Degree", degreeVec3))
 		{
-			transform.SetEulerDegree(degreeVec3[0], degreeVec3[1], degreeVec3[2]);
+			transform.SetRotationDegree(degreeVec3[0], degreeVec3[1], degreeVec3[2]);
 			changed = true;
 		}
 

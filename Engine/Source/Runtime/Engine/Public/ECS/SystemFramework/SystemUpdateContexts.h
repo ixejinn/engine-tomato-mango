@@ -27,7 +27,9 @@ namespace tomato
     struct RenderContext
     {
         entt::entity mainCam{entt::null};
-        entt::entity editCam{entt::null};
+
+        entt::entity editorCam{entt::null};
+        entt::entity playerCam{entt::null};
     };
 
     struct UIContext
