@@ -17,7 +17,7 @@ namespace tomato
 	{
 	public:
 		void InitImGui(GLFWwindow* wnd, Input& input);
-		void ShutdownImGui();
+		void ShutdownImGui(Input& input);
 
 		void BeginFrame();
 		void Draw(State*, RunMode&);
