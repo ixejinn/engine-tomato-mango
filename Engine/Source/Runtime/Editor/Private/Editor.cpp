@@ -68,8 +68,14 @@ namespace tomato
 		panels.push_back(std::make_unique<InspectorPanel>(300.f, 600.f, Window::GetWidth(), 900.f));
 	}
 
-	void Editor::ShutdownImGui()
+	void Editor::ShutdownImGui(Input& input)
 	{
+        input.GetMouseButtonSink().disconnect<ImGui_ImplGlfw_MouseButtonCallback>();
+        input.GetCursorPosSink().disconnect<ImGui_ImplGlfw_CursorPosCallback>();
+        input.GetScrollSink().disconnect<ImGui_ImplGlfw_ScrollCallback>();
+        input.GetKeySink().disconnect<ImGui_ImplGlfw_KeyCallback>();
+        input.GetCharSink().disconnect<ImGui_ImplGlfw_CharCallback>();
+
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
@@ -122,15 +128,6 @@ namespace tomato
 		input.GetScrollSink().connect<ImGui_ImplGlfw_ScrollCallback>();
 		input.GetKeySink().connect<ImGui_ImplGlfw_KeyCallback>();
 		input.GetCharSink().connect<ImGui_ImplGlfw_CharCallback>();
-
-		// InputCallbacks cb;
-		// cb.mouseButton = ImGui_ImplGlfw_MouseButtonCallback;
-		// cb.mouseMove = ImGui_ImplGlfw_CursorPosCallback;
-		// cb.scroll = ImGui_ImplGlfw_ScrollCallback;
-		// cb.key = ImGui_ImplGlfw_KeyCallback;
-		// cb.character = ImGui_ImplGlfw_CharCallback;
-		//
-		// Input::SetExternalInputCallbacks(cb);
 	}
 
 	void Editor::PickObject(entt::registry& reg, glm::vec2 mousePos)

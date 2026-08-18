@@ -14,10 +14,13 @@ namespace tomato
         void Update(SimContext& simCtx) override;
 
     private:
+        static constexpr float MOUSE_LOOK_SENSITIVITY_DIST{500.f};
+        static constexpr float CAMERA_MOVE_SPEED{8.f};
+
+        glm::vec3 freeLookStartEulerRad;
         bool isFreeLooking_{false};
 
         glm::vec2 preCursorPos;
-        glm::vec3 initCameraEulerDegree;
     };
 }
 

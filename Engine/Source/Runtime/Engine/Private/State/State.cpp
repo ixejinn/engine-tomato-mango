@@ -1,5 +1,6 @@
-#include "Engine.h"
+﻿#include "Engine.h"
 #include "State/State.h"
+#include "State/StateRegistry.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Particle/ParticleEmitterPool.h"
 #include "Utils/PassKey.h"
@@ -16,6 +17,16 @@ namespace tomato
         // Create editor mode camera
         entt::entity& editCam = registry_.ctx().get<RenderContext>().editorCam;
         editCam = Prefab::CreateCamera(registry_, false);
+    }
+
+    void State::SetNextState(std::unique_ptr<State>&& newState)
+    {
+        engine_.SetNextState(std::move(newState));
+    }
+
+    std::unique_ptr<State> State::GetStateByID(AssetID stateID)
+    {
+        return StateRegistry::GetInstance().GetStateFactory(stateID)(engine_);
     }
 
     Window& State::GetWindow()

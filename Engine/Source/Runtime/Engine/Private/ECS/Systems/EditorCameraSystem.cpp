@@ -21,39 +21,52 @@ namespace tomato
 
         auto& keyDeviceState = KeyDeviceState::GetInstance();
 
+        //// Start free looking
         if (!isFreeLooking_ && keyDeviceState.IsKeyPressed(Key::RightMouseButton))
         {
             isFreeLooking_ = true;
 
             preCursorPos.x = keyDeviceState.GetKeyState(Key::MouseX);
             preCursorPos.y = keyDeviceState.GetKeyState(Key::MouseY);
-            initCameraEulerDegree = registry.get<TransformComponent>(renderCtx.editorCam).GetWorldRotationDegree();
+            freeLookStartEulerRad = registry.get<TransformComponent>(renderCtx.editorCam).GetWorldRotationRadian();
 
             simCtx.state->GetWindow().SetCursorDisable(true);
-            std::cout << "(( press " << keyDeviceState.GetKeyState(Key::MouseX) << " " << keyDeviceState.GetKeyState(Key::MouseY) << "\n";
+//            std::cout << "(( press " << keyDeviceState.GetKeyState(Key::MouseX) << " " << keyDeviceState.GetKeyState(Key::MouseY) << "\n";
         }
 
         if (isFreeLooking_)
         {
+            //// Finish free looking
             if (keyDeviceState.IsKeyReleased(Key::RightMouseButton))
             {
                 isFreeLooking_ = false;
 
                 simCtx.state->GetWindow().SetCursorDisable(false);
-                std::cout << "(( release " << keyDeviceState.GetKeyState(Key::MouseX) << " " << keyDeviceState.GetKeyState(Key::MouseY) << "\n";
+//                std::cout << "(( release " << keyDeviceState.GetKeyState(Key::MouseX) << " " << keyDeviceState.GetKeyState(Key::MouseY) << "\n";
                 return;
             }
 
+            //// Update camera position and rotation
+            auto& trf = registry.get<TransformComponent>(renderCtx.editorCam);
+
+            // Rotate camera
             glm::vec2 currCursorPos{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)};
             glm::vec2 deltaCursorPos = currCursorPos - preCursorPos;
             preCursorPos = currCursorPos;
-            constexpr float dist = 50.f;
 
-            auto upAxisRadian = glm::atan(deltaCursorPos.x, dist);
-            auto rightAxisRadian = glm::atan(deltaCursorPos.y, dist);
-            //std::cout << "   upAxis: " << glm::degrees(upAxisRadian) << "\n";
-            //std::cout << "rightAxis: " << glm::degrees(rightAxisRadian) << "\n";
+            const float yawDelta = glm::atan(deltaCursorPos.x, MOUSE_LOOK_SENSITIVITY_DIST);
+            const float pitchDelta = glm::atan(deltaCursorPos.y, MOUSE_LOOK_SENSITIVITY_DIST);
 
+            freeLookStartEulerRad.y -= yawDelta;
+            freeLookStartEulerRad.x -= pitchDelta;
+            freeLookStartEulerRad.x = glm::clamp(freeLookStartEulerRad.x,
+                                                 glm::radians(-89.f), glm::radians(89.f));
+
+            trf.SetQuaternion(
+                    glm::angleAxis(freeLookStartEulerRad.y, glm::vec3(0, 1, 0)) *
+                    glm::angleAxis(freeLookStartEulerRad.x, glm::vec3(1, 0, 0)));
+
+            // Move camera
             int back = 0, right = 0;
             if (keyDeviceState.IsKeyPressed(Key::W))
                 --back;
@@ -65,18 +78,14 @@ namespace tomato
                 ++right;
 
             glm::vec2 dir{back, right};
-            auto len = glm::length(dir);
+            const float len = glm::length(dir);
             if (len > 1)
                 dir /= len;
+            dir *= CAMERA_MOVE_SPEED * FIXED_DELTA_TIME;
 
-            constexpr float speed = 8.f;
-            dir *= speed * FIXED_DELTA_TIME;
-            auto& trf = registry.get<TransformComponent>(renderCtx.editorCam);
-
-            auto wQuat = trf.GetWorldQuaternion();
-            glm::vec3 b = wQuat * glm::vec3(0, 0, 1);
-            glm::vec3 r = wQuat * glm::vec3(1, 0, 0);
-            glm::vec3 u = wQuat * glm::vec3(0, 1, 0);
+            const auto wQuat = trf.GetLocalQuaternion();
+            const glm::vec3 b = wQuat * glm::vec3(0, 0, 1);
+            const glm::vec3 r = wQuat * glm::vec3(1, 0, 0);
 
             trf.AddPosition(dir.x * b + dir.y * r);
         }

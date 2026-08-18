@@ -189,24 +189,27 @@ namespace tomato
 		ImGui::ColorEdit4("##color", glm::value_ptr(render.color));
 
 		ImGui::SeparatorText("Mesh");
+
 		const char* meshPreview = AssetRegistry<Mesh>::GetInstance().GetName(render.mesh) + 11;
+
+		auto itBegin = AssetRegistry<Mesh>::GetInstance().GetNameMapBegin();
+		auto itEnd = AssetRegistry<Mesh>::GetInstance().GetNameMapEnd();
 
 		if (ImGui::BeginCombo("##mesh", meshPreview))
 		{
-			for (const auto& info : Mesh::PrimitiveMetas)
+			for (itBegin; itBegin != itEnd; ++itBegin)
 			{
-				if(ImGui::Selectable(
-					info.name,
-					render.mesh == GetAssetID(Mesh::GetPrimitiveName(info.primitive))))
+				if (ImGui::Selectable(
+					itBegin->second.c_str() + 11,
+					render.mesh == itBegin->first))
 				{
-					render.mesh = GetAssetID(Mesh::GetPrimitiveName(info.primitive));
+					render.mesh = itBegin->first;
 					changed = true;
 				}
 			}
-			
+
 			ImGui::EndCombo();
 		}
-
 		ImGui::SeparatorText("Shader");
 		const char* curShader = AssetRegistry<Shader>::GetInstance().GetName(render.shader);
 		if (ImGui::BeginCombo("##shader", curShader))
