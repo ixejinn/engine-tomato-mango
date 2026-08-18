@@ -68,6 +68,7 @@ namespace tomato
             if (!IsVisible(registry, e))
                 continue;
 
+            if (render.shader == 0) render.shader = curShader_;
             if (curShader_ != render.shader)
             {
                 curShader_ = render.shader;
@@ -75,12 +76,14 @@ namespace tomato
                 shader->Use();
             }
 
+            if (render.texture == 0) render.texture = curTexture_;
             if (curTexture_ != render.texture)
             {
                 curTexture_ = render.texture;
                 AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
             }
 
+            if (render.mesh == 0) render.mesh = curMesh_;
             if (curMesh_ != render.mesh)
             {
                 curMesh_ = render.mesh;

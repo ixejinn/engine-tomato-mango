@@ -66,7 +66,7 @@ void TestState::Init() {
     entt::entity player0 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, 2, 0 });
     auto& renderp0 = registry_.get<RenderComponent>(player0);
 //    renderp0.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    renderp0.mesh = GetAssetID("Primitive::Sphere20_10");
+    renderp0.mesh = GetAssetID("Primitive::Sphere_20_10");
     renderp0.color = { 1.f, 1.f, 0.f, 1.f };
     auto& channelp0 = registry_.get<InputChannelComponent>(player0);
     channelp0.channel = 0;

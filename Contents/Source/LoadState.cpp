@@ -47,6 +47,18 @@ void LoadState::Init()
 	//		engine_.RequestMatchToServer();
 	//		uiController_.onMatchRequest(e);
 	//	};
+
+	std::string meshName{ "sphere_20_10" };
+
+	auto first = meshName.find("_");
+	auto second = meshName.find("_", first + 1);
+
+	auto sector = meshName.substr(first + 1, second - first - 1);
+	auto stack = meshName.substr(second + 1);
+
+	auto type = meshName.substr(0, first);
+	std::cout << type << ", " << std::stoi(sector) << ", " << std::stoi(stack) << '\n';
+	
 }
 
 void LoadState::Update()

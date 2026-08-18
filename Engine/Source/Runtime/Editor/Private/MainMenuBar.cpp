@@ -107,7 +107,7 @@ namespace tomato
 
 		else
 		{
-			Serialization::NewStateScene(eCtx.currentState->GetEngine(), eCtx.currentState);
+			Serialization::NewStateScene(eCtx.currentState);
 			eCtx.sceneDirty = false;
 			eCtx.currentScenePath = "";
 			eCtx.currentSceneRuntimePath = "";
@@ -133,7 +133,6 @@ namespace tomato
 			{
 				FileUtils::CopyAsset(path.value(), runtimePath, std::filesystem::copy_options::overwrite_existing);
 				Serialization::LoadStateScene(
-					eCtx.currentState->GetEngine(),
 					eCtx.currentState,
 					runtimePath.string().c_str()
 				);
@@ -191,7 +190,6 @@ namespace tomato
 		if (!path.empty())
 		{
 			Serialization::LoadStateScene(
-				eCtx.currentState->GetEngine(),
 				eCtx.currentState,
 				path.string().c_str()
 			);
