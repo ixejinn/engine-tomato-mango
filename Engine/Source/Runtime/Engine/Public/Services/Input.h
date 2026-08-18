@@ -5,13 +5,14 @@
 #include "Input/InputEvent.h"
 #include "Event/EventSignal.h"
 #include "ServiceFwd.h"
+#include "TomatoFwd.h"
 
 namespace tomato
 {
     class Input
     {
     public:
-        explicit Input(Window& window, IntentTranslator& recorder, InputUI& inputUI);
+        explicit Input(Window& window);
 
         auto GetMouseButtonSink() { return entt::sink{mouseButtonSigh_}; }
         auto GetCursorPosSink() { return entt::sink{cursorPosSigh_}; }
@@ -45,6 +46,8 @@ namespace tomato
         entt::sigh<void(GLFWwindow*, double, double)> scrollSigh_;
         entt::sigh<void(GLFWwindow*, int, int, int, int)>keySigh_;
         entt::sigh<void(GLFWwindow*, unsigned int)> charSigh_;
+
+        friend class Engine;
     };
 }
 
