@@ -1,4 +1,5 @@
 ﻿#include "Input/InputUI.h"
+#include "Input/KeyDeviceState.h"
 
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Services/Input.h"
@@ -12,7 +13,7 @@
 
 namespace tomato
 {
-	bool InputUI::OnClick(const MouseEvent& mouseEvent)
+	bool InputUI::OnClick(const MouseButtonEvent& mouseEvent)
 	{
 		if (currentStatePtr_ == nullptr)
 			return true;
@@ -46,7 +47,7 @@ namespace tomato
 		return false;
 	}
 
-	bool InputUI::OnHover(const MouseMoveEvent& moveEvent)
+	bool InputUI::OnHover(const CursorPosEvent& moveEvent)
 	{
 		if (currentStatePtr_ == nullptr)
 			return true;
@@ -58,7 +59,7 @@ namespace tomato
 		if (currentHovered == entt::null)
 			return true;
 
-		if (previousHovered == currentHovered && Input::IsKeyPressed(Key::LeftMouseButton))
+		if (previousHovered == currentHovered && KeyDeviceState::GetInstance().IsKeyPressed(Key::LeftMouseButton))
 			return false;
 
 		auto& rect = r.get<RectTransformComponent>(currentHovered);

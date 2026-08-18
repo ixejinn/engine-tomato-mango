@@ -8,9 +8,10 @@
 
 #include "Math/AABB.h"
 
-namespace tomato {
-    
-    struct Vertex {
+namespace tomato
+{
+    struct Vertex
+    {
         glm::vec3 position;
         glm::vec3 normal;
         glm::vec2 uv;
@@ -55,7 +56,8 @@ namespace tomato {
 
         static constexpr const char* GetPrimitiveName(Primitive type)
         {
-            switch (type) {
+            switch (type)
+            {
                 case Primitive::Plain:
                     return "Primitive::Plain";
                 case Primitive::LBPlain:
@@ -70,7 +72,6 @@ namespace tomato {
 
                 case Primitive::Cylinder:
                     return "Primitive::Cylinder";
-
                 case Primitive::OpenCylinder:
                     return "Primitive::OpenCylinder";
             }
@@ -78,12 +79,15 @@ namespace tomato {
 
     private:
         explicit Mesh(Primitive type);
+        explicit Mesh(Primitive type, int sectorCnt, int stackCnt = 0);
 
     public:
         ~Mesh();
 
         static void Cleanup() {}
+
         static void Create();
+        static void Create(Primitive type, int sectorCnt, int stackCnt = 0);
 
         void Bind() const;
         void Draw(bool drawLine = false) const;
@@ -96,10 +100,16 @@ namespace tomato {
         static void Plain(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
         static void LBPlain(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
         static void Cube(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
-        static void Sphere(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
-        static void Capsule(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
-        static void Cylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
-        static void OpenCylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
+
+        static void Sphere(
+                std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
+                int sectorCnt = 8, int stackCnt = 6);
+        static void Capsule(
+                std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
+                int sectorCnt = 8, int stackCnt = 6);
+
+        static void Cylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int sectorCnt = 10);
+        static void OpenCylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int sectorCnt = 10);
 
         /**
          * @brief Populates vertex and index buffers for a single face (quad).

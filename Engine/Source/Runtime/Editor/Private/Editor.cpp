@@ -22,6 +22,8 @@
 #include "Services/Window.h"
 #include "State/State.h"
 
+#include "Input/KeyDeviceState.h"
+
 #include "EditorPanel.h"
 #include "HierarchyPanel.h"
 #include "InspectorPanel.h"
@@ -30,7 +32,7 @@
 
 namespace tomato
 {
-	void Editor::InitImGui(GLFWwindow* wnd)
+	void Editor::InitImGui(GLFWwindow* wnd, Input& input)
 	{
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
@@ -42,7 +44,7 @@ namespace tomato
 		ImGui_ImplGlfw_InitForOpenGL(wnd, false);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
 		ImGui_ImplOpenGL3_Init();
 		
-		SetInputCallbacks();
+		SetInputCallbacks(input);
 
 		ImFontConfig config;
 
@@ -95,8 +97,14 @@ namespace tomato
 		for (auto& panel : panels)
 			panel->Draw(eCtx);
 		
-		if (Input::IsKeyPressed(Key::LeftMouseButton))
-			PickObject(eCtx.currentState->GetRegistry(), Input::GetMousePosition());
+		// if (Input::IsKeyPressed(Key::LeftMouseButton))
+		if (KeyDeviceState::GetInstance().IsKeyPressed(Key::LeftMouseButton))
+		{
+			auto& keyDeviceState = KeyDeviceState::GetInstance();
+			// PickObject(eCtx.currentState->GetRegistry(), Input::GetMousePosition());
+			PickObject(eCtx.currentState->GetRegistry(),
+				{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)});
+		}
 #elif 1
 #endif
 	}
@@ -107,16 +115,22 @@ namespace tomato
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	void Editor::SetInputCallbacks()
+	void Editor::SetInputCallbacks(Input& input)
 	{
-		InputCallbacks cb;
-		cb.mouseButton = ImGui_ImplGlfw_MouseButtonCallback;
-		cb.mouseMove = ImGui_ImplGlfw_CursorPosCallback;
-		cb.scroll = ImGui_ImplGlfw_ScrollCallback;
-		cb.key = ImGui_ImplGlfw_KeyCallback;
-		cb.character = ImGui_ImplGlfw_CharCallback;
+		input.GetMouseButtonSink().connect<ImGui_ImplGlfw_MouseButtonCallback>();
+		input.GetCursorPosSink().connect<ImGui_ImplGlfw_CursorPosCallback>();
+		input.GetScrollSink().connect<ImGui_ImplGlfw_ScrollCallback>();
+		input.GetKeySink().connect<ImGui_ImplGlfw_KeyCallback>();
+		input.GetCharSink().connect<ImGui_ImplGlfw_CharCallback>();
 
-		Input::SetExternalInputCallbacks(cb);
+		// InputCallbacks cb;
+		// cb.mouseButton = ImGui_ImplGlfw_MouseButtonCallback;
+		// cb.mouseMove = ImGui_ImplGlfw_CursorPosCallback;
+		// cb.scroll = ImGui_ImplGlfw_ScrollCallback;
+		// cb.key = ImGui_ImplGlfw_KeyCallback;
+		// cb.character = ImGui_ImplGlfw_CharCallback;
+		//
+		// Input::SetExternalInputCallbacks(cb);
 	}
 
 	void Editor::PickObject(entt::registry& reg, glm::vec2 mousePos)

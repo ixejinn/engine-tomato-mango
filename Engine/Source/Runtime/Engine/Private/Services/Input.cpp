@@ -1,14 +1,113 @@
 ﻿#include "Services/Input.h"
 #include "Services/Window.h"
-#include "Input/InputRecorder.h"
+#include "Input/IntentTranslator.h"
 #include "Input/InputUI.h"
+#include "Input/KeyDeviceState.h"
+#include "ECS/Systems/EditorCameraSystem.h"
 #include "Simulation/Tick/TickClock.h"
 #include "Utils/Logger.h"
 #include <GLFW/glfw3.h>
 
 namespace tomato
 {
-    InputCallbacks Input::externalCallbacks_;
+    Input::Input(Window& window, IntentTranslator& recorder, InputUI& inputUI)
+    {
+        auto* windowHandle = window.GetHandle();
+        glfwSetKeyCallback(windowHandle, OnKeyEvent);
+        glfwSetMouseButtonCallback(windowHandle, OnMouseButtonEvent);
+        glfwSetCursorPosCallback(windowHandle, OnCursorPosEvent);
+        glfwSetScrollCallback(windowHandle, OnScrollEvent);
+        glfwSetCharCallback(windowHandle, OnCharEvent);
+
+        keySignal_.Connect<&IntentTranslator::OnKeyEvent>(recorder);
+        cursorSignal_.Connect<&InputUI::OnHover>(inputUI);
+        mouseSignal_.Connect<&IntentTranslator::OnMouseButtonEvent>(recorder);
+        mouseSignal_.Connect<&InputUI::OnClick>(inputUI);
+    }
+
+    void Input::OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
+    {
+        // if (externalCallbacks_.key)
+        // {
+        //     externalCallbacks_.key(window, key, scancode, action, mods);
+        //     //return; @TODO : if editor mode
+        // }
+
+        Key k = ConvertKeyGLFW(key);
+        KeyAction a = ConvertActionGLFW(action);
+        if (a == KeyAction::Error)
+        {
+            TMT_WARN << "KeyAction of " << static_cast<int>(k) << " is invalid";
+            return;
+        }
+
+        auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+        auto* input = winData->input;
+        auto* tickClock = winData->tickClock;
+
+        input->keySigh_.publish(window, key, scancode, action, mods);
+        input->keySignal_.Collect(input->collector_,
+            KeyEvent{k, a, a == KeyAction::Release ? 0.f : 1.f, tickClock->GetTick()});
+
+        KeyDeviceState::GetInstance().UpdateInputAxis(k, a == KeyAction::Release ? 0.f : 1.f);
+    }
+
+    void Input::OnMouseButtonEvent(GLFWwindow* window, int button, int action, int mods)
+    {
+        Key k = ConvertKeyGLFW(button);
+        KeyAction a = ConvertActionGLFW(action);
+
+        if (a == KeyAction::Error)
+        {
+            TMT_WARN << "KeyAction of " << static_cast<int>(k) << " is invalid";
+            return;
+        }
+
+        auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+        auto* input = winData->input;
+        auto* tickClock = winData->tickClock;
+
+        double xPos(0), yPos(0);
+        glfwGetCursorPos(window, &xPos, &yPos);
+
+        input->mouseButtonSigh_.publish(window, button, action, mods);
+        input->mouseSignal_.Collect(input->collector_,
+            MouseButtonEvent{
+                k, a, a == KeyAction::Release ? 0.f : 1.f, tickClock->GetTick(),
+                static_cast<float>(xPos), static_cast<float>(yPos)});
+
+        // if (externalCallbacks_.mouseButton)
+        //     externalCallbacks_.mouseButton(window, button, action, mods);
+
+        KeyDeviceState::GetInstance().UpdateInputAxis(k, a == KeyAction::Release ? 0.f : 1.f);
+    }
+
+    void Input::OnCursorPosEvent(GLFWwindow* window, double xpos, double ypos)
+    {
+        auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+        auto* input = winData->input;
+        auto* tickClock = winData->tickClock;
+
+        input->cursorPosSigh_.publish(window, xpos, ypos);
+        input->cursorSignal_.Publish(
+            CursorPosEvent{tickClock->GetTick(), static_cast<float>(xpos), static_cast<float>(ypos)});
+
+        // if (externalCallbacks_.mouseMove)
+        //     externalCallbacks_.mouseMove(window, xpos, ypos);
+
+        KeyDeviceState::GetInstance().UpdateInputAxis(Key::MouseX, xpos);
+        KeyDeviceState::GetInstance().UpdateInputAxis(Key::MouseY, ypos);
+    }
+    
+    void Input::OnScrollEvent(GLFWwindow* window, double xoffset, double yoffset)
+    {
+        static_cast<WindowData*>(glfwGetWindowUserPointer(window))->input->scrollSigh_.publish(window, xoffset, yoffset);
+    }
+
+    void Input::OnCharEvent(GLFWwindow* window, unsigned int codepoint)
+    {
+        static_cast<WindowData*>(glfwGetWindowUserPointer(window))->input->charSigh_.publish(window, codepoint);
+    }
 
     Key Input::ConvertKeyGLFW(int glfwKey)
     {
@@ -145,117 +244,5 @@ namespace tomato
         default:
             return KeyAction::Error;
         }
-    }
-
-    bool Input::IsKeyPressed(Key key)
-    {
-        return latestKeyAction_[key] == KeyAction::Press;
-    }
-
-    bool Input::IsKeyReleased(Key key)
-    {
-        return latestKeyAction_[key] == KeyAction::Release;
-    }
-
-    glm::vec2 Input::GetMousePosition()
-    {
-        double xPos(0), yPos(0);
-        glfwGetCursorPos(glfwGetCurrentContext(), &xPos, &yPos);
-
-        return glm::vec2{ xPos, yPos };
-    }
-
-    Input::Input(Window& window, InputRecorder& recorder, InputUI& inputUI) {
-        glfwSetKeyCallback(window.GetHandle(), OnKeyEvent);
-        glfwSetMouseButtonCallback(window.GetHandle(), OnMouseButtonEvent);
-        glfwSetCursorPosCallback(window.GetHandle(), OnMouseMoveEvent);
-        glfwSetScrollCallback(window.GetHandle(), OnScrollEvent);
-        glfwSetCharCallback(window.GetHandle(), OnCharacterEvent);
-
-        keySignal_.Connect<&InputRecorder::UpdateInputKey>(recorder);
-        moveSignal_.Connect<&InputUI::OnHover>(inputUI);
-        mouseSignal_.Connect<&InputRecorder::UpdateInputMouse>(recorder);
-        mouseSignal_.Connect<&InputUI::OnClick>(inputUI);
-    }
-
-    void Input::SetExternalInputCallbacks(InputCallbacks cb)
-    {
-        externalCallbacks_ = cb;
-    }
-
-    void Input::OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {
-        if (externalCallbacks_.key)
-        {
-            externalCallbacks_.key(window, key, scancode, action, mods);
-            //return; @TODO : if editor mode
-        }
-        Key k = ConvertKeyGLFW(key);
-        KeyAction a = ConvertActionGLFW(action);
-
-        if (a == KeyAction::Error)
-        {
-            TMT_WARN << "KeyAction of " << static_cast<int>(k) << " is invalid";
-            return;
-        }
-        latestKeyAction_[k] = a;
-
-        auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-        auto* input = winData->input;
-        auto* tickClock = winData->tickClock;
-        input->keySignal_.Collect(input->collector_,
-                               KeyEvent{k, a, a == KeyAction::Release ? 0.f : 1.f, tickClock->GetTick()});
-
-    }
-
-    void Input::OnMouseButtonEvent(GLFWwindow* window, int button, int action, int mods)
-    {
-        Key k = ConvertKeyGLFW(button);
-        KeyAction a = ConvertActionGLFW(action);
-
-        if (a == KeyAction::Error)
-        {
-            TMT_WARN << "KeyAction of " << static_cast<int>(k) << " is invalid";
-            return;
-        }
-
-        latestKeyAction_[k] = a;
-
-        auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-        auto* input = winData->input;
-        auto* tickClock = winData->tickClock;
-
-        double xPos(0), yPos(0);
-        glfwGetCursorPos(window, &xPos, &yPos);
-
-        input->mouseSignal_.Collect(input->collector_,
-                                   MouseEvent{k, a, a == KeyAction::Release ? 0.f : 1.f, tickClock->GetTick(), static_cast<float>(xPos), static_cast<float>(yPos)});
-    
-        if (externalCallbacks_.mouseButton)
-            externalCallbacks_.mouseButton(window, button, action, mods);
-    }
-
-    void Input::OnMouseMoveEvent(GLFWwindow* window, double xpos, double ypos)
-    {
-        auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-        auto* input = winData->input;
-        auto* tickClock = winData->tickClock;
-
-        input->moveSignal_.Collect(input->collector_,
-            MouseMoveEvent{ tickClock->GetTick(), static_cast<float>(xpos), static_cast<float>(ypos) });
-
-        if (externalCallbacks_.mouseMove)
-            externalCallbacks_.mouseMove(window, xpos, ypos);
-    }
-    
-    void Input::OnScrollEvent(GLFWwindow* window, double xoffset, double yoffset)
-    {
-        if (externalCallbacks_.scroll)
-            externalCallbacks_.scroll(window, xoffset, yoffset);
-    }
-
-    void Input::OnCharacterEvent(GLFWwindow* window, unsigned int codepoint)
-    {
-        if (externalCallbacks_.character)
-            externalCallbacks_.character(window, codepoint);
     }
 }

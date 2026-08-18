@@ -11,12 +11,12 @@ namespace tomato
         const glm::vec3& eulerRot,
         const glm::vec3& scl)
     : position(pos)
-    , eulerDegree(eulerRot), lRotation(glm::quat(glm::radians(eulerDegree)))
+    , rotation(glm::quat(glm::radians(eulerRot)))
     , scale(scl) {}
 
-    void TransformComponent::AddPosition(const glm::vec3& offset)
+    void TransformComponent::AddPosition(const glm::vec3& delta)
     {
-        position += offset;
+        position += delta;
         dirty = true;
     }
 
@@ -32,17 +32,36 @@ namespace tomato
         dirty = true;
     }
 
-    void TransformComponent::SetEulerDegree(const glm::vec3& newRot)
+    void TransformComponent::AddRotationDegree(const glm::vec3& delta)
     {
-        eulerDegree = newRot;
-        lRotation = glm::quat(glm::radians(eulerDegree));
+        rotation *= glm::quat(glm::radians(delta));
         dirty = true;
     }
 
-    void TransformComponent::SetEulerDegree(const float x, const float y, const float z)
+    void TransformComponent::SetRotationDegree(const glm::vec3& newRot)
     {
-        eulerDegree = glm::vec3{x, y, z};
-        lRotation = glm::quat(glm::radians(eulerDegree));
+        rotation = glm::quat(glm::radians(newRot));
+        dirty = true;
+    }
+
+    void TransformComponent::SetRotationDegree(const float x, const float y, const float z)
+    {
+        glm::vec3 eulerDegree{x, y, z};
+        rotation = glm::quat(glm::radians(eulerDegree));
+        dirty = true;
+    }
+
+    void TransformComponent::AddQuaternion(const glm::quat& delta)
+    {
+        rotation *= delta;
+        rotation = glm::normalize(rotation);
+        dirty = true;
+    }
+
+    void TransformComponent::SetQuaternion(const glm::quat& newQuat)
+    {
+        rotation = newQuat;
+        rotation = glm::normalize(rotation);
         dirty = true;
     }
 

@@ -13,8 +13,8 @@ namespace tomato
 	class InputUI
 	{
 	public:
-		bool OnClick(const MouseEvent& mouseEvent);
-		bool OnHover(const MouseMoveEvent& moveEvent);
+		bool OnClick(const MouseButtonEvent& mouseEvent);
+		bool OnHover(const CursorPosEvent& moveEvent);
 
 		void SetState(State* newState);
 

@@ -1,23 +1,27 @@
-#ifndef MANGO_INPUTCONSTANTS_H
-#define MANGO_INPUTCONSTANTS_H
+#ifndef MANGO_INPUTINTENT_H
+#define MANGO_INPUTINTENT_H
 
 #include <cstdint>
 
 namespace tomato {
     /**
-     * @brief Bitmask for logical player intents for a single simulation tick.
+     * @brief User-extensible bitmask of logical player actions for a single simulation tick.
+     *
+     * 각 비트는 물리 키가 아니라 Jump와 같은 의미가 있는 액션을 나타내며,
+     * IntentTranslator의 바인딩 테이블에서 실제 물리 키와 연결할 수 있다.
      */
     enum class InputIntent : uint32_t
     {
         None    = 0,
 
-        // 1P
         Up      = 1 << 0,
         Down    = 1 << 1,
         Left    = 1 << 2,
         Right   = 1 << 3,
 
         Jump    = 1 << 4,
+
+        //--------------------
 
         TurnLeft    = 1 << 5,
         TurnRight   = 1 << 6,
@@ -42,4 +46,4 @@ namespace tomato {
     };
 }
 
-#endif //MANGO_INPUTCONSTANTS_H
+#endif //MANGO_INPUTINTENT_H

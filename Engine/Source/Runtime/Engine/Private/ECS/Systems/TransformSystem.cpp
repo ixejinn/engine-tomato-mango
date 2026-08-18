@@ -40,10 +40,10 @@ namespace tomato
         {
             // Scale → Rotate → Translate
             auto T = glm::translate(glm::mat4(1.f), trf.position);
-            auto R = glm::toMat4(trf.lRotation);
+            auto R = glm::toMat4(trf.rotation);
             auto S = glm::scale(glm::mat4(1.f), trf.scale);
 
-            trf.wRotation = pQuat * trf.lRotation;
+            trf.wRotation = pQuat * trf.rotation;
             trf.wScale = pScale * trf.scale;
             trf.transformMatrix = pMatrix * (T * R * S);
             trf.dirty = false;
@@ -79,10 +79,10 @@ namespace tomato
             auto& targetTrf = reg.get<TransformComponent>(GetEntityByUUID(reg, runtime.target));
 
             auto T = glm::translate(glm::mat4(1.f), trf.position);
-            auto R = glm::toMat4(trf.lRotation);
+            auto R = glm::toMat4(trf.rotation);
             auto S = glm::scale(glm::mat4(1.f), trf.scale);
 
-            trf.wRotation = targetTrf.wRotation * trf.lRotation;
+            trf.wRotation = targetTrf.wRotation * trf.rotation;
             trf.wScale = targetTrf.wScale * trf.scale;
             trf.transformMatrix = targetTrf.transformMatrix * (T * R * S);
             trf.dirty = false;

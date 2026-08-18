@@ -2,7 +2,7 @@
 #define MANGO_BITMASKFWD_H
 
 #include <type_traits>
-#include "Input/InputConstantsFwd.h"
+#include "Input/InputIntentFwd.h"
 #include "Collision/CollisionConstantsFwd.h"
 #include "ECS/Forward/SystemFrameworkFwd.h"
 #include "Serialization/ComponentInfo.h"

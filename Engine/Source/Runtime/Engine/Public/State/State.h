@@ -6,6 +6,7 @@
 #include <typeindex>
 #include <entt/entity/registry.hpp>
 #include "State/StateFwd.h"
+#include "Services/ServiceFwd.h"
 #include "UUID.h"
 #include "TomatoFwd.h"
 
@@ -21,13 +22,15 @@ namespace tomato
         virtual void Update() = 0;
         virtual void Exit() = 0;
 
-        Engine& GetEngine() { return engine_; }
+        Engine& GetEngine() { return engine_; }     /////////
         entt::registry& GetRegistry() { return registry_; }
         std::unordered_map<UUID, entt::entity>& GetEntityMap() { return entityMap_; }
 
+        Window& GetWindow();
+
         PlayerInputTimelines& GetPlayerInputTimelines() { return playerInputs_; }
 
-        void SetPlayerInput(uint32_t tick, InputRecord input, int playerID);
+        void SetPlayerInput(uint32_t tick, IntentState input, int playerID);
 
     protected:
         Engine& engine_;

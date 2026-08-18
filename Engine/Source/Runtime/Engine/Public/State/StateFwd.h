@@ -3,13 +3,13 @@
 
 #include <array>
 #include "Containers/Timeline.h"
-#include "Input/InputRecord.h"
+#include "Input/IntentState.h"
 #include "GameplayConfig.h"
 
 namespace tomato {
     class State;
 
-    using PlayerInputTimelines = std::array<Timeline<InputRecord>, MAX_PLAYER_NUM>;
+    using PlayerInputTimelines = std::array<Timeline<IntentState>, MAX_PLAYER_NUM>;
 }
 
 #endif //MANGO_STATEFWD_H
