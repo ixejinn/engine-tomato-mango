@@ -24,14 +24,28 @@ namespace tomato
         //// Start free looking
         if (!isFreeLooking_ && keyDeviceState.IsKeyPressed(Key::RightMouseButton))
         {
+//            std::cout << "((((( start free looking\n";
             isFreeLooking_ = true;
 
             preCursorPos.x = keyDeviceState.GetKeyState(Key::MouseX);
             preCursorPos.y = keyDeviceState.GetKeyState(Key::MouseY);
             freeLookStartEulerRad = registry.get<TransformComponent>(renderCtx.editorCam).GetWorldRotationRadian();
 
+            constexpr float rad180 = glm::radians(180.f);
+            if (freeLookStartEulerRad.x > glm::radians(89.f))
+            {
+                freeLookStartEulerRad.x -= rad180;
+                freeLookStartEulerRad.y += rad180; freeLookStartEulerRad.y *= -1;
+                freeLookStartEulerRad.z -= rad180;
+            }
+            else if (freeLookStartEulerRad.x < glm::radians(-89.f))
+            {
+                freeLookStartEulerRad.x += rad180;
+                freeLookStartEulerRad.y -= rad180; freeLookStartEulerRad.y *= -1;
+                freeLookStartEulerRad.z += rad180;
+            }
+
             simCtx.state->GetWindow().SetCursorDisable(true);
-//            std::cout << "(( press " << keyDeviceState.GetKeyState(Key::MouseX) << " " << keyDeviceState.GetKeyState(Key::MouseY) << "\n";
         }
 
         if (isFreeLooking_)
@@ -39,10 +53,10 @@ namespace tomato
             //// Finish free looking
             if (keyDeviceState.IsKeyReleased(Key::RightMouseButton))
             {
+//                std::cout << "))))) finish free looking\n";
                 isFreeLooking_ = false;
 
                 simCtx.state->GetWindow().SetCursorDisable(false);
-//                std::cout << "(( release " << keyDeviceState.GetKeyState(Key::MouseX) << " " << keyDeviceState.GetKeyState(Key::MouseY) << "\n";
                 return;
             }
 
