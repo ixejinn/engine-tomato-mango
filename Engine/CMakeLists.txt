@@ -189,6 +189,8 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Systems/EditorCameraSystem.h
 		Source/Runtime/Engine/Public/ECS/Systems/PlayerCameraSystem.h
 		Source/Runtime/Engine/Public/Input/KeyDeviceState.h
+		Source/Runtime/Engine/Public/ECS/SystemFramework/ChangeRunModeEvent.h
+		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemFrameworkEventFwd.h
 )
 
 set(ENGINE_SOURCES

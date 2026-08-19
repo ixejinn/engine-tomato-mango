@@ -1,5 +1,6 @@
 ﻿#include "ECS/SystemFramework/SystemRegistry.h"
 #include "ECS/SystemFramework/SystemManager.h"
+#include "ECS/SystemFramework/ChangeRunModeEvent.h"
 #include "ECS/Systems/Systems.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 #include "Event/EventDispatcher.h"
@@ -71,6 +72,8 @@ namespace tomato
         auto& eventDispatcher = EventDispatcher::GetInstance();
         eventDispatcher.Connect<TriggerEnterEvent, &CharacterMovement::OnTriggerEnter_UpdateMovementMode>();
         eventDispatcher.Connect<TriggerExitEvent, &CharacterMovement::OnTriggerExit_UpdateMovementMode>();
+
+        eventDispatcher.Connect<ChangeRunModeEvent>();
 
         eventDispatcher.Connect<LandingEvent>();
         eventDispatcher.Connect<ChangeMovementModeEvent>();

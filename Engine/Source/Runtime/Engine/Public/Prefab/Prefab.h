@@ -7,27 +7,32 @@
 
 namespace tomato::Prefab
 {
-    enum Primitive {
+    enum Primitive
+    {
         Cube,
         Sphere
     };
 
-    entt::entity CreateEmpty(entt::registry& reg,
-                            Primitive mesh = Cube,
-                            glm::vec3 pos = glm::vec3{ 0.f });
+    entt::entity CreateEmpty(
+            entt::registry& reg,
+            Primitive mesh = Cube,
+            glm::vec3 pos = glm::vec3{ 0.f });
 
-    entt::entity CreateStaticObject(entt::registry& reg,
-                                    Primitive mesh = Cube,
-                                    glm::vec3 pos = glm::vec3{0.f});
+    entt::entity CreateStaticObject(
+            entt::registry& reg,
+            Primitive mesh = Cube,
+            glm::vec3 pos = glm::vec3{0.f});
    
-    entt::entity CreateCharacter(entt::registry& reg,
-                                Primitive mesh = Cube,
-                                glm::vec3 pos = glm::vec3{0.f});
+    entt::entity CreateCharacter(
+            entt::registry& reg,
+            Primitive mesh = Cube,
+            glm::vec3 pos = glm::vec3{0.f});
 
-    entt::entity CreateCamera(entt::registry& reg,
-                               bool isMain = true,
-                               glm::vec3 pos = {0.f, 7.5f, 15.f},
-                               glm::vec3 rot = {-30.f, 0.f, 0.f});
+    entt::entity CreateCamera(
+            entt::registry& reg,
+            bool isMain = true,
+            glm::vec3 pos = {0.f, 1.f, 10.f},
+            glm::vec3 rot = {0.f, 0.f, 0.f});
 
     entt::entity CreateSkybox(entt::registry& reg);
 

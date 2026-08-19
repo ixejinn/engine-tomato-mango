@@ -1,0 +1,9 @@
+#ifndef MANGO_SYSTEMFRAMEWORKEVENTFWD_H
+#define MANGO_SYSTEMFRAMEWORKEVENTFWD_H
+
+namespace tomato
+{
+    struct ChangeRunModeEvent;
+}
+
+#endif //MANGO_SYSTEMFRAMEWORKEVENTFWD_H
