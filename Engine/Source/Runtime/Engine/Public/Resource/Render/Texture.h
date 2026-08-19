@@ -31,10 +31,10 @@ namespace tomato {
         Texture(const std::filesystem::path& path, Format format = Format::RGBA8);
 
         /**
-         *
-         * @param filenames right, left, top, bottom, front, back
+         * @brief Constructor for cubemap texture
+         * @param filenames vector for right, left, top, bottom, front, back texture names.
          */
-        Texture(std::vector<const char*> filenames, Format format = Format::RGB8);
+        Texture(const std::vector<const char*>& filenames, Format format = Format::RGB8);
 
     public:
         ~Texture();

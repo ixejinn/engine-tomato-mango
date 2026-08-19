@@ -64,7 +64,7 @@ namespace tomato {
 
     Texture::Texture(const std::filesystem::path& path, Format format) : Texture(path.string().c_str(), format) {}
 
-    Texture::Texture(std::vector<const char*> filenames, Format format) : format_(ConvertFormatGL(format))
+    Texture::Texture(const std::vector<const char*>& filenames, Format format) : format_(ConvertFormatGL(format))
     {
         if (filenames.size() < 6)
         {
@@ -72,7 +72,7 @@ namespace tomato {
             return;
         }
 
-        stbi_set_flip_vertically_on_load(true);
+        stbi_set_flip_vertically_on_load(false);
 
         glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &textureID_);
 
@@ -85,6 +85,17 @@ namespace tomato {
         glTextureParameteri(textureID_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTextureParameteri(textureID_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+        // Upload textures for 6 sides
+        int actualCh;
+        unsigned char* images[6];
+        for (int i = 0; i < 6; ++i)
+        {
+            images[i] = stbi_load(filenames[i], &width_, &height_, &actualCh, format_.channels);
+
+            if (images[i] && format_.channels != 0 && actualCh > format_.channels)
+                TMT_WARN << "Data loss occurs: " << filenames[i];
+        }
+
         // Allocate immutable storage for the texture (6개 면을 위한 메모리가 한 번에 할당)
         glTextureStorage2D(textureID_, 1, format_.internalFormat, width_, height_);
 
@@ -94,22 +105,15 @@ namespace tomato {
         // Set to 1 byte alignment to handle any image format
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-        // Upload textures for 6 sides
+        // Copy textures to GPU
         for (int i = 0; i < 6; ++i)
         {
-            int actualCh;
-            unsigned char* image = stbi_load(filenames[i], &width_, &height_, &actualCh, format_.channels);
-            if (image)
-            {
-                if (format_.channels != 0 && actualCh > format_.channels)
-                    TMT_WARN << "Data loss occurs: " << filenames[i];
-
-                glTextureSubImage3D(textureID_, 0, 0, 0, i, width_, height_, 1, format_.format, format_.type, image);
-            }
+            if (images[i])
+                glTextureSubImage3D(textureID_, 0, 0, 0, i, width_, height_, 1, format_.format, format_.type, images[i]);
             else
                 TMT_ERR << "Failed to load cubemap texture: " << filenames[i];
 
-            stbi_image_free(image);
+            stbi_image_free(images[i]);
         }
 
         // Restore previous alignment

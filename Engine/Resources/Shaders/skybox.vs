@@ -8,8 +8,8 @@ uniform mat4 uViewProj;
 
 void main()
 {
-	vec4 position = uModel * vec4(aPos, 1.0);
-    gl_Position = uViewProj * position;
+	vec4 position = uViewProj * uModel * vec4(aPos, 1.0);
+    gl_Position = position.xyww;
 
 	vTexDir = aPos;
 }

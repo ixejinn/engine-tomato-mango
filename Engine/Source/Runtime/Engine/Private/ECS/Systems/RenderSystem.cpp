@@ -52,7 +52,7 @@ namespace tomato
             TMT_WARN << "Main camera is not found.";
             return;
         }
-        auto* viewProjMat = registry.try_get<CameraComponent>(mainCam);
+        auto* mainCamComp = registry.try_get<CameraComponent>(mainCam);
 
         Mesh* mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
         mesh->Bind();
@@ -96,7 +96,7 @@ namespace tomato
 
             const auto& mtx = trf.GetTransformMatrix();
             shader->SetUniformMat4("uModel", mtx);
-            shader->SetUniformMat4("uViewProj", viewProjMat == nullptr ? glm::mat4(1.f) : viewProjMat->viewProjMat);
+            shader->SetUniformMat4("uViewProj", mainCamComp == nullptr ? glm::mat4(1.f) : mainCamComp->viewProjMat);
             shader->SetUniformMat3("uNormal", glm::transpose(glm::inverse(glm::mat3(mtx))));
 
             shader->SetUniformInt("uTexture", 0);
@@ -111,7 +111,30 @@ namespace tomato
 
         if (skybox != entt::null)
         {
-            /////////////////////
+            if (!IsVisible(registry, skybox))
+                return;
+
+            glCullFace(GL_FRONT);
+            glDepthFunc(GL_LEQUAL);
+
+            Shader* skyShader = AssetRegistry<Shader>::GetInstance().Get(GetAssetID("SkyboxShader"));
+            skyShader->Use();
+
+            Texture* skyTexture = AssetRegistry<Texture>::GetInstance().Get(GetAssetID("PrimitiveSkybox"));
+            skyTexture->Bind();
+
+            Mesh* skyMesh = AssetRegistry<Mesh>::GetInstance().Get(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)));
+            skyMesh->Bind();
+
+            skyShader->SetUniformMat4("uModel", glm::mat4(1.f));
+            auto viewMtx = glm::mat4(glm::mat3(mainCamComp == nullptr ? glm::mat4(1.f) : mainCamComp->view));
+            skyShader->SetUniformMat4("uViewProj", mainCamComp->projection * viewMtx);
+            skyShader->SetUniformInt("uCubemap", 0);
+
+            skyMesh->Draw();
+
+            glCullFace(GL_BACK);
+            glDepthFunc(GL_LESS);
         }
     }
 
