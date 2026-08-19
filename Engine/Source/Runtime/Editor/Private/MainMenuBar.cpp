@@ -18,6 +18,10 @@
 #include "Utils/FileDialog.h"
 #include "Resource/PathManager.h"
 #include <iostream>
+
+#include "Event/EventDispatcher.h"
+#include "ECS/SystemFramework/ChangeRunModeEvent.h"
+
 namespace tomato
 {
 	void MainMenuBar::Draw(EditorContext& eCtx, RunMode& mode)
@@ -64,6 +68,8 @@ namespace tomato
 
 	void MainMenuBar::EditModeButton(EditorContext& eCtx, RunMode& mode)
 	{
+        RunMode preMode = mode;
+
 		float buttonX = ImGui::GetContentRegionAvail().x;
 		ImGui::SetCursorPosX(buttonX / 2.f);
 
@@ -94,6 +100,9 @@ namespace tomato
 			mode = RunMode::Editor;
 		}
 		ImGui::EndDisabled();
+
+        if (preMode != mode)
+            EventDispatcher::GetInstance().Enqueue(ChangeRunModeEvent{mode});
 	}
 
 	void MainMenuBar::NewScene(EditorContext& eCtx)

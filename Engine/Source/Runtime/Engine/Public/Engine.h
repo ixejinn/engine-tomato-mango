@@ -57,7 +57,6 @@ namespace tomato
 
         Editor editor_;
 
-        void InitializeNetwork();
         void ProcessQueuedPackets(TickClock& tc);
         std::unique_ptr<ClientNetwork> network_{ nullptr };
         std::unique_ptr<GamePlayNetSystem> gameNet_{ nullptr };
@@ -75,6 +74,9 @@ namespace tomato
         SystemManager systemManager_;
 
         bool isRunning_{true};
+
+        void InitializeInputCallbacks();
+        void InitializeNetwork();
     };
 }
 

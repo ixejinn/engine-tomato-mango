@@ -18,9 +18,11 @@ using namespace std::chrono_literals;
 namespace tomato {
     Engine::Engine(const int width, const int height, const char* title, NetMode netMode)
         : window_(width, height, title)
-        , input_(window_, intentTranslator_, inputUI_)
+        , input_(window_)
         , netMode_(netMode)
     {
+        InitializeInputCallbacks();
+
         InitializeNetwork();
         editor_.InitImGui(window_.GetHandle(), input_);
 
@@ -200,17 +202,6 @@ namespace tomato {
         }
     }
 
-    void Engine::InitializeNetwork()
-    {
-        network_ = std::make_unique<ClientNetwork>();
-        gameNet_ = std::make_unique<GamePlayNetSystem>(currState_.get());
-        network_->SetGameplaySystem(gameNet_.get());
-        gameNet_->SetNetwork(network_.get());
-
-        if (!rollbackManager_)
-            rollbackManager_ = std::make_unique<RollbackManager>();
-    }
-
     void Engine::ProcessQueuedPackets(TickClock& tc)
     {
         gameNet_->InitializeConfirmedTick(tc.GetTick()); // for rollback
@@ -236,5 +227,24 @@ namespace tomato {
             ++simCtx.tick;
             rollbackManager_->Capture(simCtx);
         }
+    }
+
+    void Engine::InitializeInputCallbacks()
+    {
+        input_.keySignal_.Connect<&IntentTranslator::OnKeyEvent>(intentTranslator_);
+        input_.cursorSignal_.Connect<&InputUI::OnHover>(inputUI_);
+        input_.mouseSignal_.Connect<&IntentTranslator::OnMouseButtonEvent>(intentTranslator_);
+        input_.mouseSignal_.Connect<&InputUI::OnClick>(inputUI_);
+    }
+
+    void Engine::InitializeNetwork()
+    {
+        network_ = std::make_unique<ClientNetwork>();
+        gameNet_ = std::make_unique<GamePlayNetSystem>(currState_.get());
+        network_->SetGameplaySystem(gameNet_.get());
+        gameNet_->SetNetwork(network_.get());
+
+        if (!rollbackManager_)
+            rollbackManager_ = std::make_unique<RollbackManager>();
     }
 }

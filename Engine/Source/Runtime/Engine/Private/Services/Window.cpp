@@ -2,8 +2,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Services/Window.h"
+#include "Services/ChangeFramebufferSizeEvent.h"
 #include "Utils/Logger.h"
 #include "Simulation/Tick/TickClock.h"
+#include "Event/EventDispatcher.h"
 
 namespace tomato {
     int Window::width_ = 0;
@@ -33,6 +35,7 @@ namespace tomato {
         //glfwSwapInterval(1);
 
         glfwSetFramebufferSizeCallback(handle_, OnFramebufferSizeChanged);
+        EventDispatcher::GetInstance().Connect<ChangeFramebufferSizeEvent>();
 
         // [GLAD] load all OpenGL function pointers
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -103,5 +106,7 @@ namespace tomato {
         height_ = height;
 
         glViewport(0, 0, width, height);
+
+        EventDispatcher::GetInstance().Enqueue(ChangeFramebufferSizeEvent{width, height});
     }
 }

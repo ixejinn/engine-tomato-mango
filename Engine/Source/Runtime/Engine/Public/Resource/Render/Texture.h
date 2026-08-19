@@ -2,6 +2,7 @@
 #define MANGO_TEXTURE_H
 
 #include <filesystem>
+#include <vector>
 #include <glad/glad.h>
 
 namespace tomato {
@@ -29,6 +30,12 @@ namespace tomato {
         Texture(const char* filename, Format format = Format::RGBA8);
         Texture(const std::filesystem::path& path, Format format = Format::RGBA8);
 
+        /**
+         * @brief Constructor for cubemap texture
+         * @param filenames vector for right, left, top, bottom, front, back texture names.
+         */
+        Texture(const std::vector<const char*>& filenames, Format format = Format::RGB8);
+
     public:
         ~Texture();
 
@@ -40,8 +47,8 @@ namespace tomato {
         void Bind() const;
 
         GLuint GetTexture() const { return textureID_; }
-        int GetWidth() const { return width; }
-        int GetHeight() const { return height; }
+        int GetWidth() const { return width_; }
+        int GetHeight() const { return height_; }
     private:
         struct GLFormat
         {
@@ -55,7 +62,7 @@ namespace tomato {
 
         GLuint textureID_{0};
         GLFormat format_;
-        int width, height;
+        int width_, height_;
     };
 }
 

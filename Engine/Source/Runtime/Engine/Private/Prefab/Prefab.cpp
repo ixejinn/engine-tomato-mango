@@ -103,6 +103,18 @@ namespace tomato::Prefab
         return obj;
     }
 
+    entt::entity CreateSkybox(entt::registry& reg)
+    {
+        const entt::entity obj = reg.create();
+
+        reg.emplace<NametagComponent>(obj, GenerateUUID(), GenerateEntityName(reg, "Skybox"));
+        reg.emplace<TransformComponent>(obj);
+        reg.emplace<VisibilityComponent>(obj);
+        reg.emplace<RootEntityTag>(obj);
+
+        return obj;
+    }
+
     entt::entity AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
         const entt::entity col = reg.create();
         reg.emplace<NametagComponent>(col, GenerateUUID(), GenerateEntityName(reg, "Collider"));

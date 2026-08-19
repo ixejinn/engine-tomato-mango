@@ -31,14 +31,15 @@ namespace tomato {
         glTextureParameteri(textureID_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         int actualCh;
-        if (unsigned char* image = stbi_load(filename, &width, &height, &actualCh, format_.channels))
+        unsigned char* image = stbi_load(filename, &width_, &height_, &actualCh, format_.channels);
+        if (image)
         {
             if (format_.channels != 0 && actualCh > format_.channels)
                 TMT_WARN << "Data loss occurs: " << filename;
 
             // Allocate immutable storage for the texture
-            auto levels = static_cast<GLsizei>(std::floor(std::log2(std::max(width, height))) + 1);    // for mipmaps
-            glTextureStorage2D(textureID_, levels, format_.internalFormat, width, height);
+            auto levels = static_cast<GLsizei>(std::floor(std::log2(std::max(width_, height_))) + 1);    // for mipmaps
+            glTextureStorage2D(textureID_, levels, format_.internalFormat, width_, height_);
 
             // Get current alignment to restore it later
             GLint prevAlign = 0;
@@ -47,21 +48,77 @@ namespace tomato {
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
             // Upload pixel data to allocated storage
-            glTextureSubImage2D(textureID_, 0, 0, 0, width, height, format_.format, format_.type, image);
+            glTextureSubImage2D(textureID_, 0, 0, 0, width_, height_, format_.format, format_.type, image);
 
             // Restore previous alignment
             glPixelStorei(GL_UNPACK_ALIGNMENT, prevAlign);
 
             // Generate mipmaps for texture
             glGenerateTextureMipmap(textureID_);
-
-            stbi_image_free(image);
         }
         else
             TMT_ERR << "Failed to load texture: " << filename;
+
+        stbi_image_free(image);
     }
 
     Texture::Texture(const std::filesystem::path& path, Format format) : Texture(path.string().c_str(), format) {}
+
+    Texture::Texture(const std::vector<const char*>& filenames, Format format) : format_(ConvertFormatGL(format))
+    {
+        if (filenames.size() < 6)
+        {
+            TMT_ERR << "Invalid cubemap texture vector size: " << filenames.size();
+            return;
+        }
+
+        stbi_set_flip_vertically_on_load(false);
+
+        glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &textureID_);
+
+        // Set wrapping options
+        glTextureParameteri(textureID_, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(textureID_, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(textureID_, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+        // Set filtering options
+        glTextureParameteri(textureID_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(textureID_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        // Upload textures for 6 sides
+        int actualCh;
+        unsigned char* images[6];
+        for (int i = 0; i < 6; ++i)
+        {
+            images[i] = stbi_load(filenames[i], &width_, &height_, &actualCh, format_.channels);
+
+            if (images[i] && format_.channels != 0 && actualCh > format_.channels)
+                TMT_WARN << "Data loss occurs: " << filenames[i];
+        }
+
+        // Allocate immutable storage for the texture (6개 면을 위한 메모리가 한 번에 할당)
+        glTextureStorage2D(textureID_, 1, format_.internalFormat, width_, height_);
+
+        // Get current alignment to restore it later
+        GLint prevAlign = 0;
+        glGetIntegerv(GL_UNPACK_ALIGNMENT, &prevAlign);
+        // Set to 1 byte alignment to handle any image format
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        // Copy textures to GPU
+        for (int i = 0; i < 6; ++i)
+        {
+            if (images[i])
+                glTextureSubImage3D(textureID_, 0, 0, 0, i, width_, height_, 1, format_.format, format_.type, images[i]);
+            else
+                TMT_ERR << "Failed to load cubemap texture: " << filenames[i];
+
+            stbi_image_free(images[i]);
+        }
+
+        // Restore previous alignment
+        glPixelStorei(GL_UNPACK_ALIGNMENT, prevAlign);
+    }
 
     Texture::~Texture()
     {
@@ -71,8 +128,18 @@ namespace tomato {
 
     void Texture::Create()
     {
-        std::unique_ptr<Texture> ptr{new Texture};
-        AssetRegistry<Texture>::GetInstance().Register(PrimitiveName, std::move(ptr));
+        std::unique_ptr<Texture> whitePtr{new Texture};
+        AssetRegistry<Texture>::GetInstance().Register(PrimitiveName, std::move(whitePtr));
+
+        std::vector<const char*> skyboxFilenames(6);
+        skyboxFilenames[0] = "Resources/Engine/Textures/Cubemaps/skybox/right.jpg";
+        skyboxFilenames[1] = "Resources/Engine/Textures/Cubemaps/skybox/left.jpg";
+        skyboxFilenames[2] = "Resources/Engine/Textures/Cubemaps/skybox/top.jpg";
+        skyboxFilenames[3] = "Resources/Engine/Textures/Cubemaps/skybox/bottom.jpg";
+        skyboxFilenames[4] = "Resources/Engine/Textures/Cubemaps/skybox/front.jpg";
+        skyboxFilenames[5] = "Resources/Engine/Textures/Cubemaps/skybox/back.jpg";
+        std::unique_ptr<Texture> skyboxPtr{new Texture(skyboxFilenames)};
+        AssetRegistry<Texture>::GetInstance().Register("PrimitiveSkybox", std::move(skyboxPtr));
     }
 
     void Texture::Create(const char* filename, Format format)

@@ -10,7 +10,7 @@
 
 namespace tomato
 {
-    Input::Input(Window& window, IntentTranslator& recorder, InputUI& inputUI)
+    Input::Input(Window& window)
     {
         auto* windowHandle = window.GetHandle();
         glfwSetKeyCallback(windowHandle, OnKeyEvent);
@@ -18,11 +18,6 @@ namespace tomato
         glfwSetCursorPosCallback(windowHandle, OnCursorPosEvent);
         glfwSetScrollCallback(windowHandle, OnScrollEvent);
         glfwSetCharCallback(windowHandle, OnCharEvent);
-
-        keySignal_.Connect<&IntentTranslator::OnKeyEvent>(recorder);
-        cursorSignal_.Connect<&InputUI::OnHover>(inputUI);
-        mouseSignal_.Connect<&IntentTranslator::OnMouseButtonEvent>(recorder);
-        mouseSignal_.Connect<&InputUI::OnClick>(inputUI);
     }
 
     void Input::OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)

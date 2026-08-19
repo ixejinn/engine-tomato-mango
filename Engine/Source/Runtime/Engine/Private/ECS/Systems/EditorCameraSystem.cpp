@@ -6,13 +6,20 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Systems/EditorCameraSystem.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
+#include "ECS/SystemFramework/ChangeRunModeEvent.h"
 #include "Simulation/SimulationConfig.h"
 #include "State/State.h"
 #include "Input/KeyDeviceState.h"
 #include "Services/Window.h"
+#include "Event/EventDispatcher.h"
 
 namespace tomato
 {
+    EditorCameraSystem::EditorCameraSystem()
+    {
+        EventDispatcher::GetInstance().Connect<ChangeRunModeEvent, &EditorCameraSystem::OnChangeRunMode>(*this);
+    }
+
     void EditorCameraSystem::Update(SimContext& simCtx)
     {
         auto& registry = simCtx.state->GetRegistry();
@@ -21,17 +28,31 @@ namespace tomato
 
         auto& keyDeviceState = KeyDeviceState::GetInstance();
 
-        //// Start free looking
-        if (!isFreeLooking_ && keyDeviceState.IsKeyPressed(Key::RightMouseButton))
+        if (!isFreeLooking_)
         {
-            isFreeLooking_ = true;
+            if (resetTrf_)
+            {
+                resetTrf_ = false;
 
-            preCursorPos.x = keyDeviceState.GetKeyState(Key::MouseX);
-            preCursorPos.y = keyDeviceState.GetKeyState(Key::MouseY);
-            freeLookStartEulerRad = registry.get<TransformComponent>(renderCtx.editorCam).GetWorldRotationRadian();
+                camPos = INIT_POS;
+                camRad = INIT_RAD;
 
-            simCtx.state->GetWindow().SetCursorDisable(true);
-//            std::cout << "(( press " << keyDeviceState.GetKeyState(Key::MouseX) << " " << keyDeviceState.GetKeyState(Key::MouseY) << "\n";
+                auto& trf = registry.get<TransformComponent>(renderCtx.editorCam);
+                trf.SetPosition(camPos);
+                trf.SetQuaternion(glm::quat(camRad));
+            }
+
+            //// Start free looking
+            if (keyDeviceState.IsKeyPressed(Key::RightMouseButton))
+            {
+//            std::cout << "((((( start free looking\n";
+                isFreeLooking_ = true;
+
+                preCursorPos.x = keyDeviceState.GetKeyState(Key::MouseX);
+                preCursorPos.y = keyDeviceState.GetKeyState(Key::MouseY);
+
+                simCtx.state->GetWindow().SetCursorDisable(true);
+            }
         }
 
         if (isFreeLooking_)
@@ -39,10 +60,10 @@ namespace tomato
             //// Finish free looking
             if (keyDeviceState.IsKeyReleased(Key::RightMouseButton))
             {
+//                std::cout << "))))) finish free looking\n";
                 isFreeLooking_ = false;
 
                 simCtx.state->GetWindow().SetCursorDisable(false);
-//                std::cout << "(( release " << keyDeviceState.GetKeyState(Key::MouseX) << " " << keyDeviceState.GetKeyState(Key::MouseY) << "\n";
                 return;
             }
 
@@ -57,14 +78,13 @@ namespace tomato
             const float yawDelta = glm::atan(deltaCursorPos.x, MOUSE_LOOK_SENSITIVITY_DIST);
             const float pitchDelta = glm::atan(deltaCursorPos.y, MOUSE_LOOK_SENSITIVITY_DIST);
 
-            freeLookStartEulerRad.y -= yawDelta;
-            freeLookStartEulerRad.x -= pitchDelta;
-            freeLookStartEulerRad.x = glm::clamp(freeLookStartEulerRad.x,
-                                                 glm::radians(-89.f), glm::radians(89.f));
+            camRad.y -= yawDelta;
+            camRad.x -= pitchDelta;
+            camRad.x = glm::clamp(camRad.x, glm::radians(-89.f), glm::radians(89.f));
 
             trf.SetQuaternion(
-                    glm::angleAxis(freeLookStartEulerRad.y, glm::vec3(0, 1, 0)) *
-                    glm::angleAxis(freeLookStartEulerRad.x, glm::vec3(1, 0, 0)));
+                    glm::angleAxis(camRad.y, glm::vec3(0, 1, 0)) *
+                    glm::angleAxis(camRad.x, glm::vec3(1, 0, 0)));
 
             // Move camera
             int back = 0, right = 0;
@@ -83,13 +103,18 @@ namespace tomato
                 dir /= len;
             dir *= CAMERA_MOVE_SPEED * FIXED_DELTA_TIME;
 
-            const auto wQuat = trf.GetLocalQuaternion();
-            const glm::vec3 b = wQuat * glm::vec3(0, 0, 1);
-            const glm::vec3 r = wQuat * glm::vec3(1, 0, 0);
+            const auto quat = glm::quat(camRad);
+            const glm::vec3 b = quat * glm::vec3(0, 0, 1);
+            const glm::vec3 r = quat * glm::vec3(1, 0, 0);
 
-            trf.AddPosition(dir.x * b + dir.y * r);
+            camPos += (dir.x * b + dir.y * r);
+            trf.SetPosition(camPos);
         }
+    }
 
-
+    void EditorCameraSystem::OnChangeRunMode(const ChangeRunModeEvent &e)
+    {
+        if (e.newMode == RunMode::Editor)
+            resetTrf_ = true;
     }
 }

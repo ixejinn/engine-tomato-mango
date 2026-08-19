@@ -30,6 +30,12 @@ namespace tomato
                 cam.right.z, cam.up.z, cam.back.z, 0,   // column 2
                 -glm::dot(cam.right, pos), -glm::dot(cam.up, pos), -glm::dot(cam.back, pos), 1
             };
+            /** glm::mat4는 column-major이므로 실제 4x4 행렬은
+             *  r.x  r.y  r.z  -dot(r, pos)
+             *  u.x  u.y  r.z  -dot(u, pos)
+             *  b.x  b.y  b.z  -dot(b, pos)
+             *   0    0    0         1
+             */
 
             const float width = static_cast<float>(Window::GetWidth());
             const float height = static_cast<float>(Window::GetHeight());
