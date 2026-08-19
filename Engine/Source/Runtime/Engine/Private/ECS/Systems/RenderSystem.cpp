@@ -28,8 +28,9 @@ namespace tomato
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        if (cullface_)
-            glEnable(GL_CULL_FACE);
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+        glEnable(GL_CULL_FACE);
 
         AssetRegistry<Mesh>::GetInstance().CreatePrimitives();
         AssetRegistry<Texture>::GetInstance().CreatePrimitives();
@@ -40,6 +41,7 @@ namespace tomato
     {
         auto& registry = simCtx.state->GetRegistry();
         auto& mainCam = registry.ctx().get<RenderContext>().mainCam;
+        auto& skybox = registry.ctx().get<RenderContext>().skybox;
 
         glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -105,6 +107,11 @@ namespace tomato
                 mesh->Draw();
             else
                 mesh->Draw(true);
+        }
+
+        if (skybox != entt::null)
+        {
+            /////////////////////
         }
     }
 

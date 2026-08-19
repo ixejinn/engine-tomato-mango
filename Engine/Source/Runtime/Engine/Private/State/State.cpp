@@ -17,6 +17,10 @@ namespace tomato
         // Create editor mode camera
         entt::entity& editCam = registry_.ctx().get<RenderContext>().editorCam;
         editCam = Prefab::CreateCamera(registry_, false);
+
+        // Skybox
+        entt::entity& skybox = registry_.ctx().get<RenderContext>().skybox;
+        skybox = Prefab::CreateSkybox(registry_);
     }
 
     void State::SetNextState(std::unique_ptr<State>&& newState)

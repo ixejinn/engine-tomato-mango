@@ -29,6 +29,9 @@ namespace tomato {
         std::unique_ptr<Shader> shaderPtr{new Shader};
         AssetRegistry<Shader>::GetInstance().Register(PrimitiveName, std::move(shaderPtr));
 
+        std::unique_ptr<Shader> skyboxShaderPtr{ new Shader{"Resources/Engine/Shaders/skybox.vs", "Resources/Engine/Shaders/skybox.fs"} };
+        AssetRegistry<Shader>::GetInstance().Register("SkyboxShader", std::move(skyboxShaderPtr));
+
         std::unique_ptr<Shader> particleShaderPtr{ new Shader{"Resources/Engine/Shaders/billboarding.vs", "Resources/Engine/Shaders/billboarding.fs"} };
         AssetRegistry<Shader>::GetInstance().Register("ParticleShader", std::move(particleShaderPtr));
 

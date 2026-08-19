@@ -29,6 +29,8 @@ namespace tomato::Prefab
                                glm::vec3 pos = {0.f, 7.5f, 15.f},
                                glm::vec3 rot = {-30.f, 0.f, 0.f});
 
+    entt::entity CreateSkybox(entt::registry& reg);
+
     entt::entity AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type);
 
     entt::entity AttachCharacterCollider(entt::registry& reg, entt::entity parent, ColliderType type);
