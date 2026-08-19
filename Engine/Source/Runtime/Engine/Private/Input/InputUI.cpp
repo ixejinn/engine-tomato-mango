@@ -1,18 +1,24 @@
 ﻿#include "Input/InputUI.h"
+#include "Input/InputEvent.h"
 #include "Input/KeyDeviceState.h"
 
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
-#include "Services/Input.h"
-#include "Services/Window.h"
+#include "ECS/SystemFramework/ChangeRunModeEvent.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
+#include "Services/Input.h"
+#include "Services/Window.h"
+#include "Event/EventDispatcher.h"
 #include "State/State.h"
-
-#include <GLFW/glfw3.h>
 
 namespace tomato
 {
+    InputUI::InputUI()
+    {
+        EventDispatcher::GetInstance().Connect<ChangeRunModeEvent, &InputUI::OnChangeRunMode>(*this);
+    }
+
 	bool InputUI::OnClick(const MouseButtonEvent& mouseEvent)
 	{
 		if (currentStatePtr_ == nullptr)
@@ -29,6 +35,9 @@ namespace tomato
 		if (!r.all_of<MouseEventComponent>(currentHovered))
 			return false;
 		auto& mouseEvnt = r.get<MouseEventComponent>(currentHovered);
+
+        if (runMode_ != RunMode::Game)
+            return false;
 
 		if (mouseEvent.action == KeyAction::Press)
 		{
@@ -75,6 +84,11 @@ namespace tomato
 	{
 		currentStatePtr_ = newState;
 	}
+
+    void InputUI::OnChangeRunMode(const tomato::ChangeRunModeEvent &modeEvent)
+    {
+        runMode_ = modeEvent.newMode;
+    }
 
 	bool InputUI::PointInRect(glm::vec2 point, glm::vec2 min, glm::vec2 max)
 	{
