@@ -1,4 +1,4 @@
-﻿#include "ECS/Systems/ScreenUIRenderSystem.h"
+﻿#include "ECS/Systems/WorldUIRenderSystem.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 
 #include "Services/Window.h"
@@ -22,38 +22,41 @@
 
 namespace tomato
 {
-	ScreenUIRenderSystem::ScreenUIRenderSystem()
-    : curMesh_(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)))
-    , curShader_(GetAssetID("UIShader"))
-    , curTexture_(GetAssetID(Texture::PrimitiveName))
+	WorldUIRenderSystem::WorldUIRenderSystem()
+	: curMesh_(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)))
+	, curShader_(GetAssetID("UIShader"))
+	, curTexture_(GetAssetID(Texture::PrimitiveName))
 	{
-        AssetRegistry<Font>::GetInstance().CreatePrimitives();
-        textRenderer_.Init(AssetRegistry<Shader>::GetInstance().Get(GetAssetID("FontShader")));
+		AssetRegistry<Font>::GetInstance().CreatePrimitives();
+		textRenderer_.Init(AssetRegistry<Shader>::GetInstance().Get(GetAssetID("FontShader")));
 	}
 
-	void ScreenUIRenderSystem::Update(SimContext& simCtx)
+	void WorldUIRenderSystem::Update(SimContext& simCtx)
 	{
-        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);
 
-	    auto& registry = simCtx.state->GetRegistry();
+        auto& registry = simCtx.state->GetRegistry();
         auto* uiCtx = registry.ctx().find<UIContext>();
-        if (uiCtx == nullptr)
+        if (!uiCtx)
             return;
+
+        auto& renderCtx = registry.ctx().get<RenderContext>();
+        auto* camera = registry.try_get<CameraComponent>(renderCtx.mainCam);
+
+        if (!camera) return;
 
         Mesh* mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
         mesh->Bind();
 
         Shader* shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
         shader->Use();
-
-        glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(Window::GetWidth()), 0.0f, static_cast<float>(Window::GetHeight()), -1.0f, 1.0f);
         shader->SetUniformInt("tex", 0);
-        shader->SetUniformMat4("uView", glm::mat4(1.0f));
-        shader->SetUniformMat4("uProjection", projection);
+        shader->SetUniformMat4("uView", camera->view);
+        shader->SetUniformMat4("uProjection", camera->projection);
 
         AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
 
-        for (auto e : uiCtx->screenDrawList)
+        for (auto e : uiCtx->worldDrawList)
         {
             auto& ui = registry.get<UIComponent>(e);
             if (ui.type == UIType::Text)
@@ -73,8 +76,8 @@ namespace tomato
                 shader->Use();
 
                 shader->SetUniformInt("tex", 0);
-                shader->SetUniformMat4("uView", glm::mat4(1.0f));
-                shader->SetUniformMat4("uProjection", projection);
+                shader->SetUniformMat4("uView", camera->view);
+                shader->SetUniformMat4("uProjection", camera->projection);
             }
 
             if (curTexture_ != render->texture)
@@ -101,7 +104,7 @@ namespace tomato
         shader->Use();
         shader->SetUniformInt("text", 0);
 
-        for (auto e : uiCtx->screenDrawList)
+        for (auto e : uiCtx->worldDrawList)
         {
             auto& ui = registry.get<UIComponent>(e);
             if (ui.type != UIType::Text)
@@ -125,12 +128,11 @@ namespace tomato
                 text.color,
                 font,
                 rect.model_matrix,
-                projection
+                camera->viewProjMat
             );
         }
         textRenderer_.Flush();
 
-        glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
 	}
 }

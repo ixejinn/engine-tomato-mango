@@ -20,14 +20,14 @@ namespace tomato
 
 	struct CanvasComponent // root
 	{
-		UUID camera; // optinal
-
 		RenderMode mode{RenderMode::ScreenOverlay};
 
 		glm::vec2 actualSize{Window::GetWidth(), Window::GetHeight()};
 		glm::vec2 referenceSize{actualSize};
 
 		int sortOrder{0};
+
+		UUID camera; // optinal
 	};
 
 #define TMT_UI_TYPE_LIST(X)	\

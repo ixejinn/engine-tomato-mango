@@ -58,6 +58,8 @@ namespace tomato
             std::make_unique<UITransformSystem>());
         manager.AddSystem(FramePhase::UI, RunMode::Game | RunMode::Editor,
             std::make_unique<ScreenUIRenderSystem>());
+        manager.AddSystem(FramePhase::UI, RunMode::Game | RunMode::Editor,
+            std::make_unique<WorldUIRenderSystem>());
         for (const auto& factory : frameFactories_[FramePhase::UI])
             manager.AddSystem(FramePhase::UI, factory.mode, factory.factory());
 

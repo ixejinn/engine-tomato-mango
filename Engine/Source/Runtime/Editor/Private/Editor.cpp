@@ -203,9 +203,9 @@ namespace tomato
 	{
 		auto& uiCtx = reg.ctx().get<UIContext>();
 
-		if (!uiCtx.drawList.empty())
+		if (!uiCtx.screenDrawList.empty())
 		{
-			for (auto entity : uiCtx.drawList)
+			for (auto entity : uiCtx.screenDrawList)
 			{
 				auto& rect = reg.get<RectTransformComponent>(entity);
 

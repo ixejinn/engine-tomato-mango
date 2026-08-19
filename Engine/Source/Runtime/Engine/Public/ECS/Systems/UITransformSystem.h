@@ -14,6 +14,7 @@ namespace tomato
 
 	private:
 		void UpdateScreenUI(SimContext& simCtx);
+		void UpdateWorldUI(SimContext& simCtx);
 	};
 }
 #endif // !MANGO_UITRANSFORMSYSTEM_H

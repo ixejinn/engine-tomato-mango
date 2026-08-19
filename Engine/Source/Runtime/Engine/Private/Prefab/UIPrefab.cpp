@@ -21,12 +21,12 @@
 
 namespace tomato::UIPrefab
 {
-	entt::entity CreateCanvas(entt::registry& reg)
+	entt::entity CreateCanvas(entt::registry& reg, RenderMode mode)
 	{
 		const entt::entity canvas = reg.create();
 
         reg.emplace<NametagComponent>(canvas, GenerateUUID(), GenerateEntityName(reg, "Canvas"));
-        reg.emplace<tomato::CanvasComponent>(canvas);
+        reg.emplace<tomato::CanvasComponent>(canvas, mode);
         reg.emplace<tomato::UIComponent>(canvas, (UUID)0, 0, UIType::Canvas);
         reg.emplace<tomato::RectTransformComponent>(canvas);
         reg.emplace<tomato::RootEntityTag>(canvas);
@@ -41,9 +41,9 @@ namespace tomato::UIPrefab
         return canvas;
 	}
 
-    entt::entity CreateButton(entt::registry& reg, glm::vec2 pos)
+    entt::entity CreateButton(entt::registry& reg, entt::entity canvas, glm::vec2 pos)
     {
-        entt::entity canvas = GetCanvas(reg);
+        canvas = canvas == entt::null ? GetCanvas(reg) : canvas;
 
         const auto button = reg.create();
 
@@ -75,9 +75,9 @@ namespace tomato::UIPrefab
         return button;
     }
 
-    entt::entity CreateText(entt::registry& reg, glm::vec2 pos, std::string inText, glm::vec4 color, float size, const std::filesystem::path& fontName)
+    entt::entity CreateText(entt::registry& reg, entt::entity canvas, glm::vec2 pos, std::string inText, glm::vec4 color, float size, const std::filesystem::path& fontName)
     {
-        entt::entity canvas = GetCanvas(reg);
+        canvas = canvas == entt::null ? GetCanvas(reg) : canvas;
 
         const auto text = reg.create();
 
@@ -95,9 +95,9 @@ namespace tomato::UIPrefab
         return text;
     }
 
-    entt::entity CreateImage(entt::registry& reg, const std::filesystem::path& textureName, glm::vec2 pos, glm::vec2 size)
+    entt::entity CreateImage(entt::registry& reg, entt::entity canvas, const std::filesystem::path& textureName, glm::vec2 pos, glm::vec2 size)
     {
-        entt::entity canvas = GetCanvas(reg);
+        canvas = canvas == entt::null ? GetCanvas(reg) : canvas;
         
         const auto img = reg.create();
 

@@ -1,4 +1,4 @@
-#ifndef MANGO_SYSTEMS_H
+﻿#ifndef MANGO_SYSTEMS_H
 #define MANGO_SYSTEMS_H
 
 #include "ECS/Systems/CameraTransformSystem.h"
@@ -12,6 +12,7 @@
 #include "ECS/Systems/PlayerCameraSystem.h"
 #include "ECS/Systems/RenderSystem.h"
 #include "ECS/Systems/ScreenUIRenderSystem.h"
+#include "ECS/Systems/WorldUIRenderSystem.h"
 #include "ECS/Systems/TransformSystem.h"
 #include "ECS/Systems/UISystem.h"
 #include "ECS/Systems/UITransformSystem.h"

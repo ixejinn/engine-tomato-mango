@@ -1,6 +1,8 @@
 ﻿#include <glm/ext.hpp>
 #include <glad/glad.h>
 
+#include "Services/Window.h"
+
 #include "Font/TextRenderer.h"
 #include "Font/AtlasManager.h"
 #include "Resource/AssetRegistry.h"
@@ -20,9 +22,7 @@ namespace tomato
 		shader_ = shader;
 
 		shader_->Use();
-
-		glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(1600), 0.0f, static_cast<float>(900), -1.0f, 1.0f);
-		shader->SetUniformMat4("projection", projection);
+		//shader->SetUniformMat4("projection", projection);
 
 		glUseProgram(0);
 
@@ -55,8 +55,11 @@ namespace tomato
 		TMT_INFO << "TextRenderer initialized with reserved capacity: 1000 chars.";
 	}
 
-	void TextRenderer::DrawString(const std::u32string& text, float x, float y, float size, const glm::vec4& color, Font* font, const glm::mat4 model)
+	void TextRenderer::DrawString(const std::u32string& text, float x, float y, float size, const glm::vec4& color, Font* font, const glm::mat4 model, const glm::mat4 projection)
 	{
+		//@TODO
+		shader_->SetUniformMat4("projection", projection);
+
 		// @NOTE :
 		// Pixel perfect handling is not implemented yet.
 		// May cause minor visual issues (e.g. blurriness or jitter).

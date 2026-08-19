@@ -92,20 +92,9 @@ void TestState::Init() {
     renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
 
     //entt::entity objUp = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, 10, 0 });
-    entt::entity objUp = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0.f, 12.f, 15.f });
+    //entt::entity objUp = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0.f, 12.f, 15.f });
 
     ////UI
-    auto targetLabel = UIPrefab::CreateText(registry_, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 20.f);
-    registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0), glm::vec3{0.f, 100.f, 0.f});
-    SetHierarchy(registry_, UIPrefab::GetCanvas(registry_), targetLabel);
-    auto& uiCmp = registry_.get<UIComponent>(targetLabel);
-    uiCmp.sortOrder = 1;
-
-    auto targetLabel1 = UIPrefab::CreateText(registry_, { 0.f, 0.f }, "player1", {1.0f, 1.0f, 0.f, 1.f}, 20.f);
-    registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1), glm::vec3{ 0.f, 100.f, 0.f });
-    SetHierarchy(registry_, UIPrefab::GetCanvas(registry_), targetLabel1);
-    auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
-    uiCmp1.sortOrder = 1;
 
     // auto btn = UIPrefab::CreateButton(registry_, { 0.f, -10.f });
     // auto& btnuiCmp = registry_.get<UIComponent>(btn);
@@ -117,7 +106,7 @@ void TestState::Init() {
     //         uiController_.onClick(e);
     //     };
 
-    auto tBtn = UIPrefab::CreateButton(registry_, { 0.f, -10.f });
+    auto tBtn = UIPrefab::CreateButton(registry_, entt::null, { 0.f, -10.f });
     auto& tBtnUIComp = registry_.get<UIComponent>(tBtn);
     tBtnUIComp.sortOrder = 100;
     auto& tMouseEvt = registry_.get<MouseEventComponent>(tBtn);
@@ -150,11 +139,39 @@ void TestState::Init() {
     };
 
 
-    UIPrefab::CreateText(registry_, { 100.f, 0.f });
-    UIPrefab::CreateImage(registry_, PathManager::ProjectImage("WATER_GAME_LOGO.png"), {200.f, 300.f});
+    UIPrefab::CreateText(registry_, entt::null, { 100.f, 0.f });
+    UIPrefab::CreateImage(registry_, entt::null, PathManager::ProjectImage("WATER_GAME_LOGO.png"), {200.f, 300.f});
     //UIPrefab::CreateCanvas(registry_);
     //UIPrefab::CreateCanvas(registry_);
     //UIPrefab::CreateCanvas(registry_);
+#if 0
+    auto targetLabel = UIPrefab::CreateText(registry_, entt::null, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 20.f);
+    registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0), glm::vec3{ 0.f, 1.f, 0.f });
+    SetHierarchy(registry_, UIPrefab::GetCanvas(registry_), targetLabel);
+    auto& uiCmp = registry_.get<UIComponent>(targetLabel);
+    uiCmp.sortOrder = 1;
+
+    auto targetLabel1 = UIPrefab::CreateText(registry_, entt::null, { 0.f, 0.f }, "player1", { 1.0f, 1.0f, 0.f, 1.f }, 20.f);
+    registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1), glm::vec3{ 0.f, 1.f, 0.f });
+    SetHierarchy(registry_, UIPrefab::GetCanvas(registry_), targetLabel1);
+    auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
+    uiCmp1.sortOrder = 1;
+#elif 1
+    auto worldCanvas = UIPrefab::CreateCanvas(registry_, RenderMode::World);
+    auto targetLabel = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
+    registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0), glm::vec3{ 0.f, 1.f, 0.f });
+    SetHierarchy(registry_, worldCanvas, targetLabel);
+    auto& uiCmp = registry_.get<UIComponent>(targetLabel);
+    uiCmp.sortOrder = 1;
+
+    auto targetLabel1 = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player1", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
+    registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1), glm::vec3{ 0.f, 1.f, 0.f });
+    SetHierarchy(registry_, worldCanvas, targetLabel1);
+    auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
+    uiCmp1.sortOrder = 1;
+#endif
+
+    
     //Serialization::SaveScene(registry_, "Resources/Engine/Assets/test.data");
 
     EventDispatcher::GetInstance().Connect<CollisionEnterEvent, &TEST_CollisionEnter>();

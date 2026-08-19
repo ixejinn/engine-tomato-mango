@@ -27,6 +27,10 @@ namespace tomato
         float zNear;
         float zFar;
 
+        glm::vec3 right;
+        glm::vec3 up;
+        glm::vec3 back;
+
         glm::mat4 view;
         glm::mat4 projection;
         glm::mat4 viewProjMat;

@@ -76,6 +76,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Resource/Render/Shader.h
         Source/Runtime/Engine/Public/Resource/Render/Texture.h
         Source/Runtime/Engine/Public/ECS/Systems/ScreenUIRenderSystem.h
+        Source/Runtime/Engine/Public/ECS/Systems/WorldUIRenderSystem.h
         Source/Runtime/Engine/Public/ECS/Systems/TransformSystem.h
         Source/Runtime/Engine/Public/ECS/Systems/UISystem.h
 		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemRegistry.h
@@ -225,6 +226,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Input/InputUI.cpp
         Source/Runtime/Engine/Private/ECS/Systems/UISystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/ScreenUIRenderSystem.cpp
+        Source/Runtime/Engine/Private/ECS/Systems/WorldUIRenderSystem.cpp
         Source/Runtime/Core/Private/Network/SocketAddress.cpp
         Source/Runtime/Core/Private/Network/TCPSocket.cpp
         Source/Runtime/Core/Private/Network/UDPSocket.cpp

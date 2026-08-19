@@ -24,7 +24,8 @@ namespace tomato
 		BuildDrawList(ctx);
 
 		UpdateTextContentSize(ctx);
-		UpdateRectTransform(ctx);
+		UpdateScreenRectTransform(ctx);
+		UpdateWorldRectTransform(ctx);
 
 		BulidSelectableList(ctx);
 	}
@@ -54,7 +55,7 @@ namespace tomato
 			uiCtx = registry.ctx().find<UIContext>();
 		}
 
-		std::vector<entt::entity> canvases, drawList;
+		std::vector<entt::entity> canvases, screenDrawList, worldDrawList;
 
 		auto canvasView = registry.view<CanvasComponent>();
 		for (auto canvas : canvasView)
@@ -68,11 +69,17 @@ namespace tomato
 			});
 
 		for (auto canvas : canvases)
-			Traverse(ctx, canvas, drawList);
+		{
+			auto& canvasCmp = registry.get<CanvasComponent>(canvas);
+			if (canvasCmp.mode == RenderMode::ScreenOverlay)
+				Traverse(ctx, canvas, screenDrawList);
+			else
+				Traverse(ctx, canvas, worldDrawList);
+		}
 
 		std::stable_sort(
-			drawList.begin(),
-			drawList.end(),
+			screenDrawList.begin(),
+			screenDrawList.end(),
 			[&](entt::entity a, entt::entity b)
 			{
 				auto& uiA = registry.get<UIComponent>(a);
@@ -82,8 +89,23 @@ namespace tomato
 			}
 		);
 
-		uiCtx->drawList.clear();
-		uiCtx->drawList = std::move(drawList);
+		std::stable_sort(
+			worldDrawList.begin(),
+			worldDrawList.end(),
+			[&](entt::entity a, entt::entity b)
+			{
+				auto& uiA = registry.get<UIComponent>(a);
+				auto& uiB = registry.get<UIComponent>(b);
+
+				return uiA.sortOrder < uiB.sortOrder;
+			}
+		);
+
+		uiCtx->screenDrawList.clear();
+		uiCtx->screenDrawList = std::move(screenDrawList);
+
+		uiCtx->worldDrawList.clear();
+		uiCtx->worldDrawList = std::move(worldDrawList);
 	}
 
 	void UISystem::BulidSelectableList(SimContext& ctx)
@@ -96,7 +118,7 @@ namespace tomato
 
 		if (!uiCtx->selectableDirty) return;
 
-		for (auto it = uiCtx->drawList.rbegin(); it != uiCtx->drawList.rend(); ++it)
+		for (auto it = uiCtx->screenDrawList.rbegin(); it != uiCtx->screenDrawList.rend(); ++it)
 		{
 			if (!registry.all_of<SelectableComponent>(*it)) continue;
 			uiCtx->selectableList.emplace_back(*it);
@@ -126,16 +148,16 @@ namespace tomato
 		}
 	}
 
-	void UISystem::UpdateRectTransform(SimContext& ctx)
+	void UISystem::UpdateScreenRectTransform(SimContext& ctx)
 	{
 		auto& registry = ctx.state->GetRegistry();
 		auto& uiCtx = registry.ctx().get<UIContext>();
 
-		if (uiCtx.drawList.empty())
+		if (uiCtx.screenDrawList.empty())
 			return;
 
 		CanvasComponent* currentCanvas = nullptr;
-		for (auto entity : uiCtx.drawList)
+		for (auto entity : uiCtx.screenDrawList)
 		{
 			auto& hierarchy = registry.get<HierarchyComponent>(entity);
 
@@ -155,7 +177,7 @@ namespace tomato
 		}
 
 		if (!currentCanvas) return;
-		for (auto entity : uiCtx.drawList)
+		for (auto entity : uiCtx.screenDrawList)
 		{
 			auto& hierarchy = registry.get<HierarchyComponent>(entity);
 			if (hierarchy.parent == entt::null)
@@ -164,7 +186,6 @@ namespace tomato
 			// children
 			auto& rect = registry.get<RectTransformComponent>(entity);
 			auto& parentRect = registry.get<RectTransformComponent>(hierarchy.parent);
-			//auto& ui = ctx.registry.get<UIComponent>(entity);
 
 			glm::vec2 scaleFactor = currentCanvas->actualSize / currentCanvas->referenceSize;
 			glm::vec2 parentSize = parentRect.computedSize;
@@ -179,8 +200,10 @@ namespace tomato
 				if (registry.all_of<TargetComponent>(entity))
 				{
 					auto* target = registry.try_get<TargetComponent>(entity);
+					if (!target) continue;
+
 					auto* targetTransform = registry.try_get<TransformComponent>(GetEntityByUUID(registry, target->target));
-					if (!target || !targetTransform)
+					if (!targetTransform)
 						continue;
 
 					 if (!registry.ctx().find<RenderContext>())
@@ -228,6 +251,61 @@ namespace tomato
 
 			rect.screenRect.max.x = rect.screenRect.min.x + rect.computedSize.x;
 			rect.screenRect.max.y = rect.screenRect.min.y + rect.computedSize.y;
+		}
+	}
+
+	void UISystem::UpdateWorldRectTransform(SimContext& ctx)
+	{
+		auto& registry = ctx.state->GetRegistry();
+		auto& uiCtx = registry.ctx().get<UIContext>();
+
+		if (uiCtx.worldDrawList.empty())
+			return;
+
+		/*CanvasComponent* currentCanvas = nullptr;
+		for (auto entity : uiCtx.worldDrawList)
+		{
+			auto& hierarchy = registry.get<HierarchyComponent>(entity);
+
+			// entity is canvas(root).
+			if (hierarchy.parent == entt::null)
+			{
+				currentCanvas = &registry.get<CanvasComponent>(entity);
+
+				auto& rect = registry.get<RectTransformComponent>(entity);
+				rect.computedSize = currentCanvas->actualSize;
+				rect.position = glm::vec3(rect.computedSize * rect.pivot, 0.f);
+				rect.scale = glm::vec3(1.f);
+
+				rect.screenPosition = rect.position;
+				break;
+			}
+		}
+
+		if (!currentCanvas) return;*/
+		for (auto entity : uiCtx.worldDrawList)
+		{
+			auto& hierarchy = registry.get<HierarchyComponent>(entity);
+			if (hierarchy.parent == entt::null)
+				continue;
+
+			// children
+			auto& rect = registry.get<RectTransformComponent>(entity);
+
+			// Target-based World UI
+				
+			if (auto* target = registry.try_get<TargetComponent>(entity))
+			{
+				auto* targetTransform = registry.try_get<TransformComponent>(GetEntityByUUID(registry, target->target));
+				if (!targetTransform) continue;
+
+				rect.position = targetTransform->GetWorldPosition() + target->headOffset;
+
+				rect.computedSize = rect.sizeDelta;
+				continue;
+			}
+
+			//@TODO : Normal World UI
 		}
 	}
 
