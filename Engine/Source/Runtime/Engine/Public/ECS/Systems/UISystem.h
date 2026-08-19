@@ -16,6 +16,8 @@ namespace tomato
 		void Update(SimContext& ctx) override;
 
 	private:
+		void OnChangeWindowSize();
+
 		void Traverse(SimContext& ctx, entt::entity e, std::vector<entt::entity>& drawList);
 		void BuildDrawList(SimContext& ctx);
 		void BulidSelectableList(SimContext& ctx);
@@ -29,6 +31,9 @@ namespace tomato
 		void UpdateTextContentSize(SimContext& ctx);
 		void UpdateScreenRectTransform(SimContext& ctx);
 		void UpdateWorldRectTransform(SimContext& ctx);
+
+	private:
+		SimContext* ctx{ nullptr };
 	};
 
 }

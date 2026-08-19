@@ -111,7 +111,6 @@ namespace tomato
                 billboard[2] = glm::vec4(camera->back, 0.f);
                 billboard[3] = glm::vec4(rect.position, 1.f);
 
-
                 rect.world_matrix = billboard;
                 rect.model_matrix = rect.world_matrix;
                 continue;

@@ -38,9 +38,9 @@ namespace tomato
 		glBufferData(GL_ARRAY_BUFFER, reservedSize, nullptr, GL_DYNAMIC_DRAW);
 
 		// 3. Set Vertex Attributes
-		// Position (vec2)
+		// Position (vec3)
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(TextVertex), (void*)offsetof(TextVertex, position));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(TextVertex), (void*)offsetof(TextVertex, position));
 	
 		// UV (vec2)
 		glEnableVertexAttribArray(1);

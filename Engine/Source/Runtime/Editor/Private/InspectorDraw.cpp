@@ -308,8 +308,20 @@ namespace tomato
 		bool changed = false;
 
 		ImGui::SeparatorText("Render Mode");
-		if (ImGui::BeginCombo("##renderMode", "ScreenOverlay"))
+		const char* modePreview = UIRenderModeMetas[(int)canvas.mode].name;
+		if (ImGui::BeginCombo("##renderMode", modePreview))
+		{
+			for (auto meta : UIRenderModeMetas)
+			{
+				//@TODO: Not support ScreenCamera, Normal World UI
+				if (ImGui::Selectable(meta.name, canvas.mode == meta.mode))
+				{
+					canvas.mode = meta.mode;
+					changed = true;
+				}
+			}
 			ImGui::EndCombo();
+		}
 		
 		ImGui::SeparatorText("Size");
 		ImGui::Text("Reference Size");// ImGui::SameLine();
@@ -469,7 +481,7 @@ namespace tomato
 			changed = true;
 
 		ImGui::SeparatorText("Size");
-		if(ImGui::DragFloat("##fontSize", &text.fontSize, 1.f, 0.0f, 0.0f, "%g"))
+		if(ImGui::DragFloat("##fontSize", &text.fontSize, 1.f, 1e-4f, 100.0f, "%g", ImGuiSliderFlags_AlwaysClamp))
 			changed = true;
 
 		auto beginIt = AssetRegistry<Font>::GetInstance().GetNameMapBegin();

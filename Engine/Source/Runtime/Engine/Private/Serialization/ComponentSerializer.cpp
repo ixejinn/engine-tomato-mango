@@ -540,6 +540,7 @@ namespace tomato::Serialization
 
 	void Save(json& data, const CanvasComponent& canvas)
 	{
+		data["mode"] = canvas.mode;
 		data["refSize"] = { canvas.referenceSize.x, canvas.referenceSize.y };
 		data["actSize"] = { canvas.actualSize.x, canvas.actualSize.y };
 		data["sortOrder"] = canvas.sortOrder;
@@ -547,6 +548,7 @@ namespace tomato::Serialization
 
 	void Load(const json& data, CanvasComponent& canvas)
 	{
+		canvas.mode = data["mode"];
 		canvas.referenceSize = { data["refSize"][0], data["refSize"][1] };
 		canvas.actualSize = { data["actSize"][0], data["actSize"][1] };
 		canvas.sortOrder = data["sortOrder"];
@@ -603,7 +605,7 @@ namespace tomato::Serialization
 
 	void Load(const json& data, TargetComponent& target)
 	{
-		target.target = data["taget"];
+		//target.target = data["taget"];
 		target.headOffset = {
 			data["offset"][0],
 			data["offset"][1],

@@ -1,5 +1,6 @@
 ﻿#include "ECS/Systems/UISystem.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
+
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/Target.h"
@@ -7,20 +8,31 @@
 #include "ECS/Components/Text.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Camera.h"
+#include "ECS/Entity/Entity.h"
+
 #include "Services/Window.h"
 #include "Services/Input.h"
+#include "Event/EventDispatcher.h"
+#include "Services/ChangeFramebufferSizeEvent.h"
+
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Font.h"
-#include "ECS/Entity/Entity.h"
+
 #include "Utils/Utf.h"
 #include "Utils/Logger.h"
 
 namespace tomato
 {
-	UISystem::UISystem() {}
+	UISystem::UISystem()
+	{
+		EventDispatcher::GetInstance().Connect<ChangeFramebufferSizeEvent, &UISystem::OnChangeWindowSize>(*this);
+	}
 
 	void UISystem::Update(SimContext& ctx)
 	{
+		if (this->ctx != &ctx)
+			this->ctx = &ctx;
+
 		BuildDrawList(ctx);
 
 		UpdateTextContentSize(ctx);
@@ -28,6 +40,15 @@ namespace tomato
 		UpdateWorldRectTransform(ctx);
 
 		BulidSelectableList(ctx);
+	}
+
+	void UISystem::OnChangeWindowSize()
+	{
+		auto& registry = ctx->state->GetRegistry();
+		auto canvasView = registry.view<CanvasComponent>();
+
+		for (auto [e, canvas] : canvasView.each())
+			canvas.actualSize = { Window::GetWidth(), Window::GetHeight() };
 	}
 
 	void UISystem::Traverse(SimContext& ctx, entt::entity e, std::vector<entt::entity>& drawList)

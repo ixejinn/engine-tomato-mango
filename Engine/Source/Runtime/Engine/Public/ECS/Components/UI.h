@@ -11,12 +11,39 @@
 
 namespace tomato
 {
+#define TMT_RENDERMODE_TYPE_LIST(X)		\
+	X(ScreenOverlay, "ScreenOverlay")	\
+	X(ScreenCamera,	"ScreenCamera")		\
+	X(World, "World")
+
 	enum class RenderMode
 	{
-		ScreenOverlay,
-		ScreenCamera,
-		World
+#define X(Enum, Display) Enum,
+		TMT_RENDERMODE_TYPE_LIST(X)
+#undef X
 	};
+
+	struct UIRenderModeMeta
+	{
+		RenderMode mode;
+		const char* name;
+	};
+	static constexpr UIRenderModeMeta UIRenderModeMetas[] =
+	{
+#define X(Enum, Display) { RenderMode::Enum, Display },
+		TMT_RENDERMODE_TYPE_LIST(X)
+#undef X
+	};
+#undef TMT_RENDERMODE_TYPE_LIST
+
+	NLOHMANN_JSON_SERIALIZE_ENUM(
+		RenderMode,
+		{
+			{ RenderMode::ScreenOverlay, "ScreenOverlay" },
+			{ RenderMode::ScreenCamera,	"ScreenCamera" },
+			{ RenderMode::World, "World" }
+		}
+	)
 
 	struct CanvasComponent // root
 	{
