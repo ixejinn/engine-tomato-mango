@@ -22,11 +22,7 @@ namespace tomato
         auto& r = simCtx.state->GetRegistry();
         auto* uiCtx = r.ctx().find<UIContext>();
         if (uiCtx == nullptr)
-        {
-            std::cout << "NULL DRAWLIST\n";
-            r.ctx().emplace<UIContext>();
-            uiCtx = r.ctx().find<UIContext>();
-        }
+            uiCtx = &r.ctx().emplace<UIContext>();
 
         for (auto e : uiCtx->screenDrawList)
         {

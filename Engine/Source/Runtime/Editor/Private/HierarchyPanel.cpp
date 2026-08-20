@@ -24,6 +24,7 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Particle.h"
+#include "ECS/Components/EditorTag.h"
 #include "Particle/ParticleEmitterPool.h"
 
 #include "ECS/Entity/Hierarchy.h"
@@ -70,7 +71,11 @@ namespace tomato
 				auto view = editorCtx.currentState->GetRegistry().view<RootEntityTag, NametagComponent>();
 
 				for (auto [e, tag] : view.each())
+				{
+					if (editorCtx.currentState->GetRegistry().all_of<EditorHidden>(e))
+						continue;
 					DrawEntity(editorCtx, e);
+				}
 
 				ImGui::InvisibleButton("HierarchyBackground", ImGui::GetContentRegionAvail());
 				DragDropTargetBackground(editorCtx);

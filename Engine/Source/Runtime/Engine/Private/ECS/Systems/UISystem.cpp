@@ -70,11 +70,7 @@ namespace tomato
 		auto& registry = ctx.state->GetRegistry();
 		auto* uiCtx = registry.ctx().find<UIContext>();
 		if (uiCtx == nullptr)
-		{
-			std::cout << "NULL DRAWLIST\n";
-			registry.ctx().emplace<UIContext>();
-			uiCtx = registry.ctx().find<UIContext>();
-		}
+			uiCtx = &registry.ctx().emplace<UIContext>();
 
 		std::vector<entt::entity> canvases, screenDrawList, worldDrawList;
 

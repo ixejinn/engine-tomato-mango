@@ -712,4 +712,10 @@ namespace tomato::Serialization
 
 	void Save(json& data, const CharacterTag& charTag) {}
 	void Load(const json& data, CharacterTag& charTag) {}
+
+	void Save(json&, const EditorHidden&) {}
+	void Load(const json&, EditorHidden&) {}
+
+	void Save(json&, const NoInspector&) {}
+	void Load(const json&, NoInspector&) {}
 }

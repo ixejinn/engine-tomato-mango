@@ -5,6 +5,7 @@
 #include "Particle/ParticleEmitterPool.h"
 #include "Utils/PassKey.h"
 #include "Prefab/Prefab.h"
+#include "ECS/Components/EditorTag.h"
 
 namespace tomato
 {
@@ -12,15 +13,18 @@ namespace tomato
     {
         registry_.ctx().emplace<RenderContext>();
         registry_.ctx().emplace<CollisionContext>();
+        registry_.ctx().emplace<UIContext>();
         registry_.ctx().emplace<ParticleEmitterPool>(PassKey<State>(), registry_);
 
         // Create editor mode camera
         entt::entity& editCam = registry_.ctx().get<RenderContext>().editorCam;
         editCam = Prefab::CreateCamera(registry_, false);
+        registry_.emplace<EditorHidden>(editCam);
 
         // Skybox
         entt::entity& skybox = registry_.ctx().get<RenderContext>().skybox;
         skybox = Prefab::CreateSkybox(registry_);
+        registry_.emplace<NoInspector>(skybox);
     }
 
     void State::SetNextState(std::unique_ptr<State>&& newState)

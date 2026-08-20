@@ -470,7 +470,7 @@ namespace tomato
 		bool changed = false;
 
 		ImGui::SeparatorText("Text");
-		if (ImGui::InputText("##text", &text.text))
+		if (ImGui::InputText("##text", &text.text, ImGuiInputTextFlags_None))
 		{
 			text.dirty = true;
 			changed = true;

@@ -31,11 +31,11 @@ namespace tomato::UIPrefab
         reg.emplace<tomato::RectTransformComponent>(canvas);
         reg.emplace<tomato::RootEntityTag>(canvas);
         reg.emplace<tomato::HierarchyComponent>(canvas);
-        reg.emplace<tomato::RenderComponent>(canvas,
+        /*reg.emplace<tomato::RenderComponent>(canvas,
             glm::vec4{ 1.f, 1.f, 1.f, 0.0f },
             GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
             GetAssetID("UIShader"),
-            GetAssetID(Texture::PrimitiveName));
+            GetAssetID(Texture::PrimitiveName));*/
         reg.emplace<tomato::VisibilityComponent>(canvas);
 
         return canvas;

@@ -19,6 +19,7 @@
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Camera.h"
+#include "ECS/Components/EditorTag.h"
 
 #include "Utils/FileDialog.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
@@ -33,6 +34,9 @@ namespace tomato
 	void InspectorPanel::Draw(EditorContext& editorCtx)
 	{
 		if (editorCtx.selectedEntity == entt::null)
+			return;
+
+		if (editorCtx.currentState->GetRegistry().all_of<NoInspector>(editorCtx.selectedEntity))
 			return;
 
 		ImGui::SetNextWindowPos(ImVec2(posX_, posY_), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
@@ -51,7 +55,6 @@ namespace tomato
 				if (!comp.Has(editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity))
 					continue;
 
-				//if (HasFlag<Serialization::ComponentFlags>(comp.flags, Serialization::ComponentFlags::Hidden))
 				if (HasFlag(comp.flags, Serialization::ComponentFlags::Hidden))
 					continue;
 

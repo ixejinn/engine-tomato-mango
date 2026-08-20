@@ -29,6 +29,9 @@ namespace tomato
 	struct RootEntityTag;
 	struct MainCameraTag;
 	struct CharacterTag;
+
+	struct EditorHidden;
+	struct NoInspector;
 }
 
 #endif // !MANGO_COMPONENTFWD_H

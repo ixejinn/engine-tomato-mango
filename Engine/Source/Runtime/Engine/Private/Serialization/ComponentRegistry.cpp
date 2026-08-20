@@ -14,6 +14,7 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Character.h"
 #include "ECS/Components/Particle.h"
+#include "ECS/Components/EditorTag.h"
 
 #include "Utils/Bitmask/BitmaskOperators.h"
 namespace tomato::Serialization
@@ -46,10 +47,12 @@ namespace tomato::Serialization
 		RegisterComponent<ParticleRenderComponent>("Particle Render", ComponentCategory::Particle, ComponentFlags::Hidden);
 		
 		//Tag
-		RegisterComponent<RootEntityTag>("TagRoot", ComponentCategory::Tag);
+		RegisterComponent<RootEntityTag>("TagRoot", ComponentCategory::Tag, ComponentFlags::Hidden);
 		RegisterComponent<MainCameraTag>("TagMainCam", ComponentCategory::Tag);
-		RegisterComponent<CharacterTag>("TagCharacter", ComponentCategory::Tag);
-
+		RegisterComponent<CharacterTag>("TagCharacter", ComponentCategory::Tag, ComponentFlags::Hidden);
+		RegisterComponent<EditorHidden>("TagEditorHidden", ComponentCategory::Tag, ComponentFlags::Hidden);
+		RegisterComponent<NoInspector>("TagNoInspector", ComponentCategory::Tag, ComponentFlags::Hidden);
+		
 
 		initialized = true;
 	}
