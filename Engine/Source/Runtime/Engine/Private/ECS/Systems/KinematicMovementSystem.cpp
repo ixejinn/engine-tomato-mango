@@ -72,6 +72,7 @@ namespace tomato {
                 CharacterMovement::Jump(registry, e, move, velocity, JUMP_SPEED);
 
             // std::cout << (int)e << " kine velocity: " << velocity.velocity.x << " " << velocity.velocity.y << " " << velocity.velocity.z << "\n";
+            
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿#include "ProjectileSystem.h"
 #include "ECS/Components/Components.h"
+#include "ProjectileComponent.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "State/State.h"
 #include "Utils/RegistryEntry.h"
@@ -10,11 +11,26 @@ using namespace tomato;
 void ProjectileSystem::Update(SimContext& simCtx)
 {
 	auto& reg = simCtx.state->GetRegistry();
-	auto view = reg.view<TransformComponent, VelocityComponent, TargetComponent>();
+	auto view = reg.view<TransformComponent, MoveBetweenComponent, VelocityComponent, TargetComponent>();
 
-	for (auto [e, transform, velocity, target] : view.each())
+	for (auto [e, transform, move, velocity, target] : view.each())
 	{
-		auto tEntity = GetEntityByUUID(reg, target.target);
+		glm::vec3 toEnd = move.end - transform.GetWorldPosition();
+		if (toEnd == glm::vec3{ 0 })
+			continue;
+
+		glm::vec3 moveDir = glm::normalize(velocity.velocity);
+
+		if (glm::dot(moveDir, toEnd) <= 0.f)
+		{
+			transform.SetPosition(move.end);
+			velocity.velocity = glm::vec3{ 0 };
+		}
+		else
+			velocity.velocity = glm::normalize(toEnd) * velocity.horizontalSpeed;
+
+
+		/*auto tEntity = GetEntityByUUID(reg, target.target);
 		auto& targetTransform = reg.get<TransformComponent>(tEntity);
 
 		glm::vec3 toTarget = targetTransform.GetWorldPosition() - transform.GetWorldPosition();
@@ -48,7 +64,7 @@ void ProjectileSystem::Update(SimContext& simCtx)
 			//velocity.velocity = glm::vec3{ 0 };
 			//std::cout << "pass\n";
 		}
-		//velocity.horizontalSpeed = 0.5f;
+		//velocity.horizontalSpeed = 0.5f;*/
 		
 	}
 

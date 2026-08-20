@@ -85,7 +85,7 @@ namespace tomato
 
 		glm::vec3 pos = transform.GetLocalPosition();
 		float posVec3[3] = { pos.x, pos.y, pos.z };
-		if (DrawVec3Control("Position", posVec3))
+		if (DrawVec3Control("Position", posVec3, 0.f, 0.f, ImGuiSliderFlags_ColorMarkers))
 		{
 			transform.SetPosition(posVec3[0], posVec3[1], posVec3[2]);
 			changed = true;
@@ -93,7 +93,7 @@ namespace tomato
 
 		glm::vec3 degree = transform.GetLocalRotationDegree();
 		float degreeVec3[3] = { degree.x, degree.y, degree.z };
-		if (DrawVec3Control("Degree", degreeVec3))
+		if (DrawVec3Control("Degree", degreeVec3, 0.f, 0.f, ImGuiSliderFlags_ColorMarkers))
 		{
 			transform.SetRotationDegree(degreeVec3[0], degreeVec3[1], degreeVec3[2]);
 			changed = true;
@@ -101,7 +101,7 @@ namespace tomato
 
 		glm::vec3 scale = transform.GetLocalScale();
 		float scaleVec3[3] = { scale.x, scale.y, scale.z };
-		if (DrawVec3Control("Scale", scaleVec3, 1e-4f, 0.f, ImGuiSliderFlags_ClampOnInput))
+		if (DrawVec3Control("Scale", scaleVec3, 1e-4f, 0.f, ImGuiSliderFlags_ClampOnInput | ImGuiSliderFlags_ColorMarkers))
 		{
 			transform.SetScale(scaleVec3[0], scaleVec3[1], scaleVec3[2]);
 			changed = true;

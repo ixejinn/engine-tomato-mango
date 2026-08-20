@@ -21,6 +21,7 @@
 #include "ECS/Components/Nametag.h"
 #include "Particle/ParticleEmitterPool.h"
 #include "Utils/RegistryEntry.h"
+#include "ProjectileComponent.h"
 REGISTER_STATE(MyState)
 
 using namespace tomato;
@@ -41,12 +42,6 @@ void MyState::Init()
     auto& channelp = registry_.get<InputChannelComponent>(player);
     channelp.channel = 0;
 
-    entt::entity player1 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { -3, -1, -3 });
-    auto& channelp1 = registry_.get<InputChannelComponent>(player1);
-    channelp1.channel = 1;
-    entt::entity player2 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 2, -1, 5 });
-    auto& channelp2 = registry_.get<InputChannelComponent>(player2);
-    channelp2.channel = 2;
 
     // Ground
     entt::entity ground = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, -3, 0 });
@@ -56,32 +51,15 @@ void MyState::Init()
     renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
 
     //Projectile
-    auto projectile = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, {-3, -2, 0});
+    auto projectile = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { -3, -2, 0 });
+    registry_.emplace<MoveBetweenComponent>(projectile, glm::vec3{ -3, -2, 0 }, glm::vec3{ 3.f, 0.f, 0.f });
     registry_.emplace<TargetComponent>(projectile, GetUUID(registry_, player));
-    registry_.emplace<VelocityComponent>(projectile);
+    registry_.emplace<VelocityComponent>(projectile, 0.5f);
     registry_.emplace<LifetimeComponent>(projectile);
     auto& trfPt = registry_.get<TransformComponent>(projectile);
     trfPt.SetScale({ 0.5f, 0.5f, 0.5f });
     auto& renderPt = registry_.get<RenderComponent>(projectile);
     renderPt.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain));
-
-    auto projectile1 = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { -3, -0, 0 });
-    registry_.emplace<TargetComponent>(projectile1, GetUUID(registry_, player1));
-    registry_.emplace<VelocityComponent>(projectile1);
-    registry_.emplace<LifetimeComponent>(projectile1);
-    auto& trfPt1 = registry_.get<TransformComponent>(projectile1);
-    trfPt1.SetScale({ 0.5f, 0.5f, 0.5f });
-    auto& renderPt1 = registry_.get<RenderComponent>(projectile1);
-    renderPt1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain));
-
-    auto projectile2 = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { -0, -2, 0 });
-    registry_.emplace<TargetComponent>(projectile2, GetUUID(registry_, player2));
-    registry_.emplace<VelocityComponent>(projectile2);
-    registry_.emplace<LifetimeComponent>(projectile2);
-    auto& trfPt2 = registry_.get<TransformComponent>(projectile2);
-    trfPt2.SetScale({ 0.5f, 0.5f, 0.5f });
-    auto& renderPt2 = registry_.get<RenderComponent>(projectile2);
-    renderPt2.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain));
 }
 
 void MyState::Update()
