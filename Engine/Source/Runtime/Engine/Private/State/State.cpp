@@ -16,15 +16,22 @@ namespace tomato
         registry_.ctx().emplace<UIContext>();
         registry_.ctx().emplace<ParticleEmitterPool>(PassKey<State>(), registry_);
 
+        //// Set render context
+        auto& renderCtx = registry_.ctx().get<RenderContext>();
+
         // Create editor mode camera
-        entt::entity& editCam = registry_.ctx().get<RenderContext>().editorCam;
+        entt::entity& editCam = renderCtx.editorCam;
         editCam = Prefab::CreateCamera(registry_, false);
         registry_.emplace<EditorHidden>(editCam);
 
         // Skybox
-        entt::entity& skybox = registry_.ctx().get<RenderContext>().skybox;
+        entt::entity& skybox = renderCtx.skybox;
         skybox = Prefab::CreateSkybox(registry_);
         registry_.emplace<NoInspector>(skybox);
+
+        // View gizmo
+        entt::entity& viewGizmo = renderCtx.viewGizmo;
+        viewGizmo = Prefab::CreateGizmo(registry_);
     }
 
     void State::SetNextState(std::unique_ptr<State>&& newState)

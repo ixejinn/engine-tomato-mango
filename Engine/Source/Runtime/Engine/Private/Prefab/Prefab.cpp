@@ -1,15 +1,7 @@
 ﻿#include <entt/entt.hpp>
 #include "Prefab/Prefab.h"
 #include "GameObject/Character/CharacterMovement.h"
-#include "ECS/Components/Movement.h"
-#include "ECS/Components/ComponentsPhys.h"
-#include "ECS/Components/Render.h"
-#include "ECS/Components/Camera.h"
-#include "ECS/Components/Rollback.h"
-#include "ECS/Components/Nametag.h"
-#include "ECS/Components/Visibility.h"
-#include "ECS/Components/Character.h"
-#include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/Components.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "Resource/AssetHash.h"
 #include "Resource/Render/Mesh.h"
@@ -113,6 +105,70 @@ namespace tomato::Prefab
         reg.emplace<RootEntityTag>(obj);
 
         return obj;
+    }
+
+    entt::entity CreateGizmo(entt::registry& reg)
+    {
+        // Center(root)
+        const entt::entity center = reg.create();
+        reg.emplace<NametagComponent>(center, GenerateUUID(), GenerateEntityName(reg, "Gizmo"));
+        reg.emplace<TransformComponent>(center);
+        reg.emplace<VisibilityComponent>(center);
+        reg.emplace<RootEntityTag>(center);
+        reg.emplace<EditorHidden>(center);
+        reg.emplace<RenderComponent>(center,
+            glm::vec4(1.f),
+            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
+            GetAssetID(Shader::PrimitiveName),
+            GetAssetID(Texture::PrimitiveName));
+
+        // X axis
+        const entt::entity x = reg.create();
+        reg.emplace<NametagComponent>(x, GenerateUUID(), GenerateEntityName(reg, "X"));
+        reg.emplace<TransformComponent>(x,
+            glm::vec3(3, 0, 0),
+            glm::vec3(0, 0, 90),
+            glm::vec3(2.5, 5, 2.5));
+        reg.emplace<VisibilityComponent>(x);
+        reg.emplace<RenderComponent>(x,
+            glm::vec4(1.f, 0.f, 0.f, 1.f),
+            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)),
+            GetAssetID(Shader::PrimitiveName),
+            GetAssetID(Texture::PrimitiveName));
+        SetHierarchy(reg, center, x);
+
+        // Y axis
+        const entt::entity y = reg.create();
+        reg.emplace<NametagComponent>(y, GenerateUUID(), GenerateEntityName(reg, "Y"));
+        reg.emplace<TransformComponent>(y,
+            glm::vec3(0, 3, 0),
+            glm::vec3(-180, 0, 0),
+            glm::vec3(2.5, 5, 2.5));
+        reg.emplace<VisibilityComponent>(y);
+        reg.emplace<RenderComponent>(y,
+            glm::vec4(0.f, 1.f, 0.f, 1.f),
+            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)),
+            GetAssetID(Shader::PrimitiveName),
+            GetAssetID(Texture::PrimitiveName));
+        SetHierarchy(reg, center, y);
+
+        // Z axis
+        const entt::entity z = reg.create();
+        reg.emplace<NametagComponent>(z, GenerateUUID(), GenerateEntityName(reg, "Z"));
+        reg.emplace<TransformComponent>(z,
+            glm::vec3(0, 0, 3),
+            glm::vec3(-90, 0, 0),
+            glm::vec3(2.5, 5, 2.5));
+        reg.emplace<VisibilityComponent>(z);
+        reg.emplace<RenderComponent>(z,
+            glm::vec4(0.f, 0.f, 1.f, 1.f),
+            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)),
+            GetAssetID(Shader::PrimitiveName),
+            GetAssetID(Texture::PrimitiveName));
+        SetHierarchy(reg, center, z);
+
+        reg.get<TransformComponent>(center).SetScale(0.1f, 0.1f, 0.1f);
+        return center;
     }
 
     entt::entity AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type) {

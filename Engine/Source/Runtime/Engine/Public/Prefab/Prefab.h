@@ -36,6 +36,8 @@ namespace tomato::Prefab
 
     entt::entity CreateSkybox(entt::registry& reg);
 
+    entt::entity CreateGizmo(entt::registry& reg);
+
     entt::entity AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type);
 
     entt::entity AttachCharacterCollider(entt::registry& reg, entt::entity parent, ColliderType type);
