@@ -8,7 +8,8 @@ namespace tomato
 	struct WaveComponent
 	{
 		glm::vec3 origin{ 0 };
-		float diameter;
+		float radius;
+		float speed;
 
 		int64_t startTick{ 0 };
 	};

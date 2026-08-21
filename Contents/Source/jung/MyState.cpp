@@ -52,22 +52,21 @@ void MyState::Init()
     
     // Wave
     auto wave = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, -2.9f, 0 });
-    registry_.emplace<WaveComponent>(wave, glm::vec3{ 0, -2.9f, 0 }, 10.f);
+    registry_.emplace<WaveComponent>(wave, glm::vec3{ 0, -2.9f, 0 }, 5.f, 0.01f);
     auto& waveRender = registry_.get<RenderComponent>(wave);
     waveRender.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::OpenCylinder));
     auto& waveTransform = registry_.get<TransformComponent>(wave);
     waveTransform.SetScale({ 0.f, 0.1f, 0.f });
 
     //Projectile
-    auto projectile = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, -2.9f, 0 });
-    registry_.emplace<WaveComponent>(projectile, glm::vec3{ 0, -2.9f, 0 }, 10.f);
+    auto projectile = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, 0.f, 0 });
     registry_.emplace<TargetComponent>(projectile, GetUUID(registry_, player));
-    registry_.emplace<VelocityComponent>(projectile, 0.8f);
-    registry_.emplace<LifetimeComponent>(projectile);
+    //registry_.emplace<LifetimeComponent>(projectile);
     auto& trfPt = registry_.get<TransformComponent>(projectile);
     trfPt.SetScale({ 0.5f, 0.5f, 0.5f });
     auto& renderPt = registry_.get<RenderComponent>(projectile);
-    renderPt.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain));
+    //renderPt.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain));
+    SetHierarchy(registry_, wave, projectile);
 }
 
 void MyState::Update()
