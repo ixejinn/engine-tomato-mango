@@ -146,7 +146,7 @@ namespace tomato
         auto& keyDeviceState = KeyDeviceState::GetInstance();
 
         //// Finish pan
-        if (keyDeviceState.IsKeyReleased(Key::RightMouseButton))
+        if (keyDeviceState.IsKeyReleased(Key::MiddleMouseButton))
         {
             mode_ = None;
 
@@ -154,28 +154,34 @@ namespace tomato
             return;
         }
 
-        //// Update camera position and rotation
+        //// Update camera position
         auto& trf = registry.get<TransformComponent>(renderCtx.editorCam);
 
-        // Move camera
+        // Move along camera's up and right vectors
         glm::vec2 currCursorPos{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)};
         glm::vec2 deltaCursorPos = currCursorPos - preCursorPos;
         preCursorPos = currCursorPos;
 
-        glm::vec3 dir{deltaCursorPos.x, -deltaCursorPos.y, 0};
+        glm::vec3 cursorDir{deltaCursorPos.x, -deltaCursorPos.y, 0};
+        const float cursorDirLen = glm::length(cursorDir);
+        if (cursorDirLen > 1)
+            cursorDir /= cursorDirLen;
 
+        // Move along camera's front(-back) and right vectors
+        glm::vec3 keyBoardDir{0};
         if (keyDeviceState.IsKeyPressed(Key::W))
-            dir.z -= PAN_KEYBOARD_WEIGHT;
+            --keyBoardDir.z;
         if (keyDeviceState.IsKeyPressed(Key::S))
-            dir.z += PAN_KEYBOARD_WEIGHT;
+            ++keyBoardDir.z;
         if (keyDeviceState.IsKeyPressed(Key::A))
-            --dir.x;
+            --keyBoardDir.x;
         if (keyDeviceState.IsKeyPressed(Key::D))
-            ++dir.x;
+            ++keyBoardDir.x;
+        const float keyBoardDirLen = glm::length(keyBoardDir);
+        if (keyBoardDirLen > 1)
+            keyBoardDir /= keyBoardDirLen;
 
-        const float len = glm::length(dir);
-        if (len > 1)
-            dir /= len;
+        glm::vec3 dir = cursorDir * 0.5f + keyBoardDir * 0.5f;
         dir *= CAMERA_MOVE_SPEED * FIXED_DELTA_TIME;
 
         const auto quat = glm::quat(camRad);

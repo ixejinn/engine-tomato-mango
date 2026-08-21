@@ -27,7 +27,6 @@ namespace tomato
 
         static constexpr float MOUSE_LOOK_SENSITIVITY_DIST{500.f};
         static constexpr float CAMERA_MOVE_SPEED{8.f};
-        static constexpr float PAN_KEYBOARD_WEIGHT{30.f};
 
         static constexpr glm::vec3 INIT_POS{0.f, 1.f, 10.f};
         static constexpr glm::vec3 INIT_RAD{0.f};
