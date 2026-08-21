@@ -146,6 +146,9 @@ namespace tomato
             glViewport(-80, -80, 300, 300);
             glClear(GL_DEPTH_BUFFER_BIT);
 
+            glm::vec3 viewGizmoLight =
+                    registry.get<TransformComponent>(mainCam).GetWorldQuaternion() * glm::vec3(0, 0, 1);
+
             // Render view gizmo center
             auto& viewGizmoTrfMtx = registry.get<TransformComponent>(viewGizmo).GetTransformMatrix();
             auto& viewGizmoRender = registry.get<RenderComponent>(viewGizmo);
@@ -169,7 +172,7 @@ namespace tomato
             shader->SetUniformMat3("uNormal", glm::transpose(glm::inverse(glm::mat3(viewGizmoTrfMtx))));
 
             shader->SetUniformInt("uTexture", 0);
-            shader->SetUniformVec3("uLightPos", glm::vec3(0, 10, 0));
+            shader->SetUniformVec3("uLightPos", viewGizmoLight);
             shader->SetUniformVec4("uColor", viewGizmoRender.color);
 
             mesh->Draw();
@@ -191,7 +194,7 @@ namespace tomato
                 shader->SetUniformMat3("uNormal", glm::transpose(glm::inverse(glm::mat3(axisTrfMtx))));
 
                 shader->SetUniformInt("uTexture", 0);
-                shader->SetUniformVec3("uLightPos", glm::vec3(0, 10, 0));
+                shader->SetUniformVec3("uLightPos", viewGizmoLight);
                 shader->SetUniformVec4("uColor", axisRender.color);
 
                 mesh->Draw();
