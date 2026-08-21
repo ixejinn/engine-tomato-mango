@@ -18,6 +18,7 @@ namespace tomato
 
         // BUTTONS ------------------------------------------------
         LeftMouseButton,
+        MiddleMouseButton,
         RightMouseButton,
 
         Escape,
