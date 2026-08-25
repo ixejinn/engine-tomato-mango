@@ -67,6 +67,7 @@ namespace tomato::Serialization
 		return data;
 	}
 
+	/*
 	void SaveScene(entt::registry& reg, const char* path)
 	{
 		json root;
@@ -102,7 +103,7 @@ namespace tomato::Serialization
 		ResolveHierarchy(reg, entityMap);
 
 		//AttachParticles(root, reg);
-	}
+	}*/
 
 	void SaveScene(State* state, const char* path)
 	{
@@ -154,6 +155,7 @@ namespace tomato::Serialization
 		AttachParticles(root, registry.ctx().get<ParticleEmitterPool>());
 
 		state->SetNextState(std::move(newState));
+		registry.ctx().get<EntityNameGenerator>().Initialize(registry);
 	}
 
 	void NewStateScene(State* state)

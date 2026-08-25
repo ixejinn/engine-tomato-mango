@@ -25,7 +25,8 @@ namespace tomato::UIPrefab
 	{
 		const entt::entity canvas = reg.create();
 
-        reg.emplace<NametagComponent>(canvas, GenerateUUID(), GenerateEntityName(reg, "Canvas"));
+        auto& generator = reg.ctx().get<EntityNameGenerator>();
+        reg.emplace<NametagComponent>(canvas, GenerateUUID(), generator.Generate("Canvas"));
         reg.emplace<tomato::CanvasComponent>(canvas, mode);
         reg.emplace<tomato::UIComponent>(canvas, (UUID)0, 0, UIType::Canvas);
         reg.emplace<tomato::RectTransformComponent>(canvas);
@@ -47,7 +48,8 @@ namespace tomato::UIPrefab
 
         const auto button = reg.create();
 
-        reg.emplace<NametagComponent>(button, GenerateUUID(), GenerateEntityName(reg, "Button"));
+        auto& generator = reg.ctx().get<EntityNameGenerator>();
+        reg.emplace<NametagComponent>(button, GenerateUUID(), generator.Generate("Button"));
         reg.emplace<UIComponent>(button, GetUUID(reg, canvas), 0);
         reg.emplace<RectTransformComponent>(button, pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(100.f, 100.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
         auto& selectable = reg.emplace<SelectableComponent>(button);
@@ -62,7 +64,7 @@ namespace tomato::UIPrefab
         reg.emplace<VisibilityComponent>(button);
 
         const auto buttonText = reg.create();
-        reg.emplace<NametagComponent>(buttonText, GenerateUUID(), GenerateEntityName(reg, "Text"));
+        reg.emplace<NametagComponent>(buttonText, GenerateUUID(), generator.Generate("Text"));
         reg.emplace<UIComponent>(buttonText, GetUUID(reg, canvas), 0, UIType::Text);
         auto& btnTxtComp = reg.emplace<TextComponent>(buttonText, "Button");
         btnTxtComp.color = glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f };
@@ -81,7 +83,8 @@ namespace tomato::UIPrefab
 
         const auto text = reg.create();
 
-        reg.emplace<NametagComponent>(text, GenerateUUID(), GenerateEntityName(reg, "Text"));
+        auto& generator = reg.ctx().get<EntityNameGenerator>();
+        reg.emplace<NametagComponent>(text, GenerateUUID(), generator.Generate("Text"));
         reg.emplace<UIComponent>(text, GetUUID(reg, canvas), 0, UIType::Text);
         auto& txtComp = reg.emplace<TextComponent>(text, inText);
 	    txtComp.color = color;
@@ -101,7 +104,8 @@ namespace tomato::UIPrefab
         
         const auto img = reg.create();
 
-        reg.emplace<NametagComponent>(img, GenerateUUID(), GenerateEntityName(reg, "Image"));
+        auto& generator = reg.ctx().get<EntityNameGenerator>();
+        reg.emplace<NametagComponent>(img, GenerateUUID(), generator.Generate("Image"));
         reg.emplace<UIComponent>(img, GetUUID(reg, canvas), 0);
 
         auto texture = AssetRegistry<Texture>::GetInstance().Get(GetAssetID(textureName));

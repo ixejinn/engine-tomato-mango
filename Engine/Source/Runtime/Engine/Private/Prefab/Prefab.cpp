@@ -22,7 +22,9 @@ namespace tomato::Prefab
 {
     void AddRequiredComponents(entt::registry& reg, entt::entity e, std::string name)
     {
-        reg.emplace<NametagComponent>(e, GenerateUUID(), GenerateEntityName(reg, name));
+        auto& generator = reg.ctx().get<EntityNameGenerator>();
+
+        reg.emplace<NametagComponent>(e, GenerateUUID(), generator.Generate(name));
         reg.emplace<VisibilityComponent>(e);
     }
 
@@ -30,7 +32,8 @@ namespace tomato::Prefab
     {
         const entt::entity obj = reg.create();
 
-        reg.emplace<NametagComponent>(obj, GenerateUUID(), GenerateEntityName(reg, "GameObject"));
+        auto& generator = reg.ctx().get<EntityNameGenerator>();
+        reg.emplace<NametagComponent>(obj, GenerateUUID(), generator.Generate("GameObject"));
         reg.emplace<VisibilityComponent>(obj);
         reg.emplace<TransformComponent>(obj, pos);
         reg.emplace<RootEntityTag>(obj);
@@ -43,7 +46,8 @@ namespace tomato::Prefab
                                             Primitive mesh, glm::vec3 pos) {
         const entt::entity obj = reg.create();
 
-        reg.emplace<NametagComponent>(obj, GenerateUUID(), GenerateEntityName(reg, "Object"));
+        auto& generator = reg.ctx().get<EntityNameGenerator>();
+        reg.emplace<NametagComponent>(obj, GenerateUUID(), generator.Generate("Object"));
         reg.emplace<TransformComponent>(obj, pos);
         reg.emplace<RenderComponent>(obj,
                                      glm::vec4(1.f),
@@ -62,7 +66,8 @@ namespace tomato::Prefab
                                          Primitive mesh, glm::vec3 pos) {
         const entt::entity obj = reg.create();
 
-        reg.emplace<NametagComponent>(obj, GenerateUUID(), GenerateEntityName(reg, "Character"));
+        auto& generator = reg.ctx().get<EntityNameGenerator>();
+        reg.emplace<NametagComponent>(obj, GenerateUUID(), generator.Generate("Character"));
         reg.emplace<TransformComponent>(obj, pos);
         reg.emplace<RenderComponent>(obj,
                                      glm::vec4(1.f),
@@ -89,7 +94,8 @@ namespace tomato::Prefab
                                       ) {
         const entt::entity obj = reg.create();
 
-        reg.emplace<NametagComponent>(obj, GenerateUUID(), GenerateEntityName(reg, "Camera"));
+        auto& generator = reg.ctx().get<EntityNameGenerator>();
+        reg.emplace<NametagComponent>(obj, GenerateUUID(), generator.Generate("Camera"));
         reg.emplace<TransformComponent>(obj, pos, rot);
         reg.emplace<CameraComponent>(obj);
         reg.emplace<RootEntityTag>(obj);
@@ -107,7 +113,8 @@ namespace tomato::Prefab
     {
         const entt::entity obj = reg.create();
 
-        reg.emplace<NametagComponent>(obj, GenerateUUID(), GenerateEntityName(reg, "Skybox"));
+        auto& generator = reg.ctx().get<EntityNameGenerator>();
+        reg.emplace<NametagComponent>(obj, GenerateUUID(), generator.Generate("Skybox"));
         reg.emplace<TransformComponent>(obj);
         reg.emplace<VisibilityComponent>(obj);
         reg.emplace<RootEntityTag>(obj);
@@ -117,7 +124,9 @@ namespace tomato::Prefab
 
     entt::entity AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
         const entt::entity col = reg.create();
-        reg.emplace<NametagComponent>(col, GenerateUUID(), GenerateEntityName(reg, "Collider"));
+
+        auto& generator = reg.ctx().get<EntityNameGenerator>();
+        reg.emplace<NametagComponent>(col, GenerateUUID(), generator.Generate("Collider"));
 
         SetHierarchy(reg, parent, col);
 

@@ -2,10 +2,11 @@
 #include "State/State.h"
 #include "State/StateRegistry.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
-#include "Particle/ParticleEmitterPool.h"
-#include "Utils/PassKey.h"
-#include "Prefab/Prefab.h"
+#include "ECS/Entity/Entity.h"
 #include "ECS/Components/EditorTag.h"
+#include "Particle/ParticleEmitterPool.h"
+#include "Prefab/Prefab.h"
+#include "Utils/PassKey.h"
 
 namespace tomato
 {
@@ -14,6 +15,7 @@ namespace tomato
         registry_.ctx().emplace<RenderContext>();
         registry_.ctx().emplace<CollisionContext>();
         registry_.ctx().emplace<UIContext>();
+        registry_.ctx().emplace<EntityNameGenerator>();
         registry_.ctx().emplace<ParticleEmitterPool>(PassKey<State>(), registry_);
 
         // Create editor mode camera

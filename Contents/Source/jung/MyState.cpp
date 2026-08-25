@@ -35,38 +35,55 @@ void MyState::Init()
         glm::vec3(-30.f, 0.f, 0.f)
     );
 
-    entt::entity player = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, -1, 0 });
-    auto& renderp1 = registry_.get<RenderComponent>(player);
-    renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    renderp1.color = { 0.f, 1.f, 1.f, 1.f };
-    auto& channelp = registry_.get<InputChannelComponent>(player);
-    channelp.channel = 0;
+    /*
+    auto start = std::chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < 1'000; ++i)
+    {
+        Prefab::CreateStaticObject(registry_);
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::cout
+        << std::chrono::duration_cast<std::chrono::milliseconds>(
+            end - start
+        ).count()
+        << " ms\n";
+        */
+
+    //entt::entity player = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, -1, 0 });
+    //auto& renderp1 = registry_.get<RenderComponent>(player);
+    //renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    //renderp1.color = { 0.f, 1.f, 1.f, 1.f };
+    //auto& channelp = registry_.get<InputChannelComponent>(player);
+    //channelp.channel = 0;
 
 
-    // Ground
-    entt::entity ground = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, -3, 0 });
-    auto& trfGnd = registry_.get<TransformComponent>(ground);
-    trfGnd.SetScale(10, 0.1, 10);
-    auto& renderGnd = registry_.get<RenderComponent>(ground);
-    renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
-    
-    // Wave
-    auto wave = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, -2.9f, 0 });
-    registry_.emplace<WaveComponent>(wave, glm::vec3{ 0, -2.9f, 0 }, 5.f, 0.01f);
-    auto& waveRender = registry_.get<RenderComponent>(wave);
-    waveRender.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::OpenCylinder));
-    auto& waveTransform = registry_.get<TransformComponent>(wave);
-    waveTransform.SetScale({ 0.f, 0.1f, 0.f });
+    //// Ground
+    //entt::entity ground = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, -3, 0 });
+    //auto& trfGnd = registry_.get<TransformComponent>(ground);
+    //trfGnd.SetScale(10, 0.1, 10);
+    //auto& renderGnd = registry_.get<RenderComponent>(ground);
+    //renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
+    //
+    //// Wave
+    //auto wave = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, -2.9f, 0 });
+    //registry_.emplace<WaveComponent>(wave, glm::vec3{ 0, -2.9f, 0 }, 5.f, 0.01f);
+    //auto& waveRender = registry_.get<RenderComponent>(wave);
+    //waveRender.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::OpenCylinder));
+    //auto& waveTransform = registry_.get<TransformComponent>(wave);
+    //waveTransform.SetScale({ 0.f, 0.1f, 0.f });
 
-    //Projectile
-    auto projectile = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, 0.f, 0 });
-    registry_.emplace<TargetComponent>(projectile, GetUUID(registry_, player));
-    //registry_.emplace<LifetimeComponent>(projectile);
-    auto& trfPt = registry_.get<TransformComponent>(projectile);
-    trfPt.SetScale({ 0.5f, 0.5f, 0.5f });
-    auto& renderPt = registry_.get<RenderComponent>(projectile);
-    //renderPt.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain));
-    SetHierarchy(registry_, wave, projectile);
+    ////Projectile
+    //auto projectile = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, 0.f, 0 });
+    //registry_.emplace<TargetComponent>(projectile, GetUUID(registry_, player));
+    ////registry_.emplace<LifetimeComponent>(projectile);
+    //auto& trfPt = registry_.get<TransformComponent>(projectile);
+    //trfPt.SetScale({ 0.5f, 0.5f, 0.5f });
+    //auto& renderPt = registry_.get<RenderComponent>(projectile);
+    ////renderPt.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain));
+    //SetHierarchy(registry_, wave, projectile);
 }
 
 void MyState::Update()
