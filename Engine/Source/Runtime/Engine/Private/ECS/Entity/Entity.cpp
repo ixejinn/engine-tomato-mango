@@ -1,4 +1,5 @@
-﻿#include <entt/entt.hpp>
+﻿#include <regex>
+#include <entt/entt.hpp>
 
 #include "ECS/Entity/Entity.h"
 #include "ECS/Entity/Hierarchy.h"
@@ -24,38 +25,6 @@ namespace tomato
 			return tag.name == name;
 
 		return false;
-	}
-
-	std::string GenerateEntityName(entt::registry& reg, std::string_view baseName)
-	{
-		auto view = reg.view<NametagComponent>();
-
-		auto Exists = [&](const std::string& name)
-			{
-				for (auto [e, tag] : view.each())
-				{
-					if (tag.name == name)
-						return true;
-				}
-				return false;
-			};
-
-		std::string candidate(baseName);
-
-		if (!Exists(candidate))
-			return candidate;
-
-		int index = 1;
-
-		while (true)
-		{
-			candidate = std::string(baseName) + " (" + std::to_string(index) + ")";
-
-			if (!Exists(candidate))
-				return candidate;
-
-			++index;
-		}
 	}
 
 	entt::entity GetEntityByUUID(entt::registry& reg, UUID id)
@@ -95,4 +64,41 @@ namespace tomato
         else
             reg.destroy(e);
     }
+
+	void EntityNameGenerator::Initialize(entt::registry& reg)
+	{
+		static const std::regex pattern(R"(^(.+) \((\d+)\)$)");
+		nextIndices_.clear();
+
+		auto view = reg.view<NametagComponent>();
+		for (auto [e, name] : view.each())
+		{
+			std::smatch match;
+			
+			if (!std::regex_match(name.name, match, pattern))
+				nextIndices_.try_emplace(name.name, 1);
+			
+			else
+			{
+				std::string baseName = match[1].str();
+				uint32_t index = std::stoul(match[2].str());
+
+				auto& nextIndex = nextIndices_[baseName];
+				nextIndex = std::max(nextIndex, index + 1);
+			}
+		}
+	}
+
+	std::string EntityNameGenerator::Generate(std::string_view baseName)
+	{
+		auto& nextIndex = nextIndices_[std::string(baseName)];
+
+		if (nextIndex == 0)
+		{
+			nextIndex = 1;
+			return std::string(baseName);
+		}
+
+		return std::string(baseName) + " (" + std::to_string(nextIndex++) + ")";
+	}
 }

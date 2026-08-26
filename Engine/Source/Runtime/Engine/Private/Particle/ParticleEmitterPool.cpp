@@ -22,8 +22,9 @@ namespace tomato
         {
             entt::entity e = registry_.create();
 
+            auto& generator = reg.ctx().get<EntityNameGenerator>();
             registry_.emplace<NametagComponent>(e,
-                GenerateUUID(), GenerateEntityName(registry_, "ParticleEffect"));
+                GenerateUUID(), generator.Generate("ParticleEffect"));
             registry_.emplace<VisibilityComponent>(e);
 
             registry_.emplace<TransformComponent>(e);

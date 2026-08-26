@@ -19,8 +19,8 @@ namespace tomato::Serialization
 	void CreateJsonFile(const char*);
 	json LoadJsonData(const char*);
 
-	void SaveScene(entt::registry&, const char*);
-	void LoadScene(entt::registry&, const char*, std::unordered_map<UUID, entt::entity>&);
+	/*void SaveScene(entt::registry&, const char*);
+	void LoadScene(entt::registry&, const char*, std::unordered_map<UUID, entt::entity>&);*/
 	
 	void SaveScene(State*, const char*);
 	void LoadStateScene(State*, const char*);

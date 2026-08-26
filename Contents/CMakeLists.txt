@@ -14,7 +14,7 @@ set(CONTENTS_SOURCES
         Source/TimerTestSystem.cpp
         Source/CollisionTestState.h
         Source/CollisionTestState.cpp
- "Source/jung/MyState.cpp" "Source/jung/ProjectileSystem.cpp")
+ "Source/jung/MyState.cpp" "Source/jung/WaveSystem.cpp")
 
 add_executable(contents
         ${CONTENTS_SOURCES}

@@ -24,7 +24,6 @@ namespace tomato
         virtual void Update() = 0;
         virtual void Exit() = 0;
 
-        //Engine& GetEngine() { return engine_; }     /////////
         void SetNextState(std::unique_ptr<State>&&);
         std::unique_ptr<State> GetStateByID(AssetID);
 

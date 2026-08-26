@@ -90,9 +90,7 @@ namespace tomato
 
 	void Editor::Draw(State* state, RunMode& mode)
 	{
-#if 1
-		ImGui::ShowDemoWindow();
-
+		//ImGui::ShowDemoWindow();
 		if (eCtx.currentState != state)
 		{
 			eCtx.currentState = state;
@@ -103,16 +101,12 @@ namespace tomato
 		for (auto& panel : panels)
 			panel->Draw(eCtx);
 		
-		// if (Input::IsKeyPressed(Key::LeftMouseButton))
 		if (KeyDeviceState::GetInstance().IsKeyPressed(Key::LeftMouseButton))
 		{
 			auto& keyDeviceState = KeyDeviceState::GetInstance();
-			// PickObject(eCtx.currentState->GetRegistry(), Input::GetMousePosition());
 			PickObject(eCtx.currentState->GetRegistry(),
 				{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)});
 		}
-#elif 1
-#endif
 	}
 
 	void Editor::EndFrame()
