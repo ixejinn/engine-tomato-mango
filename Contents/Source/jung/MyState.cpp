@@ -39,7 +39,7 @@ void MyState::Init()
         glm::vec3(-30.f, 0.f, 0.f)
     );
 
-    Mesh::Create(Mesh::Primitive::OpenCylinder, 40, 10);
+    Mesh::Create(Mesh::Primitive::OpenCylinder, 50, 10);
     
     /*auto start = std::chrono::high_resolution_clock::now();
 
@@ -104,7 +104,6 @@ void MyState::Init()
     //auto& collider = registry_.get<HierarchyComponent>(projectile).children[0];
     //registry_.get<TransformComponent>(collider).SetScale(glm::vec3{1.f, 0.1f, 0.1f});
 
-    //WavePool wavePool(key_, registry_);
     registry_.ctx().emplace<WavePool>(key_, registry_);
 
     EventDispatcher::GetInstance().Connect<TriggerEnterEvent, &WaveCollisionEnter>();

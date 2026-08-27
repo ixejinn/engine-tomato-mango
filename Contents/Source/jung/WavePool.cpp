@@ -25,25 +25,29 @@ void WavePoolTraits::Assemble(entt::registry& registry_, entt::entity wave)
     registry_.emplace<TransformComponent>(wave, glm::vec3{ 0, -2.9f, 0 }, glm::vec3(0), glm::vec3(0, 0.1f, 0));
     registry_.emplace<RenderComponent>(wave,
         glm::vec4(1.f),
-        GetAssetID("Primitive::OpenCylinder_40_10"),
+        GetAssetID("Primitive::OpenCylinder_50_10"),
         GetAssetID(Shader::PrimitiveName),
         GetAssetID(Texture::PrimitiveName));
-    registry_.emplace<WaveComponent>(wave, false, glm::vec3{ 0, -2.9f, 0 }, 5.f, 0.01f);
+    registry_.emplace<WaveComponent>(wave, false, glm::vec3{ 0, -2.9f, 0 }, 10.f, 0.01f);
     registry_.emplace<RootEntityTag>(wave);
     registry_.emplace<EditorHidden>(wave);
 }
 
-void WavePoolTraits::Reset(entt::registry& registry_, entt::entity e, entt::entity owner, glm::vec3 pos, float speed)
+void WavePoolTraits::Reset(entt::registry& registry_, entt::entity e, entt::entity owner, glm::vec3 pos, float speed, float radius)
 {
     auto& waveComp = registry_.get<WaveComponent>(e);
     waveComp.active = true;
     waveComp.owner = owner;
     waveComp.speed = speed;
+    waveComp.radius = radius;
     waveComp.startTick = 0;
 
     auto& transform = registry_.get<TransformComponent>(e);
     transform.SetPosition(pos);
     transform.SetScale({ 0.f, 0.1f, 0.f });
+
+    auto& visibility = registry_.get<VisibilityComponent>(e);
+    visibility.visible = true;
 }
 
 bool WavePoolTraits::Deactivate(entt::registry& registry_, entt::entity e)
@@ -53,7 +57,9 @@ bool WavePoolTraits::Deactivate(entt::registry& registry_, entt::entity e)
         return false;
 
     wave->active = false;
-    wave->owner = entt::null;
+
+    auto& visibility = registry_.get<VisibilityComponent>(e);
+    visibility.visible = false;
 
     return true;
 }

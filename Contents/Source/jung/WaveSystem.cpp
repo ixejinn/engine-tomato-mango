@@ -69,6 +69,7 @@ void WaveSystem::Update(SimContext& simCtx)
 
 	for (auto [e, transform, wave] : waveView.each())
 	{
+		if (!wave.active) continue; // change active tag?
 		if (transform.GetLocalScale().x >= wave.radius * 2.f)
 			reg.ctx().get<WavePool>().Release(e);
 

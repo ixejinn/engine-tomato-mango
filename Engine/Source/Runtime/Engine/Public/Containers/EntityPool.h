@@ -5,13 +5,29 @@
 #include <vector>
 #include <optional>
 #include <cassert>
+#include <concepts>
 #include <type_traits>
 
 #include "Utils/PassKey.h"
 #include "State/StateFwd.h"
+#include "ECS/Components/TypeTraitsTag.h"
+
 namespace tomato
 {
+	// Deactivate가 있는지 컴파일 타임에 감지
 	template<typename Traits>
+	concept HasDeactivate = requires(entt::registry & registry_, entt::entity entity)
+	{
+		{ Traits::Deactivate(registry_, entity) };
+	};
+
+	template<typename Traits>
+	concept EntityPoolTraits = requires(entt::registry & registry_, entt::entity entity)
+	{
+		{ Traits::Assemble(registry_, entity) } -> std::same_as<void>;
+	};
+
+	template<EntityPoolTraits Traits>
 	class EntityPool
 	{
 	public:
@@ -38,9 +54,14 @@ namespace tomato
 
 		bool Release(entt::entity entity)
 		{
-			if (!Traits::Deactivate(registry_, entity))
-				return false;
+			assert(registry_.all_of<PoolOwnerTag<Traits>>(entity)
+				&& "Attempting to return a different Pool entity.");
 
+			if constexpr (HasDeactivate<Traits>)
+			{
+				if (!Traits::Deactivate(registry_, entity))
+					return false;
+			}
 			entities_.push_back(entity);
 
 			return true;
@@ -55,7 +76,7 @@ namespace tomato
 			{
 				entt::entity entity = registry_.create();
 				Traits::Assemble(registry_, entity);
-				//Traits Tag?
+				registry_.emplace<PoolOwnerTag<Traits>>(entity);
 
 				entities_.push_back(entity);
 			}

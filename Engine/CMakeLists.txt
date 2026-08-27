@@ -195,7 +195,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemFrameworkEventFwd.h
 		Source/Runtime/Engine/Public/Services/ChangeFramebufferSizeEvent.h
 		Source/Runtime/Engine/Public/Services/WindowEventFwd.h
- "Source/Runtime/Engine/Public/ECS/Components/EditorTag.h" "Source/Runtime/Engine/Public/Containers/EntityPool.h")
+ "Source/Runtime/Engine/Public/ECS/Components/EditorTag.h" "Source/Runtime/Engine/Public/Containers/EntityPool.h" "Source/Runtime/Engine/Public/ECS/Components/TypeTraitsTag.h")
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
