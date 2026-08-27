@@ -2,6 +2,7 @@
 #include "ECS/Components/Components.h"
 #include "WaveComponent.h"
 #include "WavePool.h"
+#include "WaveColliderPool.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "State/State.h"
 #include "Utils/RegistryEntry.h"
@@ -113,18 +114,21 @@ void WaveSystem::Update(SimContext& simCtx)
 		//	glm::vec3 newRot = targetTransform.GetWorldPosition() - childTransform.GetWorldPosition();
 		//	childTransform.SetQuaternion(glm::vec3{ 0.f, glm::normalize(newRot).y, 0.f });
 		//}
-		auto colView = reg.view<TransformComponent, TargetComponent, WaveColliderTag>();
-		for (auto [col, colTransform, target] : colView.each())
+		auto colView = reg.view<TransformComponent, TargetComponent, WaveColliderComponent, WaveColliderTag>();
+		for (auto [col, colTransform, target, waveCollider] : colView.each())
 		{
-			//colTransform.SetPosition(transform.GetLocalPosition());
+			if (waveCollider.wave != e)
+				continue;
+
 			auto* target = reg.try_get<TargetComponent>(col);
 				if (!target) continue;
 
 			auto tEntity = GetEntityByUUID(reg, target->target);
 			auto& targetTransform = reg.get<TransformComponent>(tEntity);
 
-			if (transform.GetLocalScale().x >= wave.radius * 2.f)
-				colTransform.SetPosition(wave.origin);
+			if (wave.active == false || transform.GetLocalScale().x >= wave.radius * 2.f)
+				reg.ctx().get<WaveColliderPool>().Release(col);
+				//colTransform.SetPosition(wave.origin);
 
 			int64_t elapsed = simCtx.tick - wave.startTick; //최초 생성 후 지난 틱
 
@@ -136,9 +140,10 @@ void WaveSystem::Update(SimContext& simCtx)
 			glm::vec3 wavePoint = wave.origin + glm::normalize(toTarget) * radius;
 
 			glm::vec3 newpoint = wavePoint;
-			colTransform.SetPosition({ newpoint.x, transform.GetLocalPosition().y, newpoint.z});
+			//colTransform.SetPosition({ newpoint.x, transform.GetLocalPosition().y, newpoint.z});
+			colTransform.SetPosition({ newpoint.x, 0.f, newpoint.z});
 
-			// targer 방향으로 법선 회전
+			// target 방향으로 법선 회전
 			glm::vec3 newRot = glm::normalize(targetTransform.GetWorldPosition() - colTransform.GetWorldPosition());
 			glm::quat rotation = glm::quatLookAt(newRot, glm::vec3(0, 1, 0));
 			colTransform.SetQuaternion(rotation);

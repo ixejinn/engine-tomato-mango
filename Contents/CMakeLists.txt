@@ -18,7 +18,7 @@ set(CONTENTS_SOURCES
         Source/jung/WaveSystem.cpp
         Source/jung/WavePool.h
         Source/jung/WavePool.cpp
-)
+ "Source/jung/WaveColliderPool.h" "Source/jung/WaveColliderPool.cpp")
 
 add_executable(contents
         ${CONTENTS_SOURCES}

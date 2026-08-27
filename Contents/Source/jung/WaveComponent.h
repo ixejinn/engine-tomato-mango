@@ -21,7 +21,7 @@ namespace tomato
 
 	struct WaveColliderComponent
 	{
-		entt::entity wave;
+		entt::entity wave{ entt::null };
 	};
 
 	struct WaveColliderTag {};

@@ -38,6 +38,7 @@ void WavePoolTraits::Reset(entt::registry& registry_, entt::entity e, entt::enti
     auto& waveComp = registry_.get<WaveComponent>(e);
     waveComp.active = true;
     waveComp.owner = owner;
+    waveComp.origin = pos;
     waveComp.speed = speed;
     waveComp.radius = radius;
     waveComp.startTick = 0;

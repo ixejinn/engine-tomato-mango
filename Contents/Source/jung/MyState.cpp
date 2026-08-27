@@ -21,10 +21,12 @@
 #include "ECS/Components/Nametag.h"
 #include "Particle/ParticleEmitterPool.h"
 #include "Utils/RegistryEntry.h"
+#include "Containers/EntityPool.h"
+
 #include "WaveComponent.h"
 #include "WaveCollisionComponent.h"
 #include "WavePool.h"
-#include "Containers/EntityPool.h"
+#include "WaveColliderPool.h"
 
 REGISTER_STATE(MyState)
 
@@ -105,6 +107,7 @@ void MyState::Init()
     //registry_.get<TransformComponent>(collider).SetScale(glm::vec3{1.f, 0.1f, 0.1f});
 
     registry_.ctx().emplace<WavePool>(key_, registry_);
+    registry_.ctx().emplace<WaveColliderPool>(key_, registry_);
 
     EventDispatcher::GetInstance().Connect<TriggerEnterEvent, &WaveCollisionEnter>();
     EventDispatcher::GetInstance().Connect<TriggerExitEvent, &WaveCollisionExit>();
@@ -124,7 +127,6 @@ void MyState::WaveCollisionEnter(const tomato::TriggerEnterEvent& event) {
 
     {
         auto* testComp = event.reg->try_get<WaveCollisionComponent>(root1);
-        //auto* target = event.reg->try_get<WaveColliderTag>(root2);
         if (testComp && event.reg->all_of<WaveColliderTag>(root2))
         {
             if (auto* render = event.reg->try_get<RenderComponent>(root1))
@@ -138,7 +140,6 @@ void MyState::WaveCollisionEnter(const tomato::TriggerEnterEvent& event) {
 
     {
         auto* testComp = event.reg->try_get<WaveCollisionComponent>(root2);
-        //auto* target = event.reg->try_get<WaveColliderTag>(root1);
         if (testComp && event.reg->all_of<WaveColliderTag>(root1))
         {
             if (auto* render = event.reg->try_get<RenderComponent>(root2))
@@ -176,6 +177,12 @@ void MyState::WaveCollisionExit(const tomato::TriggerExitEvent& event)
 
 void MyState::MakeWaveJump(const LandingEvent& event)
 {
-    auto e = event.reg->ctx().get<WavePool>().Acquire(event.e, event.position, 0.025f);
-    std::cout << "Make Wave " << (int)e.value() << "\n";
+    auto wave = event.reg->ctx().get<WavePool>().Acquire(event.e, event.position, 0.01f);
+    if (wave.has_value())
+    {
+        auto e = event.reg->ctx().get<WaveColliderPool>().Acquire(wave.value(), event.e);
+
+        std::cout << "Make Wave " << (int)wave.value() << "\n";
+        if(e.has_value()) std::cout << "Make Wave Coll" << (int)e.value() << "\n";
+    }
 }

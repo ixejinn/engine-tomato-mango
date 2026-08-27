@@ -14,7 +14,7 @@
 
 namespace tomato
 {
-	// Deactivate가 있는지 컴파일 타임에 감지
+	// Detect whether "Deactivate" exists at compile time.
 	template<typename Traits>
 	concept HasDeactivate = requires(entt::registry & registry_, entt::entity entity)
 	{
