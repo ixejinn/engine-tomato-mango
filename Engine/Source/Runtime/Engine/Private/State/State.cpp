@@ -16,7 +16,7 @@ namespace tomato
         registry_.ctx().emplace<CollisionContext>();
         registry_.ctx().emplace<UIContext>();
         registry_.ctx().emplace<EntityNameGenerator>();
-        registry_.ctx().emplace<ParticleEmitterPool>(PassKey<State>(), registry_);
+        registry_.ctx().emplace<ParticleEmitterPool>(key_, registry_);
 
         // Create editor mode camera
         entt::entity& editCam = registry_.ctx().get<RenderContext>().editorCam;

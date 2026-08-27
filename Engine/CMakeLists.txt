@@ -187,7 +187,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Math/Geometry.h
         Source/Runtime/Engine/Public/Math/AABB.h
         Source/Runtime/Engine/Public/Math/Ray.h
-		Source/Runtime/Engine/Public/Particle/ParticleEmitterPoolFwd.h
+		
 		Source/Runtime/Engine/Public/ECS/Systems/EditorCameraSystem.h
 		Source/Runtime/Engine/Public/ECS/Systems/PlayerCameraSystem.h
 		Source/Runtime/Engine/Public/Input/KeyDeviceState.h
@@ -195,7 +195,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemFrameworkEventFwd.h
 		Source/Runtime/Engine/Public/Services/ChangeFramebufferSizeEvent.h
 		Source/Runtime/Engine/Public/Services/WindowEventFwd.h
- "Source/Runtime/Engine/Public/ECS/Components/EditorTag.h")
+ "Source/Runtime/Engine/Public/ECS/Components/EditorTag.h" "Source/Runtime/Engine/Public/Containers/EntityPool.h")
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
