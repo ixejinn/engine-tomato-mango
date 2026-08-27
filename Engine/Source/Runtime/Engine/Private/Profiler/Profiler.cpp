@@ -1,23 +1,27 @@
 #include <iostream>
 #include "Profiler/Profiler.h"
-#include "Profiler/CPUUsage.h"
+#include "Profiler/ExecutionTime.h"
+#include "Services/Window.h"
 
 namespace tomato
 {
     void Profiler::Start()
     {
+        active_ = true;
         frameCnt_ = 0;
+        Window::SetVSync(false);
     }
 
     void Profiler::End()
     {
         active_ = false;
+        Window::SetVSync(true);
 
-        size_t startIdx = frameCnt_ - 256;
-        int totalCnt = 256;
-        if (frameCnt_ < 256) {
-            startIdx = 0;
-            totalCnt = frameCnt_;
+        size_t offset = frameCnt_ - PROFILER_SAMPLE_COUNT;
+        int sampleCnt = PROFILER_SAMPLE_COUNT;
+        if (frameCnt_ < PROFILER_SAMPLE_COUNT) {
+            offset = 0;
+            sampleCnt = frameCnt_;
         }
 
         std::cout << "\n";
@@ -31,20 +35,20 @@ namespace tomato
 
         double avgMain = -1;
 
-        auto view = registry_.view<CPUUsageGraphDataComponent>();
-        for (auto [e, graphData] : view.each())
+        auto view = registry_.view<ExecutionTimeHistoryComponent>();
+        for (auto [e, exeHistory] : view.each())
         {
-            long long sum = 0;
-            for (size_t i = startIdx; i < frameCnt_; ++i)
-                sum += graphData.data[i];
+            long long exeSum = 0;
+            for (size_t i = offset; i < frameCnt_; ++i)
+                exeSum += exeHistory.data[i];
 
-            double avg = sum / totalCnt;
+            double avg = exeSum / sampleCnt;
 
-            if (e == main_)
+            if (registry_.all_of<TotalFrameTag>(e))
                 avgMain = avg;
             else
             {
-                std::cout << " " << std::left << std::setw(39) << graphData.name
+                std::cout << " " << std::left << std::setw(39) << exeHistory.name
                     << " | " << std::right << std::fixed << std::setprecision(1) << std::setw(17) << avg
                     << " | " << std::right << std::fixed << std::setprecision(3) << std::setw(17) << avg * 0.001
                     << "\n";
@@ -58,25 +62,27 @@ namespace tomato
             << "\n";
         
         std::cout << "================================================================================\n";
-        std::cout << " * Each average is calculated over the last " << totalCnt << " recorded frames.\n";
+        std::cout << " * Each average is calculated over the last " << sampleCnt << " recorded frames.\n";
         std::cout << "================================================================================\n\n";
     }
 
     void Profiler::BeginFrame()
     {
-        auto view = registry_.view<CPUUsageComponent>();
-        for (auto [e, usage] : view.each())
+        // Initialize execution time 0
+        auto view = registry_.view<ExecutionTimeComponent>();
+        for (auto [e, exeTime] : view.each())
         {
-            usage.usage = 0;
+            exeTime.microSecs = 0;
         }
     }
 
     void Profiler::Update()
     {
-        auto view = registry_.view<CPUUsageComponent, CPUUsageGraphDataComponent>();
-        for (auto [e, usage, graphData] : view.each())
+        // Copy execution time sample of ExecutionTimeComponent to ExecutionTimeHistoryComponent
+        auto view = registry_.view<ExecutionTimeComponent, ExecutionTimeHistoryComponent>();
+        for (auto [e, exeTime, exeHistory] : view.each())
         {
-            graphData.data[frameCnt_] = usage.usage;
+            exeHistory.data[frameCnt_] = exeTime.microSecs;
         }
 
         ++frameCnt_;

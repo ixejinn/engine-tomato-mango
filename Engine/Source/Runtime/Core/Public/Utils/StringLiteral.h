@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <algorithm>
+#include <string_view>
 
 namespace tomato
 {
@@ -14,12 +15,7 @@ namespace tomato
             std::copy_n(str, N, value);
         }
 
-        constexpr operator std::string_view() const noexcept
-        {
-            return { value, N - 1 };
-        }
-
-        constexpr bool operator==(std::string_view other) const noexcept
+        constexpr bool operator==(const std::string_view other) const noexcept
         {
             return std::string_view(value, N - 1) == other;
         }

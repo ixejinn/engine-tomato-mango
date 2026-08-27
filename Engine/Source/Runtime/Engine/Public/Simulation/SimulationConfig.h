@@ -1,5 +1,5 @@
-#ifndef MANGO_ENGINECONFIG_H
-#define MANGO_ENGINECONFIG_H
+#ifndef MANGO_SIMULATIONCONFIG_H
+#define MANGO_SIMULATIONCONFIG_H
 
 namespace tomato {
     constexpr int FRAME_PER_SECOND{60};
@@ -8,4 +8,4 @@ namespace tomato {
     constexpr int MAX_SIMULATION_NUM_PER_FRAME{3};
 }
 
-#endif //MANGO_ENGINECONFIG_H
+#endif //MANGO_SIMULATIONCONFIG_H

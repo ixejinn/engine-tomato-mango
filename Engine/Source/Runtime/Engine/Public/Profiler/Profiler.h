@@ -26,8 +26,7 @@ namespace tomato
 
         bool IsActive() const { return active_; }
         void SetActive(bool active) { active_ = active; }
-
-        void SetMainProfiler(entt::entity e) { main_ = e; }
+        void ToggleActive() { active_ = !active_; }
 
         void Start();
         void End();
@@ -37,10 +36,8 @@ namespace tomato
 
     private:
         entt::registry registry_;
-        entt::entity main_{ entt::null };
 
         size_t frameCnt_{0};
-
         bool active_{false};
     };
 }

@@ -11,6 +11,9 @@
 		
 		Source/ThirdParty/imgui/backends/imgui_impl_glfw.cpp
 		Source/ThirdParty/imgui/backends/imgui_impl_opengl3.cpp
+
+		Source/ThirdParty/implot/implot.cpp
+		Source/ThirdParty/implot/implot_items.cpp
 )
 
 set(ENGINE_HEADERS
@@ -199,7 +202,9 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Profiler/Profiler.h
 		Source/Runtime/Core/Public/Utils/StringLiteral.h
 		Source/Runtime/Core/Public/Profiler/CPUProfiler.h
-		Source/Runtime/Engine/Public/Profiler/CPUUsage.h
+        Source/Runtime/Engine/Public/Profiler/ExecutionTime.h
+		Source/Runtime/Engine/Public/Profiler/ProfilerConfig.h
+		Source/Runtime/Engine/Public/EngineConfig.h
 )
 
 set(ENGINE_SOURCES
@@ -287,7 +292,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/ECS/Systems/EditorCameraSystem.cpp
 		Source/Runtime/Engine/Private/Input/KeyDeviceState.cpp
         Source/Runtime/Engine/Private/ECS/Systems/PlayerCameraSystem.cpp
-		Source/Runtime/Core/Private/Profiler/Profiler.cpp
+        Source/Runtime/Engine/Private/Profiler/Profiler.cpp
 )
 
 add_library(engine STATIC

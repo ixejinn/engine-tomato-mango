@@ -1,4 +1,6 @@
 ﻿#include "Engine.h"
+#include "EngineConfig.h"
+
 #include "Event/EventDispatcher.h"
 #include "Simulation/Tick/TickClock.h"
 #include "State/DefaultState.h"
@@ -15,9 +17,6 @@
 #include "Profiler/CPUProfiler.h"
 #include "Input/KeyDeviceState.h"
 
-#include "Clock/Timer.h"
-using namespace std::chrono_literals;
-
 namespace tomato {
     Engine::Engine(const int width, const int height, const char* title, NetMode netMode)
         : window_(width, height, title)
@@ -25,8 +24,8 @@ namespace tomato {
         , netMode_(netMode)
     {
         InitializeInputCallbacks();
-
         InitializeNetwork();
+
         editor_.InitImGui(window_.GetHandle(), input_);
 
         Serialization::ComponentRegistry::GetInstance().Init();
@@ -69,8 +68,11 @@ namespace tomato {
         systemRegistry.RegisterEventCallbacks();
 
         TickClock tickClock;
-        RunMode runMode{ RunMode::Editor };
-        //RunMode runMode{RunMode::Game}; // TODO: remove this line
+#ifdef TOMATO_ENGINE
+        RunMode runMode{RunMode::Editor};
+#else
+        RunMode runMode{RunMode::Game};
+#endif
 
         window_.SetWindowUserPointer(input_, tickClock);
         GarbageEntityCollectionSystem garbageCollectionSystem;
@@ -79,29 +81,13 @@ namespace tomato {
 
         auto& keyState = KeyDeviceState::GetInstance();
         auto& profiler = Profiler::GetInstance();
-        bool profilerKeyPressed = false;
 
         while (!window_.ShouldClose() && isRunning_)
         {
             if (nextState_)
                 ChangeState(tickClock);
 
-            if (!profilerKeyPressed && keyState.IsKeyPressed(Key::P))
-                profilerKeyPressed = true;
-
-            if (profilerKeyPressed && keyState.IsKeyReleased(Key::P))
-            {
-                profilerKeyPressed = false;
-
-                bool profilerState = !profiler.IsActive();
-                profiler.SetActive(profilerState);
-                if (profilerState)
-                    profiler.Start();
-                else
-                    profiler.End();
-            }
-
-            CPU_PROFILER_BEGIN(TOTAL)
+            CPU_PROFILER_TOTAL_BEGIN()
 
             // std::cout << "       *========== " << tickClock.GetTick() << " ==========*\n";
             ProcessQueuedPackets(tickClock);
@@ -132,8 +118,7 @@ namespace tomato {
             Update(simCtx, runMode);
             UpdateEditor(runMode);
 
-            CPU_PROFILER_END(TOTAL)
-            profiler.Update();
+            CPU_PROFILER_TOTAL_END()
 
             window_.SwapBuffers();
             // ----------* Simulate and render
@@ -191,7 +176,9 @@ namespace tomato {
 
     void Engine::Update(SimContext& simCtx, RunMode mode)
     {
+        CPU_PROFILER_BLOCK_BEGIN(Update);
         systemManager_.Update(simCtx, mode);
+        CPU_PROFILER_BLOCK_END(Update);
     }
 
     void Engine::UpdateEditor(RunMode& mode)

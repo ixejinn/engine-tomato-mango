@@ -4,21 +4,23 @@
 #include <chrono>
 #include <string>
 #include "Containers/RingArray.h"
+#include "Profiler/ProfilerConfig.h"
 
 namespace tomato
 {
-    struct CPUUsageComponent
+    struct ExecutionTimeComponent
     {
         std::chrono::time_point<std::chrono::high_resolution_clock> start;
-
-        int usage;
+        int microSecs{0};
     };
 
-    struct CPUUsageGraphDataComponent
+    struct ExecutionTimeHistoryComponent
     {
-        std::string name;
-        RingArray<int, 256> data;
+        std::string_view name;
+        RingArray<int, PROFILER_SAMPLE_COUNT> data;
     };
+
+    struct TotalFrameTag {};
 }
 
 #endif //MANGO_CPUUSAGE_H

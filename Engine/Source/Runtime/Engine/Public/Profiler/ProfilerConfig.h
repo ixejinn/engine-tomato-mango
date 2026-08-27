@@ -1,0 +1,9 @@
+#ifndef MANGO_PROFILERCONFIG_H
+#define MANGO_PROFILERCONFIG_H
+
+namespace tomato
+{
+    constexpr int PROFILER_SAMPLE_COUNT{256};
+}
+
+#endif //MANGO_PROFILERCONFIG_H

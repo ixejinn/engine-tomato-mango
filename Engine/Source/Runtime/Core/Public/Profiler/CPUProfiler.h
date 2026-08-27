@@ -4,53 +4,64 @@
 #include "entt/entt.hpp"
 #include "Utils/StringLiteral.h"
 #include "Profiler/Profiler.h"
-#include "Profiler/CPUUsage.h"
+#include "Profiler/ExecutionTime.h"
+#include "EngineConfig.h"
 
 namespace tomato
 {
     template<StringLiteral Str>
     struct CPUProfiler
     {
-        static void MarkerBegin()
+        static void Begin()
         {
+            auto& profiler = Profiler::GetInstance();
+            auto& registry = profiler.GetRegistry();
+
             if (e == entt::null)
             {
-                auto& profiler = Profiler::GetInstance();
-                auto& registry = profiler.GetRegistry();
+                // Create CPU profiler entity
                 e = registry.create();
-                registry.emplace<CPUUsageComponent>(e);
-                auto& graphData = registry.emplace<CPUUsageGraphDataComponent>(e);
-                graphData.name = std::string(Str);
+                registry.emplace<ExecutionTimeComponent>(e);
+                auto& graphData = registry.emplace<ExecutionTimeHistoryComponent>(e);
+                graphData.name = Str.value;
 
                 if constexpr (Str == "TOTAL")
-                    profiler.SetMainProfiler(e);
+                    registry.emplace<TotalFrameTag>(e);
             }
 
-            auto& profiler = Profiler::GetInstance();
             if (!profiler.IsActive())
                 return;
-            
-            auto& usage = profiler.GetRegistry().get<CPUUsageComponent>(e);
-            usage.start = std::chrono::high_resolution_clock::now();
+
+            auto& sample = profiler.GetRegistry().get<ExecutionTimeComponent>(e);
+            sample.start = std::chrono::high_resolution_clock::now();
         }
 
-        static void MarkerEnd()
+        static void End()
         {
             auto& profiler = Profiler::GetInstance();
             if (!profiler.IsActive())
                 return;
 
-            auto& usage = profiler.GetRegistry().get<CPUUsageComponent>(e);
+            auto& sample = profiler.GetRegistry().get<ExecutionTimeComponent>(e);
 
             auto end = std::chrono::high_resolution_clock::now();
-            usage.usage = std::chrono::duration_cast<std::chrono::microseconds>(end - usage.start).count();
+            sample.microSecs = std::chrono::duration_cast<std::chrono::microseconds>(end - sample.start).count();
         }
 
         inline static entt::entity e{entt::null};
     };
 }
 
-#define CPU_PROFILER_BEGIN(BLOCK_NAME) tomato::CPUProfiler<#BLOCK_NAME>::MarkerBegin();
-#define CPU_PROFILER_END(BLOCK_NAME)   tomato::CPUProfiler<#BLOCK_NAME>::MarkerEnd();
+#ifdef TOMATO_DEBUG
+#define CPU_PROFILER_BLOCK_BEGIN(BLOCK_NAME) tomato::CPUProfiler<#BLOCK_NAME>::Begin();
+#define CPU_PROFILER_BLOCK_END(BLOCK_NAME)   tomato::CPUProfiler<#BLOCK_NAME>::End();
+#define CPU_PROFILER_TOTAL_BEGIN() tomato::CPUProfiler<"TOTAL">::Begin();
+#define CPU_PROFILER_TOTAL_END()   tomato::CPUProfiler<"TOTAL">::End();
+#else
+#define CPU_PROFILER_BLOCK_BEGIN(BLOCK_NAME)
+#define CPU_PROFILER_BLOCK_END(BLOCK_NAME)
+#define CPU_PROFILER_TOTAL_BEGIN()
+#define CPU_PROFILER_TOTAL_END()
+#endif
 
 #endif //MANGO_CPUPROFILER_H
