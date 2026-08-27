@@ -195,7 +195,12 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemFrameworkEventFwd.h
 		Source/Runtime/Engine/Public/Services/ChangeFramebufferSizeEvent.h
 		Source/Runtime/Engine/Public/Services/WindowEventFwd.h
- "Source/Runtime/Engine/Public/ECS/Components/EditorTag.h")
+ "Source/Runtime/Engine/Public/ECS/Components/EditorTag.h"
+		Source/Runtime/Engine/Public/Profiler/Profiler.h
+		Source/Runtime/Core/Public/Utils/StringLiteral.h
+		Source/Runtime/Core/Public/Profiler/CPUProfiler.h
+		Source/Runtime/Engine/Public/Profiler/CPUUsage.h
+)
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -282,6 +287,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/ECS/Systems/EditorCameraSystem.cpp
 		Source/Runtime/Engine/Private/Input/KeyDeviceState.cpp
         Source/Runtime/Engine/Private/ECS/Systems/PlayerCameraSystem.cpp
+		Source/Runtime/Core/Private/Profiler/Profiler.cpp
 )
 
 add_library(engine STATIC

@@ -118,7 +118,9 @@ namespace tomato::Prefab
     {
         // Center(root)
         const entt::entity center = reg.create();
-        reg.emplace<NametagComponent>(center, GenerateUUID(), GenerateEntityName(reg, "Gizmo"));
+
+        auto& generator = reg.ctx().get<EntityNameGenerator>();
+        reg.emplace<NametagComponent>(center, GenerateUUID(), generator.Generate("Gizmo"));
         reg.emplace<TransformComponent>(center);
         reg.emplace<VisibilityComponent>(center);
         reg.emplace<RootEntityTag>(center);
@@ -131,7 +133,7 @@ namespace tomato::Prefab
 
         // X axis
         const entt::entity x = reg.create();
-        reg.emplace<NametagComponent>(x, GenerateUUID(), GenerateEntityName(reg, "X"));
+        reg.emplace<NametagComponent>(x, GenerateUUID(), generator.Generate("X"));
         reg.emplace<TransformComponent>(x,
             glm::vec3(3, 0, 0),
             glm::vec3(0, 0, 90),
@@ -146,7 +148,7 @@ namespace tomato::Prefab
 
         // Y axis
         const entt::entity y = reg.create();
-        reg.emplace<NametagComponent>(y, GenerateUUID(), GenerateEntityName(reg, "Y"));
+        reg.emplace<NametagComponent>(y, GenerateUUID(), generator.Generate("Y"));
         reg.emplace<TransformComponent>(y,
             glm::vec3(0, 3, 0),
             glm::vec3(-180, 0, 0),
@@ -161,7 +163,7 @@ namespace tomato::Prefab
 
         // Z axis
         const entt::entity z = reg.create();
-        reg.emplace<NametagComponent>(z, GenerateUUID(), GenerateEntityName(reg, "Z"));
+        reg.emplace<NametagComponent>(z, GenerateUUID(), generator.Generate("Z"));
         reg.emplace<TransformComponent>(z,
             glm::vec3(0, 0, 3),
             glm::vec3(-90, 0, 0),

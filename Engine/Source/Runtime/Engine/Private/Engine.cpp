@@ -11,6 +11,9 @@
 #include "Editor.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 #include "Utils/Logger.h"
+#include "Profiler/Profiler.h"
+#include "Profiler/CPUProfiler.h"
+#include "Input/KeyDeviceState.h"
 
 #include "Clock/Timer.h"
 using namespace std::chrono_literals;
@@ -74,10 +77,31 @@ namespace tomato {
 
         network_->ThreadStart();
 
+        auto& keyState = KeyDeviceState::GetInstance();
+        auto& profiler = Profiler::GetInstance();
+        bool profilerKeyPressed = false;
+
         while (!window_.ShouldClose() && isRunning_)
         {
             if (nextState_)
                 ChangeState(tickClock);
+
+            if (!profilerKeyPressed && keyState.IsKeyPressed(Key::P))
+                profilerKeyPressed = true;
+
+            if (profilerKeyPressed && keyState.IsKeyReleased(Key::P))
+            {
+                profilerKeyPressed = false;
+
+                bool profilerState = !profiler.IsActive();
+                profiler.SetActive(profilerState);
+                if (profilerState)
+                    profiler.Start();
+                else
+                    profiler.End();
+            }
+
+            CPU_PROFILER_BEGIN(TOTAL)
 
             // std::cout << "       *========== " << tickClock.GetTick() << " ==========*\n";
             ProcessQueuedPackets(tickClock);
@@ -107,6 +131,10 @@ namespace tomato {
 
             Update(simCtx, runMode);
             UpdateEditor(runMode);
+
+            CPU_PROFILER_END(TOTAL)
+            profiler.Update();
+
             window_.SwapBuffers();
             // ----------* Simulate and render
 
@@ -114,6 +142,12 @@ namespace tomato {
         }
 
         network_->ThreadStop();
+
+        if (profiler.IsActive())
+        {
+            profiler.SetActive(false);
+            profiler.End();
+        }
     }
 
     void Engine::RequestMatchToServer()
