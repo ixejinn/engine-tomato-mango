@@ -29,7 +29,7 @@ using namespace tomato;
 void MyState::Init()
 {
     // Camera
-    Prefab::CreateCamera(registry_,
+    Prefab::CreateCamera(registry_, "Camera",
         true,
         glm::vec3(0.f, 4.f, 10.f),
         glm::vec3(-30.f, 0.f, 0.f)

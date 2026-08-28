@@ -76,4 +76,10 @@ namespace tomato
         scale = glm::vec3{x, y, z};
         dirty = true;
     }
+
+    void TransformComponent::SetScale(float s)
+    {
+        scale = glm::vec3{s, s, s};
+        dirty = true;
+    }
 }

@@ -38,6 +38,7 @@ namespace tomato
         glm::vec3 GetWorldScale() const { return wScale; }
         void SetScale(const glm::vec3& newScl);
         void SetScale(float x, float y, float z);
+        void SetScale(float s);
 
         const glm::mat4& GetTransformMatrix() const { return transformMatrix; }
 

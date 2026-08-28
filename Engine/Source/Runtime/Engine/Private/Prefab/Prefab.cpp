@@ -12,95 +12,114 @@
 
 namespace tomato::Prefab
 {
-    void AddRequiredComponents(entt::registry& reg, entt::entity e, std::string name)
+    entt::entity CreateBaseEntity(
+        entt::registry& registry, const std::string& name, const bool root)
     {
-        auto& generator = reg.ctx().get<EntityNameGenerator>();
+        const entt::entity obj = registry.create();
 
-        reg.emplace<NametagComponent>(e, GenerateUUID(), generator.Generate(name));
-        reg.emplace<VisibilityComponent>(e);
+        registry.emplace<NametagComponent>(obj, GenerateUUID(), registry.ctx().get<EntityNameGenerator>().Generate(name));
+        registry.emplace<VisibilityComponent>(obj);
+        registry.emplace<TransformComponent>(obj);
+        if (root)
+            registry.emplace<RootEntityTag>(obj);
+
+        return obj;
     }
 
-    entt::entity CreateEmpty(entt::registry& reg, Primitive mesh, glm::vec3 pos)
+    entt::entity CreateCamera(
+        entt::registry& registry, const std::string& name,
+        const bool main, const glm::vec3& pos, const glm::vec3& rot)
     {
-        const entt::entity obj = reg.create();
+        const entt::entity obj = CreateBaseEntity(registry, name);
 
-        auto& generator = reg.ctx().get<EntityNameGenerator>();
-        reg.emplace<NametagComponent>(obj, GenerateUUID(), generator.Generate("GameObject"));
-        reg.emplace<VisibilityComponent>(obj);
-        reg.emplace<TransformComponent>(obj, pos);
-        reg.emplace<RootEntityTag>(obj);
+        registry.emplace<CameraComponent>(obj);
 
-        TMT_INFO << "Create Empty object: " << (int)obj;
+        if (main)
+            registry.emplace<MainCameraTag>(obj);
+
+        auto& trf = registry.get<TransformComponent>(obj);
+        trf.SetPosition(pos);
+        trf.SetRotationDegree(rot);
+
         return obj;
     }
 
-    entt::entity CreateStaticObject(entt::registry& reg,
-                                            Primitive mesh, glm::vec3 pos) {
-        const entt::entity obj = reg.create();
+    entt::entity CreateStaticMesh(entt::registry& registry, const std::string& name)
+    {
+        const entt::entity obj = CreateBaseEntity(registry, name);
 
-        auto& generator = reg.ctx().get<EntityNameGenerator>();
-        reg.emplace<NametagComponent>(obj, GenerateUUID(), generator.Generate("Object"));
-        reg.emplace<TransformComponent>(obj, pos);
-        reg.emplace<RenderComponent>(obj,
-                                     glm::vec4(1.f),
-                                     GetAssetID(Mesh::GetPrimitiveName(
-                                             mesh == Cube ? Mesh::Primitive::Cube : Mesh::Primitive::Sphere)),
-                                     GetAssetID(Shader::PrimitiveName),
-                                     GetAssetID(Texture::PrimitiveName));
-        reg.emplace<VisibilityComponent>(obj);
-        const entt::entity col = AttachCollider(reg, obj, mesh == Cube ? ColliderType::Cube : ColliderType::Sphere);
+        registry.emplace<RenderComponent>(obj);
 
-        TMT_INFO << "Create static object: " << (int)obj;
         return obj;
     }
 
-    entt::entity CreateCharacter(entt::registry& reg,
-                                         Primitive mesh, glm::vec3 pos) {
-        const entt::entity obj = reg.create();
+    entt::entity CreateTriggerVolume(entt::registry& registry, const std::string& name)
+    {
+        const entt::entity obj = CreateBaseEntity(registry, name);
 
-        auto& generator = reg.ctx().get<EntityNameGenerator>();
-        reg.emplace<NametagComponent>(obj, GenerateUUID(), generator.Generate("Character"));
-        reg.emplace<TransformComponent>(obj, pos);
-        reg.emplace<RenderComponent>(obj,
-                                     glm::vec4(1.f),
-                                     GetAssetID(Mesh::GetPrimitiveName(
-                                             mesh == Cube ? Mesh::Primitive::Cube : Mesh::Primitive::Sphere)),
-                                     GetAssetID(Shader::PrimitiveName),
-                                     GetAssetID(Texture::PrimitiveName));
-        reg.emplace<VisibilityComponent>(obj);
+        registry.emplace<ColliderComponent>(obj, true);
 
-        const entt::entity col = AttachCharacterCollider(reg, obj, mesh == Cube ? ColliderType::Cube : ColliderType::Sphere);
-
-        reg.emplace<VelocityComponent>(obj);
-        reg.emplace<InputChannelComponent>(obj);    //////////////////// 수정
-        reg.emplace<MovementComponent>(obj);
-        reg.emplace<CharacterTag>(obj);
-        reg.emplace<RollbackEntityTag>(obj);
-
-        TMT_INFO << "Create character: " << (int)obj;
         return obj;
     }
 
-    entt::entity CreateCamera(entt::registry& reg, bool isMain,
-                                      glm::vec3 pos, glm::vec3 rot
-                                      ) {
-        const entt::entity obj = reg.create();
+    entt::entity CreateWorldObject(entt::registry& registry, const std::string& name, bool printInfo)
+    {
+        const entt::entity obj = CreateBaseEntity(registry, name);
 
-        auto& generator = reg.ctx().get<EntityNameGenerator>();
-        reg.emplace<NametagComponent>(obj, GenerateUUID(), generator.Generate("Camera"));
-        reg.emplace<TransformComponent>(obj, pos, rot);
-        reg.emplace<CameraComponent>(obj);
-        reg.emplace<RootEntityTag>(obj);
-        reg.emplace<VisibilityComponent>(obj);
-        // reg.emplace<RollbackEntityTag>(obj);
+        registry.emplace<RenderComponent>(obj);
+        const entt::entity col = AttachColliderEntity(registry, obj, false);
 
-        if (isMain)
-            reg.emplace<MainCameraTag>(obj);
-
-        TMT_INFO << "Create camera: " << (int)obj;
+        if (printInfo)
+        {
+            TMT_INFO << "[WorldObject] " << std::left << std::setw(12) << name << "\n"
+                     << "              entity   ID: " << std::right << std::setw(4) << (int)obj
+                     << "              collider ID: " << std::right << std::setw(4) << (int)col;
+        }
         return obj;
     }
 
+    entt::entity CreateCharacter(entt::registry& registry, const std::string& name, bool printInfo)
+    {
+        const entt::entity obj = CreateWorldObject(registry, name, false);
+
+        registry.emplace<VelocityComponent>(obj);
+        registry.emplace<InputChannelComponent>(obj);
+        registry.emplace<MovementComponent>(obj);
+
+        registry.emplace<CharacterTag>(obj);
+        registry.emplace<RollbackEntityTag>(obj);
+
+        const entt::entity colObj = registry.get<HierarchyComponent>(obj).children[0];
+        const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, "Ground trigger");
+
+        auto& trfColGnd = registry.get<TransformComponent>(colGnd);
+        constexpr float scaleColGnd = 0.8;
+        constexpr float deltaPosY = (1 - scaleColGnd) * 0.5f + COLLISION_SKIN * 2;
+        trfColGnd.SetScale(scaleColGnd);
+        trfColGnd.SetPosition(0, -deltaPosY, 0);
+
+        if (printInfo)
+        {
+            TMT_INFO << "[ Character ] " << std::left << std::setw(12) << name << "\n"
+                     << "              entity   ID: " << std::right << std::setw(4) << (int)obj
+                     << "              collider ID: " << std::right << std::setw(4) << (int)colObj
+                     << "              trigger  ID: " << std::right << std::setw(4) << (int)colGnd;
+        }
+        return obj;
+    }
+
+    entt::entity AttachColliderEntity(entt::registry& registry, entt::entity parent, bool trigger, const std::string& name)
+    {
+        const entt::entity col = CreateBaseEntity(registry, name, false);
+
+        registry.emplace<ColliderComponent>(col, trigger);
+        registry.emplace<RenderComponent>(col);
+        SetHierarchy(registry, parent, col);
+
+        return col;
+    }
+
+    /////////////// 구버전
     entt::entity CreateSkybox(entt::registry& reg)
     {
         const entt::entity obj = reg.create();
@@ -180,41 +199,41 @@ namespace tomato::Prefab
         return center;
     }
 
-    entt::entity AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
-        const entt::entity col = reg.create();
-
-        auto& generator = reg.ctx().get<EntityNameGenerator>();
-        reg.emplace<NametagComponent>(col, GenerateUUID(), generator.Generate("Collider"));
-
-        SetHierarchy(reg, parent, col);
-
-        reg.emplace<TransformComponent>(col);
-        reg.emplace<ColliderComponent>(col, type);
-        reg.emplace<RenderComponent>(col,
-                                     glm::vec4(1.f),
-                                     GetAssetID(Mesh::GetPrimitiveName(
-                                             type == ColliderType::Cube ? Mesh::Primitive::Cube : Mesh::Primitive::Sphere)),
-                                     GetAssetID(Shader::PrimitiveName),
-                                     GetAssetID(Texture::PrimitiveName));
-        reg.emplace<VisibilityComponent>(col);
-
-        TMT_INFO << "Create collider: " << (int)col;
-        return col;
-    }
-
-    entt::entity AttachCharacterCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
-        const entt::entity col = AttachCollider(reg, parent, type);
-        TransformComponent& trfP = reg.get<TransformComponent>(parent);
-
-        const entt::entity ground = AttachCollider(reg, col, type);
-        TransformComponent& trfC = reg.get<TransformComponent>(ground);
-        
-        trfC.SetScale(trfP.GetLocalScale() * 0.8f);
-        trfC.AddPosition({0.f, -(trfP.GetLocalScale().y * 0.1 + COLLISION_SKIN + 0.001f), 0.f});
-        
-        reg.get<ColliderComponent>(ground).isTrigger = true;
-        
-        TMT_INFO << "Create character collider, ground: " << (int)col << ", " << (int)ground;
-        return col;
-    }
+    // entt::entity AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
+    //     const entt::entity col = reg.create();
+    //
+    //     auto& generator = reg.ctx().get<EntityNameGenerator>();
+    //     reg.emplace<NametagComponent>(col, GenerateUUID(), generator.Generate("Collider"));
+    //
+    //     SetHierarchy(reg, parent, col);
+    //
+    //     reg.emplace<TransformComponent>(col);
+    //     reg.emplace<ColliderComponent>(col, type);
+    //     reg.emplace<RenderComponent>(col,
+    //                                  glm::vec4(1.f),
+    //                                  GetAssetID(Mesh::GetPrimitiveName(
+    //                                          type == ColliderType::Cube ? Mesh::Primitive::Cube : Mesh::Primitive::Sphere)),
+    //                                  GetAssetID(Shader::PrimitiveName),
+    //                                  GetAssetID(Texture::PrimitiveName));
+    //     reg.emplace<VisibilityComponent>(col);
+    //
+    //     TMT_INFO << "Create collider: " << (int)col;
+    //     return col;
+    // }
+    //
+    // entt::entity AttachCharacterCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
+    //     const entt::entity col = AttachCollider(reg, parent, type);
+    //     TransformComponent& trfP = reg.get<TransformComponent>(parent);
+    //
+    //     const entt::entity ground = AttachCollider(reg, col, type);
+    //     TransformComponent& trfC = reg.get<TransformComponent>(ground);
+    //
+    //     trfC.SetScale(trfP.GetLocalScale() * 0.8f);
+    //     trfC.AddPosition({0.f, -(trfP.GetLocalScale().y * 0.1 + COLLISION_SKIN + 0.001f), 0.f});
+    //
+    //     reg.get<ColliderComponent>(ground).trigger = true;
+    //
+    //     TMT_INFO << "Create character collider, ground: " << (int)col << ", " << (int)ground;
+    //     return col;
+    // }
 }

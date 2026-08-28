@@ -12,9 +12,8 @@ set(CONTENTS_SOURCES
         Source/CollisionTestComponent.h
         Source/UIController.cpp
         Source/TimerTestSystem.cpp
-        Source/CollisionTestState.h
-        Source/CollisionTestState.cpp
- "Source/jung/MyState.cpp" "Source/jung/WaveSystem.cpp")
+		"Source/jung/MyState.cpp" "Source/jung/WaveSystem.cpp"
+)
 
 add_executable(contents
         ${CONTENTS_SOURCES}

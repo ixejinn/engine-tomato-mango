@@ -515,14 +515,14 @@ namespace tomato::Serialization
 	{
 		data["layer"] = collider.layer;
 		data["type"] =  collider.type;
-		data["trigger"] = collider.isTrigger;
+		data["trigger"] = collider.trigger;
 	}
 
 	void Load(const json& data, ColliderComponent& collider)
 	{
 		collider.layer = data["layer"];
 		collider.type = data["type"];
-		collider.isTrigger = data["trigger"];
+		collider.trigger = data["trigger"];
 	}
 
 	
