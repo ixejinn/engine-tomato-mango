@@ -56,6 +56,67 @@ void TestState::Init() {
     trfCam.SetPosition(0, 8, 8);
     trfCam.SetRotationDegree(-50, 0, 0);
 
+    //PlayTest();
+    BottleneckTest();
+}
+
+void TestState::Update() {
+    // if (engine_.GetInputRecorder().IsPress(InputIntent::Test_1))
+    //     audioPtr_->Start();
+}
+
+void TestState::Exit() {}
+
+void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.e1);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+        {
+            if (!testComp->color.has_value())
+                testComp->color = render->color;
+            render->color = CollisionTestComponent::COLLISION_COLOR;
+        }
+    }
+
+    root = GetRootEntity(event.reg, event.e2);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+        {
+            if (!testComp->color.has_value())
+                testComp->color = render->color;
+            render->color = CollisionTestComponent::COLLISION_COLOR;
+        }
+    }
+}
+
+void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.e1);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+            render->color = testComp->color.value();
+    }
+
+    root = GetRootEntity(event.reg, event.e2);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+            render->color = testComp->color.value();
+    }
+}
+
+void TestState::CallbackJump(const tomato::LandingEvent& event)
+{
+    auto e = event.reg->ctx().get<ParticleEmitterPool>().Acquire(
+        GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
+        event.position);
+     std::cout << "Jump particle " << (int)e.value() << "\n";
+}
+
+void TestState::PlayTest()
+{
     // Player0 character
     entt::entity player0 = Prefab::CreateCharacter(registry_, "Player 0", true);
 
@@ -182,57 +243,12 @@ void TestState::Init() {
     EventDispatcher::GetInstance().Connect<CollisionExitEvent, &TEST_CollisionExit>();
 }
 
-void TestState::Update() {
-    // if (engine_.GetInputRecorder().IsPress(InputIntent::Test_1))
-    //     audioPtr_->Start();
-}
-
-void TestState::Exit() {}
-
-void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
-    entt::entity root = GetRootEntity(event.reg, event.e1);
-    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
-    {
-        if (auto* render = event.reg->try_get<RenderComponent>(root))
-        {
-            if (!testComp->color.has_value())
-                testComp->color = render->color;
-            render->color = CollisionTestComponent::COLLISION_COLOR;
-        }
-    }
-
-    root = GetRootEntity(event.reg, event.e2);
-    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
-    {
-        if (auto* render = event.reg->try_get<RenderComponent>(root))
-        {
-            if (!testComp->color.has_value())
-                testComp->color = render->color;
-            render->color = CollisionTestComponent::COLLISION_COLOR;
-        }
-    }
-}
-
-void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
-    entt::entity root = GetRootEntity(event.reg, event.e1);
-    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
-    {
-        if (auto* render = event.reg->try_get<RenderComponent>(root))
-            render->color = testComp->color.value();
-    }
-
-    root = GetRootEntity(event.reg, event.e2);
-    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
-    {
-        if (auto* render = event.reg->try_get<RenderComponent>(root))
-            render->color = testComp->color.value();
-    }
-}
-
-void TestState::CallbackJump(const tomato::LandingEvent& event)
+void TestState::BottleneckTest()
 {
-    auto e = event.reg->ctx().get<ParticleEmitterPool>().Acquire(
-        GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
-        event.position);
-     std::cout << "Jump particle " << (int)e.value() << "\n";
+    for (int x = 0; x < 1000; ++x)
+    {
+        entt::entity e = Prefab::CreateWorldObject(registry_, "GameObject", false);
+        auto& trf = registry_.get<TransformComponent>(e);
+        trf.SetPosition(2 * x, 0, 0);
+    }
 }
