@@ -5,6 +5,7 @@
 #include "Input/InputIntentFwd.h"
 #include "Collision/CollisionConstantsFwd.h"
 #include "ECS/Forward/SystemFrameworkFwd.h"
+#include "ECS/Forward/TransformDirtyFwd.h"
 #include "Serialization/ComponentInfo.h"
 
 namespace tomato {
@@ -13,10 +14,14 @@ namespace tomato {
     struct is_bitmask : std::false_type {};
 
     template<> struct is_bitmask<InputIntent>       : std::true_type {};
+
     template<> struct is_bitmask<CollisionLayer>    : std::true_type {};
     template<> struct is_bitmask<ColliderType>      : std::true_type {};
+    template<> struct is_bitmask<Transform::Dirty>  : std::true_type {};
+
     template<> struct is_bitmask<RunMode>           : std::true_type {};
-    template<> struct is_bitmask<Serialization::ComponentFlags>           : std::true_type {};
+
+    template<> struct is_bitmask<Serialization::ComponentFlags> : std::true_type {};
 }
 
 #endif //MANGO_BITMASKFWD_H

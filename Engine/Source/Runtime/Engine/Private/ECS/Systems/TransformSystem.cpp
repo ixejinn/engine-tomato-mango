@@ -6,9 +6,13 @@
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Particle.h"
 #include "ECS/Components/Target.h"
+#include "ECS/Components/TransformDirty.h"
+#include "ECS/Entity/Hierarchy.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
+#include "Utils/Bitmask/BitmaskOperators.h"
 #include "Event/EventDispatcher.h"
 #include "GameObject/Character/MovementMode.h"
+#include "Profiler/CPUProfiler.h"
 
 namespace tomato
 {
@@ -16,17 +20,41 @@ namespace tomato
     {
         EventDispatcher::GetInstance().Update<LandingEvent>();
 
+        CPU_PROFILER_BLOCK_BEGIN(TransformSystem::Update);
         auto& registry = simCtx.state->GetRegistry();
-        auto rootView = registry.view<RootEntityTag, TransformComponent>();
+        SetRootEntityDirtyBit(registry);
 
         static constexpr glm::quat ROOT_QUAT = glm::quat(1.f, 0.f, 0.f, 0.f);
         static constexpr glm::vec3 ROOT_SCL = glm::vec3{1.f};
         static constexpr glm::mat4 ROOT_MAT = glm::mat4{1.f};
 
+        auto rootView = registry.view<RootEntityTag, TransformComponent>();
         for (auto [e, trf] : rootView.each())
-            UpdateFrom(registry, e, ROOT_QUAT, ROOT_SCL, ROOT_MAT, false);
+        {
+            if (HasFlag(trf.dirty, Transform::Dirty::Local | Transform::Dirty::Hierarchy))
+                UpdateFrom(registry, e, ROOT_QUAT, ROOT_SCL, ROOT_MAT, false);
+        }
 
         UpdateParticleTransform(registry);
+        CPU_PROFILER_BLOCK_END(TransformSystem::Update);
+    }
+
+    void TransformSystem::SetRootEntityDirtyBit(entt::registry& reg)
+    {
+        auto view = reg.view<TransformComponent, HierarchyComponent>();
+        for (auto [e, trf, hierarchy] : view.each())
+        {
+            if (!HasFlag(trf.dirty, Transform::Dirty::Local))
+                continue;
+
+            if (hierarchy.parent == entt::null)
+            {
+                trf.dirty |= Transform::Dirty::Hierarchy;
+                continue;
+            }
+
+            reg.get<TransformComponent>(GetRootEntity(reg, e)).dirty |= Transform::Dirty::Hierarchy;
+        }
     }
 
     void TransformSystem::UpdateFrom(
@@ -36,7 +64,7 @@ namespace tomato
     {
         auto& trf = reg.get<TransformComponent>(cur);
 
-        bool bUpdated = trf.dirty || pDirty;
+        bool bUpdated = HasFlag(trf.dirty, Transform::Dirty::Local) || pDirty;
         if (bUpdated)
         {
             // Scale → Rotate → Translate
@@ -47,7 +75,7 @@ namespace tomato
             trf.wRotation = pQuat * trf.rotation;
             trf.wScale = pScale * trf.scale;
             trf.transformMatrix = pMatrix * (T * R * S);
-            trf.dirty = false;
+            trf.dirty = Transform::Dirty::None;
 
             if (auto* cam = reg.try_get<CameraComponent>(cur))
                 cam->dirty = true;
@@ -86,7 +114,6 @@ namespace tomato
             trf.wRotation = targetTrf.wRotation * trf.rotation;
             trf.wScale = targetTrf.wScale * trf.scale;
             trf.transformMatrix = targetTrf.transformMatrix * (T * R * S);
-            trf.dirty = false;
         }
     }
 }

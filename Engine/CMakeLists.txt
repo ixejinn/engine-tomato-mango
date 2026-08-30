@@ -24,8 +24,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Core/Public/Collision/CollisionConstants.h
         Source/Runtime/Engine/Public/Collision/CollisionEvent.h
         Source/Runtime/Engine/Public/Collision/CollisionLayerMatrix.h
-		Source/Runtime/Engine/Public/Utils/Bitmask/BitmaskOperators.h
-		Source/Runtime/Engine/Public/Utils/Bitmask/BitmaskDefines.h
+		Source/Runtime/Engine/Private/Utils/Bitmask/BitmaskOperators.h
+		Source/Runtime/Engine/Private/Utils/Bitmask/BitmaskDefines.h
         Source/Runtime/Engine/Public/ECS/Components/Collision.h
         Source/Runtime/Core/Public/Containers/MemoryPool.h
         Source/Runtime/Core/Public/Utils/Logger.h
@@ -205,6 +205,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Profiler/ExecutionTime.h
 		Source/Runtime/Engine/Public/Profiler/ProfilerConfig.h
 		Source/Runtime/Engine/Public/EngineConfig.h
+		Source/Runtime/Engine/Private/ECS/Components/TransformDirty.h
+		Source/Runtime/Engine/Public/ECS/Forward/TransformDirtyFwd.h
 )
 
 set(ENGINE_SOURCES
