@@ -223,31 +223,31 @@ namespace tomato
 		auto selected = editorCtx.selectedEntity;
 
 		if (ImGui::MenuItem("Create Empty"))
-			 CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateEmpty(reg), isPopup);
+			 CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateBaseEntity(reg), isPopup);
 		
 
 		if (ImGui::BeginMenu("Game Object"))
 		{
-			if (ImGui::BeginMenu("Static"))
-			{
-				if (ImGui::MenuItem("Cube"))
-					CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateStaticObject(reg), isPopup);
+			//if (ImGui::BeginMenu("Static"))
+			//{
+			//	if (ImGui::MenuItem("Cube"))
+			//		CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateStaticObject(reg), isPopup);
 
-				if (ImGui::MenuItem("Sphere"))
-					CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateStaticObject(reg, Prefab::Sphere), isPopup);
+			//	if (ImGui::MenuItem("Sphere"))
+			//		CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateStaticObject(reg, Prefab::Sphere), isPopup);
 
-				ImGui::EndMenu();
-			}
+			//	ImGui::EndMenu();
+			//}
 
-			if (ImGui::MenuItem("Character"))
-				CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateCharacter(reg), isPopup);
+			//if (ImGui::MenuItem("Character"))
+			//	CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateCharacter(reg), isPopup);
 
 			if (ImGui::MenuItem("Camera"))
 			{
 				auto view = reg.view<MainCameraTag>();
 				CreateAndSetHierarchyEntity(
 					editorCtx,
-					selected = Prefab::CreateCamera(reg, view.empty() == true ? true : false),
+					selected = Prefab::CreateCamera(reg, "Camera", view.empty() == true ? true : false),
 					isPopup);
 			}
 

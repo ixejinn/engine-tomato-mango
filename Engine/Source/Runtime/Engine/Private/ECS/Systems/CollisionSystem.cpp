@@ -122,7 +122,7 @@ namespace tomato
 
                 if (col1 && col2)
                 {
-                    if (col1->isTrigger || col2->isTrigger)
+                    if (col1->trigger || col2->trigger)
                     {
                         std::cout << "      trg EXIT " << it->first << "\n";
                         EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{ it->first.a, it->first.b, &registry });

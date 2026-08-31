@@ -31,9 +31,6 @@ namespace tomato {
         }
         glfwMakeContextCurrent(handle_);
 
-        // VSync ON
-        //glfwSwapInterval(1);
-
         glfwSetFramebufferSizeCallback(handle_, OnFramebufferSizeChanged);
         EventDispatcher::GetInstance().Connect<ChangeFramebufferSizeEvent>();
 
@@ -62,6 +59,14 @@ namespace tomato {
     void Window::PollEvents()
     {
         glfwPollEvents();
+    }
+
+    void Window::SetVSync(bool set)
+    {
+        if (set)
+            glfwSwapInterval(1);
+        else
+            glfwSwapInterval(0);
     }
 
     bool Window::ShouldClose() const

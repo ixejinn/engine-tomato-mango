@@ -28,8 +28,9 @@ namespace tomato
 
         auto& keyDeviceState = KeyDeviceState::GetInstance();
 
-        if (!isFreeLooking_)
+        if (mode_ == None)
         {
+            // Reset editor camera transform
             if (resetTrf_)
             {
                 resetTrf_ = false;
@@ -42,12 +43,16 @@ namespace tomato
                 trf.SetQuaternion(glm::quat(camRad));
             }
 
-            //// Start free looking
+            // Start free look
             if (keyDeviceState.IsKeyPressed(Key::RightMouseButton))
-            {
-//            std::cout << "((((( start free looking\n";
-                isFreeLooking_ = true;
+                mode_ = FreeLook;
 
+            // Start pan
+            if (keyDeviceState.IsKeyPressed(Key::MiddleMouseButton))
+                mode_ = Pan;
+
+            if (mode_ != None)
+            {
                 preCursorPos.x = keyDeviceState.GetKeyState(Key::MouseX);
                 preCursorPos.y = keyDeviceState.GetKeyState(Key::MouseY);
 
@@ -55,60 +60,15 @@ namespace tomato
             }
         }
 
-        if (isFreeLooking_)
+        switch (mode_)
         {
-            //// Finish free looking
-            if (keyDeviceState.IsKeyReleased(Key::RightMouseButton))
-            {
-//                std::cout << "))))) finish free looking\n";
-                isFreeLooking_ = false;
+            case FreeLook:
+                UpdateFreeLook(simCtx);
+                break;
 
-                simCtx.state->GetWindow().SetCursorDisable(false);
-                return;
-            }
-
-            //// Update camera position and rotation
-            auto& trf = registry.get<TransformComponent>(renderCtx.editorCam);
-
-            // Rotate camera
-            glm::vec2 currCursorPos{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)};
-            glm::vec2 deltaCursorPos = currCursorPos - preCursorPos;
-            preCursorPos = currCursorPos;
-
-            const float yawDelta = glm::atan(deltaCursorPos.x, MOUSE_LOOK_SENSITIVITY_DIST);
-            const float pitchDelta = glm::atan(deltaCursorPos.y, MOUSE_LOOK_SENSITIVITY_DIST);
-
-            camRad.y -= yawDelta;
-            camRad.x -= pitchDelta;
-            camRad.x = glm::clamp(camRad.x, glm::radians(-89.f), glm::radians(89.f));
-
-            trf.SetQuaternion(
-                    glm::angleAxis(camRad.y, glm::vec3(0, 1, 0)) *
-                    glm::angleAxis(camRad.x, glm::vec3(1, 0, 0)));
-
-            // Move camera
-            int back = 0, right = 0;
-            if (keyDeviceState.IsKeyPressed(Key::W))
-                --back;
-            if (keyDeviceState.IsKeyPressed(Key::S))
-                ++back;
-            if (keyDeviceState.IsKeyPressed(Key::A))
-                --right;
-            if (keyDeviceState.IsKeyPressed(Key::D))
-                ++right;
-
-            glm::vec2 dir{back, right};
-            const float len = glm::length(dir);
-            if (len > 1)
-                dir /= len;
-            dir *= CAMERA_MOVE_SPEED * FIXED_DELTA_TIME;
-
-            const auto quat = glm::quat(camRad);
-            const glm::vec3 b = quat * glm::vec3(0, 0, 1);
-            const glm::vec3 r = quat * glm::vec3(1, 0, 0);
-
-            camPos += (dir.x * b + dir.y * r);
-            trf.SetPosition(camPos);
+            case Pan:
+                UpdatePan(simCtx);
+                break;
         }
     }
 
@@ -116,5 +76,120 @@ namespace tomato
     {
         if (e.newMode == RunMode::Editor)
             resetTrf_ = true;
+    }
+
+    void EditorCameraSystem::UpdateFreeLook(SimContext& simCtx)
+    {
+        auto& registry = simCtx.state->GetRegistry();
+        auto& renderCtx = registry.ctx().get<RenderContext>();
+
+        auto& keyDeviceState = KeyDeviceState::GetInstance();
+
+        //// Finish free looking
+        if (keyDeviceState.IsKeyReleased(Key::RightMouseButton))
+        {
+            mode_ = None;
+
+            simCtx.state->GetWindow().SetCursorDisable(false);
+            return;
+        }
+
+        //// Update camera position and rotation
+        auto& trf = registry.get<TransformComponent>(renderCtx.editorCam);
+
+        // Rotate camera
+        glm::vec2 currCursorPos{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)};
+        glm::vec2 deltaCursorPos = currCursorPos - preCursorPos;
+        preCursorPos = currCursorPos;
+
+        const float yawDelta = glm::atan(deltaCursorPos.x, MOUSE_LOOK_SENSITIVITY_DIST);
+        const float pitchDelta = glm::atan(deltaCursorPos.y, MOUSE_LOOK_SENSITIVITY_DIST);
+
+        camRad.y -= yawDelta;
+        camRad.x -= pitchDelta;
+        camRad.x = glm::clamp(camRad.x, glm::radians(-89.f), glm::radians(89.f));
+
+        trf.SetQuaternion(
+                glm::angleAxis(camRad.y, glm::vec3(0, 1, 0)) *
+                glm::angleAxis(camRad.x, glm::vec3(1, 0, 0)));
+
+        // Move camera
+        int back = 0, right = 0;
+        if (keyDeviceState.IsKeyPressed(Key::W))
+            --back;
+        if (keyDeviceState.IsKeyPressed(Key::S))
+            ++back;
+        if (keyDeviceState.IsKeyPressed(Key::A))
+            --right;
+        if (keyDeviceState.IsKeyPressed(Key::D))
+            ++right;
+
+        glm::vec3 dir{right, 0, back};
+        const float len = glm::length(dir);
+        if (len > 1)
+            dir /= len;
+        dir *= CAMERA_MOVE_SPEED * FIXED_DELTA_TIME;
+
+        const auto quat = glm::quat(camRad);
+        const glm::vec3 r = quat * glm::vec3(1, 0, 0);
+        const glm::vec3 b = quat * glm::vec3(0, 0, 1);
+
+        camPos += (dir.x * r + dir.z * b);
+        trf.SetPosition(camPos);
+    }
+
+    void EditorCameraSystem::UpdatePan(SimContext& simCtx)
+    {
+        auto& registry = simCtx.state->GetRegistry();
+        auto& renderCtx = registry.ctx().get<RenderContext>();
+
+        auto& keyDeviceState = KeyDeviceState::GetInstance();
+
+        //// Finish pan
+        if (keyDeviceState.IsKeyReleased(Key::MiddleMouseButton))
+        {
+            mode_ = None;
+
+            simCtx.state->GetWindow().SetCursorDisable(false);
+            return;
+        }
+
+        //// Update camera position
+        auto& trf = registry.get<TransformComponent>(renderCtx.editorCam);
+
+        // Move along camera's up and right vectors
+        glm::vec2 currCursorPos{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)};
+        glm::vec2 deltaCursorPos = currCursorPos - preCursorPos;
+        preCursorPos = currCursorPos;
+
+        glm::vec3 cursorDir{deltaCursorPos.x, -deltaCursorPos.y, 0};
+        const float cursorDirLen = glm::length(cursorDir);
+        if (cursorDirLen > 1)
+            cursorDir /= cursorDirLen;
+
+        // Move along camera's front(-back) and right vectors
+        glm::vec3 keyBoardDir{0};
+        if (keyDeviceState.IsKeyPressed(Key::W))
+            --keyBoardDir.z;
+        if (keyDeviceState.IsKeyPressed(Key::S))
+            ++keyBoardDir.z;
+        if (keyDeviceState.IsKeyPressed(Key::A))
+            --keyBoardDir.x;
+        if (keyDeviceState.IsKeyPressed(Key::D))
+            ++keyBoardDir.x;
+        const float keyBoardDirLen = glm::length(keyBoardDir);
+        if (keyBoardDirLen > 1)
+            keyBoardDir /= keyBoardDirLen;
+
+        glm::vec3 dir = cursorDir * 0.5f + keyBoardDir * 0.5f;
+        dir *= CAMERA_MOVE_SPEED * FIXED_DELTA_TIME;
+
+        const auto quat = glm::quat(camRad);
+        const glm::vec3 r = quat * glm::vec3(1, 0, 0);
+        const glm::vec3 u = quat * glm::vec3(0, 1, 0);
+        const glm::vec3 b = quat * glm::vec3(0, 0, 1);
+
+        camPos += (dir.x * r + dir.y * u + dir.z * b);
+        trf.SetPosition(camPos);
     }
 }

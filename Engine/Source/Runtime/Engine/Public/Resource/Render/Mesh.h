@@ -30,7 +30,8 @@ namespace tomato
     X(Cube,         "Cube")         \
     X(Sphere,       "Sphere")       \
     X(Cylinder,     "Cylinder")     \
-    X(OpenCylinder, "OpenCylinder")
+    X(OpenCylinder, "OpenCylinder") \
+    X(Cone, "Cone")
 
     enum class Primitive
     {
@@ -74,6 +75,9 @@ namespace tomato
                     return "Primitive::Cylinder";
                 case Primitive::OpenCylinder:
                     return "Primitive::OpenCylinder";
+
+                case Primitive::Cone:
+                    return "Primitive::Cone";
             }
         }
 
@@ -94,8 +98,6 @@ namespace tomato
 
         const AABB& GetLocalAABB() const { return localAABB_; }
 
-        bool GetCullface() const { return cullface_; }
-
     private:
         static void Plain(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
         static void LBPlain(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
@@ -110,6 +112,8 @@ namespace tomato
 
         static void Cylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int sectorCnt = 10);
         static void OpenCylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int sectorCnt = 10);
+
+        static void Cone(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int sectorCnt = 10);
 
         /**
          * @brief Populates vertex and index buffers for a single face (quad).
@@ -153,8 +157,6 @@ namespace tomato
         int vertexCnt_{0};
 
         AABB localAABB_;
-
-        bool cullface_{true};
     };
 }
 

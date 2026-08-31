@@ -33,6 +33,8 @@ namespace tomato
          */
         static void PollEvents();
 
+        static void SetVSync(bool set);
+
         GLFWwindow* GetHandle() { return handle_; }
 
         [[nodiscard]] bool ShouldClose() const;

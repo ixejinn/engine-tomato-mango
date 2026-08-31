@@ -3,6 +3,7 @@
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <entt/fwd.hpp>
 #include "ECS/Systems/System.h"
 #include "ECS/SystemFramework/SystemFrameworkEventFwd.h"
 #include "Input/InputEventFwd.h"
@@ -17,6 +18,13 @@ namespace tomato
         void Update(SimContext& simCtx) override;
 
     private:
+        enum ViewportNavigation
+        {
+            None,
+            FreeLook,
+            Pan
+        };
+
         static constexpr float MOUSE_LOOK_SENSITIVITY_DIST{500.f};
         static constexpr float CAMERA_MOVE_SPEED{8.f};
 
@@ -24,11 +32,14 @@ namespace tomato
         static constexpr glm::vec3 INIT_RAD{0.f};
         void OnChangeRunMode(const ChangeRunModeEvent& e);
 
+        void UpdateFreeLook(SimContext& simCtx);
+        void UpdatePan(SimContext& simCtx);
+
         glm::vec3 camPos{INIT_POS};
         glm::vec3 camRad{INIT_RAD};
         bool resetTrf_{true};
 
-        bool isFreeLooking_{false};
+        ViewportNavigation mode_{None};
         glm::vec2 preCursorPos;
     };
 }

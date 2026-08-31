@@ -7,6 +7,8 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include <implot/implot.h>
+#include <implot/implot_internal.h>
 
 #include "EditorPanel.h"
 #include "State/State.h"
@@ -22,6 +24,9 @@
 #include "Event/EventDispatcher.h"
 #include "ECS/SystemFramework/ChangeRunModeEvent.h"
 
+#include "Profiler/Profiler.h"
+#include "Profiler/ExecutionTime.h"
+
 namespace tomato
 {
 	void MainMenuBar::Draw(EditorContext& eCtx, RunMode& mode)
@@ -30,6 +35,7 @@ namespace tomato
 		if (ImGui::BeginMainMenuBar())
 		{
 			MenuFile(eCtx);
+			MenuTools(eCtx);
 
 			EditModeButton(eCtx, mode);
 
@@ -42,6 +48,9 @@ namespace tomato
 			openNotSavedPopup = false;
 		}
 		OpenPopupModal(eCtx);
+
+		if (showCPUProfiler)
+			ShowCPUProfilerWindow(eCtx);
 	}
 
 	void MainMenuBar::MenuFile(EditorContext& eCtx)
@@ -62,6 +71,25 @@ namespace tomato
 			if (ImGui::MenuItem("Save As..."))
 				SaveAs(eCtx);
 			
+			ImGui::EndMenu();
+		}
+	}
+
+	void MainMenuBar::MenuTools(EditorContext&)
+	{
+		if (ImGui::BeginMenu("Tools"))
+		{
+			if (ImGui::MenuItem("CPU Profiler", NULL, &showCPUProfiler))
+			{
+				auto& profiler = Profiler::GetInstance();
+				profiler.SetActive(showCPUProfiler);
+
+				if (showCPUProfiler)
+					profiler.Start();
+				else
+					profiler.End();
+			}
+
 			ImGui::EndMenu();
 		}
 	}
@@ -258,6 +286,7 @@ namespace tomato
 				break;
 		}
 	}
+
 	void MainMenuBar::ProcessShortcuts(EditorContext& eCtx)
 	{
 		ImGuiInputFlags shortcutFlags = ImGuiInputFlags_RouteGlobal | ImGuiInputFlags_RouteOverFocused;
@@ -270,6 +299,55 @@ namespace tomato
 
 		if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, shortcutFlags))
 			Save(eCtx);
+	}
 
+	void MainMenuBar::ShowCPUProfilerWindow(EditorContext&)
+	{
+		auto& profiler = Profiler::GetInstance();
+		profiler.Update();
+
+		size_t currFrame = profiler.GetFrameCnt();
+		size_t offset = currFrame - PROFILER_SAMPLE_COUNT;
+		if (currFrame < PROFILER_SAMPLE_COUNT)
+			offset = 0;
+
+		// Create ImGui window
+		ImGui::SetNextWindowPos(ImVec2(0.f, ImGui::GetFrameHeight()), ImGuiCond_Once, ImVec2(0.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(600.f, 150.f), ImGuiCond_Once);
+
+		// Draw CPU profiler graph on the window
+		if (ImGui::Begin("CPU Profiler", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar))
+		{
+			auto& registry = profiler.GetRegistry();
+
+			if (ImPlot::BeginPlot("##CPU Profiler Graph", ImVec2(-1, 115), ImPlotFlags_Crosshairs))
+			{
+				ImPlot::SetupAxes(nullptr, "us", ImPlotAxisFlags_NoTickLabels);
+
+				ImPlot::SetupAxisLimitsConstraints(ImAxis_Y1, 0, INFINITY);
+				ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 20000, ImPlotCond_Once);
+				ImPlot::SetupAxisLimits(ImAxis_X1, 0, PROFILER_SAMPLE_COUNT, ImPlotCond_Always);
+
+				auto view = registry.view<ExecutionTimeHistoryComponent>();
+				for (auto [e, exeHistory] : view.each())
+				{
+					ImPlotSpec spec;
+					spec.Offset = offset;
+
+					const auto* data = exeHistory.data.GetRawArray().data();
+
+					if (registry.all_of<TotalFrameTag>(e))
+					{
+						spec.FillAlpha = 0.35f;
+						ImPlot::PlotShaded(exeHistory.name.data(), data, PROFILER_SAMPLE_COUNT, INFINITY, 1, 0, spec);
+					}
+					ImPlot::PlotLine(exeHistory.name.data(), data, PROFILER_SAMPLE_COUNT, 1, 0, spec);
+				}
+
+				ImPlot::EndPlot();
+			}
+
+			ImGui::End();
+		}
 	}
 }

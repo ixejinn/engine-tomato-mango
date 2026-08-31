@@ -173,7 +173,7 @@ namespace tomato
 
 		ImGui::SeparatorText("Trigger");
 		ImGui::Text("Is Trigger"); ImGui::SameLine();
-		if(ImGui::Checkbox("##Trigger", &collider.isTrigger))
+		if(ImGui::Checkbox("##Trigger", &collider.trigger))
 			changed = true;
 
 		ImGui::NewLine();

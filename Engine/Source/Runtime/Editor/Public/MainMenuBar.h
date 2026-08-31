@@ -22,6 +22,7 @@ namespace tomato
 
 	private:
 		void MenuFile(EditorContext&);
+		void MenuTools(EditorContext&);
 		void EditModeButton(EditorContext&, RunMode&);
 
 		void NewScene(EditorContext&);
@@ -34,11 +35,15 @@ namespace tomato
 		void ExecutePendingAction(EditorContext&, bool);
 		void ProcessShortcuts(EditorContext&);
 
+		void ShowCPUProfilerWindow(EditorContext&);
+
 	private:
 		PendingAction pendingAction_ = PendingAction::None;
 		bool openNotSavedPopup = false;
 
 		bool modeBtnClicked = false;
+
+		bool showCPUProfiler = false;
 	};
 }
 #endif // !MANGO_MAINMENUBAR_H

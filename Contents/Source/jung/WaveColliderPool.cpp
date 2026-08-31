@@ -1,4 +1,4 @@
-#include "WaveColliderPool.h"
+﻿#include "WaveColliderPool.h"
 #include <entt/entt.hpp>
 
 #include "ECS/Components/Nametag.h"
@@ -37,10 +37,10 @@ void WaveColliderPoolTraits::Assemble(entt::registry& registry_, entt::entity e)
     registry_.emplace<WaveColliderComponent>(e);
     registry_.emplace<EditorHidden>(e);
 
-    const entt::entity col = Prefab::AttachCollider(registry_, e, ColliderType::Cube);
-    registry_.get<ColliderComponent>(col).isTrigger = true;
-    //registry_.get<TransformComponent>(col).SetScale(glm::vec3{1.f, 0.1f, 0.1f});
-    registry_.get<TransformComponent>(col).SetScale(glm::vec3{1.f, 1.f, 0.1f});
+    //const entt::entity col = Prefab::AttachCollider(registry_, e, ColliderType::Cube);
+    //registry_.get<ColliderComponent>(col).isTrigger = true;
+    ////registry_.get<TransformComponent>(col).SetScale(glm::vec3{1.f, 0.1f, 0.1f});
+    //registry_.get<TransformComponent>(col).SetScale(glm::vec3{1.f, 1.f, 0.1f});
 }
 
 void WaveColliderPoolTraits::Reset(entt::registry& registry_, entt::entity e, entt::entity wave, entt::entity target)

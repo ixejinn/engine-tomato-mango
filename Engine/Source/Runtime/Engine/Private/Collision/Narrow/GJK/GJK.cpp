@@ -28,8 +28,8 @@ namespace tomato
 
     std::optional<ContactData> GJK::EvaluateContactPair(entt::registry& reg, const ContactPair& pair)
     {
-        if (reg.get<ColliderComponent>(pair.a).isTrigger ||
-            reg.get<ColliderComponent>(pair.b).isTrigger)
+        if (reg.get<ColliderComponent>(pair.a).trigger ||
+            reg.get<ColliderComponent>(pair.b).trigger)
         {
             if (GJKBool(reg, pair))
                 return ContactData{};

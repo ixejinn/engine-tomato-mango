@@ -22,6 +22,10 @@ private:
 
     static void CallbackJump(const tomato::LandingEvent& event);
 
+    void PlayTest();
+
+    void BottleneckTest();
+
     tomato::Audio* audioPtr_{nullptr};
     UIController uiController_;
 };

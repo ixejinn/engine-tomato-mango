@@ -35,7 +35,7 @@ using namespace tomato;
 void MyState::Init()
 {
     // Camera
-    Prefab::CreateCamera(registry_,
+    Prefab::CreateCamera(registry_, "Camera",
         true,
         glm::vec3(0.f, 4.f, 10.f),
         glm::vec3(-30.f, 0.f, 0.f)
@@ -59,7 +59,10 @@ void MyState::Init()
         << " ms\n";
         */
 
-    entt::entity player = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, -1, 0 });
+    entt::entity player = Prefab::CreateCharacter(registry_, "Player");
+    auto& trfP0 = registry_.get<TransformComponent>(player);
+    trfP0.SetPosition(1, -1, 0);
+
     auto& renderp1 = registry_.get<RenderComponent>(player);
     renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
     renderp1.color = { 0.f, 1.f, 1.f, 1.f };
@@ -69,8 +72,9 @@ void MyState::Init()
 
 
     // Ground
-    entt::entity ground = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, -3, 0 });
+    entt::entity ground = Prefab::CreateWorldObject(registry_, "Ground");
     auto& trfGnd = registry_.get<TransformComponent>(ground);
+    trfGnd.SetPosition(0, -3, 0);
     trfGnd.SetScale(20, 0.1, 20);
     auto& renderGnd = registry_.get<RenderComponent>(ground);
     //renderGnd.color = { 0.639f, 0.8f, 0.639f, 1.f };
@@ -107,7 +111,7 @@ void MyState::Init()
     //registry_.get<TransformComponent>(collider).SetScale(glm::vec3{1.f, 0.1f, 0.1f});
 
     registry_.ctx().emplace<WavePool>(key_, registry_);
-    registry_.ctx().emplace<WaveColliderPool>(key_, registry_);
+    //registry_.ctx().emplace<WaveColliderPool>(key_, registry_);
 
     EventDispatcher::GetInstance().Connect<TriggerEnterEvent, &WaveCollisionEnter>();
     EventDispatcher::GetInstance().Connect<TriggerExitEvent, &WaveCollisionExit>();
@@ -178,11 +182,11 @@ void MyState::WaveCollisionExit(const tomato::TriggerExitEvent& event)
 void MyState::MakeWaveJump(const LandingEvent& event)
 {
     auto wave = event.reg->ctx().get<WavePool>().Acquire(event.e, event.position, 0.01f);
-    if (wave.has_value())
+    /*if (wave.has_value())
     {
         auto e = event.reg->ctx().get<WaveColliderPool>().Acquire(wave.value(), event.e);
 
         std::cout << "Make Wave " << (int)wave.value() << "\n";
         if(e.has_value()) std::cout << "Make Wave Coll" << (int)e.value() << "\n";
-    }
+    }*/
 }

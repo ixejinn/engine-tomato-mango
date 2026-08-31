@@ -35,7 +35,10 @@ namespace tomato
 
             case Primitive::OpenCylinder:
                 OpenCylinder(vertices, indices);
-                cullface_ = false;
+                break;
+
+            case Primitive::Cone:
+                Cone(vertices, indices);
                 break;
 
             default:
@@ -72,7 +75,10 @@ namespace tomato
 
             case Primitive::OpenCylinder:
                 OpenCylinder(vertices, indices, sectorCnt);
-                cullface_ = false;
+                break;
+
+            case Primitive::Cone:
+                Cone(vertices, indices, sectorCnt);
                 break;
 
             default:
@@ -326,6 +332,42 @@ namespace tomato
                          vertices, indices);
         FillMeshData(topCircle[sectorCnt - 1], bottomCircle[sectorCnt - 1], bottomCircle[0], topCircle[0],
                      vertices, indices);
+    }
+
+    void Mesh::Cone(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int sectorCnt)
+    {
+        vertices.resize(3 * sectorCnt * 2); // top and bottom consist of triangles
+        indices.resize(3 * sectorCnt * 2);
+
+        const auto pi = glm::pi<float>();
+        const float sectorStep = 2 * pi / sectorCnt;
+
+        float lon = 0.f;
+
+        glm::vec3 topCenter{0.f, 0.5f, 0.f};
+        glm::vec3 bottomCenter{0.f, -0.5f, 0.f};
+        std::vector<glm::vec3> coords(sectorCnt);
+        for (int j = 0; j < sectorCnt; j++) {
+            coords[j] = {
+                    glm::cos(lon),
+                    -1,
+                    -glm::sin(lon)
+            };
+            coords[j] *= 0.5f;
+
+            lon += sectorStep;
+        }
+
+        auto& bottomCircle = coords;
+
+        for (int j = 0; j < sectorCnt - 1; j++)
+        {
+            const int j_ = j + 1;
+            FillMeshData(topCenter, bottomCircle[j], bottomCircle[j_], vertices, indices);
+            FillMeshData(bottomCenter, bottomCircle[j_], bottomCircle[j], vertices, indices);
+        }
+        FillMeshData(topCenter, bottomCircle[sectorCnt - 1], bottomCircle[0], vertices, indices);
+        FillMeshData(bottomCenter, bottomCircle[0], bottomCircle[sectorCnt - 1], vertices, indices);
     }
 
     void Mesh::FillMeshData(

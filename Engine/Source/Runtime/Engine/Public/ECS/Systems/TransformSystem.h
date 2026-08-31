@@ -11,6 +11,8 @@ namespace tomato {
         void Update(SimContext &simCtx) override;
 
     private:
+        static void SetRootEntityDirtyBit(entt::registry& reg);
+
         static void UpdateFrom(
             entt::registry& reg, entt::entity cur,
             const glm::quat& pQuat, const glm::vec3& pScale,

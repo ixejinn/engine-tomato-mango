@@ -16,6 +16,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include <implot/implot.h>
 
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Services/Input.h"
@@ -39,6 +40,9 @@ namespace tomato
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
 		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+
+		// Setup ImPlot context
+		ImPlot::CreateContext();
 		
 		// Setup Platform/Renderer backends
 		ImGui_ImplGlfw_InitForOpenGL(wnd, false);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
@@ -75,6 +79,8 @@ namespace tomato
         input.GetScrollSink().disconnect<ImGui_ImplGlfw_ScrollCallback>();
         input.GetKeySink().disconnect<ImGui_ImplGlfw_KeyCallback>();
         input.GetCharSink().disconnect<ImGui_ImplGlfw_CharCallback>();
+
+		ImPlot::DestroyContext();
 
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();

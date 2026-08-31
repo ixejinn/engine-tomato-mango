@@ -32,6 +32,8 @@ namespace tomato
         static constexpr size_type Size() noexcept { return N; }
         static constexpr size_type ByteSize() noexcept { return N * sizeof(T); }
 
+        const std::array<T, N>& GetRawArray() const { return buffer_; }
+
     private:
         static constexpr size_type mask = N - 1;
         std::array<T, N> buffer_;

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <source_location>
+#include "EngineConfig.h"
 
 namespace tomato {
     class Logger {
@@ -48,16 +49,6 @@ namespace tomato {
         std::ostringstream buffer_;
     };
 }
-
-// !!!!! 나중에 옮기기 !!!!!
-#ifndef NDEBUG
-#define TOMATO_DEBUG
-#endif
-
-#ifdef _DEBUG
-#define TOMATO_DEBUG
-#endif
-// !!!!! 나중에 옮기기 !!!!!
 
 #ifdef TOMATO_DEBUG
 #define TMT_INFO Logger(tomato::Logger::Level::Info)

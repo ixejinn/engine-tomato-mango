@@ -29,9 +29,10 @@ using namespace tomato;
 using namespace std::chrono_literals;
 
 void TestState::Init() {
-    //// Audio test
-    auto id = Audio::Create(PathManager::ProjectSound("sfx_get_heart.mp3"), 8);
-    audioPtr_ = AssetRegistry<Audio>::GetInstance().Get(id);
+    //// Load Assets
+    auto audioTest = Audio::Create(PathManager::ProjectSound("sfx_get_heart.mp3"), 8);
+    audioPtr_ = AssetRegistry<Audio>::GetInstance().Get(audioTest);
+
     Texture::Create(PathManager::ProjectImage("WATER_GAME_LOGO.png"));
     Texture::Create(PathManager::ProjectImage("heart.png"));
     Font::Create(PathManager::ProjectFont("D2Coding.ttf"));
@@ -42,54 +43,121 @@ void TestState::Init() {
     ParticleEffect::Create(PathManager::ProjectParticle("ribbon_particle.tmt.ptc"));
     ParticleEffect::Create(PathManager::ProjectParticle("jump.tmt.ptc"));
 
-    EventDispatcher::GetInstance().Connect<LandingEvent, TestState::CallbackJump>();
-
-    engine_.GetInputRecorder().BindInputIntent(Key::J, InputIntent::Test_1);
-    // engine_.GetInputRecorder().BindInputIntent(Key::LeftMouseButton, InputIntent::Test_2);
+    EventDispatcher::GetInstance().Connect<LandingEvent, CallbackJump>();
 
     //// Set rollback
     engine_.SetRollbackComponent<MovementComponent>();
     engine_.SetRollbackComponent<VelocityComponent>();
 
     //// Create game object
+    // Main camera
+    entt::entity cam = Prefab::CreateCamera(registry_, "Camera", true);
+    auto& trfCam = registry_.get<TransformComponent>(cam);
+    trfCam.SetPosition(0, 8, 8);
+    trfCam.SetRotationDegree(-50, 0, 0);
 
-    // Camera
-    Prefab::CreateCamera(registry_,
-        true,
-        glm::vec3(0.f, 4.f, 10.f),
-        // glm::vec3(0.f, 6.f, 0.f),
-        glm::vec3(-30.f, 0.f, 0.f)
-        // glm::vec3(-90.f, 0.f, 0.f),
-        );
+    PlayTest();
+    //BottleneckTest();
+}
 
-    //// Player0 character
-    entt::entity player0 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { 1, 2, 0 });
-    auto& renderp0 = registry_.get<RenderComponent>(player0);
-//    renderp0.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    renderp0.mesh = GetAssetID("Primitive::Sphere_20_10");
-    renderp0.color = { 1.f, 1.f, 0.f, 1.f };
-    auto& channelp0 = registry_.get<InputChannelComponent>(player0);
-    channelp0.channel = 0;
+void TestState::Update() {
+    // if (engine_.GetInputRecorder().IsPress(InputIntent::Test_1))
+    //     audioPtr_->Start();
+}
+
+void TestState::Exit() {}
+
+void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.e1);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+        {
+            if (!testComp->color.has_value())
+                testComp->color = render->color;
+            render->color = CollisionTestComponent::COLLISION_COLOR;
+        }
+    }
+
+    root = GetRootEntity(event.reg, event.e2);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+        {
+            if (!testComp->color.has_value())
+                testComp->color = render->color;
+            render->color = CollisionTestComponent::COLLISION_COLOR;
+        }
+    }
+}
+
+void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.e1);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+            render->color = testComp->color.value();
+    }
+
+    root = GetRootEntity(event.reg, event.e2);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+            render->color = testComp->color.value();
+    }
+}
+
+void TestState::CallbackJump(const tomato::LandingEvent& event)
+{
+    auto e = event.reg->ctx().get<ParticleEmitterPool>().Acquire(
+        GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
+        event.position);
+     std::cout << "Jump particle " << (int)e.value() << "\n";
+}
+
+void TestState::PlayTest()
+{
+    // Player0 character
+    entt::entity player0 = Prefab::CreateCharacter(registry_, "Player 0", true);
+
+    auto& trfP0 = registry_.get<TransformComponent>(player0);
+    trfP0.SetPosition(1, 2, 0);
+
+    auto& renderP0 = registry_.get<RenderComponent>(player0);
+    renderP0.mesh = GetAssetID("Primitive::Sphere_20_10");
+    renderP0.color = {155.f / 255, 20.f / 255, 90.f / 255, 0.8f};
+
+    auto& channelP0 = registry_.get<InputChannelComponent>(player0);
+    channelP0.channel = 0;
+
     registry_.emplace<CollisionTestComponent>(player0);
 
     auto& particlePool = registry_.ctx().get<ParticleEmitterPool>();
     particlePool.Acquire(GetAssetID("Resources\\Contents\\Particle\\burst_test.tmt.ptc"), GetUUID(registry_, player0));
     particlePool.Acquire(GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
 
-    //// Player1 character
-    entt::entity player1 = Prefab::CreateCharacter(registry_, Prefab::Primitive::Cube, { -1, 2, 0 });
-    auto& renderp1 = registry_.get<RenderComponent>(player1);
-    renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    renderp1.color = { 0.f, 1.f, 1.f, 1.f };
-    auto& channelp1 = registry_.get<InputChannelComponent>(player1);
-    channelp1.channel = 1;
+    // Player1 character
+    entt::entity player1 = Prefab::CreateCharacter(registry_, "Player 1", true);
+
+    auto& trfP1 = registry_.get<TransformComponent>(player1);
+    trfP1.SetPosition(-1, 2, 0);
+
+    auto& renderP1 = registry_.get<RenderComponent>(player1);
+    renderP1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    renderP1.color = { 8.f / 255, 75.f / 255, 109.f / 255, 0.8f };
+
+    auto& channelP1 = registry_.get<InputChannelComponent>(player1);
+    channelP1.channel = 1;
 
     // Ground
-    entt::entity ground = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, -3, 0 });
+    entt::entity ground = Prefab::CreateWorldObject(registry_, "Ground", true);
+
     auto& trfGnd = registry_.get<TransformComponent>(ground);
+    trfGnd.SetPosition(0, -0.05, 0);
     trfGnd.SetScale(10, 0.1, 10);
+
     auto& renderGnd = registry_.get<RenderComponent>(ground);
-    renderGnd.color = { 0.f, 1.f, 0.f, 1.f };
+    renderGnd.color = { 129.f / 255, 172.f / 255, 167.f / 255, 1.f };
 
     //entt::entity objUp = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, 10, 0 });
     //entt::entity objUp = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0.f, 12.f, 15.f });
@@ -106,7 +174,7 @@ void TestState::Init() {
     //         uiController_.onClick(e);
     //     };
 
-    auto tBtn = UIPrefab::CreateButton(registry_, entt::null, { 0.f, -10.f });
+    auto tBtn = UIPrefab::CreateButton(registry_, entt::null, { -10.f, -10.f });
     auto& tBtnUIComp = registry_.get<UIComponent>(tBtn);
     tBtnUIComp.sortOrder = 100;
     auto& tMouseEvt = registry_.get<MouseEventComponent>(tBtn);
@@ -171,71 +239,16 @@ void TestState::Init() {
     uiCmp1.sortOrder = 1;
 #endif
 
-    
-    //Serialization::SaveScene(registry_, "Resources/Engine/Assets/test.data");
-
     EventDispatcher::GetInstance().Connect<CollisionEnterEvent, &TEST_CollisionEnter>();
     EventDispatcher::GetInstance().Connect<CollisionExitEvent, &TEST_CollisionExit>();
-
-    //std::cout << AssetRegistry<Audio>::GetInstance().GetName(id);
 }
 
-void TestState::Update() {
-    if (engine_.GetInputRecorder().IsPress(InputIntent::Test_1))
-        audioPtr_->Start();
-
-    // if (engine_.GetInputRecorder().IsPress(InputIntent::Test_2))
-    //     engine_.GetWindow().SetCursorDisable(true);
-    // else if (!engine_.GetInputRecorder().IsHeld(InputIntent::Test_2))
-    //     engine_.GetWindow().SetCursorDisable(false);
-}
-
-void TestState::Exit() {}
-
-void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
-    entt::entity root = GetRootEntity(event.reg, event.e1);
-    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
-    {
-        if (auto* render = event.reg->try_get<RenderComponent>(root))
-        {
-            if (!testComp->color.has_value())
-                testComp->color = render->color;
-            render->color = CollisionTestComponent::COLLISION_COLOR;
-        }
-    }
-
-    root = GetRootEntity(event.reg, event.e2);
-    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
-    {
-        if (auto* render = event.reg->try_get<RenderComponent>(root))
-        {
-            if (!testComp->color.has_value())
-                testComp->color = render->color;
-            render->color = CollisionTestComponent::COLLISION_COLOR;
-        }
-    }
-}
-
-void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
-    entt::entity root = GetRootEntity(event.reg, event.e1);
-    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
-    {
-        if (auto* render = event.reg->try_get<RenderComponent>(root))
-            render->color = testComp->color.value();
-    }
-
-    root = GetRootEntity(event.reg, event.e2);
-    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
-    {
-        if (auto* render = event.reg->try_get<RenderComponent>(root))
-            render->color = testComp->color.value();
-    }
-}
-
-void TestState::CallbackJump(const tomato::LandingEvent& event)
+void TestState::BottleneckTest()
 {
-    auto e = event.reg->ctx().get<ParticleEmitterPool>().Acquire(
-        GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
-        event.position);
-     std::cout << "Jump particle " << (int)e.value() << "\n";
+    for (int x = 0; x < 1000; ++x)
+    {
+        entt::entity e = Prefab::CreateWorldObject(registry_, "GameObject", false);
+        auto& trf = registry_.get<TransformComponent>(e);
+        trf.SetPosition(2 * x, 0, 0);
+    }
 }

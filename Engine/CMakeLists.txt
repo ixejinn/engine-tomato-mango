@@ -11,6 +11,9 @@
 		
 		Source/ThirdParty/imgui/backends/imgui_impl_glfw.cpp
 		Source/ThirdParty/imgui/backends/imgui_impl_opengl3.cpp
+
+		Source/ThirdParty/implot/implot.cpp
+		Source/ThirdParty/implot/implot_items.cpp
 )
 
 set(ENGINE_HEADERS
@@ -21,8 +24,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Core/Public/Collision/CollisionConstants.h
         Source/Runtime/Engine/Public/Collision/CollisionEvent.h
         Source/Runtime/Engine/Public/Collision/CollisionLayerMatrix.h
-		Source/Runtime/Engine/Public/Utils/Bitmask/BitmaskOperators.h
-		Source/Runtime/Engine/Public/Utils/Bitmask/BitmaskDefines.h
+		Source/Runtime/Engine/Private/Utils/Bitmask/BitmaskOperators.h
+		Source/Runtime/Engine/Private/Utils/Bitmask/BitmaskDefines.h
         Source/Runtime/Engine/Public/ECS/Components/Collision.h
         Source/Runtime/Core/Public/Containers/MemoryPool.h
         Source/Runtime/Core/Public/Utils/Logger.h
@@ -195,7 +198,18 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemFrameworkEventFwd.h
 		Source/Runtime/Engine/Public/Services/ChangeFramebufferSizeEvent.h
 		Source/Runtime/Engine/Public/Services/WindowEventFwd.h
- "Source/Runtime/Engine/Public/ECS/Components/EditorTag.h" "Source/Runtime/Engine/Public/Containers/EntityPool.h" "Source/Runtime/Engine/Public/ECS/Components/TypeTraitsTag.h")
+        Source/Runtime/Engine/Public/ECS/Components/EditorTag.h
+        Source/Runtime/Engine/Public/Containers/EntityPool.h
+        Source/Runtime/Engine/Public/ECS/Components/TypeTraitsTag.h
+		Source/Runtime/Engine/Public/Profiler/Profiler.h
+		Source/Runtime/Core/Public/Utils/StringLiteral.h
+		Source/Runtime/Core/Public/Profiler/CPUProfiler.h
+        Source/Runtime/Engine/Public/Profiler/ExecutionTime.h
+		Source/Runtime/Engine/Public/Profiler/ProfilerConfig.h
+		Source/Runtime/Engine/Public/EngineConfig.h
+		Source/Runtime/Engine/Private/ECS/Components/TransformDirty.h
+		Source/Runtime/Engine/Public/ECS/Forward/TransformDirtyFwd.h
+)
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -282,6 +296,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/ECS/Systems/EditorCameraSystem.cpp
 		Source/Runtime/Engine/Private/Input/KeyDeviceState.cpp
         Source/Runtime/Engine/Private/ECS/Systems/PlayerCameraSystem.cpp
+        Source/Runtime/Engine/Private/Profiler/Profiler.cpp
 )
 
 add_library(engine STATIC

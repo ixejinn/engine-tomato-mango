@@ -5,6 +5,8 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <entt/fwd.hpp>
+#include "ECS/Forward/TransformDirtyFwd.h"
 
 namespace tomato
 {
@@ -38,6 +40,7 @@ namespace tomato
         glm::vec3 GetWorldScale() const { return wScale; }
         void SetScale(const glm::vec3& newScl);
         void SetScale(float x, float y, float z);
+        void SetScale(float s);
 
         const glm::mat4& GetTransformMatrix() const { return transformMatrix; }
 
@@ -51,7 +54,7 @@ namespace tomato
         glm::quat wRotation{};
         glm::vec3 wScale{};
 
-        bool dirty{true};
+        Transform::Dirty dirty;
 
         /// Local to World.
         glm::mat4 transformMatrix{};

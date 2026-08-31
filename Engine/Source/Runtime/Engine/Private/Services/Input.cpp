@@ -112,6 +112,8 @@ namespace tomato
             return Key::LeftMouseButton;
         case GLFW_MOUSE_BUTTON_RIGHT:
             return Key::RightMouseButton;
+        case GLFW_MOUSE_BUTTON_MIDDLE:
+            return Key::MiddleMouseButton;
 
         case GLFW_KEY_ESCAPE:
             return Key::Escape;

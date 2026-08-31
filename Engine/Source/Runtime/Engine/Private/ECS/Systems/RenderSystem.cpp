@@ -13,6 +13,7 @@
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
+#include "Services/Window.h"
 
 namespace tomato
 {
@@ -30,8 +31,6 @@ namespace tomato
 
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-        glEnable(GL_CULL_FACE);
-
         AssetRegistry<Mesh>::GetInstance().CreatePrimitives();
         AssetRegistry<Texture>::GetInstance().CreatePrimitives();
         AssetRegistry<Shader>::GetInstance().CreatePrimitives();
@@ -40,8 +39,11 @@ namespace tomato
     void RenderSystem::Update(SimContext& simCtx)
     {
         auto& registry = simCtx.state->GetRegistry();
-        auto& mainCam = registry.ctx().get<RenderContext>().mainCam;
-        auto& skybox = registry.ctx().get<RenderContext>().skybox;
+
+        auto& renderCtx = registry.ctx().get<RenderContext>();
+        const entt::entity mainCam = renderCtx.mainCam;
+        const entt::entity skybox = renderCtx.skybox;
+        const entt::entity viewGizmo = renderCtx.viewGizmo;
 
         glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -56,7 +58,6 @@ namespace tomato
 
         Mesh* mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
         mesh->Bind();
-        UpdateCullface(mesh->GetCullface());
 
         Shader* shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
         shader->Use();
@@ -91,7 +92,6 @@ namespace tomato
                 curMesh_ = render.mesh;
                 mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
                 mesh->Bind();
-                UpdateCullface(mesh->GetCullface());
             }
 
             const auto& mtx = trf.GetTransformMatrix();
@@ -136,18 +136,66 @@ namespace tomato
             glCullFace(GL_BACK);
             glDepthFunc(GL_LESS);
         }
-    }
 
-    void RenderSystem::UpdateCullface(bool meshCullface)
-    {
-        if (cullface_ ^ meshCullface)
+        if (viewGizmo != entt::null)
         {
-            if (meshCullface)
-                glEnable(GL_CULL_FACE);
-            else
-                glDisable(GL_CULL_FACE);
+            glViewport(-80, -80, 300, 300);
+            glClear(GL_DEPTH_BUFFER_BIT);
 
-            cullface_ = meshCullface;
+            glm::vec3 viewGizmoLight =
+                    registry.get<TransformComponent>(mainCam).GetWorldQuaternion() * glm::vec3(0, 0, 1);
+
+            // Render view gizmo center
+            auto& viewGizmoTrfMtx = registry.get<TransformComponent>(viewGizmo).GetTransformMatrix();
+            auto& viewGizmoRender = registry.get<RenderComponent>(viewGizmo);
+
+            curShader_ = viewGizmoRender.shader;
+            shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
+            shader->Use();
+
+            curTexture_ = viewGizmoRender.texture;
+            AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
+
+            curMesh_ = viewGizmoRender.mesh;
+            mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
+            mesh->Bind();
+
+            shader->SetUniformMat4("uModel", viewGizmoTrfMtx);
+            shader->SetUniformMat4("uViewProj",
+                glm::ortho(-1.5f, 1.5f, -1.5f, 1.5f, -1.5f, 1.5f)
+                * glm::mat4(glm::mat3(mainCamComp == nullptr ? glm::mat4(1.f) : mainCamComp->view)));
+            shader->SetUniformMat3("uNormal", glm::transpose(glm::inverse(glm::mat3(viewGizmoTrfMtx))));
+
+            shader->SetUniformInt("uTexture", 0);
+            shader->SetUniformVec3("uLightPos", viewGizmoLight);
+            shader->SetUniformVec4("uColor", viewGizmoRender.color);
+
+            mesh->Draw();
+
+            // Render view gizmo axis
+            mesh = AssetRegistry<Mesh>::GetInstance().Get(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)));
+            mesh->Bind();
+
+            auto& gizmoAxes = registry.get<HierarchyComponent>(viewGizmo).children;
+            for (const entt::entity axis : gizmoAxes)
+            {
+                auto& axisTrfMtx = registry.get<TransformComponent>(axis).GetTransformMatrix();
+                auto& axisRender = registry.get<RenderComponent>(axis);
+
+                shader->SetUniformMat4("uModel", axisTrfMtx);
+                shader->SetUniformMat4("uViewProj",
+                    glm::ortho(-1.5f, 1.5f, -1.5f, 1.5f, -1.5f, 1.5f)
+                    * glm::mat4(glm::mat3(mainCamComp == nullptr ? glm::mat4(1.f) : mainCamComp->view)));
+                shader->SetUniformMat3("uNormal", glm::transpose(glm::inverse(glm::mat3(axisTrfMtx))));
+
+                shader->SetUniformInt("uTexture", 0);
+                shader->SetUniformVec3("uLightPos", viewGizmoLight);
+                shader->SetUniformVec4("uColor", axisRender.color);
+
+                mesh->Draw();
+            }
+
+            glViewport(0, 0, Window::GetWidth(), Window::GetHeight());
         }
     }
 }

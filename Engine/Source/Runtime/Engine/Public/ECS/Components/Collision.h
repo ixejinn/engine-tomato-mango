@@ -10,18 +10,20 @@ namespace tomato
     {
         ColliderComponent() = default;
 
+        ColliderComponent(bool trigger) : trigger(trigger) {}
+
         ColliderComponent(
             const ColliderType t,
             const bool trigger = false,
             const CollisionLayer l = CollisionLayer::Default)
-                : layer(l), type(t), isTrigger(trigger) {}
+                : layer(l), type(t), trigger(trigger) {}
 
         glm::vec3 min{}, max{}; // AABB for broad-phase collision detection
 
         CollisionLayer layer{CollisionLayer::Default};
         ColliderType type{ColliderType::Cube};
 
-        bool isTrigger{false};
+        bool trigger{false};
         bool aabbDirty{true};
     };
 }

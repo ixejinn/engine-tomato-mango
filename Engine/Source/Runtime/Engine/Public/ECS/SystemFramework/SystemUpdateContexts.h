@@ -31,6 +31,7 @@ namespace tomato
         entt::entity playerCam{entt::null};
 
         entt::entity skybox{entt::null};
+        entt::entity viewGizmo{entt::null};
     };
 
     struct UIContext
