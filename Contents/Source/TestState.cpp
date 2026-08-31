@@ -178,6 +178,7 @@ void TestState::PlayTest()
     auto& tBtnUIComp = registry_.get<UIComponent>(tBtn);
     tBtnUIComp.sortOrder = 100;
     auto& tMouseEvt = registry_.get<MouseEventComponent>(tBtn);
+#if 0
     auto& timerComp = registry_.emplace<TimerTestComponent>(tBtn);
     if (timerComp.timer.SetTimer(0h, 0min, 10s))
         TMT_INFO << "set timer";
@@ -205,7 +206,9 @@ void TestState::PlayTest()
             }
         }
     };
+#elif 1
 
+#endif
 
     UIPrefab::CreateText(registry_, entt::null, { 100.f, 0.f });
     UIPrefab::CreateImage(registry_, entt::null, PathManager::ProjectImage("WATER_GAME_LOGO.png"), {200.f, 300.f});

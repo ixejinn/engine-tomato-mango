@@ -6,6 +6,7 @@
 #else
 #include "Resource/PathManager.h"
 #include "TestState.h"
+#include "LoadState.h"
 #include "jung/MyState.h"
 #endif
 
@@ -21,14 +22,14 @@ int main() {
 
 #else //TOMATO_SERVER
     PathManager::SetProjectRoot(TMT_PROJECT_ROOT);
-    Engine engine(1600, 900, "TOMATO", NetMode::NM_Alone);
+    Engine engine(1600, 900, "TOMATO", NetMode::NM_Client);
 
 #if defined(TOMATO_GREENTEA)
     engine.SetNextState(std::make_unique<TestState>(engine));
 
 #else //TOMATO_GREENTEA
     ////
-    engine.SetNextState(std::make_unique<MyState>(engine));
+    engine.SetNextState(std::make_unique<LoadState>(engine));
 
 #endif //TOMATO_GREENTEA
     engine.Run();

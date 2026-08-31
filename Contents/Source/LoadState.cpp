@@ -6,6 +6,7 @@
 #include "Resource/Render/Texture.h"
 #include "Resource/PathManager.h"
 
+#include "ECS/Components/Components.h"
 #include "Serialization/ComponentSerializer.h"
 
 #include "Prefab/Prefab.h"
@@ -13,6 +14,7 @@
 #include "Utils/RegistryEntry.h"
 
 #include "TestState.h"
+#include "jung/MyState.h"
 
 REGISTER_STATE(LoadState)
 
@@ -38,32 +40,21 @@ void LoadState::Init()
 	//	{
 	//		uiController_.onClick(e);
 	//	};
-	//Prefab::CreateCamera(registry_);
-	//auto btn = UIPrefab::CreateButton(registry_);
-	//auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
-	//mouseEvt.onClick =
-	//	[this](const MouseClickEvent& e)
-	//	{
-	//		engine_.RequestMatchToServer();
-	//		uiController_.onMatchRequest(e);
-	//	};
-
-	std::string meshName{ "sphere_20_10" };
-
-	auto first = meshName.find("_");
-	auto second = meshName.find("_", first + 1);
-
-	auto sector = meshName.substr(first + 1, second - first - 1);
-	auto stack = meshName.substr(second + 1);
-
-	auto type = meshName.substr(0, first);
-	std::cout << type << ", " << std::stoi(sector) << ", " << std::stoi(stack) << '\n';
+	Prefab::CreateCamera(registry_, "Camera", true);
+	auto btn = UIPrefab::CreateButton(registry_);
+	auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
+	mouseEvt.onClick =
+		[this](const MouseClickEvent& e)
+		{
+			engine_.RequestMatchToServer();
+			uiController_.onMatchRequest(e);
+		};
 	
 }
 
 void LoadState::Update()
 {
-	//engine_.TryStartGame(std::make_unique<TestState>(engine_));
+	engine_.TryStartGame(std::make_unique<MyState>(engine_));
 }
 
 void LoadState::Exit() {}

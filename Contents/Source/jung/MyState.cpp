@@ -70,6 +70,16 @@ void MyState::Init()
     channelp.channel = 0;
     registry_.emplace<WaveCollisionComponent>(player);
 
+    entt::entity player1 = Prefab::CreateCharacter(registry_, "Player1");
+    auto& trfP1 = registry_.get<TransformComponent>(player1);
+    trfP1.SetPosition(-1, -1, 0);
+
+    auto& renderp2 = registry_.get<RenderComponent>(player1);
+    renderp2.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    renderp2.color = { 8.f / 255, 75.f / 255, 109.f / 255, 0.8f };
+    auto& channelp2 = registry_.get<InputChannelComponent>(player1);
+    channelp.channel = 1;
+    registry_.emplace<WaveCollisionComponent>(player1);
 
     // Ground
     entt::entity ground = Prefab::CreateWorldObject(registry_, "Ground");
