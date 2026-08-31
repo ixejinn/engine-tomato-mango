@@ -15,7 +15,9 @@ namespace tomato
         //addToId.try_emplace({ "192.168.31.231", 9000 }, 1);
     }
 
-    ClientNetwork::~ClientNetwork() {}
+    ClientNetwork::~ClientNetwork()
+    {
+    }
 
     void ClientNetwork::ConnectToServer()
     {

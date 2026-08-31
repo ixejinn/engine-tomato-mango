@@ -58,6 +58,8 @@ void MyState::Init()
         ).count()
         << " ms\n";
         */
+    engine_.SetRollbackComponent<MovementComponent>();
+    engine_.SetRollbackComponent<VelocityComponent>();
 
     entt::entity player = Prefab::CreateCharacter(registry_, "Player");
     auto& trfP0 = registry_.get<TransformComponent>(player);
