@@ -9,11 +9,14 @@
 #include "ECS/Components/EditorTag.h"
 #include "WaveComponent.h"
 #include "ECS/Entity/Entity.h"
+#include "Prefab/Prefab.h"
 
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
+
+#include "GameplayConfig.h"
 
 using namespace tomato;
 
@@ -28,9 +31,9 @@ void WavePoolTraits::Assemble(entt::registry& registry_, entt::entity wave)
         GetAssetID("Primitive::OpenCylinder_50_10"),
         GetAssetID(Shader::PrimitiveName),
         GetAssetID(Texture::PrimitiveName));
-    registry_.emplace<WaveComponent>(wave, false, glm::vec3{ 0, -2.9f, 0 }, 10.f, 0.01f);
     registry_.emplace<RootEntityTag>(wave);
     registry_.emplace<EditorHidden>(wave);
+    registry_.emplace<WaveComponent>(wave, false, glm::vec3{ 0, -2.9f, 0 }, 10.f, 0.01f);
 }
 
 void WavePoolTraits::Reset(entt::registry& registry_, entt::entity e, entt::entity owner, glm::vec3 pos, float speed, float radius)

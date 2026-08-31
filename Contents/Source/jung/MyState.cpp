@@ -113,6 +113,7 @@ void MyState::Init()
     registry_.ctx().emplace<WavePool>(key_, registry_);
     //registry_.ctx().emplace<WaveColliderPool>(key_, registry_);
 
+
     EventDispatcher::GetInstance().Connect<TriggerEnterEvent, &WaveCollisionEnter>();
     EventDispatcher::GetInstance().Connect<TriggerExitEvent, &WaveCollisionExit>();
     EventDispatcher::GetInstance().Connect<LandingEvent, MyState::MakeWaveJump>();
@@ -189,4 +190,5 @@ void MyState::MakeWaveJump(const LandingEvent& event)
         std::cout << "Make Wave " << (int)wave.value() << "\n";
         if(e.has_value()) std::cout << "Make Wave Coll" << (int)e.value() << "\n";
     }*/
+
 }

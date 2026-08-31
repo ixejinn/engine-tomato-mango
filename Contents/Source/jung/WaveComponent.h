@@ -4,6 +4,8 @@
 #include <entt/entt.hpp>
 #include <glm/vec3.hpp>
 #include <stdint.h>
+#include <vector>
+
 namespace tomato
 {
 	struct WaveComponent
@@ -14,15 +16,17 @@ namespace tomato
 		float radius;
 		float speed;
 
+		glm::vec3 direction{ 0 };
 		int64_t startTick{ 0 };
 
 		entt::entity owner{ entt::null };
+		std::vector<entt::entity> colliders;
 	};
 
-	struct WaveColliderComponent
-	{
-		entt::entity wave{ entt::null };
-	};
+	//struct WaveColliderComponent
+	//{
+	//	entt::entity wave{ entt::null };
+	//};
 
 	struct WaveColliderTag {};
 }

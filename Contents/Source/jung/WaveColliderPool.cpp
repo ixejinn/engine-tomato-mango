@@ -34,8 +34,8 @@ void WaveColliderPoolTraits::Assemble(entt::registry& registry_, entt::entity e)
         GetAssetID(Shader::PrimitiveName),
         GetAssetID(Texture::PrimitiveName));
     registry_.emplace<VisibilityComponent>(e);
-    registry_.emplace<WaveColliderComponent>(e);
-    registry_.emplace<EditorHidden>(e);
+    //registry_.emplace<WaveColliderComponent>(e);
+    //registry_.emplace<EditorHidden>(e);
 
     //const entt::entity col = Prefab::AttachCollider(registry_, e, ColliderType::Cube);
     //registry_.get<ColliderComponent>(col).isTrigger = true;
@@ -48,8 +48,8 @@ void WaveColliderPoolTraits::Reset(entt::registry& registry_, entt::entity e, en
     auto& targetComp = registry_.get<TargetComponent>(e);
     targetComp.target = GetUUID(registry_, target);
 
-    auto& waveColliderComp = registry_.get<WaveColliderComponent>(e);
-    waveColliderComp.wave = wave;
+    /*auto& waveColliderComp = registry_.get<WaveColliderComponent>(e);
+    waveColliderComp.wave = wave;*/
 
     auto& waveTransformComp = registry_.get<TransformComponent>(wave);
     auto& transformComp = registry_.get<TransformComponent>(e);
