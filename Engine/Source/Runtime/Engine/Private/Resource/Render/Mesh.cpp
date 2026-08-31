@@ -35,7 +35,6 @@ namespace tomato
 
             case Primitive::OpenCylinder:
                 OpenCylinder(vertices, indices);
-                cullface_ = false;
                 break;
 
             case Primitive::Cone:
@@ -76,7 +75,6 @@ namespace tomato
 
             case Primitive::OpenCylinder:
                 OpenCylinder(vertices, indices, sectorCnt);
-                cullface_ = false;
                 break;
 
             case Primitive::Cone:

@@ -31,8 +31,6 @@ namespace tomato
 
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-        glEnable(GL_CULL_FACE);
-
         AssetRegistry<Mesh>::GetInstance().CreatePrimitives();
         AssetRegistry<Texture>::GetInstance().CreatePrimitives();
         AssetRegistry<Shader>::GetInstance().CreatePrimitives();
@@ -60,7 +58,6 @@ namespace tomato
 
         Mesh* mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
         mesh->Bind();
-        UpdateCullface(mesh->GetCullface());
 
         Shader* shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
         shader->Use();
@@ -95,7 +92,6 @@ namespace tomato
                 curMesh_ = render.mesh;
                 mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
                 mesh->Bind();
-                UpdateCullface(mesh->GetCullface());
             }
 
             const auto& mtx = trf.GetTransformMatrix();
@@ -163,7 +159,6 @@ namespace tomato
             curMesh_ = viewGizmoRender.mesh;
             mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
             mesh->Bind();
-            UpdateCullface(mesh->GetCullface());
 
             shader->SetUniformMat4("uModel", viewGizmoTrfMtx);
             shader->SetUniformMat4("uViewProj",
@@ -201,19 +196,6 @@ namespace tomato
             }
 
             glViewport(0, 0, Window::GetWidth(), Window::GetHeight());
-        }
-    }
-
-    void RenderSystem::UpdateCullface(bool meshCullface)
-    {
-        if (cullface_ ^ meshCullface)
-        {
-            if (meshCullface)
-                glEnable(GL_CULL_FACE);
-            else
-                glDisable(GL_CULL_FACE);
-
-            cullface_ = meshCullface;
         }
     }
 }

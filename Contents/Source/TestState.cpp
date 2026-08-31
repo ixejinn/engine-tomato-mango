@@ -56,8 +56,8 @@ void TestState::Init() {
     trfCam.SetPosition(0, 8, 8);
     trfCam.SetRotationDegree(-50, 0, 0);
 
-    //PlayTest();
-    BottleneckTest();
+    PlayTest();
+    //BottleneckTest();
 }
 
 void TestState::Update() {

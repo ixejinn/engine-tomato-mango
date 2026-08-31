@@ -98,8 +98,6 @@ namespace tomato
 
         const AABB& GetLocalAABB() const { return localAABB_; }
 
-        bool GetCullface() const { return cullface_; }
-
     private:
         static void Plain(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
         static void LBPlain(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
@@ -159,8 +157,6 @@ namespace tomato
         int vertexCnt_{0};
 
         AABB localAABB_;
-
-        bool cullface_{true};
     };
 }
 
