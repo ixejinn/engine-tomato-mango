@@ -6,6 +6,7 @@
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Particle.h"
 #include "ECS/Components/Target.h"
+#include "ECS/Components/Character.h"
 #include "ECS/Components/TransformDirty.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"

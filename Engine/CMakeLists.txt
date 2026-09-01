@@ -207,6 +207,8 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/EngineConfig.h
 		Source/Runtime/Engine/Private/ECS/Components/TransformDirty.h
 		Source/Runtime/Engine/Public/ECS/Forward/TransformDirtyFwd.h
+		Source/Runtime/Engine/Public/ECS/Systems/CharacterScaleSystem.h
+		Source/Runtime/Engine/Public/GameObject/Character/CharacterConfig.h
 )
 
 set(ENGINE_SOURCES
@@ -296,6 +298,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Systems/PlayerCameraSystem.cpp
         Source/Runtime/Engine/Private/Profiler/Profiler.cpp
         Source/Runtime/Engine/Private/Math/AABB.cpp
+		Source/Runtime/Engine/Private/ECS/Systems/CharacterScaleSystem.cpp
 )
 
 add_library(engine STATIC

@@ -29,6 +29,8 @@ namespace tomato
             std::make_unique<IntegrationSystem>());
 
         // Post
+        manager.AddSystem(TickPhase::PostUpdate, RunMode::Game | RunMode::Editor | RunMode::Rollback,
+            std::make_unique<CharacterScaleSystem>());
         for (const auto& factory : tickFactories_[TickPhase::PostUpdate])
             manager.AddSystem(TickPhase::PostUpdate, factory.mode, factory.factory());
         manager.AddSystem(TickPhase::PostUpdate, RunMode::Game | RunMode::Editor | RunMode::Rollback,
