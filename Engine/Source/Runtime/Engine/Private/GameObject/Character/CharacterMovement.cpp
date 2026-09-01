@@ -70,7 +70,7 @@ namespace tomato::CharacterMovement
             entt::registry& reg, entt::entity e,
             MovementComponent& move, VelocityComponent& vel, float jumpSpeed)
     {
-        TMT_INFO << "Jump";
+        // TMT_INFO << "Jump";
 
         vel.velocity.y = std::max(vel.velocity.y, 0.f) + jumpSpeed;
 
@@ -82,7 +82,7 @@ namespace tomato::CharacterMovement
             entt::registry& reg, entt::entity e,
             MovementComponent& move, VelocityComponent& vel)
     {
-        TMT_INFO << "Land";
+        // TMT_INFO << "Land";
 
         vel.velocity.y = 0;
 

@@ -66,12 +66,12 @@ namespace tomato
 
                     if (result->trigger)
                     {
-                        std::cout << "      trg ENTER " << candidate << "\n";
+                        // std::cout << "      trg ENTER " << candidate << "\n";
                         eventDispatcher.Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
                     }
                     else
                     {
-                        std::cout << "      col ENTER " << candidate << "\n";
+                        // std::cout << "      col ENTER " << candidate << "\n";
                         eventDispatcher.Enqueue(
                             CollisionEnterEvent{candidate.a, candidate.b, &registry, result.value()});
                         contacts_.push_back(ContactEvent{candidate.a, candidate.b, &registry, result.value()});
@@ -117,12 +117,12 @@ namespace tomato
                 {
                     if (col1->trigger || col2->trigger)
                     {
-                        std::cout << "      trg EXIT " << it->first << "\n";
+                        // std::cout << "      trg EXIT " << it->first << "\n";
                         EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{ it->first.a, it->first.b, &registry });
                     }
                     else
                     {
-                        std::cout << "      col EXIT " << it->first << "\n";
+                        // std::cout << "      col EXIT " << it->first << "\n";
                         EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{ it->first.a, it->first.b, &registry });
                     }
                 }
@@ -174,7 +174,7 @@ namespace tomato
             weightA = 0;
         else if (sumV >= EPSILON_SQ)
             weightA = lenVA / sumV;
-         std::cout << "       weightA: " << weightA << "\n";
+         // std::cout << "       weightA: " << weightA << "\n";
         float weightB = 1 - weightA;
 
         auto& trfRootA = reg.get<TransformComponent>(rootA);
@@ -212,15 +212,15 @@ namespace tomato
         TransformComponent& trf, VelocityComponent& vel,
         const glm::vec3& normal, const float weight, const float hitTime)
     {
-        std::cout << "   CC     " << glm::to_string(normal) << " " << weight << " " << hitTime << "\n";
-        std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+        // std::cout << "   CC     " << glm::to_string(normal) << " " << weight << " " << hitTime << "\n";
+        // std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Move
         if (hitTime == 0)
             trf.AddPosition(normal * EPSILON);
         else
             trf.AddPosition((vel.velocity * FIXED_DELTA_TIME * hitTime + normal * COLLISION_SKIN) * weight);
-        std::cout << "          position C: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+        // std::cout << "          position C: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Slide
         glm::vec3 remainingMove = (1 - hitTime * weight) * vel.velocity;
@@ -232,22 +232,22 @@ namespace tomato
             vel.velocity.y = 0.f;
         if (-EPSILON < vel.velocity.z && vel.velocity.z < EPSILON)
             vel.velocity.z = 0.f;
-        std::cout << "          velocity C: " << glm::to_string(vel.velocity) << "\n";
+        // std::cout << "          velocity C: " << glm::to_string(vel.velocity) << "\n";
     }
 
     void CollisionSystem::ResolveDiscreteContact(
         TransformComponent& trf, VelocityComponent& vel,
         const glm::vec3& normal, const float weight, const float distance)
     {
-        std::cout << "    DC    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
-        std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+        // std::cout << "    DC    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
+        // std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Move
         float moveDist = COLLISION_SKIN - distance;
         if (moveDist < EPSILON_SQ)
             moveDist = EPSILON_SQ;
         trf.AddPosition(normal * moveDist * weight);
-        std::cout << "          position D: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+        // std::cout << "          position D: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Slide
         float lenV = glm::length(vel.velocity);
@@ -264,7 +264,7 @@ namespace tomato
             if (-EPSILON < vel.velocity.z && vel.velocity.z < EPSILON)
                 vel.velocity.z = 0.f;
         }
-        std::cout << "          velocity D: " << glm::to_string(vel.velocity) << "\n";
+        // std::cout << "          velocity D: " << glm::to_string(vel.velocity) << "\n";
     }
 
     void CollisionSystem::ResolvePenetration(
