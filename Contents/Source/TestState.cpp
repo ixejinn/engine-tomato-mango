@@ -68,7 +68,7 @@ void TestState::Update() {
 void TestState::Exit() {}
 
 void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
-    entt::entity root = GetRootEntity(event.reg, event.e1);
+    entt::entity root = GetRootEntity(event.reg, event.a);
     if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
@@ -79,7 +79,7 @@ void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
         }
     }
 
-    root = GetRootEntity(event.reg, event.e2);
+    root = GetRootEntity(event.reg, event.b);
     if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
@@ -92,14 +92,14 @@ void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
 }
 
 void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
-    entt::entity root = GetRootEntity(event.reg, event.e1);
+    entt::entity root = GetRootEntity(event.reg, event.a);
     if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
             render->color = testComp->color.value();
     }
 
-    root = GetRootEntity(event.reg, event.e2);
+    root = GetRootEntity(event.reg, event.b);
     if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
@@ -137,17 +137,17 @@ void TestState::PlayTest()
     particlePool.Acquire(GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
 
     // Player1 character
-    entt::entity player1 = Prefab::CreateCharacter(registry_, "Player 1", true);
+    //entt::entity player1 = Prefab::CreateCharacter(registry_, "Player 1", true);
 
-    auto& trfP1 = registry_.get<TransformComponent>(player1);
-    trfP1.SetPosition(-1, 2, 0);
+    //auto& trfP1 = registry_.get<TransformComponent>(player1);
+    //trfP1.SetPosition(-1, 2, 0);
 
-    auto& renderP1 = registry_.get<RenderComponent>(player1);
-    renderP1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    renderP1.color = { 8.f / 255, 75.f / 255, 109.f / 255, 0.8f };
+    //auto& renderP1 = registry_.get<RenderComponent>(player1);
+    //renderP1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    //renderP1.color = { 8.f / 255, 75.f / 255, 109.f / 255, 0.8f };
 
-    auto& channelP1 = registry_.get<InputChannelComponent>(player1);
-    channelP1.channel = 1;
+    //auto& channelP1 = registry_.get<InputChannelComponent>(player1);
+    //channelP1.channel = 1;
 
     // Ground
     entt::entity ground = Prefab::CreateWorldObject(registry_, "Ground", true);
@@ -226,17 +226,18 @@ void TestState::PlayTest()
     uiCmp1.sortOrder = 1;
 #elif 1
     auto worldCanvas = UIPrefab::CreateCanvas(registry_, RenderMode::World);
+
     auto targetLabel = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
     registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0), glm::vec3{ 0.f, 1.f, 0.f });
     SetHierarchy(registry_, worldCanvas, targetLabel);
     auto& uiCmp = registry_.get<UIComponent>(targetLabel);
     uiCmp.sortOrder = 1;
 
-    auto targetLabel1 = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player1", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
-    registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1), glm::vec3{ 0.f, 1.f, 0.f });
-    SetHierarchy(registry_, worldCanvas, targetLabel1);
-    auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
-    uiCmp1.sortOrder = 1;
+    //auto targetLabel1 = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player1", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
+    //registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1), glm::vec3{ 0.f, 1.f, 0.f });
+    //SetHierarchy(registry_, worldCanvas, targetLabel1);
+    //auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
+    //uiCmp1.sortOrder = 1;
 #endif
 
     EventDispatcher::GetInstance().Connect<CollisionEnterEvent, &TEST_CollisionEnter>();

@@ -94,7 +94,7 @@ namespace tomato::Prefab
 
         auto& trfColGnd = registry.get<TransformComponent>(colGnd);
         constexpr float scaleColGnd = 0.8;
-        constexpr float deltaPosY = (1 - scaleColGnd) * 0.5f + COLLISION_SKIN * 2;
+        constexpr float deltaPosY = (1 - scaleColGnd) * 0.5f + COLLISION_SKIN * 3;
         trfColGnd.SetScale(scaleColGnd);
         trfColGnd.SetPosition(0, -deltaPosY, 0);
 

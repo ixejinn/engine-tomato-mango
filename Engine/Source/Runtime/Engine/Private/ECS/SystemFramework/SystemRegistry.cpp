@@ -72,6 +72,14 @@ namespace tomato
     void SystemRegistry::RegisterEventCallbacks()
     {
         auto& eventDispatcher = EventDispatcher::GetInstance();
+        eventDispatcher.Connect<CollisionEnterEvent>();
+        eventDispatcher.Connect<CollisionStayEvent>();
+        eventDispatcher.Connect<CollisionExitEvent>();
+
+        eventDispatcher.Connect<TriggerEnterEvent>();
+        eventDispatcher.Connect<TriggerStayEvent>();
+        eventDispatcher.Connect<TriggerExitEvent>();
+
         eventDispatcher.Connect<TriggerEnterEvent, &CharacterMovement::OnTriggerEnter_UpdateMovementMode>();
         eventDispatcher.Connect<TriggerExitEvent, &CharacterMovement::OnTriggerExit_UpdateMovementMode>();
 

@@ -86,7 +86,7 @@ namespace tomato {
                 return;
             }
 
-            auto& contactPairs = reg.ctx().get<CollisionContext>().pairs;
+            auto& contactPairs = reg.ctx().get<CollisionContext>().cacheMap;
             // TMT_INFO << "     Restore collision pair " << collisionPairs.size() << " -> " << data_[tick].data.size();
             contactPairs.clear();
 
@@ -100,7 +100,7 @@ namespace tomato {
             slice.tick = tick;
             slice.data.clear();
 
-            auto& contactPairs = reg.ctx().get<CollisionContext>().pairs;
+            auto& contactPairs = reg.ctx().get<CollisionContext>().cacheMap;
             slice.data.reserve(contactPairs.size());
             // TMT_INFO << "     Back up collision pair size: " << collisionPairs.size();
             for (auto it = contactPairs.begin(); it != contactPairs.end(); ++it)

@@ -295,6 +295,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Input/KeyDeviceState.cpp
         Source/Runtime/Engine/Private/ECS/Systems/PlayerCameraSystem.cpp
         Source/Runtime/Engine/Private/Profiler/Profiler.cpp
+        Source/Runtime/Engine/Private/Math/AABB.cpp
 )
 
 add_library(engine STATIC

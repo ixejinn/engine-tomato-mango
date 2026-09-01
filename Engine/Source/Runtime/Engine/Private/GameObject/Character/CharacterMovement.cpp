@@ -14,8 +14,8 @@ namespace tomato::CharacterMovement
 {
     void OnTriggerEnter_UpdateMovementMode(const TriggerEnterEvent& event)
     {
-        auto root1 = GetRootEntity(event.reg, event.e1);
-        auto root2 = GetRootEntity(event.reg, event.e2);
+        auto root1 = GetRootEntity(event.reg, event.a);
+        auto root2 = GetRootEntity(event.reg, event.b);
 
         auto* move1 = event.reg->try_get<MovementComponent>(root1);
         auto* move2 = event.reg->try_get<MovementComponent>(root2);
@@ -23,7 +23,7 @@ namespace tomato::CharacterMovement
         auto* vel1 = event.reg->try_get<VelocityComponent>(root1);
         auto* vel2 = event.reg->try_get<VelocityComponent>(root2);
 
-        if (move1 && vel1 && event.reg->get<ColliderComponent>(event.e1).trigger)
+        if (move1 && vel1 && event.reg->get<ColliderComponent>(event.a).trigger)
         {
             EventDispatcher::GetInstance().Enqueue(
                     LandingEvent{
@@ -31,7 +31,7 @@ namespace tomato::CharacterMovement
             Land(*event.reg, root1, *move1, *vel1);
         }
 
-        if (move2 && vel2 && event.reg->get<ColliderComponent>(event.e2).trigger)
+        if (move2 && vel2 && event.reg->get<ColliderComponent>(event.b).trigger)
         {
             EventDispatcher::GetInstance().Enqueue(
                     LandingEvent{
@@ -42,16 +42,16 @@ namespace tomato::CharacterMovement
 
     void OnTriggerExit_UpdateMovementMode(const TriggerExitEvent& event)
     {
-        auto root1 = GetRootEntity(event.reg, event.e1);
-        auto root2 = GetRootEntity(event.reg, event.e2);
+        auto root1 = GetRootEntity(event.reg, event.a);
+        auto root2 = GetRootEntity(event.reg, event.b);
 
         auto* move1 = event.reg->try_get<MovementComponent>(root1);
         auto* move2 = event.reg->try_get<MovementComponent>(root2);
 
-        if (move1 && event.reg->get<ColliderComponent>(event.e1).trigger)
+        if (move1 && event.reg->get<ColliderComponent>(event.a).trigger)
             ChangeMovementMode(*event.reg, root1, *move1, Falling);
 
-        if (move2 && event.reg->get<ColliderComponent>(event.e2).trigger)
+        if (move2 && event.reg->get<ColliderComponent>(event.b).trigger)
             ChangeMovementMode(*event.reg, root2, *move2, Falling);
     }
 
