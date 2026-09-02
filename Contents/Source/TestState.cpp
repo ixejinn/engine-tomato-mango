@@ -67,8 +67,8 @@ void TestState::Update() {
 
 void TestState::Exit() {}
 
-void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
-    entt::entity root = GetRootEntity(event.reg, event.e1);
+void TestState::TEST_CollisionEnter(const CollisionEnterEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.a);
     if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
@@ -79,7 +79,7 @@ void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
         }
     }
 
-    root = GetRootEntity(event.reg, event.e2);
+    root = GetRootEntity(event.reg, event.b);
     if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
@@ -91,15 +91,55 @@ void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
     }
 }
 
-void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
-    entt::entity root = GetRootEntity(event.reg, event.e1);
+void TestState::TEST_CollisionExit(const CollisionExitEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.a);
     if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
             render->color = testComp->color.value();
     }
 
-    root = GetRootEntity(event.reg, event.e2);
+    root = GetRootEntity(event.reg, event.b);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+            render->color = testComp->color.value();
+    }
+}
+
+void TestState::TEST_TriggerEnter(const TriggerEnterEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.a);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+        {
+            if (!testComp->color.has_value())
+                testComp->color = render->color;
+            render->color = CollisionTestComponent::COLLISION_COLOR;
+        }
+    }
+
+    root = GetRootEntity(event.reg, event.b);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+        {
+            if (!testComp->color.has_value())
+                testComp->color = render->color;
+            render->color = CollisionTestComponent::COLLISION_COLOR;
+        }
+    }
+}
+
+void TestState::TEST_TriggerExit(const TriggerExitEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.a);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+            render->color = testComp->color.value();
+    }
+
+    root = GetRootEntity(event.reg, event.b);
     if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
@@ -112,7 +152,7 @@ void TestState::CallbackJump(const tomato::LandingEvent& event)
     auto e = event.reg->ctx().get<ParticleEmitterPool>().Acquire(
         GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
         event.position);
-     std::cout << "Jump particle " << (int)e.value() << "\n";
+     // std::cout << "Jump particle " << (int)e.value() << "\n";
 }
 
 void TestState::PlayTest()
@@ -226,6 +266,7 @@ void TestState::PlayTest()
     uiCmp1.sortOrder = 1;
 #elif 1
     auto worldCanvas = UIPrefab::CreateCanvas(registry_, RenderMode::World);
+
     auto targetLabel = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
     registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0), glm::vec3{ 0.f, 1.f, 0.f });
     SetHierarchy(registry_, worldCanvas, targetLabel);
@@ -239,8 +280,12 @@ void TestState::PlayTest()
     uiCmp1.sortOrder = 1;
 #endif
 
-    EventDispatcher::GetInstance().Connect<CollisionEnterEvent, &TEST_CollisionEnter>();
-    EventDispatcher::GetInstance().Connect<CollisionExitEvent, &TEST_CollisionExit>();
+    auto& eventDispatcher = EventDispatcher::GetInstance();
+    // eventDispatcher.Connect<CollisionEnterEvent, &TEST_CollisionEnter>();
+    // eventDispatcher.Connect<CollisionExitEvent, &TEST_CollisionExit>();
+
+    eventDispatcher.Connect<TriggerEnterEvent, &TEST_TriggerEnter>();
+    eventDispatcher.Connect<TriggerExitEvent, &TEST_TriggerExit>();
 }
 
 void TestState::BottleneckTest()

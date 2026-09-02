@@ -5,10 +5,12 @@
 #include <glm/fwd.hpp>
 #include "ECS/Systems/System.h"
 
-namespace tomato {
-    class TransformSystem : public System {
+namespace tomato
+{
+    class TransformSystem : public System
+    {
     public:
-        void Update(SimContext &simCtx) override;
+        void Update(SimContext& simCtx) override;
 
     private:
         static void SetRootEntityDirtyBit(entt::registry& reg);

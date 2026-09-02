@@ -1,6 +1,6 @@
 ﻿#include <entt/entt.hpp>
 #include "Prefab/Prefab.h"
-#include "GameObject/Character/CharacterMovement.h"
+#include "GameObject/Character/CharacterConfig.h"
 #include "ECS/Components/Components.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "Resource/AssetHash.h"
@@ -92,10 +92,12 @@ namespace tomato::Prefab
         const entt::entity colObj = registry.get<HierarchyComponent>(obj).children[0];
         const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, "Ground trigger");
 
+        registry.emplace<GroundTriggerTag>(colGnd);
+
         auto& trfColGnd = registry.get<TransformComponent>(colGnd);
-        constexpr float scaleColGnd = 0.8;
-        constexpr float deltaPosY = (1 - scaleColGnd) * 0.5f + COLLISION_SKIN * 2;
-        trfColGnd.SetScale(scaleColGnd);
+        constexpr float deltaPosY = (1 - Character::GROUND_TRIGGER_SCALE) * 0.5f
+                                  + COLLISION_SKIN * Character::GROUND_TRIGGER_EXTENSION_RATIO;
+        trfColGnd.SetScale(Character::GROUND_TRIGGER_SCALE);
         trfColGnd.SetPosition(0, -deltaPosY, 0);
 
         if (printInfo)

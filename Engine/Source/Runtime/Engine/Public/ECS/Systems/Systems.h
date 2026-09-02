@@ -2,6 +2,7 @@
 #define MANGO_SYSTEMS_H
 
 #include "ECS/Systems/CameraTransformSystem.h"
+#include "ECS/Systems/CharacterScaleSystem.h"
 #include "ECS/Systems/CollisionSystem.h"
 #include "ECS/Systems/EditorCameraSystem.h"
 #include "ECS/Systems/GravitySystem.h"
@@ -12,9 +13,9 @@
 #include "ECS/Systems/PlayerCameraSystem.h"
 #include "ECS/Systems/RenderSystem.h"
 #include "ECS/Systems/ScreenUIRenderSystem.h"
-#include "ECS/Systems/WorldUIRenderSystem.h"
 #include "ECS/Systems/TransformSystem.h"
 #include "ECS/Systems/UISystem.h"
 #include "ECS/Systems/UITransformSystem.h"
+#include "ECS/Systems/WorldUIRenderSystem.h"
 
 #endif //MANGO_SYSTEMS_H

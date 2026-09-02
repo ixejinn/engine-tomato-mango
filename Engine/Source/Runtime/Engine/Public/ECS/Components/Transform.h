@@ -60,6 +60,7 @@ namespace tomato
         glm::mat4 transformMatrix{};
 
         friend class TransformSystem;
+        friend class CharacterScaleSystem;
     };
 }
 

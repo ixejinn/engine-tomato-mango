@@ -8,7 +8,7 @@ namespace tomato
 {
     struct TriggerEvent
     {
-        entt::entity e1, e2;
+        entt::entity a, b;
         entt::registry* reg;
     };
 

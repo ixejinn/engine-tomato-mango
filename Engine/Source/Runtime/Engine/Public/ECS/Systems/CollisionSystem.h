@@ -30,8 +30,6 @@ namespace tomato
 
         std::vector<ContactPair> candidates_;
 
-        static void UpdateAABB(entt::registry& reg);
-
         void ResolveContacts();
         std::vector<ContactEvent> contacts_;
         static void ResolveContact(ContactEvent& event);
