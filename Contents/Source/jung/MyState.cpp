@@ -63,13 +63,23 @@ void MyState::Init()
     auto& trfP0 = registry_.get<TransformComponent>(player);
     trfP0.SetPosition(1, -1, 0);
 
-    auto& renderp1 = registry_.get<RenderComponent>(player);
-    renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    renderp1.color = { 0.f, 1.f, 1.f, 1.f };
+    auto& renderp0 = registry_.get<RenderComponent>(player);
+    renderp0.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    renderp0.color = { 0.f, 1.f, 1.f, 1.f };
     auto& channelp = registry_.get<InputChannelComponent>(player);
     channelp.channel = 0;
     registry_.emplace<WaveCollisionComponent>(player);
 
+    //entt::entity player1 = Prefab::CreateCharacter(registry_, "Player");
+    //auto& trfP1 = registry_.get<TransformComponent>(player1);
+    //trfP1.SetPosition(-1, -1, 1);
+
+    //auto& renderp1 = registry_.get<RenderComponent>(player1);
+    //renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    //renderp1.color = { 0.f, 0.5f, 0.2f, 1.f };
+    //auto& channelp1 = registry_.get<InputChannelComponent>(player1);
+    //channelp1.channel = 1;
+    //registry_.emplace<WaveCollisionComponent>(player1);
 
     // Ground
     entt::entity ground = Prefab::CreateWorldObject(registry_, "Ground");
@@ -110,9 +120,8 @@ void MyState::Init()
     //auto& collider = registry_.get<HierarchyComponent>(projectile).children[0];
     //registry_.get<TransformComponent>(collider).SetScale(glm::vec3{1.f, 0.1f, 0.1f});
 
-    registry_.ctx().emplace<WavePool>(key_, registry_);
-    //registry_.ctx().emplace<WaveColliderPool>(key_, registry_);
-
+    registry_.ctx().emplace<WaveColliderPool>(key_, registry_, 2);
+    registry_.ctx().emplace<WavePool>(key_, registry_, 1);
 
     EventDispatcher::GetInstance().Connect<TriggerEnterEvent, &WaveCollisionEnter>();
     EventDispatcher::GetInstance().Connect<TriggerExitEvent, &WaveCollisionExit>();
@@ -127,8 +136,8 @@ void MyState::Exit()
 {}
 
 void MyState::WaveCollisionEnter(const tomato::TriggerEnterEvent& event) {
-    entt::entity root1 = GetRootEntity(event.reg, event.e1);
-    entt::entity root2 = GetRootEntity(event.reg, event.e2);
+    entt::entity root1 = GetRootEntity(event.reg, event.a);
+    entt::entity root2 = GetRootEntity(event.reg, event.b);
 
     {
         auto* testComp = event.reg->try_get<WaveCollisionComponent>(root1);
@@ -159,7 +168,7 @@ void MyState::WaveCollisionEnter(const tomato::TriggerEnterEvent& event) {
 
 void MyState::WaveCollisionExit(const tomato::TriggerExitEvent& event)
 {
-    entt::entity root = GetRootEntity(event.reg, event.e1);
+    entt::entity root = GetRootEntity(event.reg, event.a);
     if (auto* testComp = event.reg->try_get<WaveCollisionComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
@@ -169,7 +178,7 @@ void MyState::WaveCollisionExit(const tomato::TriggerExitEvent& event)
         }
     }
 
-    root = GetRootEntity(event.reg, event.e2);
+    root = GetRootEntity(event.reg, event.b);
     if (auto* testComp = event.reg->try_get<WaveCollisionComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))

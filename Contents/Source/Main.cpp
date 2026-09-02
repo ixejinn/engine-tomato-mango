@@ -1,7 +1,7 @@
 ﻿#include <memory>
 #include "Engine.h"
 #include "EngineConfig.h"
- #define TOMATO_SERVER
+//#define TOMATO_SERVER
 #ifdef TOMATO_SERVER
 #include "Server/MatchServer.h"
 #else

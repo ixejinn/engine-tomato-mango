@@ -144,12 +144,24 @@ namespace tomato
 
 		ImGui::SeparatorText("Layer");
 		const char* layPreview = "Default";
+		for (const auto& info : CollisionLayerMetas)
+		{
+			if (collider.layer == info.layer)
+			{
+				layPreview = info.name;
+				break;
+			}
+		}
+
 		if (ImGui::BeginCombo("##Layer", layPreview))
 		{
-			if (ImGui::Selectable("Default", collider.layer == CollisionLayer::Default))
+			for (const auto& info : CollisionLayerMetas)
 			{
-				collider.layer = CollisionLayer::Default;
-				changed = true;
+				if (ImGui::Selectable(info.name, collider.layer == info.layer))
+				{
+					collider.layer = info.layer;
+					changed = true;
+				}
 			}
 
 			ImGui::EndCombo();

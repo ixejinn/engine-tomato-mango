@@ -70,7 +70,41 @@ void WaveSystem::Update(SimContext& simCtx)
 			colTransform.SetQuaternion(rotation);*/
 		}
 #elif 1
+		for (auto col : wave.colliders)
+		{
+			if (!reg.all_of<WaveColliderTag>(col)) continue;
+			auto* target = reg.try_get<TargetComponent>(col);
+			if (!target) continue;
 
+			auto tEntity = GetEntityByUUID(reg, target->target);
+			auto& targetTransform = reg.get<TransformComponent>(tEntity);
+			auto& colTransform = reg.get<TransformComponent>(col);
+			if (wave.active == false || transform.GetLocalScale().x >= wave.radius * 2.f)
+				reg.ctx().get<WaveColliderPool>().Release(col);
+			//colTransform.SetPosition(wave.origin);
+
+			int64_t elapsed = simCtx.tick - wave.startTick; //최초 생성 후 지난 틱
+
+			glm::vec3 toTarget = targetTransform.GetWorldPosition() - wave.origin;
+			toTarget.y = 0.f;
+
+			// 타겟이 원점과 겹칠 경우 NaN 방지를 위해 마지막으로 유효한 direction 저장
+			if (glm::length2(toTarget) > 1e-8)
+				wave.direction = glm::normalize(toTarget);
+
+			// 진행 거리(현재 파동의 반지름) = 경과 시간 * 파동 속도
+			float radius = elapsed * (wave.speed * wave.radius / 2.f);
+			glm::vec3 wavePoint = wave.origin + wave.direction * radius;
+
+			glm::vec3 newpoint = wavePoint;
+			colTransform.SetPosition({ newpoint.x, transform.GetLocalPosition().y, newpoint.z });
+			//colTransform.SetPosition({ newpoint.x, 0.f, newpoint.z});
+
+			// target 방향으로 법선 회전
+			/*glm::vec3 newRot = glm::normalize(targetTransform.GetWorldPosition() - colTransform.GetWorldPosition());
+			glm::quat rotation = glm::quatLookAt(newRot, glm::vec3(0, 1, 0));
+			colTransform.SetQuaternion(rotation);*/
+		}
 #endif
 	}
 }

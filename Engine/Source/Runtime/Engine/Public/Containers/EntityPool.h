@@ -11,6 +11,7 @@
 #include "Utils/PassKey.h"
 #include "State/StateFwd.h"
 #include "ECS/Components/TypeTraitsTag.h"
+#include "Prefab/Prefab.h"
 
 namespace tomato
 {
@@ -74,7 +75,8 @@ namespace tomato
 		{
 			for (std::size_t i = 0; i < count; ++i)
 			{
-				entt::entity entity = registry_.create();
+				//entt::entity entity = registry_.create();
+				entt::entity entity = Prefab::CreateBaseEntity(registry_);
 				Traits::Assemble(registry_, entity);
 				registry_.emplace<PoolOwnerTag<Traits>>(entity);
 

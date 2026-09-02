@@ -19,6 +19,7 @@ namespace tomato::Prefab
 
         registry.emplace<NametagComponent>(obj, GenerateUUID(), registry.ctx().get<EntityNameGenerator>().Generate(name));
         registry.emplace<VisibilityComponent>(obj);
+        //registry.emplace<LifetimeComponent>(obj);
         registry.emplace<TransformComponent>(obj);
         if (root)
             registry.emplace<RootEntityTag>(obj);
@@ -115,6 +116,7 @@ namespace tomato::Prefab
         const entt::entity col = CreateBaseEntity(registry, name, false);
 
         registry.emplace<ColliderComponent>(col, trigger);
+        //registry.emplace<LifetimeComponent>(col);
         registry.emplace<RenderComponent>(col);
         SetHierarchy(registry, parent, col);
 

@@ -23,10 +23,10 @@ namespace tomato
 		std::vector<entt::entity> colliders;
 	};
 
-	//struct WaveColliderComponent
-	//{
-	//	entt::entity wave{ entt::null };
-	//};
+	struct WaveColliderComponent
+	{
+		entt::entity wave{ entt::null };
+	};
 
 	struct WaveColliderTag {};
 }

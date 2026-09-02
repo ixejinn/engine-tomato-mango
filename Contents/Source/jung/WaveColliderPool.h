@@ -1,4 +1,4 @@
-#ifndef MANGO_WAVECOLLIDERPOOL_H
+﻿#ifndef MANGO_WAVECOLLIDERPOOL_H
 #define MANGO_WAVECOLLIDERPOOL_H
 
 #include "Containers/EntityPool.h"
