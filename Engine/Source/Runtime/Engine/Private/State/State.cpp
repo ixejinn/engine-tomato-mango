@@ -34,6 +34,10 @@ namespace tomato
         // View gizmo
         entt::entity& viewGizmo = renderCtx.viewGizmo;
         viewGizmo = Prefab::CreateGizmo(registry_);
+
+        //// Set collision context
+        auto& collisionCtx = registry_.ctx().get<CollisionContext>();
+        collisionCtx.layerMtx = &engine.collisionLayerMtx_;
     }
 
     void State::SetNextState(std::unique_ptr<State>&& newState)

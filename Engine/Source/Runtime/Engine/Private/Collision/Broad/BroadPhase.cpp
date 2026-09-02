@@ -1,8 +1,10 @@
 #include "Collision/Broad/BroadPhase.h"
+#include "Collision/CollisionLayerMatrix.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Entity/Hierarchy.h"
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 
 namespace tomato
 {
@@ -13,9 +15,15 @@ namespace tomato
     {
         entt::entity rootA = GetRootEntity(reg, a);
         entt::entity rootB = GetRootEntity(reg, b);
+        if (rootA == rootB)
+            return false;
 
-        return rootA != rootB
-            && layerMatrix_.CanCollide(layerA, layerB)
-            && (reg.try_get<VelocityComponent>(rootA) || reg.try_get<VelocityComponent>(rootB));
+        if (!reg.ctx().get<CollisionContext>().layerMtx->CanCollide(layerA, layerB))
+            return false;
+
+        if (!reg.try_get<VelocityComponent>(rootA) && !reg.try_get<VelocityComponent>(rootB))
+            return false;
+
+        return true;
     }
 }

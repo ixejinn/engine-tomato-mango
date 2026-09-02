@@ -11,6 +11,7 @@
 #include "Network/ClientNetwork.h"
 #include "GameNetwork/GamePlayNetSystem.h"
 #include "GameNetwork/Rollback/RollbackManager.h"
+#include "Collision/CollisionLayerMatrix.h"
 #include "Simulation/Tick/TickFwd.h"
 #include "Editor.h"
 
@@ -42,6 +43,8 @@ namespace tomato
         }
 
         void RequestMatchToServer();
+
+        CollisionLayerMatrix collisionLayerMtx_;
 
     private:
         Window window_;
