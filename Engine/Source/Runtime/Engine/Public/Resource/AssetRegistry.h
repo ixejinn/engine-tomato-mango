@@ -51,8 +51,8 @@ namespace tomato {
 
         void Register(std::string name, std::unique_ptr<T>&& asset);
 
-
         T* Get(AssetID id);
+        int16_t GetSortKey(AssetID id);
 
         void CreatePrimitives()
         {
@@ -67,7 +67,7 @@ namespace tomato {
 
     private:
         std::vector<std::unique_ptr<T>> data_;
-        std::unordered_map<AssetID, uint32_t> idToIdx_;
+        std::unordered_map<AssetID, uint16_t> idToIdx_;
         std::unordered_map<AssetID, std::string> idToName_;
     };
 
@@ -100,6 +100,16 @@ namespace tomato {
             TMT_ERR << "Invalid asset ID: " << id;
 
         return data_[it->second].get();
+    }
+
+    template <typename T>
+    int16_t AssetRegistry<T>::GetSortKey(AssetID id)
+    {
+        auto it = idToIdx_.find(id);
+        if (it == idToIdx_.end())
+            TMT_ERR << "Invalid asset ID: " << id;
+
+        return it->second;
     }
 }
 

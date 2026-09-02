@@ -1,4 +1,5 @@
-﻿#include <glm/glm.hpp>
+﻿#include <bit>
+#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "ECS/Systems/RenderSystem.h"
 #include "ECS/Entity/Entity.h"
@@ -14,6 +15,7 @@
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
 #include "Services/Window.h"
+#include "Render/RenderSortEntry.h"
 
 namespace tomato
 {
@@ -38,6 +40,10 @@ namespace tomato
 
     void RenderSystem::Update(SimContext& simCtx)
     {
+        constexpr static AssetID standardShader = GetAssetID(Shader::PrimitiveName);
+        constexpr static AssetID standardTexture = GetAssetID(Texture::PrimitiveName);
+        constexpr static AssetID standardMesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube));
+
         auto& registry = simCtx.state->GetRegistry();
 
         auto& renderCtx = registry.ctx().get<RenderContext>();
@@ -67,6 +73,13 @@ namespace tomato
         auto group = registry.group<TransformComponent, RenderComponent>();
         for (auto [e, trf, render] : group.each()) {
             // TODO: frustum culling
+            if (render.shader == 0)
+                render.shader = standardShader;
+            if (render.texture == 0)
+                render.texture = standardTexture;
+            if (render.mesh == 0)
+                render.mesh = standardMesh;
+            GetRenderSortKey(render, trf.GetWorldPosition(), registry.get<TransformComponent>(mainCam).GetWorldPosition());
 
             if (!IsVisible(registry, e))
                 continue;
@@ -197,5 +210,49 @@ namespace tomato
 
             glViewport(0, 0, Window::GetWidth(), Window::GetHeight());
         }
+    }
+
+    bool RenderSystem::FrustumCulling(const CameraComponent& cam)
+    {
+        return false;
+    }
+
+    uint64_t RenderSystem::GetRenderSortKey(const RenderComponent& render, const glm::vec3& pos, const glm::vec3& camPos)
+    {
+        /// *** Render sort key bit layout
+        ///  - Opaque
+        ///    0000000000000001 | render type (16) | shader ID (16) | texture ID (16)
+        ///  - Transparent
+        ///    0000000000000000 | 0000000000000000 | distance square from camera (32)
+        ///
+        /// Draw in descending order
+
+        uint64_t sortKey = 0;
+
+        uint16_t opaque = 1;
+        uint16_t type = 0;
+        uint32_t low32 = 0;
+
+        if (render.color.a < 1)
+            opaque = 0;
+
+        if (opaque == 1)
+        {
+            type = static_cast<uint16_t>(render.type);
+
+            uint16_t shader = AssetRegistry<Shader>::GetInstance().GetSortKey(render.shader);
+            uint16_t texture = AssetRegistry<Texture>::GetInstance().GetSortKey(render.texture);
+            low32 = (static_cast<uint32_t>(shader) << 16) | (static_cast<uint32_t>(texture));
+        }
+        else
+            low32 = std::bit_cast<uint32_t>(glm::length2(pos - camPos));
+
+        sortKey |= (static_cast<uint64_t>(opaque) << (16 * 3));
+        sortKey |= (static_cast<uint64_t>(type)   << (16 * 2));
+        sortKey |= (static_cast<uint64_t>(low32));
+
+        // std::cout << std::showbase << std::hex << sortKey << "\n";
+
+        return sortKey;
     }
 }

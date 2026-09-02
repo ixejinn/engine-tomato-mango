@@ -209,6 +209,10 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Forward/TransformDirtyFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/CharacterScaleSystem.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterConfig.h
+		Source/Runtime/Engine/Public/Render/RenderSortEntry.h
+		Source/Runtime/Engine/Public/Render/RenderType.h
+		Source/Runtime/Engine/Public/Render/RenderFwd.h
+		Source/Runtime/Engine/Public/ECS/Forward/RenderCompFwd.h
 )
 
 set(ENGINE_SOURCES

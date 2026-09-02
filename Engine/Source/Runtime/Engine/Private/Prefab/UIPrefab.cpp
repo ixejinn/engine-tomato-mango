@@ -57,10 +57,11 @@ namespace tomato::UIPrefab
         reg.emplace<HierarchyComponent>(button);
         SetHierarchy(reg, canvas, button);
         reg.emplace<RenderComponent>(button,
-            selectable.normalColor,
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
-            GetAssetID("UIShader"),
-            GetAssetID(Texture::PrimitiveName));
+                                     selectable.normalColor,
+                                     GetAssetID("UIShader"),
+                                     GetAssetID(Texture::PrimitiveName),
+                                     GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
+                                     RenderType::UI);
         reg.emplace<VisibilityComponent>(button);
 
         const auto buttonText = reg.create();
@@ -126,9 +127,10 @@ namespace tomato::UIPrefab
         reg.emplace<RenderComponent>(
             img,
             glm::vec4{ 1.f, 1.f, 1.f, 1.f },
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
             GetAssetID("UIShader"),
-            GetAssetID(textureName));
+            GetAssetID(textureName),
+            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
+            RenderType::UI);
         reg.emplace<VisibilityComponent>(img);
         reg.emplace<HierarchyComponent>(img);
         SetHierarchy(reg, canvas, img);

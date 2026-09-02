@@ -148,9 +148,10 @@ namespace tomato::Prefab
         reg.emplace<EditorHidden>(center);
         reg.emplace<RenderComponent>(center,
             glm::vec4(1.f),
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
             GetAssetID(Shader::PrimitiveName),
-            GetAssetID(Texture::PrimitiveName));
+            GetAssetID(Texture::PrimitiveName),
+            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
+            RenderType::UI);
 
         // X axis
         const entt::entity x = reg.create();
@@ -162,9 +163,10 @@ namespace tomato::Prefab
         reg.emplace<VisibilityComponent>(x);
         reg.emplace<RenderComponent>(x,
             glm::vec4(1.f, 0.f, 0.f, 1.f),
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)),
             GetAssetID(Shader::PrimitiveName),
-            GetAssetID(Texture::PrimitiveName));
+            GetAssetID(Texture::PrimitiveName),
+            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)),
+            RenderType::UI);
         SetHierarchy(reg, center, x);
 
         // Y axis
@@ -177,9 +179,10 @@ namespace tomato::Prefab
         reg.emplace<VisibilityComponent>(y);
         reg.emplace<RenderComponent>(y,
             glm::vec4(0.f, 1.f, 0.f, 1.f),
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)),
             GetAssetID(Shader::PrimitiveName),
-            GetAssetID(Texture::PrimitiveName));
+            GetAssetID(Texture::PrimitiveName),
+            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)),
+            RenderType::UI);
         SetHierarchy(reg, center, y);
 
         // Z axis
@@ -192,9 +195,10 @@ namespace tomato::Prefab
         reg.emplace<VisibilityComponent>(z);
         reg.emplace<RenderComponent>(z,
             glm::vec4(0.f, 0.f, 1.f, 1.f),
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)),
             GetAssetID(Shader::PrimitiveName),
-            GetAssetID(Texture::PrimitiveName));
+            GetAssetID(Texture::PrimitiveName),
+            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)),
+            RenderType::UI);
         SetHierarchy(reg, center, z);
 
         reg.get<TransformComponent>(center).SetScale(0.1f, 0.1f, 0.1f);
