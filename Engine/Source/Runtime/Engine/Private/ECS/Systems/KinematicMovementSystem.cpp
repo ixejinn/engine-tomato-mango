@@ -22,7 +22,7 @@ namespace tomato {
             const auto& inputRec = simCtx.state->GetPlayerInputTimelines()[ch.channel][simCtx.tick];
             if (inputRec.tick != simCtx.tick)
                 continue;
-            //std::cout << inputRec.tick << " " << (int)inputRec.held << " " << (int)inputRec.down << '\n';
+            //std::cout << (int)e << " " << inputRec.tick << " " << (int)inputRec.held << " " << (int)inputRec.down << '\n';
             InputIntent keypress{inputRec.held};
             InputIntent keydown{inputRec.down};
 

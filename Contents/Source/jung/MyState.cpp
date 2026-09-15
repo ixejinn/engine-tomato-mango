@@ -27,6 +27,7 @@
 #include "WaveCollisionComponent.h"
 #include "WavePool.h"
 #include "WaveColliderPool.h"
+#include "WaveManager.h"
 
 REGISTER_STATE(MyState)
 
@@ -69,17 +70,24 @@ void MyState::Init()
     auto& channelp = registry_.get<InputChannelComponent>(player);
     channelp.channel = 0;
     registry_.emplace<WaveCollisionComponent>(player);
+    entt::entity colObj = registry_.get<HierarchyComponent>(player).children[0];
+    auto& colp = registry_.get<ColliderComponent>(colObj);
+    colp.layer = CollisionLayer::Wave1;
 
-    //entt::entity player1 = Prefab::CreateCharacter(registry_, "Player");
-    //auto& trfP1 = registry_.get<TransformComponent>(player1);
-    //trfP1.SetPosition(-1, -1, 1);
+    entt::entity player1 = Prefab::CreateCharacter(registry_, "Player");
+    auto& trfP1 = registry_.get<TransformComponent>(player1);
+    trfP1.SetPosition(-1, -1, 1);
 
-    //auto& renderp1 = registry_.get<RenderComponent>(player1);
-    //renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    //renderp1.color = { 0.f, 0.5f, 0.2f, 1.f };
-    //auto& channelp1 = registry_.get<InputChannelComponent>(player1);
-    //channelp1.channel = 1;
-    //registry_.emplace<WaveCollisionComponent>(player1);
+    auto& renderp1 = registry_.get<RenderComponent>(player1);
+    renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    renderp1.color = { 0.f, 0.5f, 0.2f, 1.f };
+    auto& channelp1 = registry_.get<InputChannelComponent>(player1);
+    channelp1.channel = 0;
+    channelp1.is1P = false;
+    registry_.emplace<WaveCollisionComponent>(player1);
+    entt::entity colObj1 = registry_.get<HierarchyComponent>(player1).children[0];
+    auto& colp1 = registry_.get<ColliderComponent>(colObj1);
+    colp1.layer = CollisionLayer::Wave2;
 
     // Ground
     entt::entity ground = Prefab::CreateWorldObject(registry_, "Ground");
@@ -89,39 +97,11 @@ void MyState::Init()
     auto& renderGnd = registry_.get<RenderComponent>(ground);
     //renderGnd.color = { 0.639f, 0.8f, 0.639f, 1.f };
     renderGnd.color = { 0.710f, 0.839f, 0.573f, 1.f };
-    
-    //// Wave
-    //auto wave = registry_.create();
-    //auto& generator = registry_.ctx().get<EntityNameGenerator>();
-    //registry_.emplace<NametagComponent>(wave, GenerateUUID(), generator.Generate("wave"));
-    //registry_.emplace<TransformComponent>(wave, glm::vec3{ 0, -2.9f, 0 }, glm::vec3(0), glm::vec3(0, 0.1f, 0));
-    //registry_.emplace<RenderComponent>(wave,
-    //                                glm::vec4(1.f),
-    //                                GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::OpenCylinder)),
-    //                                GetAssetID(Shader::PrimitiveName),
-    //                                GetAssetID(Texture::PrimitiveName));
-    //registry_.emplace<VisibilityComponent>(wave);
-    //registry_.emplace<WaveComponent>(wave, glm::vec3{ 0, -2.9f, 0 }, 10.f, 0.01f);
-    //registry_.emplace<RootEntityTag>(wave);
-
-    ////Projectile
-    //auto projectile = Prefab::CreateStaticObject(registry_, Prefab::Primitive::Cube, { 0, 0.f, 0 });
-    //registry_.emplace<TargetComponent>(projectile, GetUUID(registry_, player));
-    ////registry_.emplace<LifetimeComponent>(projectile);
-    //auto& trfPt = registry_.get<TransformComponent>(projectile);
-    //trfPt.SetScale({ 0.5f, 0.1f, 0.5f });
-    //auto& renderPt = registry_.get<RenderComponent>(projectile);
-    //renderPt.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Plain));
-    //renderPt.color = glm::vec4{ 0.8f, 0.f, 0.8f, 1.f };
-    ////SetHierarchy(registry_, wave, projectile);
-    //registry_.get<ColliderComponent>(registry_.get<HierarchyComponent>(projectile).children[0]).isTrigger = true;
-    //registry_.emplace<WaveColliderTag>(projectile);
-
-    //auto& collider = registry_.get<HierarchyComponent>(projectile).children[0];
-    //registry_.get<TransformComponent>(collider).SetScale(glm::vec3{1.f, 0.1f, 0.1f});
-
-    registry_.ctx().emplace<WaveColliderPool>(key_, registry_, 2);
-    registry_.ctx().emplace<WavePool>(key_, registry_, 1);
+ 
+    engine_.collisionLayerMtx_.SetCollisionLayer(CollisionLayer::Wave1, CollisionLayer::Wave1, false);
+    engine_.collisionLayerMtx_.SetCollisionLayer(CollisionLayer::Wave2, CollisionLayer::Wave2, false);
+    engine_.collisionLayerMtx_.SetCollisionLayer(CollisionLayer::Wave1, CollisionLayer::Wave2, true);
+    registry_.ctx().emplace<WaveManager>(key_, registry_, 10);
 
     EventDispatcher::GetInstance().Connect<TriggerEnterEvent, &WaveCollisionEnter>();
     EventDispatcher::GetInstance().Connect<TriggerExitEvent, &WaveCollisionExit>();
@@ -191,13 +171,7 @@ void MyState::WaveCollisionExit(const tomato::TriggerExitEvent& event)
 
 void MyState::MakeWaveJump(const LandingEvent& event)
 {
-    auto wave = event.reg->ctx().get<WavePool>().Acquire(event.e, event.position, 0.01f);
-    /*if (wave.has_value())
-    {
-        auto e = event.reg->ctx().get<WaveColliderPool>().Acquire(wave.value(), event.e);
+    auto wave = event.reg->ctx().get<WaveManager>().Acquire(event.e, event.position, 0.01f);
 
-        std::cout << "Make Wave " << (int)wave.value() << "\n";
-        if(e.has_value()) std::cout << "Make Wave Coll" << (int)e.value() << "\n";
-    }*/
 
 }

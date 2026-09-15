@@ -27,8 +27,8 @@ void WaveColliderPoolTraits::Assemble(entt::registry& registry_, entt::entity e)
     nameTag.name = registry_.ctx().get<EntityNameGenerator>().Generate("WaveCollider");
 
     auto& trfPt = registry_.get<TransformComponent>(e);
-    trfPt.SetPosition(glm::vec3{ 100.f, 100.f, 100.f });
-    trfPt.SetScale(glm::vec3{ 1.f, 0.1f, 0.1f });
+    trfPt.SetPosition(glm::vec3{ 100.f, 100.f, 100.f }); //@TODO : set life time
+    trfPt.SetScale(glm::vec3{ 0.1f, 0.1f, 0.1f });
 
     registry_.emplace<TargetComponent>(e);
     auto& renderPt = registry_.emplace<RenderComponent>(e,
@@ -41,7 +41,10 @@ void WaveColliderPoolTraits::Assemble(entt::registry& registry_, entt::entity e)
     //registry_.emplace<WaveColliderComponent>(e);
     //registry_.emplace<EditorHidden>(e);
 
-    const entt::entity col = Prefab::AttachColliderEntity(registry_, e, true);
+    registry_.emplace<ColliderComponent>(e, true);
+    //registry.emplace<LifetimeComponent>(col);
+
+    //const entt::entity col = Prefab::AttachColliderEntity(registry_, e, true);
     //registry_.get<TransformComponent>(col).SetScale(glm::vec3{1.f, 0.1f, 0.1f});
     //registry_.get<LifetimeComponent>(col).isActive = false;
 }
@@ -51,13 +54,18 @@ void WaveColliderPoolTraits::Reset(entt::registry& registry_, entt::entity e, en
     auto& targetComp = registry_.get<TargetComponent>(e);
     targetComp.target = GetUUID(registry_, target);
 
-    auto& waveCollider = registry_.emplace<WaveColliderComponent>(e, wave);
-    //auto& transformComp = registry_.get<TransformComponent>(e);
-    //auto& waveComp = registry_.get<WaveComponent>(wave);
-    //transformComp.SetPosition(waveComp.origin);
+    //auto& waveCollider = registry_.emplace<WaveColliderComponent>(e, wave);
+    auto& transformComp = registry_.get<TransformComponent>(e);
+    auto& waveComp = registry_.get<WaveComponent>(wave);
+    transformComp.SetPosition(waveComp.origin);
     
-    //registry_.emplace<WaveColliderTag>(e); // active
+    // Set ColliderLayer
+    entt::entity ownerColObj = registry_.get<HierarchyComponent>(waveComp.owner).children[0];
+	auto& colp = registry_.get<ColliderComponent>(ownerColObj);
+    auto& myColp = registry_.get<ColliderComponent>(e);
+    myColp.layer = colp.layer;
 
+    registry_.emplace<WaveColliderTag>(e); // active
 }
 
 bool WaveColliderPoolTraits::Deactivate(entt::registry& registry_, entt::entity e)
@@ -66,6 +74,8 @@ bool WaveColliderPoolTraits::Deactivate(entt::registry& registry_, entt::entity 
         return false;
 
     registry_.remove<WaveColliderTag>(e); //deactive
-
+    auto& trfPt = registry_.get<TransformComponent>(e);
+    trfPt.SetPosition(glm::vec3{ 100.f, 100.f, 100.f }); //@TODO : set life time
+    //registry_.get<LifetimeComponent>(e).isActive = false;
     return true;
 }

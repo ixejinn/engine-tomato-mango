@@ -3,6 +3,7 @@
 #include "WaveComponent.h"
 #include "WavePool.h"
 #include "WaveColliderPool.h"
+#include "WaveManager.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "State/State.h"
 #include "Utils/RegistryEntry.h"
@@ -19,7 +20,7 @@ void WaveSystem::Update(SimContext& simCtx)
 	{
 		if (!wave.active) continue; // change active tag?
 		if (transform.GetLocalScale().x >= wave.radius * 2.f)
-			reg.ctx().get<WavePool>().Release(e);
+			reg.ctx().get<WaveManager>().Release(e);
 
 		if (wave.startTick == 0)
 			wave.startTick = simCtx.tick;
@@ -72,7 +73,7 @@ void WaveSystem::Update(SimContext& simCtx)
 #elif 1
 		for (auto col : wave.colliders)
 		{
-			if (!reg.all_of<WaveColliderTag>(col)) continue;
+			//if (!reg.all_of<WaveColliderTag>(col)) continue;
 			auto* target = reg.try_get<TargetComponent>(col);
 			if (!target) continue;
 
@@ -80,7 +81,8 @@ void WaveSystem::Update(SimContext& simCtx)
 			auto& targetTransform = reg.get<TransformComponent>(tEntity);
 			auto& colTransform = reg.get<TransformComponent>(col);
 			if (wave.active == false || transform.GetLocalScale().x >= wave.radius * 2.f)
-				reg.ctx().get<WaveColliderPool>().Release(col);
+			{ }
+				//reg.ctx().get<WaveColliderPool>().Release(col);
 			//colTransform.SetPosition(wave.origin);
 
 			int64_t elapsed = simCtx.tick - wave.startTick; //최초 생성 후 지난 틱

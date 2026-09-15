@@ -11,7 +11,8 @@ namespace tomato
 
 #define TMT_COLLISION_LAYER_LIST(X) \
     X(Default, 1 << 0, "Default")   \
-    X(Wave, 1 << 1, "Wave")
+    X(Wave1, 1 << 1, "Wave1")       \
+    X(Wave2, 1 << 2, "Wave2")       
 
     enum class CollisionLayer : uint32_t
     {
@@ -66,7 +67,8 @@ namespace tomato
         CollisionLayer,
         {
             { CollisionLayer::Default, "Default" },
-            { CollisionLayer::Wave, "Wave" }
+            { CollisionLayer::Wave1, "Wave1" },
+            { CollisionLayer::Wave2, "Wave2" },
         }
     )
 

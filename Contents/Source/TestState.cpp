@@ -188,6 +188,7 @@ void TestState::PlayTest()
 
     auto& channelP1 = registry_.get<InputChannelComponent>(player1);
     channelP1.channel = 1;
+    channelP1.is1P = false;
 
     // Ground
     entt::entity ground = Prefab::CreateWorldObject(registry_, "Ground", true);

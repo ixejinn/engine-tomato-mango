@@ -5,9 +5,9 @@
 #include <vector>
 #include <optional>
 #include <cassert>
-#include <concepts>
 #include <type_traits>
 
+#include "EntityPoolTraits.h"
 #include "Utils/PassKey.h"
 #include "State/StateFwd.h"
 #include "ECS/Components/TypeTraitsTag.h"
@@ -15,19 +15,6 @@
 
 namespace tomato
 {
-	// Detect whether "Deactivate" exists at compile time.
-	template<typename Traits>
-	concept HasDeactivate = requires(entt::registry & registry_, entt::entity entity)
-	{
-		{ Traits::Deactivate(registry_, entity) };
-	};
-
-	template<typename Traits>
-	concept EntityPoolTraits = requires(entt::registry & registry_, entt::entity entity)
-	{
-		{ Traits::Assemble(registry_, entity) } -> std::same_as<void>;
-	};
-
 	template<EntityPoolTraits Traits>
 	class EntityPool
 	{
@@ -39,11 +26,18 @@ namespace tomato
 			Create(poolSize);
 		}
 
+		EntityPool(entt::registry& registry, std::size_t poolSize = 32)
+			:registry_(registry), poolSize_(poolSize)
+		{
+			entities_.reserve(poolSize);
+			Create(poolSize);
+		}
+
 		template<typename... Args>
-		std::optional<entt::entity> Acquire(Args&&... args)
+		entt::entity Acquire(Args&&... args)
 		{
 			if (entities_.empty())
-				return std::nullopt;
+				return entt::null;
 
 			const entt::entity entity = entities_.back();
 			entities_.pop_back();

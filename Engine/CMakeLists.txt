@@ -200,6 +200,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Services/WindowEventFwd.h
         Source/Runtime/Engine/Public/ECS/Components/EditorTag.h
         Source/Runtime/Engine/Public/Containers/EntityPool.h
+        Source/Runtime/Engine/Public/Containers/EntityPoolTraits.h
         Source/Runtime/Engine/Public/ECS/Components/TypeTraitsTag.h
 		Source/Runtime/Engine/Public/Profiler/Profiler.h
 		Source/Runtime/Core/Public/Utils/StringLiteral.h
