@@ -176,9 +176,7 @@ namespace tomato {
 
     void Engine::Update(SimContext& simCtx, RunMode mode)
     {
-        CPU_PROFILER_BLOCK_BEGIN(Update);
         systemManager_.Update(simCtx, mode);
-        CPU_PROFILER_BLOCK_END(Update);
     }
 
     void Engine::UpdateEditor(RunMode& mode)

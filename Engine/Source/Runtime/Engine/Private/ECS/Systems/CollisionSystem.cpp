@@ -13,6 +13,7 @@
 #include "Simulation/SimulationConfig.h"
 #include "Event/EventDispatcher.h"
 #include "Utils/Logger.h"
+#include "Profiler/CPUProfiler.h"
 
 namespace tomato
 {
@@ -24,12 +25,14 @@ namespace tomato
 
     void CollisionSystem::Update(SimContext& simCtx)
     {
+        CPU_PROFILER_BLOCK_BEGIN(CollisionSystem::Update);
         RunBroadPhase(simCtx);
         RunNarrowPhase(simCtx);
 
         ResolveContacts();
 
         UpdateCollisionEvents();
+        CPU_PROFILER_BLOCK_END(CollisionSystem::Update);
     }
 
     void CollisionSystem::RunBroadPhase(SimContext& simCtx)
@@ -271,9 +274,10 @@ namespace tomato
         TransformComponent& trf,
         const glm::vec3& normal, const float weight, const float distance)
     {
-//        std::cout << "         position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+        // std::cout << "    PE    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
+        // std::cout << "         position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
         trf.AddPosition(normal * -distance * weight * FIXED_DELTA_TIME * CORRECTION_SPEED);
-//        std::cout << "         position P: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+        // std::cout << "         position P: " << glm::to_string(trf.GetLocalPosition()) << "\n";
     }
 
     void CollisionSystem::UpdateCollisionEvents()

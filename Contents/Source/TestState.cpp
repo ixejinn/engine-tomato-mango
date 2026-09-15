@@ -56,8 +56,8 @@ void TestState::Init() {
     trfCam.SetPosition(0, 8, 8);
     trfCam.SetRotationDegree(-50, 0, 0);
 
-    PlayTest();
-    //BottleneckTest();
+    // PlayTest();
+    BottleneckTest();
 }
 
 void TestState::Update() {
@@ -165,10 +165,11 @@ void TestState::PlayTest()
 
     auto& renderP0 = registry_.get<RenderComponent>(player0);
     renderP0.mesh = GetAssetID("Primitive::Sphere_20_10");
-    renderP0.color = {155.f / 255, 20.f / 255, 90.f / 255, 0.8f};
+    renderP0.color = {155.f / 255, 20.f / 255, 90.f / 255, 1.f};
 
     auto& channelP0 = registry_.get<InputChannelComponent>(player0);
     channelP0.channel = 0;
+    channelP0.is1P = false;
 
     registry_.emplace<CollisionTestComponent>(player0);
 
@@ -177,23 +178,35 @@ void TestState::PlayTest()
     particlePool.Acquire(GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
 
     // Player1 character
-    entt::entity player1 = Prefab::CreateCharacter(registry_, "Player 1", true);
+    //entt::entity player1 = Prefab::CreateCharacter(registry_, "Player 1", true);
 
-    auto& trfP1 = registry_.get<TransformComponent>(player1);
-    trfP1.SetPosition(-1, 2, 0);
+    //auto& trfP1 = registry_.get<TransformComponent>(player1);
+    //trfP1.SetPosition(-1, 2, 0);
 
-    auto& renderP1 = registry_.get<RenderComponent>(player1);
-    renderP1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    renderP1.color = { 8.f / 255, 75.f / 255, 109.f / 255, 0.8f };
+    //auto& renderP1 = registry_.get<RenderComponent>(player1);
+    //renderP1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    //renderP1.color = { 8.f / 255, 75.f / 255, 109.f / 255, 1.f };
 
-    auto& channelP1 = registry_.get<InputChannelComponent>(player1);
-    channelP1.channel = 1;
+    //auto& channelP1 = registry_.get<InputChannelComponent>(player1);
+    //channelP1.channel = 1;
+
+    entt::entity object = Prefab::CreateWorldObject(registry_);
+
+    auto& trfObj = registry_.get<TransformComponent>(object);
+    trfObj.SetPosition(-1, 0.51, 0);
+
+    auto& renderObj = registry_.get<RenderComponent>(object);
+    renderObj.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    renderObj.color = { 8.f / 255, 75.f / 255, 109.f / 255, 1.f };
+
+    registry_.emplace<VelocityComponent>(object);
 
     // Ground
     entt::entity ground = Prefab::CreateWorldObject(registry_, "Ground", true);
 
     auto& trfGnd = registry_.get<TransformComponent>(ground);
     trfGnd.SetPosition(0, -0.05, 0);
+    //trfGnd.SetPosition(1, -0.05, 0);
     trfGnd.SetScale(10, 0.1, 10);
 
     auto& renderGnd = registry_.get<RenderComponent>(ground);
@@ -214,7 +227,7 @@ void TestState::PlayTest()
     //         uiController_.onClick(e);
     //     };
 
-    auto tBtn = UIPrefab::CreateButton(registry_, entt::null, { -10.f, -10.f });
+    auto tBtn = UIPrefab::CreateButton(registry_, entt::null, { -700.f, 350.f });
     auto& tBtnUIComp = registry_.get<UIComponent>(tBtn);
     tBtnUIComp.sortOrder = 100;
     auto& tMouseEvt = registry_.get<MouseEventComponent>(tBtn);
@@ -247,8 +260,8 @@ void TestState::PlayTest()
     };
 
 
-    UIPrefab::CreateText(registry_, entt::null, { 100.f, 0.f });
-    UIPrefab::CreateImage(registry_, entt::null, PathManager::ProjectImage("WATER_GAME_LOGO.png"), {200.f, 300.f});
+    //UIPrefab::CreateText(registry_, entt::null, { 100.f, 0.f });
+    //UIPrefab::CreateImage(registry_, entt::null, PathManager::ProjectImage("WATER_GAME_LOGO.png"), {200.f, 300.f});
     //UIPrefab::CreateCanvas(registry_);
     //UIPrefab::CreateCanvas(registry_);
     //UIPrefab::CreateCanvas(registry_);
@@ -267,33 +280,46 @@ void TestState::PlayTest()
 #elif 1
     auto worldCanvas = UIPrefab::CreateCanvas(registry_, RenderMode::World);
 
-    auto targetLabel = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
+    auto targetLabel = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
     registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0), glm::vec3{ 0.f, 1.f, 0.f });
     SetHierarchy(registry_, worldCanvas, targetLabel);
     auto& uiCmp = registry_.get<UIComponent>(targetLabel);
     uiCmp.sortOrder = 1;
 
-    auto targetLabel1 = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player1", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
-    registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1), glm::vec3{ 0.f, 1.f, 0.f });
-    SetHierarchy(registry_, worldCanvas, targetLabel1);
-    auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
-    uiCmp1.sortOrder = 1;
+    //auto targetLabel1 = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player1", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
+    //registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1), glm::vec3{ 0.f, 1.f, 0.f });
+    //SetHierarchy(registry_, worldCanvas, targetLabel1);
+    //auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
+    //uiCmp1.sortOrder = 1;
 #endif
 
     auto& eventDispatcher = EventDispatcher::GetInstance();
     // eventDispatcher.Connect<CollisionEnterEvent, &TEST_CollisionEnter>();
     // eventDispatcher.Connect<CollisionExitEvent, &TEST_CollisionExit>();
 
-    eventDispatcher.Connect<TriggerEnterEvent, &TEST_TriggerEnter>();
-    eventDispatcher.Connect<TriggerExitEvent, &TEST_TriggerExit>();
+    //eventDispatcher.Connect<TriggerEnterEvent, &TEST_TriggerEnter>();
+    //eventDispatcher.Connect<TriggerExitEvent, &TEST_TriggerExit>();
 }
 
 void TestState::BottleneckTest()
 {
-    for (int x = 0; x < 1000; ++x)
+    // for (int x = 0; x < 1000; ++x)
+    // {
+    //     entt::entity e = Prefab::CreateWorldObject(registry_, "GameObject", false);
+    //     auto& trf = registry_.get<TransformComponent>(e);
+    //     trf.SetPosition(2 * x, 0, 0);
+    // }
+
+    for (int x = 0;  x < 20; x += 2)
     {
-        entt::entity e = Prefab::CreateWorldObject(registry_, "GameObject", false);
-        auto& trf = registry_.get<TransformComponent>(e);
-        trf.SetPosition(2 * x, 0, 0);
+        for (int y = 0; y < 20; y += 2)
+        {
+            for (int z = 0; z < 20; z += 2)
+            {
+                entt::entity e = Prefab::CreateWorldObject(registry_, "GameObject", false);
+                auto& trf = registry_.get<TransformComponent>(e);
+                trf.SetPosition(x, y, z);
+            }
+        }
     }
 }
