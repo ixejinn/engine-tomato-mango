@@ -14,8 +14,6 @@ namespace tomato
         virtual void FindContactPairCandidates(entt::registry& reg, std::vector<ContactPair>& candidates) = 0;
 
     protected:
-        inline static CollisionLayerMatrix layerMatrix_;
-
         static bool CanCollide(
             entt::registry& reg,
             entt::entity a, entt::entity b,
