@@ -79,6 +79,30 @@ namespace tomato
 		return changed;
 	}
 
+	bool DrawInputChannelInspcetor(EditorContext& eCtx, entt::registry& reg, InputChannelComponent& inputCh)
+	{
+		bool changed = false;
+
+		ImGui::SeparatorText("Key Setting");
+		if (ImGui::RadioButton("WASD", inputCh.useWASD == true))
+		{
+			inputCh.useWASD = true;
+			changed = true;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::RadioButton("Number Keys", inputCh.useWASD == false))
+		{
+			inputCh.useWASD = false;
+			changed = true;
+		}
+
+		ImGui::NewLine();
+
+		return changed;
+	}
+
 	bool DrawTransformInspector(EditorContext& eCtx, entt::registry& reg, TransformComponent& transform)
 	{
 		bool changed = false;

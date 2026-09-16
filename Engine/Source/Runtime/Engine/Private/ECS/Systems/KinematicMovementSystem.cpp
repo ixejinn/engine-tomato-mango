@@ -28,13 +28,13 @@ namespace tomato {
 
             // Move
             int x = 0, y = 0;
-            if (HasFlag(keypress, ch.is1P ? InputIntent::Up : InputIntent::Up2))
+            if (HasFlag(keypress, ch.useWASD ? InputIntent::Up : InputIntent::Up2))
                 ++y;
-            if (HasFlag(keypress, ch.is1P ? InputIntent::Down : InputIntent::Down2))
+            if (HasFlag(keypress, ch.useWASD ? InputIntent::Down : InputIntent::Down2))
                 --y;
-            if (HasFlag(keypress, ch.is1P ? InputIntent::Left : InputIntent::Left2))
+            if (HasFlag(keypress, ch.useWASD ? InputIntent::Left : InputIntent::Left2))
                 --x;
-            if (HasFlag(keypress, ch.is1P ? InputIntent::Right : InputIntent::Right2))
+            if (HasFlag(keypress, ch.useWASD ? InputIntent::Right : InputIntent::Right2))
                 ++x;
 
             // if (x > 0)
@@ -68,7 +68,7 @@ namespace tomato {
             trf.SetRotationDegree(newDegree);
 
             // Jump
-            if (HasFlag(keydown, ch.is1P ? InputIntent::Jump : InputIntent::Jump2) && move.jumpCnt < JUMP_COUNT_MAX)
+            if (HasFlag(keydown, ch.useWASD ? InputIntent::Jump : InputIntent::Jump2) && move.jumpCnt < JUMP_COUNT_MAX)
                 CharacterMovement::Jump(registry, e, move, velocity, JUMP_SPEED);
 
             // std::cout << (int)e << " kine velocity: " << velocity.velocity.x << " " << velocity.velocity.y << " " << velocity.velocity.z << "\n";
