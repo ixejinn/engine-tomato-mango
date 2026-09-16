@@ -166,6 +166,27 @@ namespace tomato
 	{
 		bool changed = false;
 
+		ImGui::SeparatorText("Type");
+		const char* typePreview = ColliderTypeMetas[(uint8_t)collider.type].name;
+		if (ImGui::BeginCombo("##Type", typePreview))
+		{
+			for (const auto& info : ColliderTypeMetas)
+			{
+				if (ImGui::Selectable(info.name, collider.type == info.type))
+				{
+					collider.type = info.type;
+					collider.aabbDirty = true;
+					changed = true;
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::SeparatorText("Trigger");
+		ImGui::Text("Is Trigger"); ImGui::SameLine();
+		if(ImGui::Checkbox("##Trigger", &collider.trigger))
+			changed = true;
+
 		ImGui::SeparatorText("Layer");
 		const char* layPreview = "Default";
 		for (const auto& info : CollisionLayerMetas)
@@ -190,28 +211,38 @@ namespace tomato
 
 			ImGui::EndCombo();
 		}
+		ImGui::NewLine();
 
-		ImGui::SeparatorText("Type");
-		const char* typePreview = ColliderTypeMetas[(uint8_t)collider.type].name;
-		if (ImGui::BeginCombo("##Type", typePreview))
+		//Layer Matrix
+		int layerSize = sizeof(CollisionLayerMetas) / sizeof(CollisionLayerMeta);
+		ImGuiTableColumnFlags column_flags = ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
+		if (ImGui::BeginTable("Layer Collision Matrix", layerSize + 1))
 		{
-			for (const auto& info : ColliderTypeMetas)
+			ImGui::TableSetupColumn("CollisionLayer", ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_WidthFixed);
+			for (int n = 0; n < layerSize; n++)
+				ImGui::TableSetupColumn(CollisionLayerMetas[n].name, column_flags | ImGuiTableColumnFlags_NoHeaderWidth);
+			ImGui::TableAngledHeadersRow();
+
+			for (int i = 0; i < layerSize; i++)
 			{
-				if (ImGui::Selectable(info.name, collider.type == info.type))
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+				ImGui::AlignTextToFramePadding();
+				ImGui::Text(CollisionLayerMetas[i].name);
+				for (int j = layerSize - 1; j >= i; j--)
 				{
-					collider.type = info.type;
-					collider.aabbDirty = true;
-					changed = true;
+					ImGui::TableSetColumnIndex(j+1);
+
+					bool test = false;
+					ImGui::PushID((i + 1) * (j + 1));
+					ImGui::Checkbox("##", &test);
+					ImGui::PopID();
 				}
+				ImGui::NewLine();
 			}
-			ImGui::EndCombo();
+			ImGui::EndTable();
 		}
-
-		ImGui::SeparatorText("Trigger");
-		ImGui::Text("Is Trigger"); ImGui::SameLine();
-		if(ImGui::Checkbox("##Trigger", &collider.trigger))
-			changed = true;
-
+		
 		ImGui::NewLine();
 
 		return changed;
