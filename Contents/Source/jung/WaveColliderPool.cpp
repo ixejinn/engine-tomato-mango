@@ -39,7 +39,7 @@ void WaveColliderPoolTraits::Assemble(entt::registry& registry_, entt::entity e)
     //registry_.emplace<RootEntityTag>(e);
     //registry_.emplace<VisibilityComponent>(e);
     //registry_.emplace<WaveColliderComponent>(e);
-    //registry_.emplace<EditorHidden>(e);
+    registry_.emplace<EditorHidden>(e);
 
     registry_.emplace<ColliderComponent>(e, true);
     //registry.emplace<LifetimeComponent>(col);

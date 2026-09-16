@@ -9,9 +9,9 @@ namespace tomato
     struct RenderComponent
     {
         glm::vec4 color{1.f, 1.f, 1.f, 1.f};
-        AssetID mesh;
-        AssetID shader;
-        AssetID texture;
+        AssetID mesh{ 0 };
+        AssetID shader{ 0 };
+        AssetID texture{ 0 };
     };
 }
 
