@@ -83,7 +83,7 @@ namespace tomato
                 else
                 {
                     // Stay
-                    if (result->distance < COLLISION_SKIN + 1e-4f)
+                    if (!result->hitTime.has_value())
                         result->normal = contactCache[candidate].normal;
                     else
                         contactCache[candidate].normal = result->normal;
@@ -219,10 +219,7 @@ namespace tomato
         // std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Move
-        if (hitTime == 0)
-            trf.AddPosition(normal * EPSILON);
-        else
-            trf.AddPosition((vel.velocity * FIXED_DELTA_TIME * hitTime + normal * COLLISION_SKIN) * weight);
+        trf.AddPosition((vel.velocity * FIXED_DELTA_TIME * hitTime + normal * COLLISION_SKIN) * weight);
         // std::cout << "          position C: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Slide
@@ -247,9 +244,8 @@ namespace tomato
 
         // Move
         float moveDist = COLLISION_SKIN - distance;
-        if (moveDist < EPSILON_SQ)
-            moveDist = EPSILON_SQ;
-        trf.AddPosition(normal * moveDist * weight);
+        if (moveDist > 0)
+            trf.AddPosition(normal * moveDist * weight);
         // std::cout << "          position D: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Slide

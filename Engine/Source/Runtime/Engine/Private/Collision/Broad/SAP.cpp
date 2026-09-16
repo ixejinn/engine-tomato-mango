@@ -25,7 +25,7 @@ namespace tomato
         std::list<entt::entity> active;
         float activeMaxX = std::numeric_limits<float>::lowest();
 
-        for (auto [e, col] : group.each())
+        for (const auto& [e, col] : group.each())
         {
             AABB& aabb = col.aabb;
 
@@ -53,15 +53,15 @@ namespace tomato
                         continue;
                     }
 
-                    // Check collision layer
-                    if (!CanCollide(reg, e, *it, col.layer, colAct.layer))
+                    // Test AABB (for axis y and z)
+                    if (!TestAABBAABB(aabbAct, aabb))
                     {
                         ++it;
                         continue;
                     }
 
-                    // Test AABB (for axis y and z)
-                    if (!TestAABBAABB(aabbAct, aabb))
+                    // Check collision layer
+                    if (!CanCollide(reg, e, *it, col.layer, colAct.layer))
                     {
                         ++it;
                         continue;

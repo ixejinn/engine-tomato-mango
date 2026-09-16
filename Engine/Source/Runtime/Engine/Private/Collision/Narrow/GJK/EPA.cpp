@@ -104,6 +104,10 @@ namespace tomato
         polytope.emplace_back(points, 1, 0, 2, 3);
         polytope.emplace_back(points, 0, 1, 2, 3);
 
+        float maxDistSq = 0.f;
+        for (const glm::vec3& p : points)
+            maxDistSq = std::max(maxDistSq, glm::length2(p));
+
         int iteration = 0;
         while (true)
         {
@@ -126,11 +130,11 @@ namespace tomato
             float dist = glm::dot(nearest->normal, points.back());
             float diff = dist - nearest->distance;
             if (dist < 0 ||
-                (diff < EPSILON && diff > -EPSILON) ||
+                std::abs(diff) < RELATIVE_TOLERANCE * glm::sqrt(maxDistSq) ||
                 iteration++ > 20)
             {
 //                std::cout << " *** EPA *** " << glm::to_string(nearest->normal) << " " << nearest->distance << "\n";
-                return DistanceResult{ nearest->normal, -nearest->distance };
+                return DistanceResult{nearest->normal, -nearest->distance};
             }
 
             // Expand polytope
@@ -153,6 +157,7 @@ namespace tomato
             }
 
             const int lastIdx = points.size() - 1;
+            maxDistSq = std::max(maxDistSq, glm::length2(points[lastIdx]));
             for (const auto& edge : edgesToExpand)
             {
                 int refIdx = 0;

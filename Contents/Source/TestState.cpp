@@ -56,8 +56,8 @@ void TestState::Init() {
     trfCam.SetPosition(0, 8, 8);
     trfCam.SetRotationDegree(-50, 0, 0);
 
-    // PlayTest();
-    BottleneckTest();
+    PlayTest();
+    // BottleneckTest();
 }
 
 void TestState::Update() {
@@ -169,7 +169,6 @@ void TestState::PlayTest()
 
     auto& channelP0 = registry_.get<InputChannelComponent>(player0);
     channelP0.channel = 0;
-    channelP0.is1P = false;
 
     registry_.emplace<CollisionTestComponent>(player0);
 
