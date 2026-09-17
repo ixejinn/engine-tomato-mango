@@ -55,8 +55,8 @@ namespace tomato
 
     glm::vec3 GJK::GetSupportPoint(
                 const glm::vec3& worldDir,
-                const ColliderComponent& col1, TransformComponent& trf1,
-                const ColliderComponent& col2, TransformComponent& trf2)
+                const ColliderComponent& col1, const TransformComponent& trf1,
+                const ColliderComponent& col2, const TransformComponent& trf2)
     {
         return Support(worldDir, col1, trf1) - Support(-worldDir, col2, trf2);
     }
@@ -156,6 +156,22 @@ namespace tomato
 
             //                       ↓ normal 방향이 원점에서 CSO를 향하는 방향이므로 raycast, EPA와 방향을 맞추기위해 부호 반전
             return DistanceResult{-normal, length, maxDistSq};
+        }
+
+        // 원점이 CSO 표면에 매우 가까워 closestP를 신뢰할 수 없는 경우 수행하는 간이 EPA
+        if (simplex.size() == 3)
+        {
+            if (auto normal = GetNormal(simplex[0], simplex[1], simplex[2]))
+            {
+                float dist = glm::dot(normal.value(), simplex[0]);
+                if (dist < 0)
+                {
+                    normal = -normal.value();
+                    dist = -dist;
+                }
+
+                return DistanceResult{-normal.value(), dist, maxDistSq};
+            }
         }
 
         return RunEPA(simplex, col1, trf1, col2, trf2);
@@ -262,7 +278,7 @@ namespace tomato
 
     glm::vec3 GJK::Support(
             const glm::vec3& worldDir,
-            const ColliderComponent& col, TransformComponent& trf)
+            const ColliderComponent& col, const TransformComponent& trf)
     {
         const auto worldRot = glm::toMat4(trf.GetWorldQuaternion());
 

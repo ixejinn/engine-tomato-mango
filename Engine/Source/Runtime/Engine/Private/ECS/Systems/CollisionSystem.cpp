@@ -226,11 +226,11 @@ namespace tomato
         glm::vec3 remainingMove = (1 - hitTime * weight) * vel.velocity;
         vel.velocity = remainingMove + glm::dot(remainingMove, -normal) * normal;
 
-        if (-EPSILON < vel.velocity.x && vel.velocity.x < EPSILON)
+        if (std::abs(vel.velocity.x) < EPSILON)
             vel.velocity.x = 0.f;
-        if (-EPSILON < vel.velocity.y && vel.velocity.y < EPSILON)
+        if (std::abs(vel.velocity.y) < EPSILON)
             vel.velocity.y = 0.f;
-        if (-EPSILON < vel.velocity.z && vel.velocity.z < EPSILON)
+        if (std::abs(vel.velocity.z) < EPSILON)
             vel.velocity.z = 0.f;
         // std::cout << "          velocity C: " << glm::to_string(vel.velocity) << "\n";
     }
@@ -256,11 +256,11 @@ namespace tomato
             glm::vec3 remainingMove = (1 - hitTime * weight) * vel.velocity;
             vel.velocity = remainingMove + glm::dot(remainingMove, -normal) * normal;
 
-            if (-EPSILON < vel.velocity.x && vel.velocity.x < EPSILON)
+            if (std::abs(vel.velocity.x) < EPSILON)
                 vel.velocity.x = 0.f;
-            if (-EPSILON < vel.velocity.y && vel.velocity.y < EPSILON)
+            if (std::abs(vel.velocity.y) < EPSILON)
                 vel.velocity.y = 0.f;
-            if (-EPSILON < vel.velocity.z && vel.velocity.z < EPSILON)
+            if (std::abs(vel.velocity.z) < EPSILON)
                 vel.velocity.z = 0.f;
         }
         // std::cout << "          velocity D: " << glm::to_string(vel.velocity) << "\n";

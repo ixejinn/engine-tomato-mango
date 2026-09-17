@@ -3,18 +3,23 @@
 
 #include <entt/fwd.hpp>
 
-namespace tomato {
+namespace tomato
+{
     template<typename T>
-    struct UnorderedPair {
+    struct UnorderedPair
+    {
         UnorderedPair() = default;
-        UnorderedPair(T x, T y) : a(x), b(y) {
-            if (x > y) {
+        UnorderedPair(T x, T y) : a(x), b(y)
+        {
+            if (x > y)
+            {
                 a = y;
                 b = x;
             }
         }
 
-        bool operator==(const UnorderedPair<T>& other) const {
+        bool operator==(const UnorderedPair<T>& other) const
+        {
             return a == other.a && b == other.b;
         }
 
@@ -22,21 +27,37 @@ namespace tomato {
     };
 }
 
-namespace std {
+namespace std
+{
     template<>
-    struct hash<tomato::UnorderedPair<entt::entity>> {
-        size_t operator()(const tomato::UnorderedPair<entt::entity>& p) const {
+    struct hash<tomato::UnorderedPair<entt::entity>>
+    {
+        size_t operator()(const tomato::UnorderedPair<entt::entity>& p) const
+        {
             uint64_t pack =
-                    (static_cast<uint64_t>(p.a) << 32) | static_cast<uint64_t>(p.b);
+                (static_cast<uint64_t>(p.a) << 32) | static_cast<uint64_t>(p.b);
             return std::hash<uint64_t>{}(pack);
         }
     };
 
     template<>
-    struct hash<tomato::UnorderedPair<uint32_t>> {
-        size_t operator()(const tomato::UnorderedPair<uint32_t>& p) const {
+    struct hash<tomato::UnorderedPair<uint32_t>>
+    {
+        size_t operator()(const tomato::UnorderedPair<uint32_t>& p) const
+        {
             uint64_t pack =
-                    (static_cast<uint64_t>(p.a) << 32) | static_cast<uint64_t>(p.b);
+                (static_cast<uint64_t>(p.a) << 32) | static_cast<uint64_t>(p.b);
+            return std::hash<uint64_t>{}(pack);
+        }
+    };
+
+    template<>
+    struct hash<std::pair<uint32_t, uint32_t>>
+    {
+        size_t operator()(const std::pair<uint32_t, uint32_t>& p) const
+        {
+            uint64_t pack =
+                (static_cast<uint64_t>(p.first) << 32) | static_cast<uint64_t>(p.second);
             return std::hash<uint64_t>{}(pack);
         }
     };
