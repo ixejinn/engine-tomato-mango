@@ -14,6 +14,7 @@
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
 #include "Services/Window.h"
+#include "Profiler/CPUProfiler.h"
 
 namespace tomato
 {
@@ -38,6 +39,7 @@ namespace tomato
 
     void RenderSystem::Update(SimContext& simCtx)
     {
+        CPU_PROFILER_BLOCK_BEGIN(RenderSystem::Update);
         auto& registry = simCtx.state->GetRegistry();
 
         auto& renderCtx = registry.ctx().get<RenderContext>();
@@ -210,5 +212,7 @@ namespace tomato
 
             glViewport(0, 0, Window::GetWidth(), Window::GetHeight());
         }
+
+        CPU_PROFILER_BLOCK_END(RenderSystem::Update);
     }
 }

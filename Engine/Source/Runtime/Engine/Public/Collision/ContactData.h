@@ -12,7 +12,7 @@ namespace tomato
         ContactData(glm::vec3 n, float ht, float d) : normal(n), hitTime(ht), distance(d) {}
         ContactData(glm::vec3 n, float d) : normal(n), distance(d) {}
 
-        glm::vec3 normal{0.f};
+        glm::vec3 normal{0.f};  // pair.a → pair.b 방향
         std::optional<float> hitTime{std::nullopt};
         float distance{0.f};
         bool trigger{false};

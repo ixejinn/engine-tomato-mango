@@ -13,6 +13,7 @@
 #include "Simulation/SimulationConfig.h"
 #include "Event/EventDispatcher.h"
 #include "Utils/Logger.h"
+#include "Profiler/CPUProfiler.h"
 
 namespace tomato
 {
@@ -24,12 +25,14 @@ namespace tomato
 
     void CollisionSystem::Update(SimContext& simCtx)
     {
+        CPU_PROFILER_BLOCK_BEGIN(CollisionSystem::Update);
         RunBroadPhase(simCtx);
         RunNarrowPhase(simCtx);
 
         ResolveContacts();
 
         UpdateCollisionEvents();
+        CPU_PROFILER_BLOCK_END(CollisionSystem::Update);
     }
 
     void CollisionSystem::RunBroadPhase(SimContext& simCtx)
@@ -80,7 +83,7 @@ namespace tomato
                 else
                 {
                     // Stay
-                    if (result->distance < COLLISION_SKIN + 1e-4f)
+                    if (!result->hitTime.has_value())
                         result->normal = contactCache[candidate].normal;
                     else
                         contactCache[candidate].normal = result->normal;
@@ -216,21 +219,18 @@ namespace tomato
         // std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Move
-        if (hitTime == 0)
-            trf.AddPosition(normal * EPSILON);
-        else
-            trf.AddPosition((vel.velocity * FIXED_DELTA_TIME * hitTime + normal * COLLISION_SKIN) * weight);
+        trf.AddPosition((vel.velocity * FIXED_DELTA_TIME * hitTime + normal * COLLISION_SKIN) * weight);
         // std::cout << "          position C: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Slide
         glm::vec3 remainingMove = (1 - hitTime * weight) * vel.velocity;
         vel.velocity = remainingMove + glm::dot(remainingMove, -normal) * normal;
 
-        if (-EPSILON < vel.velocity.x && vel.velocity.x < EPSILON)
+        if (std::abs(vel.velocity.x) < EPSILON)
             vel.velocity.x = 0.f;
-        if (-EPSILON < vel.velocity.y && vel.velocity.y < EPSILON)
+        if (std::abs(vel.velocity.y) < EPSILON)
             vel.velocity.y = 0.f;
-        if (-EPSILON < vel.velocity.z && vel.velocity.z < EPSILON)
+        if (std::abs(vel.velocity.z) < EPSILON)
             vel.velocity.z = 0.f;
         // std::cout << "          velocity C: " << glm::to_string(vel.velocity) << "\n";
     }
@@ -244,9 +244,8 @@ namespace tomato
 
         // Move
         float moveDist = COLLISION_SKIN - distance;
-        if (moveDist < EPSILON_SQ)
-            moveDist = EPSILON_SQ;
-        trf.AddPosition(normal * moveDist * weight);
+        if (moveDist > 0)
+            trf.AddPosition(normal * moveDist * weight);
         // std::cout << "          position D: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Slide
@@ -257,11 +256,11 @@ namespace tomato
             glm::vec3 remainingMove = (1 - hitTime * weight) * vel.velocity;
             vel.velocity = remainingMove + glm::dot(remainingMove, -normal) * normal;
 
-            if (-EPSILON < vel.velocity.x && vel.velocity.x < EPSILON)
+            if (std::abs(vel.velocity.x) < EPSILON)
                 vel.velocity.x = 0.f;
-            if (-EPSILON < vel.velocity.y && vel.velocity.y < EPSILON)
+            if (std::abs(vel.velocity.y) < EPSILON)
                 vel.velocity.y = 0.f;
-            if (-EPSILON < vel.velocity.z && vel.velocity.z < EPSILON)
+            if (std::abs(vel.velocity.z) < EPSILON)
                 vel.velocity.z = 0.f;
         }
         // std::cout << "          velocity D: " << glm::to_string(vel.velocity) << "\n";
@@ -271,9 +270,10 @@ namespace tomato
         TransformComponent& trf,
         const glm::vec3& normal, const float weight, const float distance)
     {
-//        std::cout << "         position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+        // std::cout << "    PE    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
+        // std::cout << "         position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
         trf.AddPosition(normal * -distance * weight * FIXED_DELTA_TIME * CORRECTION_SPEED);
-//        std::cout << "         position P: " << glm::to_string(trf.GetLocalPosition()) << "\n";
+        // std::cout << "         position P: " << glm::to_string(trf.GetLocalPosition()) << "\n";
     }
 
     void CollisionSystem::UpdateCollisionEvents()

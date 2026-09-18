@@ -7,46 +7,27 @@
 #include "Collision/Narrow/GJK/EPA.h"
 #include "Collision/Narrow/GJK/GJK.h"
 #include "Collision/CollisionConfig.h"
+#include "Containers/UnorderedPair.h"
 #include "Math/Normal.h"
 #include "Utils/Logger.h"
 
 namespace tomato
 {
-    EPAPlain::EPAPlain(
-        const std::vector<glm::vec3>& points,
-        uint32_t idx0, uint32_t idx1, uint32_t idx2)
+    bool EPA::IsOffPlane(const glm::vec3& p, const glm::vec3& normal, const glm::vec3& planeP)
     {
-        edges[0] = {idx0, idx1};
-        edges[1] = {idx1, idx2};
-        edges[2] = {idx2, idx0};
-
-        normal = -GetOrientedNormal(glm::vec3{0.f}, points[idx0], points[idx1], points[idx2]);
-
-        distance = glm::dot(normal, points[idx0]);
-    }
-
-    EPAPlain::EPAPlain(
-        const std::vector<glm::vec3>& points,
-        uint32_t ref,
-        uint32_t idx0, uint32_t idx1, uint32_t idx2)
-    {
-        edges[0] = { idx0, idx1 };
-        edges[1] = { idx1, idx2 };
-        edges[2] = { idx2, idx0 };
-
-        normal = -GetOrientedNormal(points[ref], points[idx0], points[idx1], points[idx2]);
-
-        distance = glm::dot(normal, points[idx0]);
+        const glm::vec3 planeToP = p - planeP;
+        const float dist = glm::dot(planeToP, normal);
+        return dist * dist > RELATIVE_TOLERANCE_SQ * glm::length2(normal) * glm::length2(planeToP);
     }
 
     std::optional<DistanceResult> RunEPA(
-    std::vector<glm::vec3>& points,
-        const ColliderComponent& col1, TransformComponent& trf1,
-        const ColliderComponent& col2, TransformComponent& trf2)
+        std::vector<glm::vec3>& points,
+        const ColliderComponent& col1, const TransformComponent& trf1,
+        const ColliderComponent& col2, const TransformComponent& trf2)
     {
-//        std::cout << "========== EPA\n";
+        // std::cout << "========== EPA\n";
 
-        // 심플렉스 확장
+        //// Extend points to 3-simplex
         while (points.size() < 4)
         {
             switch (points.size())
@@ -92,26 +73,63 @@ namespace tomato
                 if (glm::dot(-a, normal) < 0)
                     normal = -normal;
 
-                points.emplace_back(GJK::GetSupportPoint(normal, col1, trf1, col2, trf2));
+                glm::vec3 supportP = GJK::GetSupportPoint(normal, col1, trf1, col2, trf2);
+                if (!EPA::IsOffPlane(supportP, normal, a))
+                    supportP = GJK::GetSupportPoint(-normal, col1, trf1, col2, trf2);
+                if (!EPA::IsOffPlane(supportP, normal, a))
+                {
+                    TMT_WARN << "Degenerate 3-simplex";
+                    return std::nullopt;
+                }
+
+                points.emplace_back(supportP);
             }
             break;
             }
         }
 
-        std::vector<EPAPlain> polytope;
-        polytope.emplace_back(points, 3, 0, 1, 2);
-        polytope.emplace_back(points, 2, 0, 1, 3);
-        polytope.emplace_back(points, 1, 0, 2, 3);
-        polytope.emplace_back(points, 0, 1, 2, 3);
+        // Sort simplex point for counter-clockwise
+        const glm::vec3 n012 = glm::cross(points[1] - points[0], points[2] - points[0]);
+        if (glm::dot(n012, points[3] - points[0]) > 0)
+            std::swap(points[1], points[2]);
+
+        //// Create polytope for EPA
+        std::vector<EPA::Plane> polytope;
+
+        const uint32_t faces[4][3]
+        {
+            {0, 1, 2},
+            {0, 2, 3},
+            {0, 3, 1},
+            {1, 3, 2}
+        };
+        for (const auto& face : faces)
+        {
+            if (auto normal = GetNormal(points[face[0]], points[face[1]], points[face[2]]))
+            {
+                polytope.emplace_back(face[0], face[1], face[2],
+                    normal.value(), glm::dot(normal.value(), points[face[0]]));
+            }
+            else
+            {
+                TMT_WARN << "Degenerate polytope plane";
+                return std::nullopt;
+            }
+        }
+
+        //// EPA
+        float maxDistSq = 0.f;
+        for (const glm::vec3& p : points)
+            maxDistSq = std::max(maxDistSq, glm::length2(p));
 
         int iteration = 0;
         while (true)
         {
-            EPAPlain* nearest{nullptr};
-            for (auto& plain : polytope)
+            EPA::Plane* nearest{nullptr};
+            for (auto& plane : polytope)
             {
-                if (!nearest || nearest->distance > plain.distance)
-                    nearest = &plain;
+                if (!nearest || nearest->distance > plane.distance)
+                    nearest = &plane;
             }
 
             if (!nearest)
@@ -120,49 +138,57 @@ namespace tomato
                 return std::nullopt;
             }
 
-            points.push_back(GJK::GetSupportPoint(nearest->normal, col1, trf1, col2, trf2));
+            const glm::vec3 supportP = GJK::GetSupportPoint(nearest->normal, col1, trf1, col2, trf2);
+            points.push_back(supportP);
+            maxDistSq = std::max(maxDistSq, glm::length2(supportP));
 
-            // Check termination condition
-            float dist = glm::dot(nearest->normal, points.back());
-            float diff = dist - nearest->distance;
-            if (dist < 0 ||
-                (diff < EPSILON && diff > -EPSILON) ||
+            //// Check termination condition
+            float depth = glm::dot(nearest->normal, supportP);
+            float diff = depth - nearest->distance;
+            if (depth < 0 ||
+                std::abs(diff) < RELATIVE_TOLERANCE * glm::sqrt(maxDistSq) ||
                 iteration++ > 20)
             {
 //                std::cout << " *** EPA *** " << glm::to_string(nearest->normal) << " " << nearest->distance << "\n";
-                return DistanceResult{ nearest->normal, -nearest->distance };
+                return DistanceResult{nearest->normal, -nearest->distance};
             }
 
-            // Expand polytope
-            std::unordered_set<UnorderedPair<uint32_t>> edgesToExpand;
+            //// Expand polytope
+            // Remove visible faces from the new support point, extracting the boundary edges.
+            std::unordered_set<std::pair<uint32_t, uint32_t>> boundaryEdges;
             for (int i = polytope.size() - 1; i >= 0; --i)
             {
-                if (glm::dot(polytope[i].normal, points.back()) > polytope[i].distance)
+                if (glm::dot(polytope[i].normal, supportP) > polytope[i].distance)
                     // 서포트 포인트에서 폴리토프를 봤을 때 면의 법선이 양수인 면들은 삭제
                     polytope.erase(polytope.begin() + i);
                 else
                 {
                     for (const auto& edge : polytope[i].edges)
                     {
-                        if (edgesToExpand.contains(edge))
-                            edgesToExpand.erase(edge);
+                        if (boundaryEdges.contains(edge))
+                            boundaryEdges.erase(edge);
+                        else if (auto it = boundaryEdges.find({edge.second, edge.first}); it != boundaryEdges.end())
+                            boundaryEdges.erase(it);
                         else
-                            edgesToExpand.insert(edge);
+                            boundaryEdges.insert(edge);
                     }
                 }
             }
 
+            // Construct new faces from the boundary edges and the new support point.
             const int lastIdx = points.size() - 1;
-            for (const auto& edge : edgesToExpand)
+            for (const auto& edge : boundaryEdges)
             {
-                int refIdx = 0;
-                while (refIdx == edge.a || refIdx == edge.b || refIdx == lastIdx)
-                    ++refIdx;
-
-                polytope.emplace_back(points, refIdx, edge.a, edge.b, lastIdx);
-
-                if (glm::length2(polytope.back().normal) == 0)
-                    polytope.pop_back();
+                if (auto normal= GetNormal(supportP, points[edge.second], points[edge.first]))
+                {
+                    polytope.emplace_back(lastIdx, edge.second, edge.first,
+                        normal.value(), glm::dot(normal.value(), points[lastIdx]));
+                }
+                else
+                {
+                    TMT_WARN << "Degenerate polytope plane";
+                    return std::nullopt;
+                }
             }
         }
     }
