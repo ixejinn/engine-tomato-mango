@@ -1,0 +1,88 @@
+﻿#ifndef MANGO_ENTITYPOOL_H
+#define MANGO_ENTITYPOOL_H
+
+#include <entt/entt.hpp>
+#include <vector>
+#include <optional>
+#include <cassert>
+#include <type_traits>
+
+#include "EntityPoolTraits.h"
+#include "Utils/PassKey.h"
+#include "State/StateFwd.h"
+#include "ECS/Components/TypeTraitsTag.h"
+#include "Prefab/Prefab.h"
+
+namespace tomato
+{
+	template<EntityPoolTraits Traits>
+	class EntityPool
+	{
+	public:
+		EntityPool(const PassKey<State>& key, entt::registry& registry, std::size_t poolSize = 32)
+			:registry_(registry), poolSize_(poolSize)
+		{
+			entities_.reserve(poolSize);
+			Create(poolSize);
+		}
+
+		EntityPool(entt::registry& registry, std::size_t poolSize = 32)
+			:registry_(registry), poolSize_(poolSize)
+		{
+			entities_.reserve(poolSize);
+			Create(poolSize);
+		}
+
+		template<typename... Args>
+		entt::entity Acquire(Args&&... args)
+		{
+			if (entities_.empty())
+				return entt::null;
+
+			const entt::entity entity = entities_.back();
+			entities_.pop_back();
+
+			Traits::Reset(registry_, entity, std::forward<Args>(args)...);
+
+			return entity;
+		}
+
+		bool Release(entt::entity entity)
+		{
+			assert(registry_.all_of<PoolOwnerTag<Traits>>(entity)
+				&& "Attempting to return a different Pool entity.");
+
+			if constexpr (HasDeactivate<Traits>)
+			{
+				if (!Traits::Deactivate(registry_, entity))
+					return false;
+			}
+			entities_.push_back(entity);
+
+			return true;
+		}
+
+		std::size_t GetActiveEmitterNum() const { return poolSize_ - entities_.size(); }
+
+	private:
+		void Create(std::size_t count)
+		{
+			for (std::size_t i = 0; i < count; ++i)
+			{
+				//entt::entity entity = registry_.create();
+				entt::entity entity = Prefab::CreateBaseEntity(registry_);
+				Traits::Assemble(registry_, entity);
+				registry_.emplace<PoolOwnerTag<Traits>>(entity);
+
+				entities_.push_back(entity);
+			}
+		}
+
+		entt::registry& registry_;
+
+		std::size_t poolSize_;
+		std::vector<entt::entity> entities_;
+	};
+}
+
+#endif // !MANGO_ENTITYPOOL_H

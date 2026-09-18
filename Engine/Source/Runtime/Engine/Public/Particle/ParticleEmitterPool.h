@@ -1,35 +1,26 @@
 ﻿#ifndef MANGO_PARTICLEEMITTERPOOL_H
 #define MANGO_PARTICLEEMITTERPOOL_H
 
-#include <vector>
-#include <optional>
 #include <entt/fwd.hpp>
 #include <glm/vec3.hpp>
-#include "Utils/PassKey.h"
-#include "State/StateFwd.h"
-#include "Particle/ParticleType.h"
+
+#include "Containers/EntityPool.h"
 #include "Resource/ResourceFwd.h"
 #include "UUID.h"
 
 namespace tomato
 {
-    class ParticleEmitterPool
+    struct ParticlePoolTraits
     {
-    public:
-        ParticleEmitterPool(const PassKey<State>& key, entt::registry& reg, uint8_t poolSize = 32);
-
-        std::optional<entt::entity> Acquire(AssetID ptcID, glm::vec3 pos);
-        std::optional<entt::entity> Acquire(AssetID ptcID, UUID target, glm::vec3 offset = {0.f, 0.f, 0.f});
-        bool Release(entt::entity e);
-
-        uint8_t GetActiveEmitterNum() const { return poolSize_ - freeEmitters_.size(); }
-
-    private:
-        entt::registry& registry_;
-
-        uint8_t poolSize_;
-        std::vector<entt::entity> freeEmitters_;
+        static void Assemble(entt::registry& registry_, entt::entity e);
+        static void Reset(entt::registry& registry_, entt::entity e,
+            AssetID ptcID, glm::vec3 pos);
+        static void Reset(entt::registry& registry_, entt::entity e,
+            AssetID ptcID, UUID target, glm::vec3 offset = { 0.f, 0.f, 0.f });
+        static bool Deactivate(entt::registry& registry_, entt::entity e);
     };
+
+    using ParticleEmitterPool = EntityPool<ParticlePoolTraits>;
 }
 
 #endif //MANGO_PARTICLEEMITTERPOOL_H

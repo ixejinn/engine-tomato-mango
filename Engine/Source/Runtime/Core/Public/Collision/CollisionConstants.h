@@ -10,7 +10,9 @@ namespace tomato
     static constexpr float HALF_COLLISION_SKIN = 0.5e-2f;
 
 #define TMT_COLLISION_LAYER_LIST(X) \
-    X(Default, 1 << 0, "Default")           
+    X(Default, 1 << 0, "Default")   \
+    X(Wave1, 1 << 1, "Wave1")       \
+    X(Wave2, 1 << 2, "Wave2")       
 
     enum class CollisionLayer : uint32_t
     {
@@ -18,6 +20,19 @@ namespace tomato
         TMT_COLLISION_LAYER_LIST(X)
 #undef X
         COUNT
+    };
+
+    struct CollisionLayerMeta
+    {
+        CollisionLayer layer;
+        const char* name;
+    };
+
+    static constexpr CollisionLayerMeta CollisionLayerMetas[] =
+    {
+#define X(Enum, Value, Display) {CollisionLayer::Enum, Display},
+        TMT_COLLISION_LAYER_LIST(X)
+#undef X
     };
 #undef TMT_COLLISION_LAYER_LIST
 
@@ -51,7 +66,9 @@ namespace tomato
     NLOHMANN_JSON_SERIALIZE_ENUM(
         CollisionLayer,
         {
-            { CollisionLayer::Default, "Default" }
+            { CollisionLayer::Default, "Default" },
+            { CollisionLayer::Wave1, "Wave1" },
+            { CollisionLayer::Wave2, "Wave2" },
         }
     )
 

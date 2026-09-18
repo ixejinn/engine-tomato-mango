@@ -7,6 +7,8 @@
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Visibility.h"
 
+#include "Resource/AssetHash.h"
+
 namespace tomato
 {
 	bool ContainsUUID(entt::registry& reg, UUID id)
@@ -76,14 +78,14 @@ namespace tomato
 			std::smatch match;
 			
 			if (!std::regex_match(name.name, match, pattern))
-				nextIndices_.try_emplace(name.name, 1);
+				nextIndices_.try_emplace(GetAssetID(name.name.c_str()), 1);
 			
 			else
 			{
 				std::string baseName = match[1].str();
 				uint32_t index = std::stoul(match[2].str());
 
-				auto& nextIndex = nextIndices_[baseName];
+				auto& nextIndex = nextIndices_[GetAssetID(baseName.c_str())];
 				nextIndex = std::max(nextIndex, index + 1);
 			}
 		}
@@ -91,7 +93,8 @@ namespace tomato
 
 	std::string EntityNameGenerator::Generate(std::string_view baseName)
 	{
-		auto& nextIndex = nextIndices_[std::string(baseName)];
+		auto id = GetAssetID(baseName.data());
+		auto& nextIndex = nextIndices_[id];
 
 		if (nextIndex == 0)
 		{

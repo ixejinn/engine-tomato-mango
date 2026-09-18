@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <entt/fwd.hpp>
 #include "UUID.h"
+#include "Resource/ResourceFwd.h"
 
 namespace tomato
 {
@@ -27,7 +28,7 @@ namespace tomato
 
 	private:
 		// index to use next
-		std::unordered_map<std::string, uint32_t> nextIndices_;
+		std::unordered_map<AssetID, uint32_t> nextIndices_;
 	};
 }
 

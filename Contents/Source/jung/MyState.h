@@ -1,4 +1,4 @@
-#ifndef MANGO_MYSTATE_H
+﻿#ifndef MANGO_MYSTATE_H
 #define MANGO_MYSTATE_H
 
 #include <entt/fwd.hpp>
@@ -20,6 +20,10 @@ private:
 
     tomato::Audio* audioPtr_{ nullptr };
     UIController uiController_;
+
+    static void WaveCollisionEnter(const tomato::TriggerEnterEvent& event);
+    static void WaveCollisionExit(const tomato::TriggerExitEvent& event);
+    static void MakeWaveJump(const tomato::LandingEvent& event);
 };
 
 #endif //MANGO_MYSTATE_H

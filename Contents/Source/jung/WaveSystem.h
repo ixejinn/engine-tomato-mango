@@ -1,8 +1,8 @@
-#ifndef MANGO_WAVESYSTEM_H
+﻿#ifndef MANGO_WAVESYSTEM_H
 #define MANGO_WAVESYSTEM_H
 
 #include "ECS/Systems/System.h"
-
+#include <glm/glm.hpp>
 class WaveSystem : public tomato::System
 {
 public:

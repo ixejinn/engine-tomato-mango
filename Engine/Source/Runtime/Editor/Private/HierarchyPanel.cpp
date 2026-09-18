@@ -276,8 +276,8 @@ namespace tomato
 			//@TODO : Change default particle asset
 			auto& particlePool = editorCtx.currentState->GetRegistry().ctx().get<ParticleEmitterPool>();
 			auto newParticle = particlePool.Acquire(GetAssetID(PathManager::ProjectParticle("burst_test.tmt.ptc")), glm::vec3(0));
-			if (newParticle.has_value())
-				selected = newParticle.value();
+			if (newParticle != entt::null)
+				selected = newParticle;
 		}
 
 		editorCtx.selectedEntity = selected;

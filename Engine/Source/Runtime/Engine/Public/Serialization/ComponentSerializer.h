@@ -7,7 +7,7 @@
 #include "UUID.h"
 #include "State/StateFwd.h"
 #include "ECS/Forward/ComponentFwd.h"
-#include "Particle/ParticleEmitterPoolFwd.h"
+#include "Particle/ParticleEmitterPool.h"
 
 namespace tomato
 {

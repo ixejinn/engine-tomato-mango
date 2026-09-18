@@ -13,49 +13,26 @@
 
 namespace tomato
 {
-    ParticleEmitterPool::ParticleEmitterPool(const PassKey<State>& key, entt::registry& reg, uint8_t poolSize)
-        : registry_(reg), poolSize_(poolSize)
+    void ParticlePoolTraits::Assemble(entt::registry& registry_, entt::entity e)
     {
-        freeEmitters_.reserve(poolSize);
+        auto& nameTag = registry_.get<NametagComponent>(e);
+        nameTag.name = registry_.ctx().get<EntityNameGenerator>().Generate("ParticleEffect");
 
-        for (int i = 0; i < poolSize; ++i)
-        {
-            entt::entity e = registry_.create();
+        registry_.emplace<ParticleEmitterComponent>(e);
+        registry_.emplace<ParticleRuntimeComponent>(e);
+        registry_.emplace<ParticleRenderComponent>(e);
+        registry_.emplace<TargetComponent>(e);
 
-            auto& generator = reg.ctx().get<EntityNameGenerator>();
-            registry_.emplace<NametagComponent>(e,
-                GenerateUUID(), generator.Generate("ParticleEffect"));
-            registry_.emplace<VisibilityComponent>(e);
-
-            registry_.emplace<TransformComponent>(e);
-            registry_.emplace<RootEntityTag>(e);
-
-            registry_.emplace<ParticleEmitterComponent>(e);
-            registry_.emplace<ParticleRuntimeComponent>(e);
-            registry_.emplace<ParticleRenderComponent>(e);
-            registry_.emplace<TargetComponent>(e);
-
-            auto& particleBuf = registry_.emplace<ParticleBufferComponent>(e);
-            particleBuf.positions.reserve(MAX_PARTICLE_NUM);
-            particleBuf.velocities.reserve(MAX_PARTICLE_NUM);
-            particleBuf.lifetimes.reserve(MAX_PARTICLE_NUM);
-
-            freeEmitters_.push_back(e);
-        }
+        auto& particleBuf = registry_.emplace<ParticleBufferComponent>(e);
+        particleBuf.positions.reserve(MAX_PARTICLE_NUM);
+        particleBuf.velocities.reserve(MAX_PARTICLE_NUM);
+        particleBuf.lifetimes.reserve(MAX_PARTICLE_NUM);
     }
 
-    std::optional<entt::entity> ParticleEmitterPool::Acquire(AssetID ptcID, glm::vec3 pos)
+    void ParticlePoolTraits::Reset(entt::registry& registry_, entt::entity e,
+        AssetID ptcID, glm::vec3 pos)
     {
-        if (freeEmitters_.empty())
-        {
-            TMT_DEBUG << "Empty particle emitter pool.";
-            return std::nullopt;
-        }
-
         ParticleEffect* ptcEffect = AssetRegistry<ParticleEffect>::GetInstance().Get(ptcID);
-
-        entt::entity e = freeEmitters_.back();
-        freeEmitters_.pop_back();
 
         auto& transform = registry_.get<TransformComponent>(e);
         transform.SetPosition(pos);
@@ -74,22 +51,12 @@ namespace tomato
         };
 
         ptcEffect->InitializeParticleComponent(pData);
-
-        return e;
     }
 
-    std::optional<entt::entity> ParticleEmitterPool::Acquire(AssetID ptcID, UUID target, glm::vec3 offset)
+    void ParticlePoolTraits::Reset(entt::registry& registry_, entt::entity e,
+        AssetID ptcID, UUID target, glm::vec3 offset)
     {
-        if (freeEmitters_.empty())
-        {
-            TMT_DEBUG << "Empty particle emitter pool.";
-            return std::nullopt;
-        }
-
         ParticleEffect* ptcEffect = AssetRegistry<ParticleEffect>::GetInstance().Get(ptcID);
-
-        entt::entity e = freeEmitters_.back();
-        freeEmitters_.pop_back();
 
         auto& pRuntime = registry_.get<ParticleRuntimeComponent>(e);
         pRuntime.active = true;
@@ -110,11 +77,9 @@ namespace tomato
         };
 
         ptcEffect->InitializeParticleComponent(pData);
-
-        return e;
     }
 
-    bool ParticleEmitterPool::Release(entt::entity e)
+    bool ParticlePoolTraits::Deactivate(entt::registry& registry_, entt::entity e)
     {
         auto* particle = registry_.try_get<ParticleRuntimeComponent>(e);
         if (!particle)
@@ -127,7 +92,6 @@ namespace tomato
         auto& pTarget = registry_.get<TargetComponent>(e);
         pTarget.target = 0;
 
-        freeEmitters_.push_back(e);
         return true;
     }
 }

@@ -1,4 +1,4 @@
-#ifndef MANGO_MATCH_TYPES_H
+﻿#ifndef MANGO_MATCH_TYPES_H
 #define MANGO_MATCH_TYPES_H
 
 #include <typeinfo>
@@ -11,7 +11,7 @@ namespace tomato
 {
 	namespace MatchConstants
 	{
-		constexpr uint8_t		MAX_MATCH_PLAYER = 1;
+		constexpr uint8_t		MAX_MATCH_PLAYER = 2;
 		constexpr float			CONNECT_TIMEOUT_SEC = 10.0f;
 		constexpr ServerTimeMs	START_SERVER_TIME = 10000;
 	}

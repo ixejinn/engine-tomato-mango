@@ -3,6 +3,7 @@
         Source/LoadState.h
         Source/MyState.h
         Source/UIController.h
+        Source/jung/WaveManager.h
 )
 
 set(CONTENTS_SOURCES
@@ -12,7 +13,13 @@ set(CONTENTS_SOURCES
         Source/CollisionTestComponent.h
         Source/UIController.cpp
         Source/TimerTestSystem.cpp
-		"Source/jung/MyState.cpp" "Source/jung/WaveSystem.cpp"
+        Source/jung/MyState.cpp
+        Source/jung/WaveSystem.cpp
+        Source/jung/WavePool.h
+        Source/jung/WavePool.cpp
+        Source/jung/WaveColliderPool.h
+        Source/jung/WaveColliderPool.cpp
+        Source/jung/WaveManager.cpp
 )
 
 add_executable(contents

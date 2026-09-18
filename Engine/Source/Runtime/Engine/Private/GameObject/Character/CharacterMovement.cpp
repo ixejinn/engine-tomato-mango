@@ -1,4 +1,4 @@
-#include "CharacterMovement.h"
+﻿#include "CharacterMovement.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/ComponentsPhys.h"
@@ -82,7 +82,7 @@ namespace tomato::CharacterMovement
             entt::registry& reg, entt::entity e,
             MovementComponent& move, VelocityComponent& vel)
     {
-        // TMT_INFO << "Land";
+         TMT_INFO << "Land";
 
         vel.velocity.y = 0;
 

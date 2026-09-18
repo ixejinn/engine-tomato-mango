@@ -11,6 +11,7 @@
 #include "Resource/ResourceFwd.h"
 #include "UUID.h"
 #include "TomatoFwd.h"
+#include "Utils/PassKey.h"
 
 namespace tomato
 {
@@ -37,6 +38,8 @@ namespace tomato
         void SetPlayerInput(uint32_t tick, IntentState input, int playerID);
 
     protected:
+        PassKey<State> key_;
+
         Engine& engine_;
         entt::registry registry_;
         std::unordered_map<UUID, entt::entity> entityMap_;

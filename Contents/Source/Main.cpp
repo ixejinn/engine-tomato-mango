@@ -1,14 +1,15 @@
 ﻿#include <memory>
 #include "Engine.h"
 #include "EngineConfig.h"
+//#define TOMATO_SERVER
 #ifdef TOMATO_SERVER
 #include "Server/MatchServer.h"
 #else
 #include "Resource/PathManager.h"
 #include "TestState.h"
+#include "jung/MyState.h"
 #endif
 
-// #define TOMATO_SERVER
 #define TOMATO_GREENTEA
 
 using namespace tomato;
@@ -27,6 +28,7 @@ int main() {
 
 #else //TOMATO_GREENTEA
     ////
+    engine.SetNextState(std::make_unique<MyState>(engine));
 
 #endif //TOMATO_GREENTEA
     engine.Run();
