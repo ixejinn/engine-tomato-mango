@@ -98,6 +98,8 @@ void MyState::Init()
     //renderGnd.color = { 0.639f, 0.8f, 0.639f, 1.f };
     renderGnd.color = { 0.710f, 0.839f, 0.573f, 1.f };
  
+    engine_.collisionLayerMtx_.SetCollisionLayer(CollisionLayer::Default, CollisionLayer::Wave1, true);
+    engine_.collisionLayerMtx_.SetCollisionLayer(CollisionLayer::Default, CollisionLayer::Wave2, true);
     engine_.collisionLayerMtx_.SetCollisionLayer(CollisionLayer::Wave1, CollisionLayer::Wave1, false);
     engine_.collisionLayerMtx_.SetCollisionLayer(CollisionLayer::Wave2, CollisionLayer::Wave2, false);
     engine_.collisionLayerMtx_.SetCollisionLayer(CollisionLayer::Wave1, CollisionLayer::Wave2, true);
