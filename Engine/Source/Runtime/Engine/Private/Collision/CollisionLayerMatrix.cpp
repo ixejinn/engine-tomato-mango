@@ -1,3 +1,4 @@
+#include <ranges>
 #include "Collision/CollisionLayerMatrix.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 
@@ -22,6 +23,11 @@ namespace tomato {
     }
 
     void CollisionLayerMatrix::Initialize() {
-        matrix_[CollisionLayer::Default] |= CollisionLayer::Default;
+        int layerCnt = sizeof(CollisionLayerMetas) / sizeof(CollisionLayerMeta);
+        auto layerRange =
+                std::views::iota(0, static_cast<int>(layerCnt)) |
+                std::views::transform([](int i) { return static_cast<CollisionLayer>(1 << i); });
+        for (CollisionLayer layer : layerRange)
+            matrix_[layer] |= CollisionLayer::Default;
     }
 }
