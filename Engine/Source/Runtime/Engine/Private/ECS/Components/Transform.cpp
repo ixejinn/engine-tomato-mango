@@ -14,7 +14,7 @@ namespace tomato
         const glm::vec3& scl)
     : position(pos)
     , rotation(glm::quat(glm::radians(eulerRot)))
-    , scale(scl) {}
+    , scale(scl), dirty(Transform::Dirty::Local | Transform::Dirty::Scale) {}
 
     void TransformComponent::AddPosition(const glm::vec3& delta)
     {

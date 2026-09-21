@@ -1,6 +1,6 @@
 #include <entt/entt.hpp>
 #include "GameNetwork/Rollback/RollbackManager.h"
-#include "GameNetwork/Rollback/ComponentTimeline.h"
+#include "GameNetwork/Rollback/SnapshotTimeline.h"
 #include "ECS/Components/Lifetime.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
@@ -20,11 +20,11 @@ namespace tomato {
 
     void RollbackManager::Rollback(const SimContext& ctx) {
         for (auto& timeline : timelines_)
-            timeline->Restore(ctx.state->GetRegistry(), ctx.tick);
+            timeline->Rollback(ctx.state->GetRegistry(), ctx.tick);
     }
 
     void RollbackManager::Capture(const SimContext& ctx) {
         for (auto& timeline : timelines_)
-            timeline->Record(ctx.state->GetRegistry(), ctx.tick);
+            timeline->Capture(ctx.state->GetRegistry(), ctx.tick);
     }
 }

@@ -1,5 +1,6 @@
 ﻿#include <entt/entt.hpp>
 #include "ECS/Systems/CameraTransformSystem.h"
+#include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
@@ -12,7 +13,7 @@ namespace tomato
     {
         auto& registry = simCtx.state->GetRegistry();
 
-        auto view = registry.view<TransformComponent, CameraComponent>();
+        auto view = registry.view<ActiveTag, TransformComponent, CameraComponent>();
         for (auto [e, trf, cam] : view.each()) {
             if (!cam.dirty)
                 continue;

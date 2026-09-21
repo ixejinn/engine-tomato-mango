@@ -36,8 +36,8 @@ using namespace tomato;
 void MyState::Init()
 {
     // Camera
-    Prefab::CreateCamera(registry_, "Camera",
-        true,
+    Prefab::CreateCamera(registry_, true, true,
+        "Camera",
         glm::vec3(0.f, 4.f, 10.f),
         glm::vec3(-30.f, 0.f, 0.f)
     );
@@ -60,7 +60,7 @@ void MyState::Init()
         << " ms\n";
         */
 
-    entt::entity player = Prefab::CreateCharacter(registry_, "Player");
+    entt::entity player = Prefab::CreateCharacter(registry_, true, "Player");
     auto& trfP0 = registry_.get<TransformComponent>(player);
     trfP0.SetPosition(1, -1, 0);
 
@@ -74,7 +74,7 @@ void MyState::Init()
     auto& colp = registry_.get<ColliderComponent>(colObj);
     colp.layer = CollisionLayer::Wave1;
 
-    entt::entity player1 = Prefab::CreateCharacter(registry_, "Player");
+    entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player");
     auto& trfP1 = registry_.get<TransformComponent>(player1);
     trfP1.SetPosition(-1, -1, 1);
 
@@ -90,7 +90,7 @@ void MyState::Init()
     colp1.layer = CollisionLayer::Wave2;
 
     // Ground
-    entt::entity ground = Prefab::CreateWorldObject(registry_, "Ground");
+    entt::entity ground = Prefab::CreateWorldObject(registry_, true, false, true, "Ground");
     auto& trfGnd = registry_.get<TransformComponent>(ground);
     trfGnd.SetPosition(0, -3, 0);
     trfGnd.SetScale(20, 0.1, 20);

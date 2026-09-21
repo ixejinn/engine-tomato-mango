@@ -247,7 +247,7 @@ namespace tomato
 				auto view = reg.view<MainCameraTag>();
 				CreateAndSetHierarchyEntity(
 					editorCtx,
-					selected = Prefab::CreateCamera(reg, "Camera", view.empty() == true ? true : false),
+					selected = Prefab::CreateCamera(reg, true, view.empty() ? true : false),
 					isPopup);
 			}
 

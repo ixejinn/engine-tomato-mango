@@ -1,6 +1,7 @@
 #ifndef MANGO_COMPONENTS_H
 #define MANGO_COMPONENTS_H
 
+#include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Character.h"
 #include "ECS/Components/Collision.h"

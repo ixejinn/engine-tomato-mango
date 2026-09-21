@@ -23,7 +23,7 @@ namespace tomato
 
         // Create editor mode camera
         entt::entity& editCam = renderCtx.editorCam;
-        editCam = Prefab::CreateCamera(registry_, "Edit Camera", false);
+        editCam = Prefab::CreateCamera(registry_, true, false, "Edit Camera");
         registry_.emplace<EditorHidden>(editCam);
 
         // Skybox

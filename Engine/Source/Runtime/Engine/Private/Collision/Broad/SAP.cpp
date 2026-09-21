@@ -1,6 +1,7 @@
 #include <list>
 #include <entt/entt.hpp>
 #include "Collision/Broad/SAP.h"
+#include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Rigidbody.h"
@@ -14,7 +15,7 @@ namespace tomato
     {
         UpdateAABBs(reg);
 
-        auto group = reg.group<ColliderComponent>();
+        auto group = reg.group<ColliderComponent>(entt::get<ActiveTag>);
 
         // Sort by AABB.min.x for x-axis SAP
         group.sort<ColliderComponent>(
@@ -27,6 +28,7 @@ namespace tomato
 
         for (const auto& [e, col] : group.each())
         {
+            // std::cout << (int)e << "\n";
             AABB& aabb = col.aabb;
 
             if (activeMaxX < aabb.min.x)
@@ -75,6 +77,7 @@ namespace tomato
                 activeMaxX = std::max(activeMaxX, aabb.max.x);
             }
         }
+        // std::cout << "\n";
     }
 
     void SAP::UpdateAABBs(entt::registry& reg)

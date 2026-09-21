@@ -51,7 +51,7 @@ void TestState::Init() {
 
     //// Create game object
     // Main camera
-    entt::entity cam = Prefab::CreateCamera(registry_, "Camera", true);
+    entt::entity cam = Prefab::CreateCamera(registry_, true, true);
     auto& trfCam = registry_.get<TransformComponent>(cam);
     trfCam.SetPosition(0, 8, 8);
     trfCam.SetRotationDegree(-50, 0, 0);
@@ -158,7 +158,7 @@ void TestState::CallbackJump(const tomato::LandingEvent& event)
 void TestState::PlayTest()
 {
     // Player0 character
-    entt::entity player0 = Prefab::CreateCharacter(registry_, "Player 0", true);
+    entt::entity player0 = Prefab::CreateCharacter(registry_, true, "Player 0");
 
     auto& trfP0 = registry_.get<TransformComponent>(player0);
     trfP0.SetPosition(1, 2, 0);
@@ -177,7 +177,7 @@ void TestState::PlayTest()
     particlePool.Acquire(GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
 
     // Player1 character
-    //entt::entity player1 = Prefab::CreateCharacter(registry_, "Player 1", true);
+    //entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player 1");
 
     //auto& trfP1 = registry_.get<TransformComponent>(player1);
     //trfP1.SetPosition(-1, 2, 0);
@@ -201,7 +201,7 @@ void TestState::PlayTest()
     registry_.emplace<VelocityComponent>(object);
 
     // Ground
-    entt::entity ground = Prefab::CreateWorldObject(registry_, "Ground", true);
+    entt::entity ground = Prefab::CreateWorldObject(registry_, true, false, true, "Ground");
 
     auto& trfGnd = registry_.get<TransformComponent>(ground);
     trfGnd.SetPosition(0, -0.05, 0);
@@ -315,7 +315,7 @@ void TestState::BottleneckTest()
         {
             for (int z = 0; z < 20; z += 2)
             {
-                entt::entity e = Prefab::CreateWorldObject(registry_, "GameObject", false);
+                entt::entity e = Prefab::CreateWorldObject(registry_, true, false, false, "GameObject");
                 auto& trf = registry_.get<TransformComponent>(e);
                 trf.SetPosition(x, y, z);
             }

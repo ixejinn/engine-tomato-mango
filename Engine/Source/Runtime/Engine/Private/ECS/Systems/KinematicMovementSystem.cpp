@@ -1,6 +1,7 @@
 ﻿#include <entt/entt.hpp>
 #include <glm/glm.hpp>
 #include "ECS/Systems/KinematicMovementSystem.h"
+#include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Movement.h"
@@ -13,7 +14,7 @@ namespace tomato {
     {
         auto& registry = simCtx.state->GetRegistry();
 
-        auto view = registry.view<TransformComponent, VelocityComponent, InputChannelComponent, MovementComponent>();
+        auto view = registry.view<ActiveTag, TransformComponent, VelocityComponent, InputChannelComponent, MovementComponent>();
         for (auto [e, trf, velocity, ch, move] : view.each())
         {
             velocity.velocity.x = 0;

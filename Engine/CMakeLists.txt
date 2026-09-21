@@ -123,7 +123,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Systems/GravitySystem.h
         Source/Runtime/Engine/Private/GameObject/Character/CharacterMovement.h
         Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackManager.h
-        Source/Runtime/Engine/Public/GameNetwork/Rollback/ComponentTimeline.h
+        Source/Runtime/Engine/Public/GameNetwork/Rollback/SnapshotTimeline.h
         Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackFwd.h
         
         Source/Runtime/Engine/Private/ECS/Systems/GarbageEntityCollectionSystem.h
@@ -212,6 +212,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Forward/TransformDirtyFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/CharacterScaleSystem.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterConfig.h
+		Source/Runtime/Engine/Public/ECS/Components/ActiveTag.h
 )
 
 set(ENGINE_SOURCES

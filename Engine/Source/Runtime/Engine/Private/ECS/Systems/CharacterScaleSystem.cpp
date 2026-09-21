@@ -1,5 +1,6 @@
 #include "ECS/Systems/CharacterScaleSystem.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
+#include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Character.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
@@ -15,7 +16,7 @@ namespace tomato
     {
         auto& registry = simCtx.state->GetRegistry();
 
-        auto view = registry.view<GroundTriggerTag, TransformComponent>();
+        auto view = registry.view<ActiveTag, GroundTriggerTag, TransformComponent>();
         for (auto [e, trf] : view.each())
         {
             auto& trfRoot = registry.get<TransformComponent>(GetRootEntity(registry, e));

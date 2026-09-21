@@ -1,9 +1,10 @@
-#ifndef MANGO_COMPONENTTIMELINE_H
-#define MANGO_COMPONENTTIMELINE_H
+#ifndef MANGO_SNAPSHOTTIMELINE_H
+#define MANGO_SNAPSHOTTIMELINE_H
 
 #include <entt/entt.hpp>
 #include <vector>
 #include "Containers/Timeline.h"
+#include "Containers/EntityPool.h"
 #include "GameNetwork/Rollback/RollbackConfig.h"
 #include "ECS/Components/Rollback.h"
 #include "ECS/Components/Transform.h"
@@ -11,26 +12,32 @@
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Utils/Logger.h"
 
-namespace tomato {
-    class SnapshotTimelineBase {
+namespace tomato
+{
+    class SnapshotTimelineBase
+    {
     public:
         virtual ~SnapshotTimelineBase() = default;
 
-        virtual void Restore(entt::registry&, uint32_t tick) = 0;
-        virtual void Record(entt::registry&, uint32_t tick) = 0;
+        virtual void Rollback(entt::registry&, uint32_t tick) = 0;
+        virtual void Capture(entt::registry&, uint32_t tick) = 0;
     };
 
     template<typename Component>
-    class SnapshotTimeline : public SnapshotTimelineBase{
+    class SnapshotTimeline : public SnapshotTimelineBase
+    {
     public:
-        void Restore(entt::registry& reg, uint32_t tick) override {
+        void Rollback(entt::registry& reg, uint32_t tick) override
+        {
             const uint32_t storedTick = data_[tick].tick;
-            if (storedTick != tick) {
+            if (storedTick != tick)
+            {
                 TMT_WARN << "Rollback tick mismatch (requested: " << tick << ", stored: " << storedTick << ")";
                 return;
             }
 
-            for (auto& [e, component] : data_[tick].data) {
+            for (auto& [e, component] : data_[tick].data)
+            {
                 if (reg.all_of<Component>(e))
                     reg.get<Component>(e) = component;
                 else
@@ -38,7 +45,8 @@ namespace tomato {
             }
         }
 
-        void Record(entt::registry& reg, uint32_t tick) override {
+        void Capture(entt::registry& reg, uint32_t tick) override
+        {
             auto& slice = data_[tick];
 
             slice.tick = tick;
@@ -52,7 +60,8 @@ namespace tomato {
         }
 
     private:
-        struct TimelineSlice {
+        struct TimelineSlice
+        {
             uint32_t tick;
             std::vector<std::pair<entt::entity, Component>> data;
         };
@@ -61,7 +70,8 @@ namespace tomato {
     };
 
     template<>
-    inline void SnapshotTimeline<TransformComponent>::Record(entt::registry& reg, uint32_t tick) {
+    inline void SnapshotTimeline<TransformComponent>::Capture(entt::registry& reg, uint32_t tick)
+    {
         auto& slice = data_[tick];
 
         slice.tick = tick;
@@ -70,18 +80,22 @@ namespace tomato {
         slice.data.clear();
         slice.data.reserve(view.size_hint());
 
-        for (auto [e, component] : view.each()) {
-            component.AddPosition(glm::vec3{0.f, 0.f, 0.f});
+        for (const auto& [e, component] : view.each())
+        {
+            // component.OnLocalDirtyBit();
             slice.data.emplace_back(e, component);
         }
     }
 
     template<>
-    class SnapshotTimeline<CollisionContext> : public SnapshotTimelineBase {
+    class SnapshotTimeline<CollisionContext> : public SnapshotTimelineBase
+    {
     public:
-        void Restore(entt::registry& reg, uint32_t tick) override {
+        void Rollback(entt::registry& reg, uint32_t tick) override
+        {
             const uint32_t storedTick = data_[tick].tick;
-            if (storedTick != tick) {
+            if (storedTick != tick)
+            {
                 TMT_WARN << "Rollback tick mismatch (requested: " << tick << ", stored: " << storedTick << ")";
                 return;
             }
@@ -94,7 +108,8 @@ namespace tomato {
                 contactPairs[pb.first] = pb.second;
         }
 
-        void Record(entt::registry& reg, uint32_t tick) override {
+        void Capture(entt::registry& reg, uint32_t tick) override
+        {
             auto& slice = data_[tick];
 
             slice.tick = tick;
@@ -108,13 +123,43 @@ namespace tomato {
         }
 
     private:
-        struct TimelineSlice {
+        struct TimelineSlice
+        {
             uint32_t tick;
             std::vector<std::pair<ContactPair, ContactCache>> data;
         };
 
         Timeline<TimelineSlice> data_;
     };
+
+    template<EntityPoolTraits Traits>
+    class SnapshotTimeline<EntityPool<Traits>> : public SnapshotTimelineBase
+    {
+    public:
+        void Rollback(entt::registry& reg, uint32_t tick) override
+        {
+
+        }
+
+        void Capture(entt::registry& reg, uint32_t tick) override
+        {
+            auto& slice = data_[tick];
+
+            slice.tick = tick;
+            slice.data.clear();
+
+
+        }
+
+    private:
+        struct TimelineSlice
+        {
+            uint32_t tick;
+            std::vector<std::pair<entt::entity, bool>> data;
+        };
+
+        Timeline<TimelineSlice> data_;
+    };
 }
 
-#endif //MANGO_COMPONENTTIMELINE_H
+#endif //MANGO_SNAPSHOTTIMELINE_H
