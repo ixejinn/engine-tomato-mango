@@ -86,7 +86,7 @@ namespace tomato
             }
             else if (particle.runtime.activeCnt == 0) // 루프 아닌데 활성화된 파티클이 없으면 풀에 반납(완전 종료)
             {
-                simCtx.state->GetRegistry().ctx().get<ParticleEmitterPool>().Release(e);
+                simCtx.state->GetRegistry().ctx().get<ParticleEmitterPool>().Release(simCtx.state->GetRegistry(), e);
                 return true;
             }
         }

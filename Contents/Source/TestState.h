@@ -23,7 +23,7 @@ private:
     static void TEST_TriggerEnter(const tomato::TriggerEnterEvent& event);
     static void TEST_TriggerExit(const tomato::TriggerExitEvent& event);
 
-    static void CallbackJump(const tomato::LandingEvent& event);
+    void CallbackJump(const tomato::LandingEvent& event);
 
     void PlayTest();
 

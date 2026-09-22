@@ -26,6 +26,11 @@ add_executable(contents
         ${CONTENTS_SOURCES}
 )
 
+target_include_directories(contents
+		PUBLIC
+		${CMAKE_CURRENT_LIST_DIR}/Source
+)
+
 target_link_libraries(contents
         PRIVATE
         # Force inclusion of all object files in the static library for SystemRegistry

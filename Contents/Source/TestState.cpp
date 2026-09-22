@@ -43,7 +43,7 @@ void TestState::Init() {
     ParticleEffect::Create(PathManager::ProjectParticle("ribbon_particle.tmt.ptc"));
     ParticleEffect::Create(PathManager::ProjectParticle("jump.tmt.ptc"));
 
-    EventDispatcher::GetInstance().Connect<LandingEvent, CallbackJump>();
+    EventDispatcher::GetInstance().Connect<LandingEvent, &TestState::CallbackJump>(*this);
 
     //// Set rollback
     engine_.SetRollbackComponent<MovementComponent>();
@@ -150,7 +150,7 @@ void TestState::TEST_TriggerExit(const TriggerExitEvent& event) {
 void TestState::CallbackJump(const tomato::LandingEvent& event)
 {
     auto e = event.reg->ctx().get<ParticleEmitterPool>().Acquire(
-        GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
+        registry_, GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
         event.position);
      // std::cout << "Jump particle " << (int)e.value() << "\n";
 }
@@ -173,8 +173,8 @@ void TestState::PlayTest()
     registry_.emplace<CollisionTestComponent>(player0);
 
     auto& particlePool = registry_.ctx().get<ParticleEmitterPool>();
-    particlePool.Acquire(GetAssetID("Resources\\Contents\\Particle\\burst_test.tmt.ptc"), GetUUID(registry_, player0));
-    particlePool.Acquire(GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
+    particlePool.Acquire(registry_, GetAssetID("Resources\\Contents\\Particle\\burst_test.tmt.ptc"), GetUUID(registry_, player0));
+    particlePool.Acquire(registry_, GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
 
     // Player1 character
     entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player 1");

@@ -19,24 +19,19 @@ struct WaveInstance
 class WaveManager
 {
 public:
-	WaveManager(
-		const tomato::PassKey<tomato::State>& key, entt::registry& reg, std::size_t poolSize)
-		:	registry_(reg), poolSize_(poolSize),
-			wavePool_(key, reg), colliderPool_(key, reg)
-	{}
+	explicit WaveManager(
+		tomato::EntityPool<WavePoolTraits>& wavePool, tomato::EntityPool<WaveColliderPoolTraits>& colliderPool)
+			: wavePool_(wavePool), colliderPool_(colliderPool) {}
 
 	/*WaveInstance Acquire(entt::entity owner, glm::vec3 pos, float speed, float radius);
 	void Release(WaveInstance* wave);*/
 
-	entt::entity Acquire(entt::entity owner, glm::vec3 pos, float speed, float radius = 10.f);
-	void Release(entt::entity wave);
+	entt::entity Acquire(entt::registry& registry, entt::entity owner, glm::vec3 pos, float speed, float radius = 10.f);
+	void Release(entt::registry& registry, entt::entity wave);
+
 private:
-	entt::registry& registry_;
-	std::size_t poolSize_;
-
-	tomato::EntityPool<WavePoolTraits> wavePool_;
-	tomato::EntityPool<WaveColliderPoolTraits> colliderPool_;
-
+	tomato::EntityPool<WavePoolTraits>& wavePool_;
+	tomato::EntityPool<WaveColliderPoolTraits>& colliderPool_;
 };
 
 #endif // !MANGO_WAVEMANAGER_H

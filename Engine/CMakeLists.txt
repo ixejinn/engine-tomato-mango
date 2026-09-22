@@ -200,8 +200,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Services/WindowEventFwd.h
         Source/Runtime/Engine/Public/ECS/Components/EditorTag.h
         Source/Runtime/Engine/Public/Containers/EntityPool.h
-        Source/Runtime/Engine/Public/Containers/EntityPoolTraits.h
-        Source/Runtime/Engine/Public/Profiler/Profiler.h
+		Source/Runtime/Engine/Public/Profiler/Profiler.h
 		Source/Runtime/Core/Public/Utils/StringLiteral.h
 		Source/Runtime/Core/Public/Profiler/CPUProfiler.h
         Source/Runtime/Engine/Public/Profiler/ExecutionTime.h
@@ -214,6 +213,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Components/ActiveTag.h
 		Source/Runtime/Engine/Public/GameObject/Character/LandingEvent.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterMovementConfig.h
+		../Contents/Source/jung/WaveManagerFwd.h
 )
 
 set(ENGINE_SOURCES

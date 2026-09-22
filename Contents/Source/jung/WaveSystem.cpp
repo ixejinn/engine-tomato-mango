@@ -20,7 +20,10 @@ void WaveSystem::Update(SimContext& simCtx)
 	{
 		if (!wave.active) continue; // change active tag?
 		if (transform.GetLocalScale().x >= wave.radius * 2.f)
-			reg.ctx().get<WaveManager>().Release(e);
+		{
+			if (auto* waveManager = reg.ctx().find<WaveManager>())
+				waveManager->Release(reg, e);
+		}
 
 		if (wave.startTick == 0)
 			wave.startTick = simCtx.tick;

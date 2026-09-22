@@ -3,6 +3,7 @@
 
 #include <entt/entt.hpp>
 #include <vector>
+#include <array>
 #include "Containers/Timeline.h"
 #include "Containers/EntityPool.h"
 #include "GameNetwork/Rollback/RollbackConfig.h"
@@ -138,24 +139,43 @@ namespace tomato
     public:
         void Rollback(entt::registry& reg, uint32_t tick) override
         {
+            auto* pool = reg.ctx().find<EntityPool<Traits>>();
+            if (!pool)
+            {
+                TMT_ERR << "This entity pool is not found in the registry context.";
+                return;
+            }
 
+            auto& slice = data_[tick];
+            pool->entries_ = slice.entries;
+            pool->freeIndices_ = slice.freeIndices;
+            pool->freeEntityCount_ = slice.freeEntityCount;
         }
 
         void Capture(entt::registry& reg, uint32_t tick) override
         {
+            auto* pool = reg.ctx().find<EntityPool<Traits>>();
+            if (!pool)
+            {
+                TMT_ERR << "This entity pool is not found in the registry context.";
+                return;
+            }
+
             auto& slice = data_[tick];
 
             slice.tick = tick;
-            slice.data.clear();
-
-
+            slice.entries = pool->entries_;
+            slice.freeIndices_ = pool->freeIndices_;
+            slice.freeEntityCount_ = pool->freeEntityCount_;
         }
 
     private:
         struct TimelineSlice
         {
             uint32_t tick;
-            std::vector<std::pair<entt::entity, bool>> data;
+            std::array<_entityPoolDetail::Entry, Traits::N> entries;
+            std::array<uint32_t, Traits::N> freeIndices;
+            uint32_t freeEntityCount;
         };
 
         Timeline<TimelineSlice> data_;

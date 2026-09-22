@@ -152,7 +152,7 @@ namespace tomato::Serialization
 
 		ResolveHierarchy(registry, newState->GetEntityMap());
 
-		AttachParticles(root, registry.ctx().get<ParticleEmitterPool>());
+		AttachParticles(root, registry);
 
 		state->SetNextState(std::move(newState));
 		registry.ctx().get<EntityNameGenerator>().Initialize(registry);
@@ -262,14 +262,14 @@ namespace tomato::Serialization
 		}
 	}
 
-	void AttachParticles(const json& particleData, ParticleEmitterPool& particlePool)
+	void AttachParticles(const json& particleData, entt::registry& reg)
 	{
 		for (auto& particle : particleData["Particle"])
 		{
 			AssetID asset = particle["particle"];
 			UUID target = particle["target"];
 
-			particlePool.Acquire(asset, target);
+			reg.ctx().get<ParticleEmitterPool>().Acquire(reg, asset, target);
 		}
 	}
 
