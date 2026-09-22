@@ -11,14 +11,17 @@ namespace tomato
     bool BroadPhase::CanCollide(
             entt::registry& reg,
             entt::entity a, entt::entity b,
-            CollisionLayer layerA, CollisionLayer layerB)
+            const ColliderComponent& colA, const ColliderComponent& colB)
     {
+        if (colA.trigger && colB.trigger)
+            return false;
+
+        if (!reg.ctx().get<CollisionContext>().layerMtx->CanCollide(colA.layer, colB.layer))
+            return false;
+
         entt::entity rootA = GetRootEntity(reg, a);
         entt::entity rootB = GetRootEntity(reg, b);
         if (rootA == rootB)
-            return false;
-
-        if (!reg.ctx().get<CollisionContext>().layerMtx->CanCollide(layerA, layerB))
             return false;
 
         if (!reg.try_get<VelocityComponent>(rootA) && !reg.try_get<VelocityComponent>(rootB))

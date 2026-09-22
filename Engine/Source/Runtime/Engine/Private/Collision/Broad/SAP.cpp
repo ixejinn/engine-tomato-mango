@@ -63,7 +63,7 @@ namespace tomato
                     }
 
                     // Check collision layer
-                    if (!CanCollide(reg, e, *it, col.layer, colAct.layer))
+                    if (!CanCollide(reg, e, *it, col, colAct))
                     {
                         ++it;
                         continue;

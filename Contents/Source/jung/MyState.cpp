@@ -78,20 +78,20 @@ void MyState::Init()
     auto& colp = registry_.get<ColliderComponent>(colObj);
     colp.layer = CollisionLayer::Wave1;
 
-    // entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player");
-    // auto& trfP1 = registry_.get<TransformComponent>(player1);
-    // trfP1.SetPosition(-1, -1, 1);
-    //
-    // auto& renderp1 = registry_.get<RenderComponent>(player1);
-    // renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    // renderp1.color = { 0.f, 0.5f, 0.2f, 1.f };
-    // auto& channelp1 = registry_.get<InputChannelComponent>(player1);
-    // channelp1.channel = 0;
-    // channelp1.useWASD = false;
-    // registry_.emplace<WaveCollisionComponent>(player1);
-    // entt::entity colObj1 = registry_.get<HierarchyComponent>(player1).children[0];
-    // auto& colp1 = registry_.get<ColliderComponent>(colObj1);
-    // colp1.layer = CollisionLayer::Wave2;
+    entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player");
+    auto& trfP1 = registry_.get<TransformComponent>(player1);
+    trfP1.SetPosition(-1, -1, 1);
+
+    auto& renderp1 = registry_.get<RenderComponent>(player1);
+    renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    renderp1.color = { 0.f, 0.5f, 0.2f, 1.f };
+    auto& channelp1 = registry_.get<InputChannelComponent>(player1);
+    channelp1.channel = 0;
+    channelp1.useWASD = false;
+    registry_.emplace<WaveCollisionComponent>(player1);
+    entt::entity colObj1 = registry_.get<HierarchyComponent>(player1).children[0];
+    auto& colp1 = registry_.get<ColliderComponent>(colObj1);
+    colp1.layer = CollisionLayer::Wave2;
 
     // Ground
     entt::entity ground = Prefab::CreateWorldObject(registry_, true, false, true, "Ground");

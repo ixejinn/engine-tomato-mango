@@ -2,7 +2,7 @@
 #define MANGO_BROADPHASE_H
 
 #include "Collision/CollisionFwd.h"
-#include "Collision/CollisionLayerMatrix.h"
+#include "ECS/Forward/PhysCompFwd.h"
 
 namespace tomato
 {
@@ -17,7 +17,7 @@ namespace tomato
         static bool CanCollide(
             entt::registry& reg,
             entt::entity a, entt::entity b,
-            CollisionLayer layerA, CollisionLayer layerB);
+            const ColliderComponent& colA, const ColliderComponent& colB);
     };
 }
 
