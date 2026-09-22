@@ -74,17 +74,6 @@ namespace tomato
 		struct EntryIndex { const uint32_t index; };
 
 	public:
-		static EntityPool& EmplaceInContext(entt::registry& registry)
-		{
-			if (auto* pool = registry.ctx().find<EntityPool>())
-			{
-				TMT_DEBUG << "Already contains entity pool.";
-				return *pool;
-			}
-
-			return registry.ctx().emplace<EntityPool>(PassKey<EntityPool>(), registry);
-		}
-
 		EntityPool(const PassKey<EntityPool>& key, entt::registry& registry)
 		{
 			CreateEntities(registry);
@@ -94,6 +83,24 @@ namespace tomato
 		EntityPool& operator=(const EntityPool&) = delete;
 		EntityPool(EntityPool&&) = delete;
 		EntityPool& operator=(EntityPool&&) = delete;
+
+		static EntityPool& EmplaceInContext(entt::registry& registry)
+		{
+			if (auto* pool = registry.ctx().find<EntityPool>())
+			{
+				TMT_DEBUG << "Already contains entity pool.";
+				return *pool;
+			}
+
+			registry.on_destroy<EntryIndex>().template connect<&EntityPool::OnEntryIndexDestroyed>();
+
+			return registry.ctx().emplace<EntityPool>(PassKey<EntityPool>(), registry);
+		}
+
+		static void OnEntryIndexDestroyed()
+		{
+			assert(false && "Pooled entity must not be destroyed. Use Release() instead.");
+		}
 
 		template<typename... Args>
 		requires HasReset<Traits, Args...>
