@@ -5,7 +5,8 @@
 
 namespace tomato
 {
-    enum class CollisionLayer : uint32_t;
+    enum class CollisionLayer : uint8_t;
+    enum class CollisionLayerFlag : uint32_t;
     enum class ColliderType : uint8_t;
 }
 

@@ -15,7 +15,8 @@ namespace tomato {
 
     template<> struct is_bitmask<InputIntent>       : std::true_type {};
 
-    template<> struct is_bitmask<CollisionLayer>    : std::true_type {};
+    // template<> struct is_bitmask<CollisionLayer>    : std::true_type {};
+    template<> struct is_bitmask<CollisionLayerFlag>: std::true_type {};
     template<> struct is_bitmask<ColliderType>      : std::true_type {};
     template<> struct is_bitmask<Transform::Dirty>  : std::true_type {};
 

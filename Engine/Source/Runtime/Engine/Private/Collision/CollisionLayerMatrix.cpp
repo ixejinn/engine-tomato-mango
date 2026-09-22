@@ -7,27 +7,29 @@ namespace tomato {
         Initialize();
     }
 
-    void CollisionLayerMatrix::SetCollisionLayer(const CollisionLayer layer1, const CollisionLayer layer2, const bool enabled) {
+    void CollisionLayerMatrix::SetCollisionLayer(const CollisionLayer a, const CollisionLayer b, const bool enabled) {
+        const CollisionLayerFlag flagA = GetCollisionLayerFlag(a);
+        const CollisionLayerFlag flagB = GetCollisionLayerFlag(b);
+
         if (enabled) {
-            matrix_[layer1] |= layer2;
-            matrix_[layer2] |= layer1;
+            matrix_[a] |= flagB;
+            matrix_[b] |= flagA;
         }
         else {
-            matrix_[layer1] &= ~layer2;
-            matrix_[layer2] &= ~layer1;
+            matrix_[a] &= ~flagB;
+            matrix_[b] &= ~flagA;
         }
     }
 
-    bool CollisionLayerMatrix::CanCollide(const CollisionLayer layer1, const CollisionLayer layer2) {
-        return HasFlag(matrix_[layer1], layer2);
+    bool CollisionLayerMatrix::CanCollide(const CollisionLayer a, const CollisionLayer b) {
+        return HasFlag(matrix_[a], GetCollisionLayerFlag(b));
     }
 
     void CollisionLayerMatrix::Initialize() {
-        int layerCnt = sizeof(CollisionLayerMetas) / sizeof(CollisionLayerMeta);
         auto layerRange =
-                std::views::iota(0, static_cast<int>(layerCnt)) |
-                std::views::transform([](int i) { return static_cast<CollisionLayer>(1 << i); });
+                std::views::iota(0, static_cast<int>(CollisionLayer::COUNT)) |
+                std::views::transform([](int i) { return static_cast<CollisionLayer>(i); });
         for (CollisionLayer layer : layerRange)
-            matrix_[layer] |= CollisionLayer::Default;
+            matrix_[layer] |= CollisionLayerFlag::Default;
     }
 }

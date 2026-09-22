@@ -10,14 +10,14 @@ namespace tomato
 	{
 		CollisionLayerMatrix();
 
-		void SetCollisionLayer(CollisionLayer layer1, CollisionLayer layer2, bool enabled);
+		void SetCollisionLayer(CollisionLayer a, CollisionLayer b, bool enabled);
 
-		bool CanCollide(CollisionLayer layer1, CollisionLayer layer2);
+		bool CanCollide(CollisionLayer a, CollisionLayer b);
 
 	private:
 		void Initialize();
 
-		EnumArray<CollisionLayer, CollisionLayer> matrix_;
+		EnumArray<CollisionLayer, CollisionLayerFlag> matrix_;
 	};
 }
 
