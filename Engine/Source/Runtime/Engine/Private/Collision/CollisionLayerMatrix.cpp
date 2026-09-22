@@ -30,6 +30,9 @@ namespace tomato {
                 std::views::iota(0, static_cast<int>(CollisionLayer::COUNT)) |
                 std::views::transform([](int i) { return static_cast<CollisionLayer>(i); });
         for (CollisionLayer layer : layerRange)
+        {
             matrix_[layer] |= CollisionLayerFlag::Default;
+            matrix_[CollisionLayer::Default] |= GetCollisionLayerFlag(layer);
+        }
     }
 }
