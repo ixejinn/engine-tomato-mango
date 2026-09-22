@@ -13,10 +13,6 @@ namespace tomato {
     class KinematicMovementSystem : public System {
     public:
         void Update(SimContext& simCtx) override;
-
-    private:
-        constexpr static uint8_t JUMP_COUNT_MAX{2};
-        constexpr static float JUMP_SPEED{10.f};
     };
 }
 

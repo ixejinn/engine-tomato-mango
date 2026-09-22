@@ -70,7 +70,7 @@ namespace tomato
     };
 
     template<typename T, std::size_t N>
-    inline MemoryPool<T, N>::MemoryPool()
+    MemoryPool<T, N>::MemoryPool()
     : size_(N), chunkSize_(std::max(sizeof(void*), sizeof(T)))
     {
         // 정렬 조건에 맞게 공간 할당
@@ -94,7 +94,7 @@ namespace tomato
     }
 
     template<typename T, std::size_t N>
-    inline MemoryPool<T, N>::~MemoryPool()
+    MemoryPool<T, N>::~MemoryPool()
     {
         // 반납되지 않은 객체 소멸자 호출
         auto base = static_cast<std::byte*>(pool_);
@@ -114,7 +114,7 @@ namespace tomato
 
     template<typename T, std::size_t N>
     template<typename... Args>
-    inline T* MemoryPool<T, N>::Allocate(Args&&... args)
+    T* MemoryPool<T, N>::Allocate(Args&&... args)
     {
         std::scoped_lock<std::mutex> lock(mtx_);
 
@@ -140,7 +140,7 @@ namespace tomato
     }
 
     template<typename T, std::size_t N>
-    inline bool MemoryPool<T, N>::Deallocate(T* data)
+    bool MemoryPool<T, N>::Deallocate(T* data)
     {
         // 범위 확인
         auto curB = reinterpret_cast<std::byte*>(data);

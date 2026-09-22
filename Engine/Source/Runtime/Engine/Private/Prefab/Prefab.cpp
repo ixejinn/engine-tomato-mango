@@ -107,20 +107,20 @@ namespace tomato::Prefab
 
         const entt::entity colObj = registry.get<HierarchyComponent>(obj).children[0];
         const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, true, "Ground trigger");
-        
+
         registry.emplace<GroundTriggerTag>(colGnd);
-        
+
         auto& trfColGnd = registry.get<TransformComponent>(colGnd);
         // constexpr float deltaPosY = (1 - Character::GROUND_TRIGGER_SCALE) * 0.5f
         //                         + COLLISION_SKIN * Character::GROUND_TRIGGER_EXTENSION_RATIO;
         trfColGnd.SetScale(Character::GROUND_TRIGGER_SCALE);
         // trfColGnd.SetPosition(0, -deltaPosY, 0);
-        
+
         if (printInfo)
         {
             TMT_INFO << "[ Character ] " << std::left << std::setw(12) << name << "\n"
-                    << "              entity   ID: " << std::right << std::setw(4) << (int)obj
-                    << "              collider ID: " << std::right << std::setw(4) << (int)colObj
+                    << "              entity   ID: " << std::right << std::setw(4) << (int)obj << "\n"
+                    << "              collider ID: " << std::right << std::setw(4) << (int)colObj << "\n"
                     << "              trigger  ID: " << std::right << std::setw(4) << (int)colGnd;
         }
         return obj;

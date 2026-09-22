@@ -23,8 +23,8 @@ using namespace tomato;
 
 void WaveColliderPoolTraits::Assemble(entt::registry& registry_, entt::entity e)
 {
-    auto& nameTag = registry_.get<NametagComponent>(e);
-    nameTag.name = registry_.ctx().get<EntityNameGenerator>().Generate("WaveCollider");
+    // auto& nameTag = registry_.get<NametagComponent>(e);
+    // nameTag.name = registry_.ctx().get<EntityNameGenerator>().Generate("WaveCollider");
 
     auto& trfPt = registry_.get<TransformComponent>(e);
     trfPt.SetPosition(glm::vec3{ 100.f, 100.f, 100.f }); //@TODO : set life time

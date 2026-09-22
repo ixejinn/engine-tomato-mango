@@ -21,8 +21,8 @@ using namespace tomato;
 
 void WavePoolTraits::Assemble(entt::registry& registry_, entt::entity wave)
 {
-    auto& nameTag = registry_.get<NametagComponent>(wave);
-    nameTag.name = registry_.ctx().get<EntityNameGenerator>().Generate("Wave");
+    // auto& nameTag = registry_.get<NametagComponent>(wave);
+    // nameTag.name = registry_.ctx().get<EntityNameGenerator>().Generate("Wave");
 
     auto& transform = registry_.get<TransformComponent>(wave);
     transform.SetPosition(glm::vec3{ 0, -2.9f, 0 });

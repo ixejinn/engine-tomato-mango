@@ -9,6 +9,7 @@
 #include "State/State.h"
 #include "Utils/Logger.h"
 #include "Resource/AssetHash.h"
+#include "GameObject/Character/CharacterMovementConfig.h"
 
 namespace tomato::CharacterMovement
 {
@@ -23,19 +24,22 @@ namespace tomato::CharacterMovement
         auto* vel1 = event.reg->try_get<VelocityComponent>(root1);
         auto* vel2 = event.reg->try_get<VelocityComponent>(root2);
 
-        if (move1 && vel1 && event.reg->get<ColliderComponent>(event.a).trigger)
+        auto& col1 = event.reg->get<ColliderComponent>(event.a);
+        auto& col2 = event.reg->get<ColliderComponent>(event.b);
+
+        if (move1 && vel1 && col1.trigger && !col2.trigger)
         {
             EventDispatcher::GetInstance().Enqueue(
                     LandingEvent{
-                        root1, event.reg, event.reg->get<TransformComponent>(root1).GetWorldPosition()});
+                        root1, event.reg, event.reg->get<TransformComponent>(root1).GetWorldPosition(), JUMP_COUNT_MAX - move1->jumpCnt});
             Land(*event.reg, root1, *move1, *vel1);
         }
 
-        if (move2 && vel2 && event.reg->get<ColliderComponent>(event.b).trigger)
+        if (move2 && vel2 && col2.trigger && !col1.trigger)
         {
             EventDispatcher::GetInstance().Enqueue(
                     LandingEvent{
-                        root2, event.reg, event.reg->get<TransformComponent>(root2).GetWorldPosition()});
+                        root2, event.reg, event.reg->get<TransformComponent>(root2).GetWorldPosition(), JUMP_COUNT_MAX - move2->jumpCnt});
             Land(*event.reg, root2, *move2, *vel2);
         }
     }

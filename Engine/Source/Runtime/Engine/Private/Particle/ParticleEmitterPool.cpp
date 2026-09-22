@@ -15,8 +15,8 @@ namespace tomato
 {
     void ParticlePoolTraits::Assemble(entt::registry& registry_, entt::entity e)
     {
-        auto& nameTag = registry_.get<NametagComponent>(e);
-        nameTag.name = registry_.ctx().get<EntityNameGenerator>().Generate("ParticleEffect");
+        // auto& nameTag = registry_.get<NametagComponent>(e);
+        // nameTag.name = registry_.ctx().get<EntityNameGenerator>().Generate("ParticleEffect");
 
         registry_.emplace<ParticleEmitterComponent>(e);
         registry_.emplace<ParticleRuntimeComponent>(e);

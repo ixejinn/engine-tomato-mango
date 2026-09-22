@@ -25,6 +25,7 @@ namespace tomato
         entt::entity e;
         entt::registry* reg;
         glm::vec3 position;
+        unsigned int remainingJumpCount;
     };
 }
 

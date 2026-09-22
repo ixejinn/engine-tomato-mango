@@ -173,7 +173,6 @@ void MyState::WaveCollisionExit(const tomato::TriggerExitEvent& event)
 
 void MyState::MakeWaveJump(const LandingEvent& event)
 {
-    auto wave = event.reg->ctx().get<WaveManager>().Acquire(event.e, event.position, 0.01f);
-
-
+    if (event.remainingJumpCount == 0)
+        auto wave = event.reg->ctx().get<WaveManager>().Acquire(event.e, event.position, 0.01f);
 }

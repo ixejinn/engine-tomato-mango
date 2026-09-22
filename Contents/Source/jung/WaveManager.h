@@ -22,7 +22,7 @@ public:
 	WaveManager(
 		const tomato::PassKey<tomato::State>& key, entt::registry& reg, std::size_t poolSize)
 		:	registry_(reg), poolSize_(poolSize),
-			wavePool_(key, reg, poolSize), colliderPool_(key, reg, poolSize * tomato::MAX_PLAYER_NUM)
+			wavePool_(key, reg), colliderPool_(key, reg)
 	{}
 
 	/*WaveInstance Acquire(entt::entity owner, glm::vec3 pos, float speed, float radius);

@@ -201,8 +201,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Components/EditorTag.h
         Source/Runtime/Engine/Public/Containers/EntityPool.h
         Source/Runtime/Engine/Public/Containers/EntityPoolTraits.h
-        Source/Runtime/Engine/Public/ECS/Components/TypeTraitsTag.h
-		Source/Runtime/Engine/Public/Profiler/Profiler.h
+        Source/Runtime/Engine/Public/Profiler/Profiler.h
 		Source/Runtime/Core/Public/Utils/StringLiteral.h
 		Source/Runtime/Core/Public/Profiler/CPUProfiler.h
         Source/Runtime/Engine/Public/Profiler/ExecutionTime.h
@@ -213,6 +212,8 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Systems/CharacterScaleSystem.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterConfig.h
 		Source/Runtime/Engine/Public/ECS/Components/ActiveTag.h
+		Source/Runtime/Engine/Public/GameObject/Character/LandingEvent.h
+		Source/Runtime/Engine/Public/GameObject/Character/CharacterMovementConfig.h
 )
 
 set(ENGINE_SOURCES

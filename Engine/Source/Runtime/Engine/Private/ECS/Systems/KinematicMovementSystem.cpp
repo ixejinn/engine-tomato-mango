@@ -8,6 +8,7 @@
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 #include "GameObject/Character/CharacterMovement.h"
+#include "GameObject/Character/CharacterMovementConfig.h"
 
 namespace tomato {
     void KinematicMovementSystem::Update(SimContext &simCtx)

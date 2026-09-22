@@ -14,7 +14,7 @@ using namespace tomato;
 void WaveSystem::Update(SimContext& simCtx)
 {
 	auto& reg = simCtx.state->GetRegistry();
-	auto waveView = reg.view<TransformComponent, WaveComponent>();
+	auto waveView = reg.view<ActiveTag, TransformComponent, WaveComponent>();
 
 	for (auto [e, transform, wave] : waveView.each())
 	{
