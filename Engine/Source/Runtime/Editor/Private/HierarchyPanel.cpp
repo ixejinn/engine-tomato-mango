@@ -347,7 +347,7 @@ namespace tomato
 		auto& reg = editorCtx.currentState->GetRegistry();
 		if (ImGui::MenuItem("Delete"))
 		{
-			DestroyHierarchyEntity(reg, editorCtx.selectedEntity);
+			DestroyHierarchySubtree(reg, editorCtx.selectedEntity);
 			editorCtx.selectedEntity = entt::null;
 			editorCtx.sceneDirty = true;
 		}

@@ -3,104 +3,73 @@
 #include "ECS/Entity/Entity.h"
 
 namespace tomato {
-    entt::entity GetRootEntity(entt::registry& reg, entt::entity cur)
+    entt::entity GetRootEntity(entt::registry& registry, entt::entity cur)
     {
-        entt::entity root = cur;
-
-        auto* hierarchy = reg.try_get<HierarchyComponent>(root);
-        while (hierarchy && hierarchy->parent != entt::null) {
-            root = hierarchy->parent;
-            hierarchy = reg.try_get<HierarchyComponent>(root);
+        if (auto* hierarchy = registry.try_get<HierarchyComponent>(cur))
+        {
+            if (hierarchy->root == entt::null)
+                hierarchy->root = cur;
+            return hierarchy->root;
         }
-
-        return root;
+        else
+            return cur;
     }
 
-    entt::entity GetRootEntity(entt::registry* reg, entt::entity cur)
+    entt::entity GetRootEntity(entt::registry* registry, entt::entity cur)
     {
-        entt::entity root = cur;
-
-        auto* hierarchy = reg->try_get<HierarchyComponent>(root);
-        while (hierarchy && hierarchy->parent != entt::null) {
-            root = hierarchy->parent;
-            hierarchy = reg->try_get<HierarchyComponent>(root);
+        if (auto* hierarchy = registry->try_get<HierarchyComponent>(cur))
+        {
+            if (hierarchy->root == entt::null)
+                hierarchy->root = cur;
+            return hierarchy->root;
         }
-
-        return root;
+        else
+            return cur;
     }
 
-    void SetHierarchy(entt::registry& reg, entt::entity parent, entt::entity child)
+    void SetHierarchy(entt::registry& registry, entt::entity parent, entt::entity child)
     {
-        if (IsDescendant(reg, parent, child))
+        if (IsDescendant(registry, parent, child))
             return;
 
-        auto* cHierarchy = reg.try_get<HierarchyComponent>(child);
-        if (!cHierarchy)
-            cHierarchy = &(reg.emplace<HierarchyComponent>(child));
+        auto& cHierarchy = registry.get_or_emplace<HierarchyComponent>(child);
 
-        if (cHierarchy->parentID != 0) {
-            auto& oldPHierarchy = reg.get<HierarchyComponent>(GetEntityByUUID(reg, cHierarchy->parentID));
-            auto& siblingsID = oldPHierarchy.childrenID;
-            auto& siblings = oldPHierarchy.children;
-            // siblings.erase(std::remove(siblings.begin(), siblings.end(), child), siblings.end());
-            std::erase(siblingsID, GetUUID(reg, child));
-            std::erase(siblings, child);
+        // child의 parent가 있었다면 parent의 HierarchyComponent에서 child 지우기
+        if (cHierarchy.parent != entt::null)
+        {
+            auto& prePHierarchy = registry.get<HierarchyComponent>(cHierarchy.parent);
+            std::erase(prePHierarchy.childrenUUID, GetUUID(registry, child));
+            std::erase(prePHierarchy.children, child);
         }
-        cHierarchy->parentID = GetUUID(reg, parent);
-        cHierarchy->parent = parent;
+        cHierarchy.parentUUID = GetUUID(registry, parent);
+        cHierarchy.parent = parent;
 
+        // parent 설정
         if (parent != entt::null)
         {
-            auto* newPHierarchy = reg.try_get<HierarchyComponent>(parent);
-            if (!newPHierarchy)
-                newPHierarchy = &(reg.emplace<HierarchyComponent>(parent));
+            auto& pHierarchy = registry.get_or_emplace<HierarchyComponent>(parent);
 
-            newPHierarchy->childrenID.push_back(GetUUID(reg, child));
-            newPHierarchy->children.push_back(child);
+            pHierarchy.childrenUUID.push_back(GetUUID(registry, child));
+            pHierarchy.children.push_back(child);
 
-            auto root = GetRootEntity(reg, parent);
-            if (!reg.all_of<RootEntityTag>(root))
-            {
-                reg.emplace<RootEntityTag>(root);
-                auto& rootHierarchy = reg.get<HierarchyComponent>(root);
-                rootHierarchy.parentID = 0;
-            }
+            if (pHierarchy.root == entt::null)
+                pHierarchy.root = parent;
+            cHierarchy.root = pHierarchy.root;
 
-            if (reg.all_of<RootEntityTag>(child))
-                reg.remove<RootEntityTag>(child);
+            registry.remove<RootEntityTag>(child);
         }
-        else {
-            if (!reg.all_of<RootEntityTag>(child))
-                reg.emplace<RootEntityTag>(child);
+        // child를 root로 만듦
+        else
+        {
+            registry.get_or_emplace<RootEntityTag>(child);
+
+            cHierarchy.parentUUID = 0;
+            cHierarchy.root = child;
+            cHierarchy.parent = entt::null;
         }
     }
 
-    void DestroyHierarchyEntity(entt::registry& reg, entt::entity parent)
-    {
-        auto* hierarchy = reg.try_get<HierarchyComponent>(parent);
-        if (!hierarchy)
-        {
-            if(reg.valid(parent))
-                reg.destroy(parent);
-
-            return;
-        }
-
-        // if this entity has a parent,
-        // remove it from parent's children list
-        if (hierarchy && hierarchy->parent != entt::null)
-        {
-            auto& pHierarchy = reg.get<HierarchyComponent>(hierarchy->parent);
-            std::erase(pHierarchy.children, parent);
-        }
-
-        for (entt::entity child : hierarchy->children)
-            DestroyHierarchyEntity(reg, child);
-
-        reg.destroy(parent);
-    }
-
-    bool IsDescendant(entt::registry& reg, entt::entity descendant, entt::entity ancestor)
+    bool IsDescendant(entt::registry& registry, entt::entity descendant, entt::entity ancestor)
     {
         entt::entity current = descendant;
 
@@ -109,7 +78,7 @@ namespace tomato {
             if (current == ancestor)
                 return true;
 
-            auto* hierarchy = reg.try_get<HierarchyComponent>(current);
+            auto* hierarchy = registry.try_get<HierarchyComponent>(current);
             if (!hierarchy)
                 break;
             
@@ -117,5 +86,30 @@ namespace tomato {
         }
 
         return false;
+    }
+
+    void DestroyHierarchySubtree(entt::registry& registry, entt::entity entity)
+    {
+        auto* hierarchy = registry.try_get<HierarchyComponent>(entity);
+        if (!hierarchy)
+        {
+            if(registry.valid(entity))
+                registry.destroy(entity);
+
+            return;
+        }
+
+        // if this entity has a parent, remove it from parent's children list
+        if (hierarchy->parent != entt::null)
+        {
+            auto& pHierarchy = registry.get<HierarchyComponent>(hierarchy->parent);
+            std::erase(pHierarchy.children, entity);
+        }
+
+        // destroy hierarchy subtree
+        for (entt::entity child : hierarchy->children)
+            DestroyHierarchySubtree(registry, child);
+
+        registry.destroy(entity);
     }
 }
