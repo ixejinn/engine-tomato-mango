@@ -69,12 +69,12 @@ namespace tomato
 
                     if (result->trigger)
                     {
-                         std::cout << "      trg ENTER " << candidate << "\n";
+                         // std::cout << "      trg ENTER " << candidate << "\n";
                         eventDispatcher.Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
                     }
                     else
                     {
-                         std::cout << "      col ENTER " << candidate << "\n";
+                         // std::cout << "      col ENTER " << candidate << "\n";
                         eventDispatcher.Enqueue(
                             CollisionEnterEvent{candidate.a, candidate.b, &registry, result.value()});
                         contacts_.push_back(ContactEvent{candidate.a, candidate.b, &registry, result.value()});
@@ -272,7 +272,7 @@ namespace tomato
     {
         // std::cout << "    PE    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
         // std::cout << "         position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
-        trf.AddPosition(normal * -distance * weight * FIXED_DELTA_TIME * CORRECTION_SPEED);
+        trf.AddPosition(normal * (-distance + COLLISION_SKIN) * weight);
         // std::cout << "         position P: " << glm::to_string(trf.GetLocalPosition()) << "\n";
     }
 

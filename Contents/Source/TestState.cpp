@@ -177,28 +177,29 @@ void TestState::PlayTest()
     particlePool.Acquire(GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
 
     // Player1 character
-    //entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player 1");
+    entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player 1");
 
-    //auto& trfP1 = registry_.get<TransformComponent>(player1);
-    //trfP1.SetPosition(-1, 2, 0);
+    auto& trfP1 = registry_.get<TransformComponent>(player1);
+    trfP1.SetPosition(-1, 2, 0);
 
-    //auto& renderP1 = registry_.get<RenderComponent>(player1);
-    //renderP1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    //renderP1.color = { 8.f / 255, 75.f / 255, 109.f / 255, 1.f };
+    auto& renderP1 = registry_.get<RenderComponent>(player1);
+    renderP1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    renderP1.color = { 8.f / 255, 75.f / 255, 109.f / 255, 1.f };
 
-    //auto& channelP1 = registry_.get<InputChannelComponent>(player1);
-    //channelP1.channel = 1;
+    auto& channelP1 = registry_.get<InputChannelComponent>(player1);
+    channelP1.channel = 1;
 
-    entt::entity object = Prefab::CreateWorldObject(registry_);
-
-    auto& trfObj = registry_.get<TransformComponent>(object);
-    trfObj.SetPosition(-1, 0.51, 0);
-
-    auto& renderObj = registry_.get<RenderComponent>(object);
-    renderObj.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    renderObj.color = { 8.f / 255, 75.f / 255, 109.f / 255, 1.f };
-
-    registry_.emplace<VelocityComponent>(object);
+    // Object
+    // entt::entity object = Prefab::CreateWorldObject(registry_);
+    //
+    // auto& trfObj = registry_.get<TransformComponent>(object);
+    // trfObj.SetPosition(-1, 0.51, 0);
+    //
+    // auto& renderObj = registry_.get<RenderComponent>(object);
+    // renderObj.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    // renderObj.color = { 8.f / 255, 75.f / 255, 109.f / 255, 1.f };
+    //
+    // registry_.emplace<VelocityComponent>(object);
 
     // Ground
     entt::entity ground = Prefab::CreateWorldObject(registry_, true, false, true, "Ground");
@@ -279,17 +280,17 @@ void TestState::PlayTest()
 #elif 1
     auto worldCanvas = UIPrefab::CreateCanvas(registry_, RenderMode::World);
 
-    auto targetLabel = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
+    auto targetLabel = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
     registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0), glm::vec3{ 0.f, 1.f, 0.f });
     SetHierarchy(registry_, worldCanvas, targetLabel);
     auto& uiCmp = registry_.get<UIComponent>(targetLabel);
     uiCmp.sortOrder = 1;
 
-    //auto targetLabel1 = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player1", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
-    //registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1), glm::vec3{ 0.f, 1.f, 0.f });
-    //SetHierarchy(registry_, worldCanvas, targetLabel1);
-    //auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
-    //uiCmp1.sortOrder = 1;
+    auto targetLabel1 = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player1", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
+    registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1), glm::vec3{ 0.f, 1.f, 0.f });
+    SetHierarchy(registry_, worldCanvas, targetLabel1);
+    auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
+    uiCmp1.sortOrder = 1;
 #endif
 
     auto& eventDispatcher = EventDispatcher::GetInstance();
