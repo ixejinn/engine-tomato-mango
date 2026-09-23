@@ -123,7 +123,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Systems/GravitySystem.h
         Source/Runtime/Engine/Private/GameObject/Character/CharacterMovement.h
         Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackManager.h
-        Source/Runtime/Engine/Public/GameNetwork/Rollback/ComponentTimeline.h
+        Source/Runtime/Engine/Public/GameNetwork/Rollback/SnapshotTimeline.h
         Source/Runtime/Engine/Public/GameNetwork/Rollback/RollbackFwd.h
         
         Source/Runtime/Engine/Private/ECS/Systems/GarbageEntityCollectionSystem.h
@@ -200,7 +200,6 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Services/WindowEventFwd.h
         Source/Runtime/Engine/Public/ECS/Components/EditorTag.h
         Source/Runtime/Engine/Public/Containers/EntityPool.h
-        Source/Runtime/Engine/Public/ECS/Components/TypeTraitsTag.h
 		Source/Runtime/Engine/Public/Profiler/Profiler.h
 		Source/Runtime/Core/Public/Utils/StringLiteral.h
 		Source/Runtime/Core/Public/Profiler/CPUProfiler.h
@@ -209,6 +208,12 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/EngineConfig.h
 		Source/Runtime/Engine/Private/ECS/Components/TransformDirty.h
 		Source/Runtime/Engine/Public/ECS/Forward/TransformDirtyFwd.h
+		Source/Runtime/Engine/Public/ECS/Systems/CharacterScaleSystem.h
+		Source/Runtime/Engine/Public/GameObject/Character/CharacterConfig.h
+		Source/Runtime/Engine/Public/ECS/Components/ActiveTag.h
+		Source/Runtime/Engine/Public/GameObject/Character/LandingEvent.h
+		Source/Runtime/Engine/Public/GameObject/Character/CharacterMovementConfig.h
+		../Contents/Source/jung/WaveManagerFwd.h
 )
 
 set(ENGINE_SOURCES
@@ -297,6 +302,8 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Input/KeyDeviceState.cpp
         Source/Runtime/Engine/Private/ECS/Systems/PlayerCameraSystem.cpp
         Source/Runtime/Engine/Private/Profiler/Profiler.cpp
+        Source/Runtime/Engine/Private/Math/AABB.cpp
+		Source/Runtime/Engine/Private/ECS/Systems/CharacterScaleSystem.cpp
 )
 
 add_library(engine STATIC

@@ -36,7 +36,7 @@ namespace tomato
         auto& registry = simCtx.state->GetRegistry();
 
         // 활성화된 파티클 엔티티가 없으면 종료
-        if (registry.ctx().get<ParticleEmitterPool>().GetActiveEmitterNum() == 0)
+        if (registry.ctx().get<ParticleEmitterPool>().GetActiveEntityCount() == 0)
             return;
 
         if (!mesh2D_ || !shader_)

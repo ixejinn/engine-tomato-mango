@@ -8,22 +8,49 @@
 
 namespace tomato::Prefab
 {
+    /// Base components
     entt::entity CreateBaseEntity(
-        entt::registry& registry, const std::string& name = "BaseEntity", bool root = true);
+        entt::registry& registry,
+        bool active = true, bool root = true,
+        const std::string& name = "BaseEntity");
 
+    /// Base + camera components
     entt::entity CreateCamera(
-        entt::registry& registry, const std::string& name = "Camera",
-        bool main = false, const glm::vec3& pos = {0.f, 1.f, 10.f}, const glm::vec3& rot = {0.f, 0.f, 0.f});
+        entt::registry& registry,
+        bool active = true, bool main = false,
+        const std::string& name = "Camera",
+        const glm::vec3& pos = {0.f, 1.f, 10.f}, const glm::vec3& rot = {0.f, 0.f, 0.f});
 
-    entt::entity CreateStaticMesh(entt::registry& registry, const std::string& name = "StaticMesh");
+    /// Base + render components
+    entt::entity CreateStaticMesh(
+        entt::registry& registry,
+        bool active = true,
+        const std::string& name = "StaticMesh");
 
-    entt::entity CreateTriggerVolume(entt::registry& registry, const std::string& name = "TriggerVolume");
+    /// Base components + trigger collider entity
+    entt::entity CreateTriggerVolume(
+        entt::registry& registry,
+        bool active = true,
+        const std::string& name = "TriggerVolume");
 
-    entt::entity CreateWorldObject(entt::registry& registry, const std::string& name = "GameObject", bool printInfo = false);
+    /// Base + render components + (trigger) collider entity
+    entt::entity CreateWorldObject(
+        entt::registry& registry,
+        bool active = true, bool trigger = false,
+        bool printInfo = true,
+        const std::string& name = "GameObject");
 
-    entt::entity CreateCharacter(entt::registry& registry, const std::string& name = "Character", bool printInfo = false);
+    /// Base + render + character base components + collider entity + ground trigger collider entity
+    entt::entity CreateCharacter(
+        entt::registry& registry,
+        bool active = true,
+        const std::string& name = "Character",
+        bool printInfo = true);
 
-    entt::entity AttachColliderEntity(entt::registry& registry, entt::entity parent, bool trigger, const std::string& name = "Collider");
+    entt::entity AttachColliderEntity(
+        entt::registry& registry, entt::entity parent,
+        bool active = true, bool trigger = false,
+        const std::string& name = "Collider");
 
     ///////// 구버전
     entt::entity CreateSkybox(entt::registry& reg);

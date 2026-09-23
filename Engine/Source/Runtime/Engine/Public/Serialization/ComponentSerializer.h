@@ -37,7 +37,7 @@ namespace tomato::Serialization
 	void LoadComponents(const json&, entt::registry&, std::unordered_map<UUID, entt::entity>&);
 	void LoadEntityComponents(const json&, entt::registry&, entt::entity);
 	void ResolveHierarchy(entt::registry&, std::unordered_map<UUID, entt::entity>&);
-	void AttachParticles(const json&, ParticleEmitterPool&);
+	void AttachParticles(const json&, entt::registry&);
 
 	//Component Save & Load Func
 	void Save(json&, const VisibilityComponent&);

@@ -18,8 +18,8 @@ namespace tomato
 
         static glm::vec3 GetSupportPoint(
             const glm::vec3& worldDir,
-            const ColliderComponent& col1, TransformComponent& trf1,
-            const ColliderComponent& col2, TransformComponent& trf2);
+            const ColliderComponent& col1, const TransformComponent& trf1,
+            const ColliderComponent& col2, const TransformComponent& trf2);
 
     private:
         static bool GJKBool(
@@ -33,7 +33,7 @@ namespace tomato
 
         static glm::vec3 Support(
             const glm::vec3& worldDir,
-            const ColliderComponent& col, TransformComponent& trf);
+            const ColliderComponent& col, const TransformComponent& trf);
 
         static std::optional<glm::vec3> FindClosestPointOnSimplex(std::vector<glm::vec3>& simplex);
         static glm::vec3 FindClosestPointOnTriangle(std::vector<glm::vec3>& simplex);

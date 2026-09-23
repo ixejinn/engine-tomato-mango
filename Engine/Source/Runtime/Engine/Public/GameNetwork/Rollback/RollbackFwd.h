@@ -4,6 +4,9 @@
 namespace tomato {
     class SnapshotTimelineBase;
     class RollbackManager;
+
+    template<typename RollbackDataType>
+    class SnapshotTimeline;
 }
 
 #endif //MANGO_ROLLBACKFWD_H

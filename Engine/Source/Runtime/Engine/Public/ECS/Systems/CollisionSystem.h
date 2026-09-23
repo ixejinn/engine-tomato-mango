@@ -21,7 +21,6 @@ namespace tomato
 
     private:
         static constexpr int EXIT_CNT = 2;
-        static constexpr float CORRECTION_SPEED = 5.f;
 
         void RunBroadPhase(SimContext& simCtx);
         void RunNarrowPhase(SimContext& simCtx);
@@ -29,8 +28,6 @@ namespace tomato
         std::unique_ptr<NarrowPhase> narrowPhase_;
 
         std::vector<ContactPair> candidates_;
-
-        static void UpdateAABB(entt::registry& reg);
 
         void ResolveContacts();
         std::vector<ContactEvent> contacts_;

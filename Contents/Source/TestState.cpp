@@ -43,7 +43,7 @@ void TestState::Init() {
     ParticleEffect::Create(PathManager::ProjectParticle("ribbon_particle.tmt.ptc"));
     ParticleEffect::Create(PathManager::ProjectParticle("jump.tmt.ptc"));
 
-    EventDispatcher::GetInstance().Connect<LandingEvent, CallbackJump>();
+    EventDispatcher::GetInstance().Connect<LandingEvent, &TestState::CallbackJump>(*this);
 
     //// Set rollback
     engine_.SetRollbackComponent<MovementComponent>();
@@ -51,13 +51,13 @@ void TestState::Init() {
 
     //// Create game object
     // Main camera
-    entt::entity cam = Prefab::CreateCamera(registry_, "Camera", true);
+    entt::entity cam = Prefab::CreateCamera(registry_, true, true);
     auto& trfCam = registry_.get<TransformComponent>(cam);
     trfCam.SetPosition(0, 8, 8);
     trfCam.SetRotationDegree(-50, 0, 0);
 
     PlayTest();
-    //BottleneckTest();
+    // BottleneckTest();
 }
 
 void TestState::Update() {
@@ -67,8 +67,8 @@ void TestState::Update() {
 
 void TestState::Exit() {}
 
-void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
-    entt::entity root = GetRootEntity(event.reg, event.e1);
+void TestState::TEST_CollisionEnter(const CollisionEnterEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.a);
     if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
@@ -79,7 +79,7 @@ void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
         }
     }
 
-    root = GetRootEntity(event.reg, event.e2);
+    root = GetRootEntity(event.reg, event.b);
     if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
@@ -91,15 +91,55 @@ void TestState::TEST_CollisionEnter(const tomato::CollisionEnterEvent& event) {
     }
 }
 
-void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
-    entt::entity root = GetRootEntity(event.reg, event.e1);
+void TestState::TEST_CollisionExit(const CollisionExitEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.a);
     if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
             render->color = testComp->color.value();
     }
 
-    root = GetRootEntity(event.reg, event.e2);
+    root = GetRootEntity(event.reg, event.b);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+            render->color = testComp->color.value();
+    }
+}
+
+void TestState::TEST_TriggerEnter(const TriggerEnterEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.a);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+        {
+            if (!testComp->color.has_value())
+                testComp->color = render->color;
+            render->color = CollisionTestComponent::COLLISION_COLOR;
+        }
+    }
+
+    root = GetRootEntity(event.reg, event.b);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+        {
+            if (!testComp->color.has_value())
+                testComp->color = render->color;
+            render->color = CollisionTestComponent::COLLISION_COLOR;
+        }
+    }
+}
+
+void TestState::TEST_TriggerExit(const TriggerExitEvent& event) {
+    entt::entity root = GetRootEntity(event.reg, event.a);
+    if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
+    {
+        if (auto* render = event.reg->try_get<RenderComponent>(root))
+            render->color = testComp->color.value();
+    }
+
+    root = GetRootEntity(event.reg, event.b);
     if (auto* testComp = event.reg->try_get<CollisionTestComponent>(root))
     {
         if (auto* render = event.reg->try_get<RenderComponent>(root))
@@ -110,22 +150,22 @@ void TestState::TEST_CollisionExit(const tomato::CollisionExitEvent& event) {
 void TestState::CallbackJump(const tomato::LandingEvent& event)
 {
     auto e = event.reg->ctx().get<ParticleEmitterPool>().Acquire(
-        GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
+        registry_, GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
         event.position);
-     std::cout << "Jump particle " << (int)e.value() << "\n";
+     // std::cout << "Jump particle " << (int)e.value() << "\n";
 }
 
 void TestState::PlayTest()
 {
     // Player0 character
-    entt::entity player0 = Prefab::CreateCharacter(registry_, "Player 0", true);
+    entt::entity player0 = Prefab::CreateCharacter(registry_, true, "Player 0");
 
     auto& trfP0 = registry_.get<TransformComponent>(player0);
     trfP0.SetPosition(1, 2, 0);
 
     auto& renderP0 = registry_.get<RenderComponent>(player0);
     renderP0.mesh = GetAssetID("Primitive::Sphere_20_10");
-    renderP0.color = {155.f / 255, 20.f / 255, 90.f / 255, 0.8f};
+    renderP0.color = {155.f / 255, 20.f / 255, 90.f / 255, 1.f};
 
     auto& channelP0 = registry_.get<InputChannelComponent>(player0);
     channelP0.channel = 0;
@@ -133,27 +173,40 @@ void TestState::PlayTest()
     registry_.emplace<CollisionTestComponent>(player0);
 
     auto& particlePool = registry_.ctx().get<ParticleEmitterPool>();
-    particlePool.Acquire(GetAssetID("Resources\\Contents\\Particle\\burst_test.tmt.ptc"), GetUUID(registry_, player0));
-    particlePool.Acquire(GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
+    particlePool.Acquire(registry_, GetAssetID("Resources\\Contents\\Particle\\burst_test.tmt.ptc"), GetUUID(registry_, player0));
+    particlePool.Acquire(registry_, GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
 
     // Player1 character
-    entt::entity player1 = Prefab::CreateCharacter(registry_, "Player 1", true);
+    entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player 1");
 
     auto& trfP1 = registry_.get<TransformComponent>(player1);
     trfP1.SetPosition(-1, 2, 0);
 
     auto& renderP1 = registry_.get<RenderComponent>(player1);
     renderP1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
-    renderP1.color = { 8.f / 255, 75.f / 255, 109.f / 255, 0.8f };
+    renderP1.color = { 8.f / 255, 75.f / 255, 109.f / 255, 1.f };
 
     auto& channelP1 = registry_.get<InputChannelComponent>(player1);
     channelP1.channel = 1;
 
+    // Object
+    // entt::entity object = Prefab::CreateWorldObject(registry_);
+    //
+    // auto& trfObj = registry_.get<TransformComponent>(object);
+    // trfObj.SetPosition(-1, 0.51, 0);
+    //
+    // auto& renderObj = registry_.get<RenderComponent>(object);
+    // renderObj.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+    // renderObj.color = { 8.f / 255, 75.f / 255, 109.f / 255, 1.f };
+    //
+    // registry_.emplace<VelocityComponent>(object);
+
     // Ground
-    entt::entity ground = Prefab::CreateWorldObject(registry_, "Ground", true);
+    entt::entity ground = Prefab::CreateWorldObject(registry_, true, false, true, "Ground");
 
     auto& trfGnd = registry_.get<TransformComponent>(ground);
     trfGnd.SetPosition(0, -0.05, 0);
+    //trfGnd.SetPosition(1, -0.05, 0);
     trfGnd.SetScale(10, 0.1, 10);
 
     auto& renderGnd = registry_.get<RenderComponent>(ground);
@@ -174,7 +227,7 @@ void TestState::PlayTest()
     //         uiController_.onClick(e);
     //     };
 
-    auto tBtn = UIPrefab::CreateButton(registry_, entt::null, { -10.f, -10.f });
+    auto tBtn = UIPrefab::CreateButton(registry_, entt::null, { -700.f, 350.f });
     auto& tBtnUIComp = registry_.get<UIComponent>(tBtn);
     tBtnUIComp.sortOrder = 100;
     auto& tMouseEvt = registry_.get<MouseEventComponent>(tBtn);
@@ -210,8 +263,8 @@ void TestState::PlayTest()
 
 #endif
 
-    UIPrefab::CreateText(registry_, entt::null, { 100.f, 0.f });
-    UIPrefab::CreateImage(registry_, entt::null, PathManager::ProjectImage("WATER_GAME_LOGO.png"), {200.f, 300.f});
+    //UIPrefab::CreateText(registry_, entt::null, { 100.f, 0.f });
+    //UIPrefab::CreateImage(registry_, entt::null, PathManager::ProjectImage("WATER_GAME_LOGO.png"), {200.f, 300.f});
     //UIPrefab::CreateCanvas(registry_);
     //UIPrefab::CreateCanvas(registry_);
     //UIPrefab::CreateCanvas(registry_);
@@ -229,6 +282,7 @@ void TestState::PlayTest()
     uiCmp1.sortOrder = 1;
 #elif 1
     auto worldCanvas = UIPrefab::CreateCanvas(registry_, RenderMode::World);
+
     auto targetLabel = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
     registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0), glm::vec3{ 0.f, 1.f, 0.f });
     SetHierarchy(registry_, worldCanvas, targetLabel);
@@ -242,16 +296,33 @@ void TestState::PlayTest()
     uiCmp1.sortOrder = 1;
 #endif
 
-    EventDispatcher::GetInstance().Connect<CollisionEnterEvent, &TEST_CollisionEnter>();
-    EventDispatcher::GetInstance().Connect<CollisionExitEvent, &TEST_CollisionExit>();
+    auto& eventDispatcher = EventDispatcher::GetInstance();
+    // eventDispatcher.Connect<CollisionEnterEvent, &TEST_CollisionEnter>();
+    // eventDispatcher.Connect<CollisionExitEvent, &TEST_CollisionExit>();
+
+    //eventDispatcher.Connect<TriggerEnterEvent, &TEST_TriggerEnter>();
+    //eventDispatcher.Connect<TriggerExitEvent, &TEST_TriggerExit>();
 }
 
 void TestState::BottleneckTest()
 {
-    for (int x = 0; x < 1000; ++x)
+    // for (int x = 0; x < 1000; ++x)
+    // {
+    //     entt::entity e = Prefab::CreateWorldObject(registry_, "GameObject", false);
+    //     auto& trf = registry_.get<TransformComponent>(e);
+    //     trf.SetPosition(2 * x, 0, 0);
+    // }
+
+    for (int x = 0;  x < 20; x += 2)
     {
-        entt::entity e = Prefab::CreateWorldObject(registry_, "GameObject", false);
-        auto& trf = registry_.get<TransformComponent>(e);
-        trf.SetPosition(2 * x, 0, 0);
+        for (int y = 0; y < 20; y += 2)
+        {
+            for (int z = 0; z < 20; z += 2)
+            {
+                entt::entity e = Prefab::CreateWorldObject(registry_, true, false, false, "GameObject");
+                auto& trf = registry_.get<TransformComponent>(e);
+                trf.SetPosition(x, y, z);
+            }
+        }
     }
 }

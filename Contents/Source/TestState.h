@@ -20,7 +20,10 @@ private:
     static void TEST_CollisionEnter(const tomato::CollisionEnterEvent& event);
     static void TEST_CollisionExit(const tomato::CollisionExitEvent& event);
 
-    static void CallbackJump(const tomato::LandingEvent& event);
+    static void TEST_TriggerEnter(const tomato::TriggerEnterEvent& event);
+    static void TEST_TriggerExit(const tomato::TriggerExitEvent& event);
+
+    void CallbackJump(const tomato::LandingEvent& event);
 
     void PlayTest();
 

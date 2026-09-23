@@ -14,6 +14,7 @@
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
 #include "Services/Window.h"
+#include "Profiler/CPUProfiler.h"
 
 namespace tomato
 {
@@ -29,8 +30,8 @@ namespace tomato
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        glEnable(GL_CULL_FACE);
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
         AssetRegistry<Mesh>::GetInstance().CreatePrimitives();
         AssetRegistry<Texture>::GetInstance().CreatePrimitives();
         AssetRegistry<Shader>::GetInstance().CreatePrimitives();
@@ -38,6 +39,7 @@ namespace tomato
 
     void RenderSystem::Update(SimContext& simCtx)
     {
+        CPU_PROFILER_BLOCK_BEGIN(RenderSystem::Update);
         auto& registry = simCtx.state->GetRegistry();
 
         auto& renderCtx = registry.ctx().get<RenderContext>();
@@ -47,7 +49,7 @@ namespace tomato
 
         glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        
         // Get main camera from render context
         if (mainCam == entt::null)
         {
@@ -71,7 +73,9 @@ namespace tomato
             if (!IsVisible(registry, e))
                 continue;
 
-            if (render.shader == 0) render.shader = curShader_;
+            if (render.shader == 0)
+                render.shader = GetAssetID(Shader::PrimitiveName);
+                
             if (curShader_ != render.shader)
             {
                 curShader_ = render.shader;
@@ -79,17 +83,23 @@ namespace tomato
                 shader->Use();
             }
 
-            if (render.texture == 0) render.texture = curTexture_;
+            if (render.texture == 0)
+                render.texture = GetAssetID(Texture::PrimitiveName);
             if (curTexture_ != render.texture)
             {
                 curTexture_ = render.texture;
                 AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
             }
-
-            if (render.mesh == 0) render.mesh = curMesh_;
+            
+            if (render.mesh == 0)
+                render.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube));
             if (curMesh_ != render.mesh)
             {
                 curMesh_ = render.mesh;
+                if (curMesh_ == GetAssetID("Primitive::OpenCylinder_50_10"))
+                    glDisable(GL_CULL_FACE);
+                else
+                    glEnable(GL_CULL_FACE);
                 mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
                 mesh->Bind();
             }
@@ -111,30 +121,35 @@ namespace tomato
 
         if (skybox != entt::null)
         {
-            if (!IsVisible(registry, skybox))
-                return;
+            if (IsVisible(registry, skybox))
+            {
+                glCullFace(GL_FRONT);
+                glDepthFunc(GL_LEQUAL);
 
-            glCullFace(GL_FRONT);
-            glDepthFunc(GL_LEQUAL);
+                Shader* skyShader = AssetRegistry<Shader>::GetInstance().Get(GetAssetID("SkyboxShader"));
+                skyShader->Use();
 
-            Shader* skyShader = AssetRegistry<Shader>::GetInstance().Get(GetAssetID("SkyboxShader"));
-            skyShader->Use();
+                Texture* skyTexture = AssetRegistry<Texture>::GetInstance().Get(GetAssetID("PrimitiveSkybox"));
+                skyTexture->Bind();
 
-            Texture* skyTexture = AssetRegistry<Texture>::GetInstance().Get(GetAssetID("PrimitiveSkybox"));
-            skyTexture->Bind();
+                Mesh* skyMesh = AssetRegistry<Mesh>::GetInstance().Get(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)));
+                skyMesh->Bind();
 
-            Mesh* skyMesh = AssetRegistry<Mesh>::GetInstance().Get(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)));
-            skyMesh->Bind();
+                skyShader->SetUniformMat4("uModel", glm::mat4(1.f));
+                glm::mat4 viewProj{ 1.f };
+                if (mainCamComp != nullptr)
+                    viewProj = mainCamComp->projection * glm::mat4(glm::mat3(mainCamComp->view));
 
-            skyShader->SetUniformMat4("uModel", glm::mat4(1.f));
-            auto viewMtx = glm::mat4(glm::mat3(mainCamComp == nullptr ? glm::mat4(1.f) : mainCamComp->view));
-            skyShader->SetUniformMat4("uViewProj", mainCamComp->projection * viewMtx);
-            skyShader->SetUniformInt("uCubemap", 0);
+                skyShader->SetUniformMat4("uViewProj", viewProj);/*
+                auto viewMtx = glm::mat4(glm::mat3(mainCamComp == nullptr ? glm::mat4(1.f) : mainCamComp->view));
+                skyShader->SetUniformMat4("uViewProj", mainCamComp->projection * viewMtx);*/
+                skyShader->SetUniformInt("uCubemap", 0);
 
-            skyMesh->Draw();
+                skyMesh->Draw();
 
-            glCullFace(GL_BACK);
-            glDepthFunc(GL_LESS);
+                glCullFace(GL_BACK);
+                glDepthFunc(GL_LESS);
+            }
         }
 
         if (viewGizmo != entt::null)
@@ -197,5 +212,7 @@ namespace tomato
 
             glViewport(0, 0, Window::GetWidth(), Window::GetHeight());
         }
+
+        CPU_PROFILER_BLOCK_END(RenderSystem::Update);
     }
 }

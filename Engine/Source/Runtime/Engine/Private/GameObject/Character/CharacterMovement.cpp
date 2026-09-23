@@ -1,4 +1,4 @@
-#include "CharacterMovement.h"
+﻿#include "CharacterMovement.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/ComponentsPhys.h"
@@ -9,13 +9,14 @@
 #include "State/State.h"
 #include "Utils/Logger.h"
 #include "Resource/AssetHash.h"
+#include "GameObject/Character/CharacterMovementConfig.h"
 
 namespace tomato::CharacterMovement
 {
     void OnTriggerEnter_UpdateMovementMode(const TriggerEnterEvent& event)
     {
-        auto root1 = GetRootEntity(event.reg, event.e1);
-        auto root2 = GetRootEntity(event.reg, event.e2);
+        auto root1 = GetRootEntity(event.reg, event.a);
+        auto root2 = GetRootEntity(event.reg, event.b);
 
         auto* move1 = event.reg->try_get<MovementComponent>(root1);
         auto* move2 = event.reg->try_get<MovementComponent>(root2);
@@ -23,35 +24,38 @@ namespace tomato::CharacterMovement
         auto* vel1 = event.reg->try_get<VelocityComponent>(root1);
         auto* vel2 = event.reg->try_get<VelocityComponent>(root2);
 
-        if (move1 && vel1 && event.reg->get<ColliderComponent>(event.e1).trigger)
+        auto& col1 = event.reg->get<ColliderComponent>(event.a);
+        auto& col2 = event.reg->get<ColliderComponent>(event.b);
+
+        if (move1 && vel1 && col1.trigger && !col2.trigger)
         {
             EventDispatcher::GetInstance().Enqueue(
                     LandingEvent{
-                        root1, event.reg, event.reg->get<TransformComponent>(root1).GetWorldPosition()});
+                        root1, event.reg, event.reg->get<TransformComponent>(root1).GetWorldPosition(), JUMP_COUNT_MAX - move1->jumpCnt});
             Land(*event.reg, root1, *move1, *vel1);
         }
 
-        if (move2 && vel2 && event.reg->get<ColliderComponent>(event.e2).trigger)
+        if (move2 && vel2 && col2.trigger && !col1.trigger)
         {
             EventDispatcher::GetInstance().Enqueue(
                     LandingEvent{
-                        root2, event.reg, event.reg->get<TransformComponent>(root2).GetWorldPosition()});
+                        root2, event.reg, event.reg->get<TransformComponent>(root2).GetWorldPosition(), JUMP_COUNT_MAX - move2->jumpCnt});
             Land(*event.reg, root2, *move2, *vel2);
         }
     }
 
     void OnTriggerExit_UpdateMovementMode(const TriggerExitEvent& event)
     {
-        auto root1 = GetRootEntity(event.reg, event.e1);
-        auto root2 = GetRootEntity(event.reg, event.e2);
+        auto root1 = GetRootEntity(event.reg, event.a);
+        auto root2 = GetRootEntity(event.reg, event.b);
 
         auto* move1 = event.reg->try_get<MovementComponent>(root1);
         auto* move2 = event.reg->try_get<MovementComponent>(root2);
 
-        if (move1 && event.reg->get<ColliderComponent>(event.e1).trigger)
+        if (move1 && event.reg->get<ColliderComponent>(event.a).trigger)
             ChangeMovementMode(*event.reg, root1, *move1, Falling);
 
-        if (move2 && event.reg->get<ColliderComponent>(event.e2).trigger)
+        if (move2 && event.reg->get<ColliderComponent>(event.b).trigger)
             ChangeMovementMode(*event.reg, root2, *move2, Falling);
     }
 
@@ -70,7 +74,7 @@ namespace tomato::CharacterMovement
             entt::registry& reg, entt::entity e,
             MovementComponent& move, VelocityComponent& vel, float jumpSpeed)
     {
-        TMT_INFO << "Jump";
+        // TMT_INFO << "Jump";
 
         vel.velocity.y = std::max(vel.velocity.y, 0.f) + jumpSpeed;
 
@@ -82,7 +86,7 @@ namespace tomato::CharacterMovement
             entt::registry& reg, entt::entity e,
             MovementComponent& move, VelocityComponent& vel)
     {
-        TMT_INFO << "Land";
+         TMT_INFO << "Land";
 
         vel.velocity.y = 0;
 

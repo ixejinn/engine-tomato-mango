@@ -12,6 +12,8 @@ namespace tomato
 {
     struct ParticlePoolTraits
     {
+        static constexpr uint32_t N = 4;
+        static constexpr const char* Name = "Particle Effect";
         static void Assemble(entt::registry& registry_, entt::entity e);
         static void Reset(entt::registry& registry_, entt::entity e,
             AssetID ptcID, glm::vec3 pos);

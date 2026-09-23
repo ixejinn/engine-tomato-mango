@@ -10,7 +10,7 @@ namespace tomato
     struct InputChannelComponent
     {
         uint8_t channel{0};
-        bool is1P{true};
+        bool useWASD{true};
     };
 
     struct MovementComponent

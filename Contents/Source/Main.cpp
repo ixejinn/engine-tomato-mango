@@ -1,6 +1,7 @@
 ﻿#include <memory>
 #include "Engine.h"
 #include "EngineConfig.h"
+//#define TOMATO_SERVER
 #ifdef TOMATO_SERVER
 #include "Server/MatchServer.h"
 #else
@@ -10,8 +11,7 @@
 #include "jung/MyState.h"
 #endif
 
-// #define TOMATO_SERVER
-//#define TOMATO_GREENTEA
+// #define TOMATO_GREENTEA
 
 using namespace tomato;
 

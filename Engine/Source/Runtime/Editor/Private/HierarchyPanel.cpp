@@ -247,7 +247,7 @@ namespace tomato
 				auto view = reg.view<MainCameraTag>();
 				CreateAndSetHierarchyEntity(
 					editorCtx,
-					selected = Prefab::CreateCamera(reg, "Camera", view.empty() == true ? true : false),
+					selected = Prefab::CreateCamera(reg, true, view.empty() ? true : false),
 					isPopup);
 			}
 
@@ -275,9 +275,9 @@ namespace tomato
 		{
 			//@TODO : Change default particle asset
 			auto& particlePool = editorCtx.currentState->GetRegistry().ctx().get<ParticleEmitterPool>();
-			auto newParticle = particlePool.Acquire(GetAssetID(PathManager::ProjectParticle("burst_test.tmt.ptc")), glm::vec3(0));
-			if (newParticle.has_value())
-				selected = newParticle.value();
+			auto newParticle = particlePool.Acquire(reg, GetAssetID(PathManager::ProjectParticle("burst_test.tmt.ptc")), glm::vec3(0));
+			if (newParticle != entt::null)
+				selected = newParticle;
 		}
 
 		editorCtx.selectedEntity = selected;
@@ -347,7 +347,7 @@ namespace tomato
 		auto& reg = editorCtx.currentState->GetRegistry();
 		if (ImGui::MenuItem("Delete"))
 		{
-			DestroyHierarchyEntity(reg, editorCtx.selectedEntity);
+			DestroyHierarchySubtree(reg, editorCtx.selectedEntity);
 			editorCtx.selectedEntity = entt::null;
 			editorCtx.sceneDirty = true;
 		}

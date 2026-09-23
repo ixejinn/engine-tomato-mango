@@ -1,4 +1,4 @@
-#ifndef MANGO_WAVECOLLIDERPOOL_H
+﻿#ifndef MANGO_WAVECOLLIDERPOOL_H
 #define MANGO_WAVECOLLIDERPOOL_H
 
 #include "Containers/EntityPool.h"
@@ -11,6 +11,8 @@ struct WaveColliderPoolTraits
 	static void Reset(entt::registry& registry_, entt::entity e,
 		entt::entity wave, entt::entity target);
 	static bool Deactivate(entt::registry& registry_, entt::entity e);
+	static constexpr uint32_t N = 32;
+	static constexpr const char* Name = "Wave Collider";
 };
 
 using WaveColliderPool = tomato::EntityPool<WaveColliderPoolTraits>;

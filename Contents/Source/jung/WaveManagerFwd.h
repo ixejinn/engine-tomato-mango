@@ -1,0 +1,6 @@
+#ifndef MANGO_WAVEMANAGERFWD_H
+#define MANGO_WAVEMANAGERFWD_H
+
+class WaveManager;
+
+#endif //MANGO_WAVEMANAGERFWD_H

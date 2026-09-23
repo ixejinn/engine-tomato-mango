@@ -3,10 +3,18 @@
 
 #include "Collision/Broad/BroadPhase.h"
 
-namespace tomato {
-    class SAP : public BroadPhase {
+namespace tomato
+{
+    /**
+     * @brief Sweep and Prune
+     */
+    class SAP : public BroadPhase
+    {
     public:
-        void FindContactPairCandidates(entt::registry &reg, std::vector<ContactPair> &candidates) override;
+        void FindContactPairCandidates(entt::registry& reg, std::vector<ContactPair> &candidates) override;
+
+    private:
+        static void UpdateAABBs(entt::registry& reg);
     };
 }
 

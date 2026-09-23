@@ -3,6 +3,7 @@
         Source/LoadState.h
         Source/MyState.h
         Source/UIController.h
+        Source/jung/WaveManager.h
 )
 
 set(CONTENTS_SOURCES
@@ -18,10 +19,16 @@ set(CONTENTS_SOURCES
         Source/jung/WavePool.cpp
         Source/jung/WaveColliderPool.h
         Source/jung/WaveColliderPool.cpp
+        Source/jung/WaveManager.cpp
 )
 
 add_executable(contents
         ${CONTENTS_SOURCES}
+)
+
+target_include_directories(contents
+		PUBLIC
+		${CMAKE_CURRENT_LIST_DIR}/Source
 )
 
 target_link_libraries(contents

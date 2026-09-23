@@ -62,7 +62,7 @@ namespace tomato
 
     void DestroyEntity(entt::registry& reg, entt::entity e) {
         if (reg.try_get<HierarchyComponent>(e))
-            DestroyHierarchyEntity(reg, e);
+            DestroyHierarchySubtree(reg, e);
         else
             reg.destroy(e);
     }

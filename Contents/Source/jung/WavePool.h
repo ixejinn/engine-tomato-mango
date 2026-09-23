@@ -8,12 +8,16 @@
 
 struct WavePoolTraits
 {
+	// WavePoolTraits();
+
 	static void Assemble(entt::registry& registry_, entt::entity wave);
 
 	static void Reset(entt::registry& registry_, entt::entity e,
-		entt::entity owner, glm::vec3 pos, float speed, float radius = 10.f);
+		entt::entity owner, glm::vec3 pos, float speed, float radius);
 
 	static bool Deactivate(entt::registry& registry_, entt::entity e);
+	static constexpr uint32_t N = 32;
+	static constexpr const char* Name = "Wave";
 
 };
 using WavePool = tomato::EntityPool<WavePoolTraits>;

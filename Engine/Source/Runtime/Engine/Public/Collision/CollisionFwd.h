@@ -16,6 +16,8 @@ namespace tomato
 
     class BroadPhase;
     class NarrowPhase;
+
+    class CollisionLayerMatrix;
 }
 
 #endif //MANGO_COLLISIONFWD_H

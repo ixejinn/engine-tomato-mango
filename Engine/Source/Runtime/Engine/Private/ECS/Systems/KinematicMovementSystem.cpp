@@ -1,19 +1,21 @@
 ﻿#include <entt/entt.hpp>
 #include <glm/glm.hpp>
 #include "ECS/Systems/KinematicMovementSystem.h"
+#include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Rigidbody.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 #include "GameObject/Character/CharacterMovement.h"
+#include "GameObject/Character/CharacterMovementConfig.h"
 
 namespace tomato {
     void KinematicMovementSystem::Update(SimContext &simCtx)
     {
         auto& registry = simCtx.state->GetRegistry();
 
-        auto view = registry.view<TransformComponent, VelocityComponent, InputChannelComponent, MovementComponent>();
+        auto view = registry.view<ActiveTag, TransformComponent, VelocityComponent, InputChannelComponent, MovementComponent>();
         for (auto [e, trf, velocity, ch, move] : view.each())
         {
             velocity.velocity.x = 0;
@@ -22,19 +24,19 @@ namespace tomato {
             const auto& inputRec = simCtx.state->GetPlayerInputTimelines()[ch.channel][simCtx.tick];
             if (inputRec.tick != simCtx.tick)
                 continue;
-            //std::cout << inputRec.tick << " " << (int)inputRec.held << " " << (int)inputRec.down << '\n';
+            //std::cout << (int)e << " " << inputRec.tick << " " << (int)inputRec.held << " " << (int)inputRec.down << '\n';
             InputIntent keypress{inputRec.held};
             InputIntent keydown{inputRec.down};
 
             // Move
             int x = 0, y = 0;
-            if (HasFlag(keypress, ch.is1P ? InputIntent::Up : InputIntent::Up2))
+            if (HasFlag(keypress, ch.useWASD ? InputIntent::Up : InputIntent::Up2))
                 ++y;
-            if (HasFlag(keypress, ch.is1P ? InputIntent::Down : InputIntent::Down2))
+            if (HasFlag(keypress, ch.useWASD ? InputIntent::Down : InputIntent::Down2))
                 --y;
-            if (HasFlag(keypress, ch.is1P ? InputIntent::Left : InputIntent::Left2))
+            if (HasFlag(keypress, ch.useWASD ? InputIntent::Left : InputIntent::Left2))
                 --x;
-            if (HasFlag(keypress, ch.is1P ? InputIntent::Right : InputIntent::Right2))
+            if (HasFlag(keypress, ch.useWASD ? InputIntent::Right : InputIntent::Right2))
                 ++x;
 
             // if (x > 0)
@@ -68,7 +70,7 @@ namespace tomato {
             trf.SetRotationDegree(newDegree);
 
             // Jump
-            if (HasFlag(keydown, ch.is1P ? InputIntent::Jump : InputIntent::Jump2) && move.jumpCnt < JUMP_COUNT_MAX)
+            if (HasFlag(keydown, ch.useWASD ? InputIntent::Jump : InputIntent::Jump2) && move.jumpCnt < JUMP_COUNT_MAX)
                 CharacterMovement::Jump(registry, e, move, velocity, JUMP_SPEED);
 
             // std::cout << (int)e << " kine velocity: " << velocity.velocity.x << " " << velocity.velocity.y << " " << velocity.velocity.z << "\n";

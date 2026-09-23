@@ -1,7 +1,7 @@
 ﻿#ifndef MANGO_COLLISION_H
 #define MANGO_COLLISION_H
 
-#include <glm/vec3.hpp>
+#include "Math/AABB.h"
 #include "Collision/CollisionConstants.h"
 
 namespace tomato
@@ -18,9 +18,9 @@ namespace tomato
             const CollisionLayer l = CollisionLayer::Default)
                 : layer(l), type(t), trigger(trigger) {}
 
-        glm::vec3 min{}, max{}; // AABB for broad-phase collision detection
-
         CollisionLayer layer{CollisionLayer::Default};
+
+        AABB aabb;
         ColliderType type{ColliderType::Cube};
 
         bool trigger{false};

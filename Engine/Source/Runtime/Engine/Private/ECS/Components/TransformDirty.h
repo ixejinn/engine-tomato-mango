@@ -10,6 +10,7 @@ namespace tomato::Transform
         None        = 0,
         Local       = 1 << 0,
         Hierarchy   = 1 << 1,
+        Scale       = 1 << 2
     };
 }
 

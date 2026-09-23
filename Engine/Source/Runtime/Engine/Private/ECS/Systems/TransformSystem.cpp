@@ -1,4 +1,5 @@
 ﻿#include "ECS/Systems/TransformSystem.h"
+#include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Rigidbody.h"
@@ -6,6 +7,7 @@
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Particle.h"
 #include "ECS/Components/Target.h"
+#include "ECS/Components/Character.h"
 #include "ECS/Components/TransformDirty.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
@@ -28,7 +30,7 @@ namespace tomato
         static constexpr glm::vec3 ROOT_SCL = glm::vec3{1.f};
         static constexpr glm::mat4 ROOT_MAT = glm::mat4{1.f};
 
-        auto rootView = registry.view<RootEntityTag, TransformComponent>();
+        auto rootView = registry.view<ActiveTag, RootEntityTag, TransformComponent>();
         for (auto [e, trf] : rootView.each())
         {
             if (HasFlag(trf.dirty, Transform::Dirty::Local | Transform::Dirty::Hierarchy))
@@ -41,7 +43,7 @@ namespace tomato
 
     void TransformSystem::SetRootEntityDirtyBit(entt::registry& reg)
     {
-        auto view = reg.view<TransformComponent, HierarchyComponent>();
+        auto view = reg.view<ActiveTag, TransformComponent, HierarchyComponent>();
         for (auto [e, trf, hierarchy] : view.each())
         {
             if (!HasFlag(trf.dirty, Transform::Dirty::Local))

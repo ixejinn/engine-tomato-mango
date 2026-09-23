@@ -14,7 +14,7 @@ namespace tomato
         const glm::vec3& scl)
     : position(pos)
     , rotation(glm::quat(glm::radians(eulerRot)))
-    , scale(scl) {}
+    , scale(scl), dirty(Transform::Dirty::Local | Transform::Dirty::Scale) {}
 
     void TransformComponent::AddPosition(const glm::vec3& delta)
     {
@@ -70,18 +70,18 @@ namespace tomato
     void TransformComponent::SetScale(const glm::vec3& newScl)
     {
         scale = newScl;
-        dirty |= Transform::Dirty::Local;
+        dirty |= Transform::Dirty::Local | Transform::Dirty::Scale;
     }
 
     void TransformComponent::SetScale(const float x, const float y, const float z)
     {
         scale = glm::vec3{x, y, z};
-        dirty |= Transform::Dirty::Local;
+        dirty |= Transform::Dirty::Local | Transform::Dirty::Scale;
     }
 
     void TransformComponent::SetScale(float s)
     {
         scale = glm::vec3{s, s, s};
-        dirty |= Transform::Dirty::Local;
+        dirty |= Transform::Dirty::Local | Transform::Dirty::Scale;
     }
 }

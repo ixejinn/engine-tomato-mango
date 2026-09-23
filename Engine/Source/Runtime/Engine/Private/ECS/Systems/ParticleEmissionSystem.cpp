@@ -21,7 +21,7 @@ namespace tomato
         auto& registry = simCtx.state->GetRegistry();
 
 		// 활성화된 파티클 엔티티가 없으면 종료
-		if (registry.ctx().get<ParticleEmitterPool>().GetActiveEmitterNum() == 0)
+		if (registry.ctx().get<ParticleEmitterPool>().GetActiveEntityCount() == 0)
 			return;
 
 		auto view = registry.view<ParticleEmitterComponent, ParticleRuntimeComponent,
@@ -86,7 +86,7 @@ namespace tomato
             }
             else if (particle.runtime.activeCnt == 0) // 루프 아닌데 활성화된 파티클이 없으면 풀에 반납(완전 종료)
             {
-                simCtx.state->GetRegistry().ctx().get<ParticleEmitterPool>().Release(e);
+                simCtx.state->GetRegistry().ctx().get<ParticleEmitterPool>().Release(simCtx.state->GetRegistry(), e);
                 return true;
             }
         }

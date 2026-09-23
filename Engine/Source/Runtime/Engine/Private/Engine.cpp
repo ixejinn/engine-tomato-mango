@@ -157,7 +157,7 @@ namespace tomato {
         while (cnt--)
         {
             simCtx.tick = tc.GetTick();
-//            std::cout << "\n       *--------- " << simCtx.tick << " ---------*\n";
+            //std::cout << "\n       *--------- " << simCtx.tick << " ---------*\n";
 
             systemManager_.FixedUpdate(simCtx, mode);
 
@@ -176,9 +176,7 @@ namespace tomato {
 
     void Engine::Update(SimContext& simCtx, RunMode mode)
     {
-        CPU_PROFILER_BLOCK_BEGIN(Update);
         systemManager_.Update(simCtx, mode);
-        CPU_PROFILER_BLOCK_END(Update);
     }
 
     void Engine::UpdateEditor(RunMode& mode)

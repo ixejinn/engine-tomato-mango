@@ -9,18 +9,56 @@ namespace tomato
     static constexpr float COLLISION_SKIN = 1e-2f;
     static constexpr float HALF_COLLISION_SKIN = 0.5e-2f;
 
+    // *---------- Collision layer
 #define TMT_COLLISION_LAYER_LIST(X) \
-    X(Default, 1 << 0, "Default")           
+    X(Default, 1 << 0, "Default")          \
+    X(Wave1,   1 << 1, "Wave1")            \
+    X(Wave2,   1 << 2, "Wave2")
 
-    enum class CollisionLayer : uint32_t
+    enum class CollisionLayer : uint8_t
     {
-#define X(Enum, Value, Display) Enum = Value,
+#define X(Enum, Value, Display) Enum,
         TMT_COLLISION_LAYER_LIST(X)
 #undef X
         COUNT
     };
+
+    struct CollisionLayerMeta
+    {
+        CollisionLayer layer;
+        const char* name;
+    };
+
+    static constexpr CollisionLayerMeta CollisionLayerMetas[] =
+    {
+#define X(Enum, Value, Display) {CollisionLayer::Enum, Display},
+        TMT_COLLISION_LAYER_LIST(X)
+#undef X
+    };
+
+    // *---------- Collision layer bitmask
+    enum class CollisionLayerFlag : uint32_t
+    {
+        None = 0,
+#define X(Enum, Value, Display) Enum = Value,
+        TMT_COLLISION_LAYER_LIST(X)
+#undef X
+    };
+
+    inline CollisionLayerFlag GetCollisionLayerFlag(const CollisionLayer layer)
+    {
+        switch (layer)
+        {
+#define X(Enum, Value, Display) case CollisionLayer::Enum: return CollisionLayerFlag::Enum;
+            TMT_COLLISION_LAYER_LIST(X)
+#undef X
+        default:
+            return CollisionLayerFlag::None;
+        }
+    }
 #undef TMT_COLLISION_LAYER_LIST
 
+    // *---------- Collision type
 #define TMT_COLLISION_TYPE_LIST(X)  \
     X(Cube, "Cube")                 \
     X(Sphere, "Sphere")
@@ -51,7 +89,9 @@ namespace tomato
     NLOHMANN_JSON_SERIALIZE_ENUM(
         CollisionLayer,
         {
-            { CollisionLayer::Default, "Default" }
+            { CollisionLayer::Default, "Default" },
+            { CollisionLayer::Wave1, "Wave1" },
+            { CollisionLayer::Wave2, "Wave2" },
         }
     )
 

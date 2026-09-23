@@ -152,7 +152,7 @@ namespace tomato::Serialization
 
 		ResolveHierarchy(registry, newState->GetEntityMap());
 
-		AttachParticles(root, registry.ctx().get<ParticleEmitterPool>());
+		AttachParticles(root, registry);
 
 		state->SetNextState(std::move(newState));
 		registry.ctx().get<EntityNameGenerator>().Initialize(registry);
@@ -256,20 +256,20 @@ namespace tomato::Serialization
 		for (auto [e, hierarchy] : view.each())
 		{
 			hierarchy.parent =
-				hierarchy.parentID == 0 ? entt::null : entityMap[hierarchy.parentID];
-			for (auto child : hierarchy.childrenID)
+				hierarchy.parentUUID == 0 ? entt::null : entityMap[hierarchy.parentUUID];
+			for (auto child : hierarchy.childrenUUID)
 				hierarchy.children.push_back(entityMap[child]);
 		}
 	}
 
-	void AttachParticles(const json& particleData, ParticleEmitterPool& particlePool)
+	void AttachParticles(const json& particleData, entt::registry& reg)
 	{
 		for (auto& particle : particleData["Particle"])
 		{
 			AssetID asset = particle["particle"];
 			UUID target = particle["target"];
 
-			particlePool.Acquire(asset, target);
+			reg.ctx().get<ParticleEmitterPool>().Acquire(reg, asset, target);
 		}
 	}
 
@@ -417,13 +417,13 @@ namespace tomato::Serialization
 	void Save(json& data, const InputChannelComponent& channel)
 	{
 		data["channel"] = channel.channel;
-		data["1P"] = channel.is1P;
+		data["key Setting"] = channel.useWASD;
 	}
 
 	void Load(const json& data, InputChannelComponent& channel)
 	{
 		channel.channel = data["channel"];
-		channel.is1P = data["1P"];
+		channel.useWASD = data["key Setting"];
 	}
 
 	void Save(json& data, const TransformComponent& transform)
@@ -694,16 +694,16 @@ namespace tomato::Serialization
 
 	void Save(json& data, const HierarchyComponent& hierarchy)
 	{
-		data["parent"] = hierarchy.parentID;
-		data["children"] = hierarchy.childrenID;
+		data["parent"] = hierarchy.parentUUID;
+		data["children"] = hierarchy.childrenUUID;
 	}
 
 	void Load(const json& data, HierarchyComponent& hierarchy)
 	{
-		hierarchy.childrenID.clear();
+		hierarchy.childrenUUID.clear();
 
-		hierarchy.parentID = data["parent"];
-		hierarchy.childrenID = data["children"].get<std::vector<UUID>>();
+		hierarchy.parentUUID = data["parent"];
+		hierarchy.childrenUUID = data["children"].get<std::vector<UUID>>();
 	}
 
 	void Save(json& data, const RootEntityTag& rootTag) {}

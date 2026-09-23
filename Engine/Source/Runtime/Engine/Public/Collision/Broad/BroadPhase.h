@@ -2,7 +2,6 @@
 #define MANGO_BROADPHASE_H
 
 #include "Collision/CollisionFwd.h"
-#include "Collision/CollisionLayerMatrix.h"
 #include "ECS/Forward/PhysCompFwd.h"
 
 namespace tomato
@@ -15,15 +14,10 @@ namespace tomato
         virtual void FindContactPairCandidates(entt::registry& reg, std::vector<ContactPair>& candidates) = 0;
 
     protected:
-        inline static CollisionLayerMatrix layerMatrix_;
-
-        static bool CheckAABBAxisX(ColliderComponent& col1, ColliderComponent& col2);
-        static bool CheckAABBAxisY(ColliderComponent& col1, ColliderComponent& col2);
-        static bool CheckAABBAxisZ(ColliderComponent& col1, ColliderComponent& col2);
-
         static bool CanCollide(
-            entt::registry& reg, entt::entity e1, entt::entity e2,
-            ColliderComponent& col1, ColliderComponent& col2);
+            entt::registry& reg,
+            entt::entity a, entt::entity b,
+            const ColliderComponent& colA, const ColliderComponent& colB);
     };
 }
 

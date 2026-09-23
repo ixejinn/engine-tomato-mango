@@ -4,6 +4,8 @@
 namespace tomato
 {
     struct CharacterTag {};
+
+    struct GroundTriggerTag {};
 }
 
 #endif //MANGO_CHARACTER_H

@@ -79,6 +79,30 @@ namespace tomato
 		return changed;
 	}
 
+	bool DrawInputChannelInspcetor(EditorContext& eCtx, entt::registry& reg, InputChannelComponent& inputCh)
+	{
+		bool changed = false;
+
+		ImGui::SeparatorText("Key Setting");
+		if (ImGui::RadioButton("WASD", inputCh.useWASD == true))
+		{
+			inputCh.useWASD = true;
+			changed = true;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::RadioButton("Number Keys", inputCh.useWASD == false))
+		{
+			inputCh.useWASD = false;
+			changed = true;
+		}
+
+		ImGui::NewLine();
+
+		return changed;
+	}
+
 	bool DrawTransformInspector(EditorContext& eCtx, entt::registry& reg, TransformComponent& transform)
 	{
 		bool changed = false;
@@ -142,19 +166,6 @@ namespace tomato
 	{
 		bool changed = false;
 
-		ImGui::SeparatorText("Layer");
-		const char* layPreview = "Default";
-		if (ImGui::BeginCombo("##Layer", layPreview))
-		{
-			if (ImGui::Selectable("Default", collider.layer == CollisionLayer::Default))
-			{
-				collider.layer = CollisionLayer::Default;
-				changed = true;
-			}
-
-			ImGui::EndCombo();
-		}
-
 		ImGui::SeparatorText("Type");
 		const char* typePreview = ColliderTypeMetas[(uint8_t)collider.type].name;
 		if (ImGui::BeginCombo("##Type", typePreview))
@@ -176,6 +187,62 @@ namespace tomato
 		if(ImGui::Checkbox("##Trigger", &collider.trigger))
 			changed = true;
 
+		ImGui::SeparatorText("Layer");
+		const char* layPreview = "Default";
+		for (const auto& info : CollisionLayerMetas)
+		{
+			if (collider.layer == info.layer)
+			{
+				layPreview = info.name;
+				break;
+			}
+		}
+
+		if (ImGui::BeginCombo("##Layer", layPreview))
+		{
+			for (const auto& info : CollisionLayerMetas)
+			{
+				if (ImGui::Selectable(info.name, collider.layer == info.layer))
+				{
+					collider.layer = info.layer;
+					changed = true;
+				}
+			}
+
+			ImGui::EndCombo();
+		}
+		ImGui::NewLine();
+
+		//Layer Matrix
+		int layerSize = sizeof(CollisionLayerMetas) / sizeof(CollisionLayerMeta);
+		ImGuiTableColumnFlags column_flags = ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
+		if (ImGui::BeginTable("Layer Collision Matrix", layerSize + 1))
+		{
+			ImGui::TableSetupColumn("CollisionLayer", ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_WidthFixed);
+			for (int n = 0; n < layerSize; n++)
+				ImGui::TableSetupColumn(CollisionLayerMetas[n].name, column_flags | ImGuiTableColumnFlags_NoHeaderWidth);
+			ImGui::TableAngledHeadersRow();
+
+			for (int i = 0; i < layerSize; i++)
+			{
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+				ImGui::AlignTextToFramePadding();
+				ImGui::Text(CollisionLayerMetas[i].name);
+				for (int j = layerSize - 1; j >= i; j--)
+				{
+					ImGui::TableSetColumnIndex(j+1);
+
+					bool test = false;
+					ImGui::PushID((i + 1) * (j + 1));
+					ImGui::Checkbox("##", &test);
+					ImGui::PopID();
+				}
+				ImGui::NewLine();
+			}
+			ImGui::EndTable();
+		}
+		
 		ImGui::NewLine();
 
 		return changed;

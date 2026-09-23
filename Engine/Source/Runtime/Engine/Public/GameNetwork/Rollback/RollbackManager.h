@@ -6,7 +6,7 @@
 #include <unordered_set>
 #include <typeindex>
 #include <entt/fwd.hpp>
-#include "GameNetwork/Rollback/ComponentTimeline.h"
+#include "GameNetwork/Rollback/SnapshotTimeline.h"
 #include "ECS/Forward/SystemFwd.h"
 
 namespace tomato {

@@ -1,6 +1,6 @@
 ﻿#include <entt/entt.hpp>
 #include "Prefab/Prefab.h"
-#include "GameObject/Character/CharacterMovement.h"
+#include "GameObject/Character/CharacterConfig.h"
 #include "ECS/Components/Components.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "Resource/AssetHash.h"
@@ -13,13 +13,17 @@
 namespace tomato::Prefab
 {
     entt::entity CreateBaseEntity(
-        entt::registry& registry, const std::string& name, const bool root)
+        entt::registry& registry,
+        bool active, bool root,
+        const std::string& name)
     {
         const entt::entity obj = registry.create();
 
         registry.emplace<NametagComponent>(obj, GenerateUUID(), registry.ctx().get<EntityNameGenerator>().Generate(name));
         registry.emplace<VisibilityComponent>(obj);
         registry.emplace<TransformComponent>(obj);
+        if (active)
+            registry.emplace<ActiveTag>(obj);
         if (root)
             registry.emplace<RootEntityTag>(obj);
 
@@ -27,13 +31,14 @@ namespace tomato::Prefab
     }
 
     entt::entity CreateCamera(
-        entt::registry& registry, const std::string& name,
-        const bool main, const glm::vec3& pos, const glm::vec3& rot)
+        entt::registry& registry,
+        bool active, const bool main,
+        const std::string& name,
+        const glm::vec3& pos, const glm::vec3& rot)
     {
-        const entt::entity obj = CreateBaseEntity(registry, name);
+        const entt::entity obj = CreateBaseEntity(registry, active, true, name);
 
         registry.emplace<CameraComponent>(obj);
-
         if (main)
             registry.emplace<MainCameraTag>(obj);
 
@@ -44,43 +49,54 @@ namespace tomato::Prefab
         return obj;
     }
 
-    entt::entity CreateStaticMesh(entt::registry& registry, const std::string& name)
+    entt::entity CreateStaticMesh(
+        entt::registry& registry,
+        bool active,
+        const std::string& name)
     {
-        const entt::entity obj = CreateBaseEntity(registry, name);
+        const entt::entity obj = CreateBaseEntity(registry, active, true, name);
 
         registry.emplace<RenderComponent>(obj);
 
         return obj;
     }
 
-    entt::entity CreateTriggerVolume(entt::registry& registry, const std::string& name)
+    entt::entity CreateTriggerVolume(
+        entt::registry& registry,
+        bool active,
+        const std::string& name)
     {
-        const entt::entity obj = CreateBaseEntity(registry, name);
-
-        registry.emplace<ColliderComponent>(obj, true);
+        const entt::entity obj = CreateBaseEntity(registry, active, true, name);
+        const entt::entity col = AttachColliderEntity(registry, obj, active, true);
 
         return obj;
     }
 
-    entt::entity CreateWorldObject(entt::registry& registry, const std::string& name, bool printInfo)
+    entt::entity CreateWorldObject(
+        entt::registry& registry,
+        bool active, bool trigger,
+        bool printInfo,
+        const std::string& name)
     {
-        const entt::entity obj = CreateBaseEntity(registry, name);
-
-        registry.emplace<RenderComponent>(obj);
-        const entt::entity col = AttachColliderEntity(registry, obj, false);
+        const entt::entity obj = CreateStaticMesh(registry, active, name);
+        const entt::entity col = AttachColliderEntity(registry, obj, true, trigger);
 
         if (printInfo)
         {
             TMT_INFO << "[WorldObject] " << std::left << std::setw(12) << name << "\n"
-                     << "              entity   ID: " << std::right << std::setw(4) << (int)obj
+                     << "              entity   ID: " << std::right << std::setw(4) << (int)obj << "\n"
                      << "              collider ID: " << std::right << std::setw(4) << (int)col;
         }
         return obj;
     }
 
-    entt::entity CreateCharacter(entt::registry& registry, const std::string& name, bool printInfo)
+    entt::entity CreateCharacter(
+        entt::registry& registry,
+        bool active,
+        const std::string& name,
+        bool printInfo)
     {
-        const entt::entity obj = CreateWorldObject(registry, name, false);
+        const entt::entity obj = CreateWorldObject(registry, active, false, false, name);
 
         registry.emplace<VelocityComponent>(obj);
         registry.emplace<InputChannelComponent>(obj);
@@ -90,27 +106,29 @@ namespace tomato::Prefab
         registry.emplace<RollbackEntityTag>(obj);
 
         const entt::entity colObj = registry.get<HierarchyComponent>(obj).children[0];
-        const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, "Ground trigger");
+        const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, true, "Ground trigger");
+
+        registry.emplace<GroundTriggerTag>(colGnd);
 
         auto& trfColGnd = registry.get<TransformComponent>(colGnd);
-        constexpr float scaleColGnd = 0.8;
-        constexpr float deltaPosY = (1 - scaleColGnd) * 0.5f + COLLISION_SKIN * 2;
-        trfColGnd.SetScale(scaleColGnd);
-        trfColGnd.SetPosition(0, -deltaPosY, 0);
+        trfColGnd.SetScale(Character::GROUND_TRIGGER_SCALE);
 
         if (printInfo)
         {
             TMT_INFO << "[ Character ] " << std::left << std::setw(12) << name << "\n"
-                     << "              entity   ID: " << std::right << std::setw(4) << (int)obj
-                     << "              collider ID: " << std::right << std::setw(4) << (int)colObj
-                     << "              trigger  ID: " << std::right << std::setw(4) << (int)colGnd;
+                    << "              entity   ID: " << std::right << std::setw(4) << (int)obj << "\n"
+                    << "              collider ID: " << std::right << std::setw(4) << (int)colObj << "\n"
+                    << "              trigger  ID: " << std::right << std::setw(4) << (int)colGnd;
         }
         return obj;
     }
 
-    entt::entity AttachColliderEntity(entt::registry& registry, entt::entity parent, bool trigger, const std::string& name)
+    entt::entity AttachColliderEntity(
+        entt::registry& registry, entt::entity parent,
+        bool active, bool trigger,
+        const std::string& name)
     {
-        const entt::entity col = CreateBaseEntity(registry, name, false);
+        const entt::entity col = CreateBaseEntity(registry, active, false, name);
 
         registry.emplace<ColliderComponent>(col, trigger);
         registry.emplace<RenderComponent>(col);

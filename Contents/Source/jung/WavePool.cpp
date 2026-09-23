@@ -5,13 +5,15 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Visibility.h"
+#include "ECS/Components/Lifetime.h"
 #include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/Character.h"
 #include "ECS/Components/EditorTag.h"
 #include "WaveComponent.h"
 #include "ECS/Entity/Entity.h"
+#include "Prefab/Prefab.h"
 
 #include "Resource/AssetRegistry.h"
-#include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
 
@@ -19,18 +21,21 @@ using namespace tomato;
 
 void WavePoolTraits::Assemble(entt::registry& registry_, entt::entity wave)
 {
-    auto& generator = registry_.ctx().get<EntityNameGenerator>();
-    registry_.emplace<NametagComponent>(wave, GenerateUUID(), generator.Generate("Wave"));
-    registry_.emplace<VisibilityComponent>(wave);
-    registry_.emplace<TransformComponent>(wave, glm::vec3{ 0, -2.9f, 0 }, glm::vec3(0), glm::vec3(0, 0.1f, 0));
+    // auto& nameTag = registry_.get<NametagComponent>(wave);
+    // nameTag.name = registry_.ctx().get<EntityNameGenerator>().Generate("Wave");
+
+    auto& transform = registry_.get<TransformComponent>(wave);
+    transform.SetPosition(glm::vec3{ 0, -2.9f, 0 });
+    transform.SetScale(glm::vec3{ 0, 0.1f, 0 });
+
     registry_.emplace<RenderComponent>(wave,
         glm::vec4(1.f),
         GetAssetID("Primitive::OpenCylinder_50_10"),
         GetAssetID(Shader::PrimitiveName),
         GetAssetID(Texture::PrimitiveName));
-    registry_.emplace<WaveComponent>(wave, false, glm::vec3{ 0, -2.9f, 0 }, 10.f, 0.01f);
-    registry_.emplace<RootEntityTag>(wave);
     registry_.emplace<EditorHidden>(wave);
+
+    auto& waveCmp = registry_.emplace<WaveComponent>(wave, false, glm::vec3{ 0, -2.9f, 0 }, 10.f, 0.01f);
 }
 
 void WavePoolTraits::Reset(entt::registry& registry_, entt::entity e, entt::entity owner, glm::vec3 pos, float speed, float radius)
