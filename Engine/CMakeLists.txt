@@ -213,6 +213,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Components/ActiveTag.h
 		Source/Runtime/Engine/Public/GameObject/Character/LandingEvent.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterMovementConfig.h
+		Source/Runtime/Engine/Public/Math/Angle.h
 )
 
 set(ENGINE_SOURCES
@@ -303,6 +304,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Profiler/Profiler.cpp
         Source/Runtime/Engine/Private/Math/AABB.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/CharacterScaleSystem.cpp
+		Source/Runtime/Engine/Private/Math/Angle.cpp
 )
 
 add_library(engine STATIC

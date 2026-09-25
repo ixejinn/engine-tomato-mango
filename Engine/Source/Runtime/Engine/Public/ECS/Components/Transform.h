@@ -19,38 +19,42 @@ namespace tomato
 
         glm::vec3 GetLocalPosition() const { return position; }
         glm::vec3 GetWorldPosition() const { return transformMatrix[3]; }
+        void AddPosition(float x, float y, float z);
         void AddPosition(const glm::vec3& delta);
-        void SetPosition(const glm::vec3& newPos);
         void SetPosition(float x, float y, float z);
+        void SetPosition(const glm::vec3& newPos);
 
-        glm::vec3 GetLocalRotationDegree() const { return glm::degrees(glm::eulerAngles(rotation)); }
-        glm::vec3 GetWorldRotationDegree() const { return glm::degrees(glm::eulerAngles(wRotation)); }
-        glm::vec3 GetLocalRotationRadian() const { return glm::eulerAngles(rotation); }
-        glm::vec3 GetWorldRotationRadian() const { return glm::eulerAngles(wRotation); }
+        glm::vec3 GetLocalRotationDegree() const { return eulerDegree; }
+        glm::vec3 GetWorldRotationDegree() const { return wEulerDegree; }
+        glm::vec3 GetLocalRotationRadian() const { return glm::radians(eulerDegree); }
+        glm::vec3 GetWorldRotationRadian() const { return glm::radians(wEulerDegree); }
+        void AddRotationDegree(float x, float y, float z);
         void AddRotationDegree(const glm::vec3& delta);
-        void SetRotationDegree(const glm::vec3& newRot);
         void SetRotationDegree(float x, float y, float z);
+        void SetRotationDegree(const glm::vec3& newRot);
 
         glm::quat GetLocalQuaternion() const { return rotation; }
         glm::quat GetWorldQuaternion() const { return wRotation; }
         void AddQuaternion(const glm::quat& delta);
-        void SetQuaternion(const glm::quat& delta);
+        void SetQuaternion(const glm::quat& newQuat);
 
         glm::vec3 GetLocalScale() const { return scale; }
         glm::vec3 GetWorldScale() const { return wScale; }
-        void SetScale(const glm::vec3& newScl);
-        void SetScale(float x, float y, float z);
         void SetScale(float s);
+        void SetScale(float x, float y, float z);
+        void SetScale(const glm::vec3& newScl);
 
         const glm::mat4& GetTransformMatrix() const { return transformMatrix; }
 
     private:
         // Local
         glm::vec3 position;
+        glm::vec3 eulerDegree;  // cache
         glm::quat rotation;
         glm::vec3 scale;
 
         // World
+        glm::vec3 wEulerDegree; // cache
         glm::quat wRotation{};
         glm::vec3 wScale{};
 
