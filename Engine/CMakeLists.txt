@@ -162,8 +162,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Editor/Public/MainMenuBar.h
 		Source/Runtime/Engine/Public/ECS/Components/Character.h
 		Source/Runtime/Core/Public/Clock/Timer.h
-		../Contents/Source/TimerTestComponent.h
-		../Contents/Source/TimerTestSystem.h
+        ../Contents/Source/PlayTest/TimerTestComponent.h
+        ../Contents/Source/PlayTest/TimerTestSystem.h
 		Source/Runtime/Core/Public/Clock/TickTimer.h
 		Source/Runtime/Core/Public/Clock/TimerState.h
 		Source/Runtime/Engine/Public/ECS/Components/Particle.h
@@ -213,7 +213,6 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Components/ActiveTag.h
 		Source/Runtime/Engine/Public/GameObject/Character/LandingEvent.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterMovementConfig.h
-		../Contents/Source/jung/WaveManagerFwd.h
 )
 
 set(ENGINE_SOURCES

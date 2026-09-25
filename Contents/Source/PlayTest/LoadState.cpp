@@ -1,4 +1,4 @@
-﻿#include "LoadState.h"
+﻿#include "PlayTest/LoadState.h"
 
 #include "Engine.h"
 
@@ -12,7 +12,7 @@
 #include "Prefab/UIPrefab.h"
 #include "Utils/RegistryEntry.h"
 
-#include "TestState.h"
+#include "PlayTest/TestState.h"
 
 REGISTER_STATE(LoadState)
 

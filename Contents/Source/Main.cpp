@@ -1,16 +1,18 @@
 ﻿#include <memory>
 #include "Engine.h"
 #include "EngineConfig.h"
+
 //#define TOMATO_SERVER
 #ifdef TOMATO_SERVER
 #include "Server/MatchServer.h"
+
 #else
 #include "Resource/PathManager.h"
-#include "TestState.h"
-#include "jung/MyState.h"
+#include "PlayTest/TestState.h"
+#include "Game/GameState.h"
 #endif
 
-// #define TOMATO_GREENTEA
+#define TOMATO_GREENTEA
 
 using namespace tomato;
 
@@ -27,25 +29,10 @@ int main() {
     engine.SetNextState(std::make_unique<TestState>(engine));
 
 #else //TOMATO_GREENTEA
-    ////
-    engine.SetNextState(std::make_unique<MyState>(engine));
+    engine.SetNextState(std::make_unique<GameState>(engine));
 
 #endif //TOMATO_GREENTEA
     engine.Run();
 
 #endif //TOMATO_SERVER
-
-
-   //  // Engine engine(1600, 900, "TOMATO", NetMode::NM_Client);
-   //  // engine.SetNextState(std::make_unique<LoadState>(engine));
-   //  PathManager::SetProjectRoot(TMT_PROJECT_ROOT);/*
-   // std::cout << PathManager::ToProject("Resources\\Contents\\Img\\apple.jpg") << '\n';
-   // std::cout << PathManager::ToRuntime("C:\\yj\\engine-tomato-mango\\Contents\\Resources\\Img\\apple.jpg") << '\n';*/
-   //
-   //  Engine engine(1600, 900, "TOMATO", NetMode::NM_Alone);
-   //  engine.SetNextState(std::make_unique<MyState>(engine));
-   //
-   //  // auto sf = StateRegistry::GetInstance().GetStateFactory(std::type_index(typeid(TestState)));
-   //  // engine.SetNextState(sf(engine));
-   //  engine.Run();
 }
