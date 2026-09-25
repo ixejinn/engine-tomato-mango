@@ -1,4 +1,4 @@
-﻿#include "MyState.h"
+﻿#include "GameState.h"
 #include "Engine.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Audio/Audio.h"
@@ -29,15 +29,15 @@
 #include "WaveColliderPool.h"
 #include "WaveManager.h"
 
-REGISTER_STATE(MyState)
+REGISTER_STATE(GameState)
 
 using namespace tomato;
 
-MyState::MyState(Engine& engine) : State(engine) {}
+GameState::GameState(Engine& engine) : State(engine) {}
 
-MyState::~MyState() = default;
+GameState::~GameState() = default;
 
-void MyState::Init()
+void GameState::Init()
 {
     // Camera
     Prefab::CreateCamera(registry_, true, true,
@@ -47,22 +47,6 @@ void MyState::Init()
     );
 
     Mesh::Create(Mesh::Primitive::OpenCylinder, 50, 10);
-    
-    /*auto start = std::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < 100'000; ++i)
-    {
-        Prefab::CreateStaticObject(registry_);
-    }
-
-    auto end = std::chrono::high_resolution_clock::now();
-
-    std::cout
-        << std::chrono::duration_cast<std::chrono::milliseconds>(
-            end - start
-        ).count()
-        << " ms\n";
-        */
 
     entt::entity player = Prefab::CreateCharacter(registry_, true, "Player");
     auto& trfP0 = registry_.get<TransformComponent>(player);
@@ -110,17 +94,17 @@ void MyState::Init()
 
     EventDispatcher::GetInstance().Connect<TriggerEnterEvent, &WaveCollisionEnter>();
     EventDispatcher::GetInstance().Connect<TriggerExitEvent, &WaveCollisionExit>();
-    EventDispatcher::GetInstance().Connect<LandingEvent, &MyState::MakeWaveJump>(*this);
+    EventDispatcher::GetInstance().Connect<LandingEvent, &GameState::MakeWaveJump>(*this);
 }
 
-void MyState::Update()
+void GameState::Update()
 {
 }
 
-void MyState::Exit()
+void GameState::Exit()
 {}
 
-void MyState::WaveCollisionEnter(const tomato::TriggerEnterEvent& event) {
+void GameState::WaveCollisionEnter(const tomato::TriggerEnterEvent& event) {
     entt::entity root1 = GetRootEntity(event.reg, event.a);
     entt::entity root2 = GetRootEntity(event.reg, event.b);
 
@@ -151,7 +135,7 @@ void MyState::WaveCollisionEnter(const tomato::TriggerEnterEvent& event) {
     }
 }
 
-void MyState::WaveCollisionExit(const tomato::TriggerExitEvent& event)
+void GameState::WaveCollisionExit(const tomato::TriggerExitEvent& event)
 {
     entt::entity root = GetRootEntity(event.reg, event.a);
     if (auto* testComp = event.reg->try_get<WaveCollisionComponent>(root))
@@ -174,7 +158,7 @@ void MyState::WaveCollisionExit(const tomato::TriggerExitEvent& event)
     }
 }
 
-void MyState::MakeWaveJump(const LandingEvent& event)
+void GameState::MakeWaveJump(const LandingEvent& event)
 {
     if (event.remainingJumpCount == 0)
         registry_.ctx().get<WaveManager>().Acquire(registry_, event.e, event.position, 0.01f);
