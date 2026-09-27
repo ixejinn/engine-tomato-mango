@@ -7,6 +7,7 @@
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Visibility.h"
 #include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/Nametag.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Resource/AssetHash.h"
 #include "Resource/AssetRegistry.h"
@@ -23,6 +24,9 @@ namespace tomato
     , curShader_(GetAssetID(Shader::PrimitiveName))
     , curTexture_(GetAssetID(Texture::PrimitiveName))
     {
+        glEnable(GL_STENCIL_TEST);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
         // Enable depth test
         glEnable(GL_DEPTH_TEST);
 
@@ -48,7 +52,8 @@ namespace tomato
         const entt::entity viewGizmo = renderCtx.viewGizmo;
 
         glClearColor(0.f, 0.f, 0.f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glStencilMask(0xFF);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         
         // Get main camera from render context
         if (mainCam == entt::null)
@@ -73,6 +78,27 @@ namespace tomato
             if (!IsVisible(registry, e))
                 continue;
 
+            if (registry.get<NametagComponent>(e).name == "Ground")
+            {
+                //glDisable(GL_DEPTH_TEST);
+                glStencilFunc(GL_ALWAYS, 1, 0xFF);
+                glStencilMask(0xFF);
+                //std::cout << registry.get<NametagComponent>(e).name << '\n';
+            }
+            else if (registry.get<NametagComponent>(e).name == "Ground2")
+            {
+                glStencilFunc(GL_EQUAL, 1, 0xFF);
+                glStencilMask(0x00);
+                //glDisable(GL_DEPTH_TEST);
+               // std::cout << registry.get<NametagComponent>(e).name << '\n';
+            }
+            else
+            {
+                glStencilMask(0x00);
+                glStencilFunc(GL_ALWAYS, 1, 0xFF);
+                glEnable(GL_DEPTH_TEST);
+            }
+
             if (render.shader == 0)
                 render.shader = GetAssetID(Shader::PrimitiveName);
                 
@@ -93,11 +119,24 @@ namespace tomato
             
             if (render.mesh == 0)
                 render.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube));
+            if (curMesh_ == GetAssetID("Primitive::OpenCylinder_50_10"))
+            {
+                glStencilFunc(GL_EQUAL, 1, 0xFF);
+                glStencilMask(0x00);
+                glDisable(GL_CULL_FACE);
+            }
+            else
+                glEnable(GL_CULL_FACE);
+
             if (curMesh_ != render.mesh)
             {
                 curMesh_ = render.mesh;
                 if (curMesh_ == GetAssetID("Primitive::OpenCylinder_50_10"))
+                {
+                    glStencilFunc(GL_EQUAL, 1, 0xFF);
+                    glStencilMask(0x00);
                     glDisable(GL_CULL_FACE);
+                }
                 else
                     glEnable(GL_CULL_FACE);
                 mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);

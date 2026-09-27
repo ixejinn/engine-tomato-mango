@@ -93,6 +93,13 @@ void MyState::Init()
     auto& colp1 = registry_.get<ColliderComponent>(colObj1);
     colp1.layer = CollisionLayer::Wave2;
 
+    //// Ground2
+    //entt::entity ground2 = Prefab::CreateWorldObject(registry_, true, false, true, "Ground2");
+    //auto& trfGnd2 = registry_.get<TransformComponent>(ground2);
+    //trfGnd2.SetPosition(0, -3, 0);
+    //trfGnd2.SetScale(20, 0.2, 40);
+    //auto& renderGnd2 = registry_.get<RenderComponent>(ground2);
+    //renderGnd2.color = { 0.573f, 0.839f, 0.710f, 1.f };
     // Ground
     entt::entity ground = Prefab::CreateWorldObject(registry_, true, false, true, "Ground");
     auto& trfGnd = registry_.get<TransformComponent>(ground);
@@ -101,6 +108,7 @@ void MyState::Init()
     auto& renderGnd = registry_.get<RenderComponent>(ground);
     //renderGnd.color = { 0.639f, 0.8f, 0.639f, 1.f };
     renderGnd.color = { 0.710f, 0.839f, 0.573f, 1.f };
+
 
     engine_.collisionLayerMtx_.SetCollisionLayer(CollisionLayer::Wave1, CollisionLayer::Wave2, true);
 
