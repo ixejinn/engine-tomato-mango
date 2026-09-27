@@ -20,7 +20,7 @@ entt::entity WaveManager::Acquire(entt::registry& registry, entt::entity owner, 
 		if (player == waveComp.owner) continue;
 
 		entt::entity collider = colliderPool_.Acquire(registry, wave, player);
-		waveComp.colliders.push_back(collider);
+		//waveComp.colliders.push_back(collider);
 	}
 
 	return wave;
@@ -28,10 +28,15 @@ entt::entity WaveManager::Acquire(entt::registry& registry, entt::entity owner, 
 
 void WaveManager::Release(entt::registry& registry, entt::entity wave)
 {
-	auto& waveComp = registry.get<WaveComponent>(wave);
-	for (auto collider : waveComp.colliders)
-		colliderPool_.Release(registry, collider);
-	waveComp.colliders.clear();
+	//auto& waveComp = registry.get<WaveComponent>(wave);
+	//for (auto collider : waveComp.colliders)
+	//	colliderPool_.Release(registry, collider);
+	//waveComp.colliders.clear();
 
 	wavePool_.Release(registry, wave);
+}
+
+void WaveManager::ReleaseCollider(entt::registry& registry, entt::entity collider)
+{
+	colliderPool_.Release(registry, collider);
 }

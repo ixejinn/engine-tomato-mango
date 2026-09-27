@@ -58,11 +58,11 @@ void WavePoolTraits::Reset(entt::registry& registry_, entt::entity e, entt::enti
 
 bool WavePoolTraits::Deactivate(entt::registry& registry_, entt::entity e)
 {
-    auto* wave = registry_.try_get<WaveComponent>(e);
+    /*auto* wave = registry_.try_get<WaveComponent>(e);
     if (!wave)
         return false;
 
-    wave->active = false;
+    wave->active = false;*/
 
     auto& visibility = registry_.get<VisibilityComponent>(e);
     visibility.visible = false;

@@ -28,6 +28,7 @@ public:
 
 	entt::entity Acquire(entt::registry& registry, entt::entity owner, glm::vec3 pos, float speed, float radius = 10.f);
 	void Release(entt::registry& registry, entt::entity wave);
+	void ReleaseCollider(entt::registry& registry, entt::entity collider);
 
 private:
 	tomato::EntityPool<WavePoolTraits>& wavePool_;
