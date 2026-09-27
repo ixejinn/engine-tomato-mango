@@ -56,8 +56,14 @@ namespace tomato
         return engine_.GetWindow();
     }
 
+    CollisionLayerMatrix& State::GetCollisionLayerMatrix()
+    {
+        return engine_.collisionLayerMtx_;
+    }
+
     void State::SetPlayerInput(uint32_t tick, IntentState input, int playerID)
     {
         playerInputs_[playerID].SetData(tick, input);
     }
+
 }

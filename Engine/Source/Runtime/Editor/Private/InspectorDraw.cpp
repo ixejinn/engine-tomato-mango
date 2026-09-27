@@ -19,8 +19,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include "State/State.h"
 #include "ECS/Components/Components.h"
-
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/Entity/Entity.h"
 
@@ -214,28 +214,41 @@ namespace tomato
 		ImGui::NewLine();
 
 		//Layer Matrix
-		int layerSize = sizeof(CollisionLayerMetas) / sizeof(CollisionLayerMeta);
+		auto& matrix = eCtx.currentState->GetCollisionLayerMatrix();
+
+		const int layerSize = static_cast<int>(CollisionLayer::COUNT);
 		ImGuiTableColumnFlags column_flags = ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
 		if (ImGui::BeginTable("Layer Collision Matrix", layerSize + 1))
 		{
 			ImGui::TableSetupColumn("CollisionLayer", ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_WidthFixed);
-			for (int n = 0; n < layerSize; n++)
-				ImGui::TableSetupColumn(CollisionLayerMetas[n].name, column_flags | ImGuiTableColumnFlags_NoHeaderWidth);
+			
+			for (int i = 0; i < layerSize; ++i) 
+				ImGui::TableSetupColumn(CollisionLayerMetas[i].name, column_flags | ImGuiTableColumnFlags_NoHeaderWidth);
+
 			ImGui::TableAngledHeadersRow();
 
-			for (int i = 0; i < layerSize; i++)
+			for (int i = 0; i < layerSize; ++i)
 			{
 				ImGui::TableNextRow();
 				ImGui::TableSetColumnIndex(0);
+
 				ImGui::AlignTextToFramePadding();
 				ImGui::Text(CollisionLayerMetas[i].name);
-				for (int j = layerSize - 1; j >= i; j--)
+
+				for (int j = layerSize - 1; j >= i; --j)
 				{
 					ImGui::TableSetColumnIndex(j+1);
 
-					bool test = false;
-					ImGui::PushID((i + 1) * (j + 1));
-					ImGui::Checkbox("##", &test);
+					const auto layerA = CollisionLayerMetas[i].layer;
+					const auto layerB = CollisionLayerMetas[j].layer;
+
+					bool canCollide = matrix.CanCollide(layerA, layerB);
+
+					ImGui::PushID(i * layerSize + j);
+
+					if (ImGui::Checkbox("##Collsion", &canCollide))
+						matrix.SetCollisionLayer(layerA, layerB, canCollide);
+					
 					ImGui::PopID();
 				}
 				ImGui::NewLine();

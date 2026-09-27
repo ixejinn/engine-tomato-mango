@@ -11,6 +11,7 @@
 #include "Resource/ResourceFwd.h"
 #include "UUID.h"
 #include "TomatoFwd.h"
+#include "Collision/CollisionLayerMatrix.h"
 #include "Utils/PassKey.h"
 
 namespace tomato
@@ -33,6 +34,7 @@ namespace tomato
 
         Window& GetWindow();
 
+        CollisionLayerMatrix& GetCollisionLayerMatrix();
         PlayerInputTimelines& GetPlayerInputTimelines() { return playerInputs_; }
 
         void SetPlayerInput(uint32_t tick, IntentState input, int playerID);
