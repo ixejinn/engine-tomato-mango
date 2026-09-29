@@ -13,37 +13,41 @@ namespace tomato
 
         switch (type)
         {
-            case Primitive::Plain:
-                Plain(vertices, indices);
-                break;
+        case Primitive::Plain:
+            Plain(vertices, indices);
+            break;
 
-            case Primitive::LBPlain:
-                LBPlain(vertices, indices);
-                break;
+        case Primitive::LBPlain:
+            LBPlain(vertices, indices);
+            break;
 
-            case Primitive::Cube:
-                Cube(vertices, indices);
-                break;
+        case Primitive::Cube:
+            Cube(vertices, indices);
+            break;
 
-            case Primitive::Sphere:
-                Sphere(vertices, indices);
-                break;
+        case Primitive::Sphere:
+            Sphere(vertices, indices);
+            break;
 
-            case Primitive::Cylinder:
-                Cylinder(vertices, indices);
-                break;
+        case Primitive::Cylinder:
+            Cylinder(vertices, indices);
+            break;
 
-            case Primitive::OpenCylinder:
-                OpenCylinder(vertices, indices);
-                break;
+        case Primitive::OpenCylinder:
+            OpenCylinder(vertices, indices);
+            break;
 
-            case Primitive::Cone:
-                Cone(vertices, indices);
-                break;
+        case Primitive::Cone:
+            Cone(vertices, indices);
+            break;
 
-            default:
-                TMT_WARN << "Invalid primitive mesh type";
-                break;
+        case Primitive::Capsule:
+            Capsule(vertices, indices);
+            break;
+
+        default:
+            TMT_WARN << "Invalid primitive mesh type";
+            break;
         }
 
         localAABB_.min = vertices[0].position;
@@ -65,25 +69,29 @@ namespace tomato
 
         switch (type)
         {
-            case Primitive::Sphere:
-                Sphere(vertices, indices, sectorCnt, stackCnt);
-                break;
+        case Primitive::Sphere:
+            Sphere(vertices, indices, sectorCnt, stackCnt);
+            break;
 
-            case Primitive::Cylinder:
-                Cylinder(vertices, indices, sectorCnt);
-                break;
+        case Primitive::Cylinder:
+            Cylinder(vertices, indices, sectorCnt);
+            break;
 
-            case Primitive::OpenCylinder:
-                OpenCylinder(vertices, indices, sectorCnt);
-                break;
+        case Primitive::OpenCylinder:
+            OpenCylinder(vertices, indices, sectorCnt);
+            break;
 
-            case Primitive::Cone:
-                Cone(vertices, indices, sectorCnt);
-                break;
+        case Primitive::Cone:
+            Cone(vertices, indices, sectorCnt);
+            break;
 
-            default:
-                TMT_WARN << "Invalid mesh type";
-                break;
+        case Primitive::Capsule:
+            Capsule(vertices, indices, sectorCnt, stackCnt);
+            break;
+
+        default:
+            TMT_WARN << "Invalid mesh type";
+            break;
         }
 
         localAABB_.min = vertices[0].position;
@@ -251,7 +259,66 @@ namespace tomato
 
     void Mesh::Capsule(
             std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
-            const int sectorCnt, const int stackCnt) {}
+            const int sectorCnt, const int stackCnt)
+    {
+        vertices.resize(4 * sectorCnt * (stackCnt - 2) + 3 * sectorCnt * 2);    // pole consists of triangles
+        indices.resize(6 * sectorCnt * (stackCnt - 2) + 3 * sectorCnt * 2);
+
+        const auto pi = glm::pi<float>();
+        const float sectorStep = 2 * pi / sectorCnt;
+        const float stackStep = pi / stackCnt;
+
+        float lon = 0.f;        // longitude
+        float lat = 0.5f * pi;  // latitude
+
+        // hemi sphere
+        glm::vec3 northPole{0.f, 1.f, 0.f};
+        glm::vec3 southPole{0.f, -1.f, 0.f};
+        std::vector<std::vector<glm::vec3>> sphereCoords(stackCnt - 1, std::vector<glm::vec3>(sectorCnt));
+        for (auto& row : sphereCoords) {
+            lat -= stackStep;
+            lon = 0.f;
+
+            for (auto& coord : row) {
+                coord = {
+                    glm::cos(lat) * glm::sin(lon),
+                    glm::sin(lat),
+                    glm::cos(lat) * glm::cos(lon)
+            };
+                coord *= 0.5f;
+
+                if (lat < 0)
+                    coord.y -= 0.5f;
+                else
+                    coord.y += 0.5f;
+
+                lon += sectorStep;
+            }
+        }
+
+        auto& northRow = sphereCoords[0];
+        for (int j = 0; j < sectorCnt - 1; j++)
+            FillMeshData(northPole, northRow[j], northRow[j + 1], vertices, indices);
+        FillMeshData(northPole, northRow[sectorCnt - 1], northRow[0], vertices, indices);
+
+        for (int i = 1; i < stackCnt - 1; i++) {
+            const int _i = i - 1;
+
+            int j;
+            for (j = 0; j < sectorCnt - 1; j++)
+            {
+                const int j_= j + 1;
+
+                FillMeshData(sphereCoords[_i][j], sphereCoords[i][j], sphereCoords[i][j_], sphereCoords[_i][j_], vertices, indices);
+            }
+            FillMeshData(sphereCoords[_i][j], sphereCoords[i][j], sphereCoords[i][0], sphereCoords[_i][0], vertices, indices);
+        }
+
+        auto& southRow = sphereCoords[stackCnt - 2];
+        for (int j = 0; j < sectorCnt - 1; j++)
+            FillMeshData(southPole, southRow[j + 1], southRow[j], vertices, indices);
+        FillMeshData(southPole, southRow[0], southRow[sectorCnt - 1], vertices, indices);
+    }
 
     void Mesh::Cylinder(
             std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,

@@ -61,7 +61,8 @@ namespace tomato
     // *---------- Collision type
 #define TMT_COLLISION_TYPE_LIST(X)  \
     X(Cube, "Cube")                 \
-    X(Sphere, "Sphere")
+    X(Sphere, "Sphere")             \
+    X(Capsule, "Capsule")
 
     enum class ColliderType : uint8_t
     {
