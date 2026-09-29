@@ -2,9 +2,9 @@
 #define MANGO_GJK_H
 
 #include <glm/vec3.hpp>
-#include "Collision/Narrow/NarrowPhase.h"
-#include "Collision/Narrow/GJK/GJKResult.h"
-#include "Collision/CollisionConstants.h"
+#include "Collision/Detection/Narrow/NarrowPhase.h"
+#include "GJKResult.h"
+#include "Collision/Collider/ColliderTypes.h"
 #include "ECS/Forward/PhysCompFwd.h"
 #include "Containers/EnumArray.h"
 #include "Event/EventSignal.h"

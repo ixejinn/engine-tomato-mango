@@ -1,7 +1,7 @@
 #ifndef MANGO_SAP_H
 #define MANGO_SAP_H
 
-#include "Collision/Broad/BroadPhase.h"
+#include "BroadPhase.h"
 
 namespace tomato
 {

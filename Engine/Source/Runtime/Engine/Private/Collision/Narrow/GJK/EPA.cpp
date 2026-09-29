@@ -4,9 +4,9 @@
 #include <glm/gtx/string_cast.hpp>
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Collision.h"
-#include "Collision/Narrow/GJK/EPA.h"
-#include "Collision/Narrow/GJK/GJK.h"
-#include "Collision/CollisionConfig.h"
+#include "Collision/Detection/Narrow/GJK/EPA.h"
+#include "Collision/Detection/Narrow/GJK/GJK.h"
+#include "Collision/CollisionTolerance.h"
 #include "Containers/UnorderedPair.h"
 #include "Math/Normal.h"
 #include "Utils/Logger.h"

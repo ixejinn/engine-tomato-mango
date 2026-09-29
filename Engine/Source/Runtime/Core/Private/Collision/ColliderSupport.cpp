@@ -1,6 +1,6 @@
 #include <glm/glm.hpp>
 #include "Collision/ColliderSupport.h"
-#include "Collision/CollisionConfig.h"
+#include "Collision/CollisionTolerance.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 

@@ -5,7 +5,7 @@
 #include "ECS/Components/Movement.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Simulation/SimulationConfig.h"
-#include "Collision/CollisionConfig.h"
+#include "Collision/CollisionTolerance.h"
 
 namespace tomato
 {
