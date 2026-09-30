@@ -7,7 +7,7 @@
 #include "ECS/Systems/System.h"
 #include "Collision/CollisionEventFwd.h"
 #include "Collision/CollisionFwd.h"
-#include "Collision/Narrow/GJK/GJK.h"
+#include "Collision/Detection/Narrow/GJK/GJK.h"
 
 namespace tomato
 {

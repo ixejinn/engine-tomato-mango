@@ -21,9 +21,9 @@ set(ENGINE_HEADERS
         Source/Runtime/Core/Public/Containers/EnumArray.h
         Source/Runtime/Core/Private/Collision/ColliderSupport.h
         Source/Runtime/Engine/Public/ECS/Forward/PhysCompFwd.h
-        Source/Runtime/Core/Public/Collision/CollisionConstants.h
+        Source/Runtime/Engine/Public/Collision/CollisionConstants.h
         Source/Runtime/Engine/Public/Collision/CollisionEvent.h
-        Source/Runtime/Engine/Public/Collision/CollisionLayerMatrix.h
+		Source/Runtime/Engine/Public/Collision/Layer/CollisionLayerMatrix.h
 		Source/Runtime/Engine/Private/Utils/Bitmask/BitmaskOperators.h
 		Source/Runtime/Engine/Private/Utils/Bitmask/BitmaskDefines.h
         Source/Runtime/Engine/Public/ECS/Components/Collision.h
@@ -91,13 +91,13 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Resource/Audio/Audio.h
         Source/Runtime/Engine/Public/TomatoFwd.h
         Source/Runtime/Core/Public/Containers/UnorderedPair.h
-        
-		Source/Runtime/Engine/Public/Collision/Narrow/GJK/GJK.h
-		Source/Runtime/Engine/Public/Collision/Narrow/GJK/EPA.h
-        Source/Runtime/Engine/Public/Collision/Broad/BroadPhase.h
+
+		Source/Runtime/Engine/Public/Collision/Detection/Narrow/GJK/GJK.h
+		Source/Runtime/Engine/Public/Collision/Detection/Narrow/GJK/EPA.h
+		Source/Runtime/Engine/Public/Collision/Detection/Broad/BroadPhase.h
         Source/Runtime/Engine/Public/Collision/CollisionFwd.h
-        Source/Runtime/Engine/Public/Collision/Broad/SAP.h
-        Source/Runtime/Engine/Public/Collision/Narrow/NarrowPhase.h
+		Source/Runtime/Engine/Public/Collision/Detection/Broad/SAP.h
+		Source/Runtime/Engine/Public/Collision/Detection/Narrow/NarrowPhase.h
         Source/Runtime/Engine/Public/Collision/ContactData.h
         Source/Runtime/Engine/Public/Math/Normal.h
         Source/Runtime/Engine/Public/Network/NetworkFwd.h
@@ -179,12 +179,12 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Private/Utils/FileDialog.h
 		Source/Runtime/Engine/Public/State/StateRegistry.h
 		Source/Runtime/Engine/Public/ECS/Forward/SystemFrameworkFwd.h
-		Source/Runtime/Core/Public/Collision/CollisionConstantsFwd.h
+		Source/Runtime/Engine/Public/Collision/CollisionTypesFwd.h
 		Source/Runtime/Engine/Public/Input/InputIntentFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/Systems.h
 		Source/Runtime/Engine/Public/Collision/CollisionCache.h
-		Source/Runtime/Engine/Public/Collision/Narrow/GJK/GJKResult.h
-		Source/Runtime/Engine/Public/Collision/CollisionConfig.h
+		Source/Runtime/Engine/Public/Collision/Detection/Narrow/GJK/GJKResult.h
+		Source/Runtime/Engine/Public/Collision/CollisionTolerance.h
 		Source/Runtime/Engine/Public/ECS/Forward/CharacterCompFwd.h
         Source/Runtime/Engine/Public/ECS/Systems/ParticleEmissionSystem.h
         Source/Runtime/Engine/Public/Math/Geometry.h
@@ -213,6 +213,9 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Components/ActiveTag.h
 		Source/Runtime/Engine/Public/GameObject/Character/LandingEvent.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterMovementConfig.h
+		Source/Runtime/Engine/Public/Math/Angle.h
+		Source/Runtime/Engine/Public/Collision/Layer/CollisionLayerTypes.h
+		Source/Runtime/Engine/Public/Collision/Collider/ColliderTypes.h
 )
 
 set(ENGINE_SOURCES
@@ -303,6 +306,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Profiler/Profiler.cpp
         Source/Runtime/Engine/Private/Math/AABB.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/CharacterScaleSystem.cpp
+		Source/Runtime/Engine/Private/Math/Angle.cpp
 )
 
 add_library(engine STATIC

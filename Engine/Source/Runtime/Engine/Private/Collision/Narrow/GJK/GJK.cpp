@@ -1,12 +1,12 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <cmath>
 #include <glm/gtx/string_cast.hpp>
-#include "Collision/Narrow/GJK/GJK.h"
-#include "Collision/Narrow/GJK/EPA.h"
+#include "Collision/Detection/Narrow/GJK/GJK.h"
+#include "Collision/Detection/Narrow/GJK/EPA.h"
 #include "Collision/ColliderSupport.h"
 #include "Collision/CollisionEvent.h"
 #include "Collision/CollisionConstants.h"
-#include "Collision/CollisionConfig.h"
+#include "Collision/CollisionTolerance.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"

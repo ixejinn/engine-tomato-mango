@@ -4,7 +4,7 @@
 #include <glm/vec3.hpp>
 #include <vector>
 #include <optional>
-#include "Collision/Narrow/GJK/GJKResult.h"
+#include "GJKResult.h"
 
 namespace tomato
 {

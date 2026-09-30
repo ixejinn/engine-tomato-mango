@@ -101,25 +101,26 @@ namespace tomato::Prefab
         registry.emplace<VelocityComponent>(obj);
         registry.emplace<InputChannelComponent>(obj);
         registry.emplace<MovementComponent>(obj);
-
         registry.emplace<CharacterTag>(obj);
         registry.emplace<RollbackEntityTag>(obj);
 
         const entt::entity colObj = registry.get<HierarchyComponent>(obj).children[0];
-        const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, true, "Ground trigger");
+//        registry.get<ColliderComponent>(colObj).type = ColliderType::Capsule;
+//        registry.get<RenderComponent>(colObj).mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Capsule));
+         const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, true, "Ground trigger");
 
-        registry.emplace<GroundTriggerTag>(colGnd);
+         registry.emplace<GroundTriggerTag>(colGnd);
 
-        auto& trfColGnd = registry.get<TransformComponent>(colGnd);
-        trfColGnd.SetScale(Character::GROUND_TRIGGER_SCALE);
+         auto& trfColGnd = registry.get<TransformComponent>(colGnd);
+         trfColGnd.SetScale(Character::GROUND_TRIGGER_SCALE);
 
-        if (printInfo)
-        {
-            TMT_INFO << "[ Character ] " << std::left << std::setw(12) << name << "\n"
-                    << "              entity   ID: " << std::right << std::setw(4) << (int)obj << "\n"
-                    << "              collider ID: " << std::right << std::setw(4) << (int)colObj << "\n"
-                    << "              trigger  ID: " << std::right << std::setw(4) << (int)colGnd;
-        }
+         if (printInfo)
+         {
+             TMT_INFO << "[ Character ] " << std::left << std::setw(12) << name << "\n"
+                     << "              entity   ID: " << std::right << std::setw(4) << (int)obj << "\n"
+                     << "              collider ID: " << std::right << std::setw(4) << (int)colObj << "\n"
+                     << "              trigger  ID: " << std::right << std::setw(4) << (int)colGnd;
+         }
         return obj;
     }
 
@@ -154,63 +155,39 @@ namespace tomato::Prefab
     entt::entity CreateGizmo(entt::registry& reg)
     {
         // Center(root)
-        const entt::entity center = reg.create();
-
-        auto& generator = reg.ctx().get<EntityNameGenerator>();
-        reg.emplace<NametagComponent>(center, GenerateUUID(), generator.Generate("Gizmo"));
-        reg.emplace<TransformComponent>(center);
-        reg.emplace<VisibilityComponent>(center);
-        reg.emplace<RootEntityTag>(center);
-        reg.emplace<EditorHidden>(center);
-        reg.emplace<RenderComponent>(center,
-            glm::vec4(1.f),
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)),
-            GetAssetID(Shader::PrimitiveName),
-            GetAssetID(Texture::PrimitiveName));
+        const entt::entity center = CreateStaticMesh(reg, true, "Gizmo");
 
         // X axis
-        const entt::entity x = reg.create();
-        reg.emplace<NametagComponent>(x, GenerateUUID(), generator.Generate("X"));
-        reg.emplace<TransformComponent>(x,
-            glm::vec3(3, 0, 0),
-            glm::vec3(0, 0, 90),
-            glm::vec3(2.5, 5, 2.5));
-        reg.emplace<VisibilityComponent>(x);
-        reg.emplace<RenderComponent>(x,
-            glm::vec4(1.f, 0.f, 0.f, 1.f),
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)),
-            GetAssetID(Shader::PrimitiveName),
-            GetAssetID(Texture::PrimitiveName));
+        const entt::entity x = CreateStaticMesh(reg, true, "X");
+        auto& trfX = reg.get<TransformComponent>(x);
+        trfX.SetPosition(3, 0, 0);
+        trfX.SetRotationDegree(0, 0, 90);
+        trfX.SetScale(2.5, 5, 2.5);
+        auto& rndrX = reg.get<RenderComponent>(x);
+        rndrX.color = glm::vec4(1.f, 0.f, 0.f, 1.f);
+        rndrX.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone));
         SetHierarchy(reg, center, x);
 
         // Y axis
-        const entt::entity y = reg.create();
-        reg.emplace<NametagComponent>(y, GenerateUUID(), generator.Generate("Y"));
-        reg.emplace<TransformComponent>(y,
-            glm::vec3(0, 3, 0),
-            glm::vec3(-180, 0, 0),
-            glm::vec3(2.5, 5, 2.5));
-        reg.emplace<VisibilityComponent>(y);
-        reg.emplace<RenderComponent>(y,
-            glm::vec4(0.f, 1.f, 0.f, 1.f),
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)),
-            GetAssetID(Shader::PrimitiveName),
-            GetAssetID(Texture::PrimitiveName));
+        const entt::entity y = CreateStaticMesh(reg, true, "Y");
+        auto& trfY = reg.get<TransformComponent>(y);
+        trfY.SetPosition(0, 3, 0);
+        trfY.SetRotationDegree(-180, 0, 0);
+        trfY.SetScale(2.5, 5, 2.5);
+        auto& rndrY = reg.get<RenderComponent>(y);
+        rndrY.color = glm::vec4(0.f, 1.f, 0.f, 1.f);
+        rndrY.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone));
         SetHierarchy(reg, center, y);
 
         // Z axis
-        const entt::entity z = reg.create();
-        reg.emplace<NametagComponent>(z, GenerateUUID(), generator.Generate("Z"));
-        reg.emplace<TransformComponent>(z,
-            glm::vec3(0, 0, 3),
-            glm::vec3(-90, 0, 0),
-            glm::vec3(2.5, 5, 2.5));
-        reg.emplace<VisibilityComponent>(z);
-        reg.emplace<RenderComponent>(z,
-            glm::vec4(0.f, 0.f, 1.f, 1.f),
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)),
-            GetAssetID(Shader::PrimitiveName),
-            GetAssetID(Texture::PrimitiveName));
+        const entt::entity z = CreateStaticMesh(reg, true, "Z");
+        auto& trfZ = reg.get<TransformComponent>(z);
+        trfZ.SetPosition(0, 0, 3);
+        trfZ.SetRotationDegree(-90, 0, 0);
+        trfZ.SetScale(2.5, 5, 2.5);
+        auto& rndrZ = reg.get<RenderComponent>(z);
+        rndrZ.color = glm::vec4(0.f, 0.f, 1.f, 1.f);
+        rndrZ.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone));
         SetHierarchy(reg, center, z);
 
         reg.get<TransformComponent>(center).SetScale(0.1f, 0.1f, 0.1f);
