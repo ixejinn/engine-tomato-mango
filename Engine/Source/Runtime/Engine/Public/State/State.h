@@ -11,7 +11,7 @@
 #include "Resource/ResourceFwd.h"
 #include "UUID.h"
 #include "TomatoFwd.h"
-#include "Collision/CollisionLayerMatrix.h"
+#include "Collision/Layer/CollisionLayerMatrix.h"
 #include "Utils/PassKey.h"
 
 namespace tomato

@@ -12,6 +12,8 @@ namespace tomato
         AssetID mesh{ 0 };
         AssetID shader{ 0 };
         AssetID texture{ 0 };
+
+
     };
 }
 

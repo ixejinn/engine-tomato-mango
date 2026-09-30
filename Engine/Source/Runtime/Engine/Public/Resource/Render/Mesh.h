@@ -99,7 +99,8 @@ namespace tomato
 
         void Bind() const;
         void Draw(bool drawLine = false) const;
-
+        
+        GLuint GetHandle() const { return vao_; }
         const AABB& GetLocalAABB() const { return localAABB_; }
 
     private:

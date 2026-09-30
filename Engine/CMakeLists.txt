@@ -216,7 +216,8 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Math/Angle.h
 		Source/Runtime/Engine/Public/Collision/Layer/CollisionLayerTypes.h
 		Source/Runtime/Engine/Public/Collision/Collider/ColliderTypes.h
-)
+        Source/Runtime/Engine/Public/Render/GLStateCache.h
+ )
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
@@ -307,6 +308,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Math/AABB.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/CharacterScaleSystem.cpp
 		Source/Runtime/Engine/Private/Math/Angle.cpp
+        Source/Runtime/Engine/Private/Render/GLStateCache.cpp
 )
 
 add_library(engine STATIC

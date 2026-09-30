@@ -40,11 +40,11 @@ namespace tomato
 	{
 		icon_visibility[0] =
 			AssetRegistry<Texture>::GetInstance().
-			Get(GetAssetID(PathManager::RuntimeIcon("visibility_off.png").string().c_str()))->GetTexture();
+			Get(GetAssetID(PathManager::RuntimeIcon("visibility_off.png").string().c_str()))->GetHandle();
 
 		icon_visibility[1] =
 			AssetRegistry<Texture>::GetInstance().
-			Get(GetAssetID(PathManager::RuntimeIcon("visibility_on.png").string().c_str()))->GetTexture();
+			Get(GetAssetID(PathManager::RuntimeIcon("visibility_on.png").string().c_str()))->GetHandle();
 	}
 
 	void HierarchyPanel::Draw(EditorContext& editorCtx)

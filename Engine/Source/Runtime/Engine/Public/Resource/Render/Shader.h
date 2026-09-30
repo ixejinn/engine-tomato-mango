@@ -23,6 +23,7 @@ namespace tomato {
         static void Create(const char* vsName, const char* fsName);
         static void Create(const std::filesystem::path& vsPath, const std::filesystem::path& fsPath);
 
+        GLuint GetHandle() const { return programID_; }
         void Use() const;
 
         void SetUniformBool(const char* name, bool value) const;

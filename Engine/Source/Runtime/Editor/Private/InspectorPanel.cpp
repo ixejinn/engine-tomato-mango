@@ -82,7 +82,7 @@ namespace tomato
 	{
 		more_vert =
 			AssetRegistry<Texture>::GetInstance().
-			Get(GetAssetID(PathManager::RuntimeIcon("more_vert.png").string().c_str()))->GetTexture();
+			Get(GetAssetID(PathManager::RuntimeIcon("more_vert.png").string().c_str()))->GetHandle();
 	}
 
 	void InspectorPanel::MenuBar(EditorContext& editorCtx)
