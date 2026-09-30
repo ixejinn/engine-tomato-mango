@@ -105,22 +105,22 @@ namespace tomato::Prefab
         registry.emplace<RollbackEntityTag>(obj);
 
         const entt::entity colObj = registry.get<HierarchyComponent>(obj).children[0];
-        registry.get<ColliderComponent>(colObj).type = ColliderType::Capsule;
-        registry.get<RenderComponent>(colObj).mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Capsule));
-        // const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, true, "Ground trigger");
-        //
-        // registry.emplace<GroundTriggerTag>(colGnd);
-        //
-        // auto& trfColGnd = registry.get<TransformComponent>(colGnd);
-        // trfColGnd.SetScale(Character::GROUND_TRIGGER_SCALE);
-        //
-        // if (printInfo)
-        // {
-        //     TMT_INFO << "[ Character ] " << std::left << std::setw(12) << name << "\n"
-        //             << "              entity   ID: " << std::right << std::setw(4) << (int)obj << "\n"
-        //             << "              collider ID: " << std::right << std::setw(4) << (int)colObj << "\n"
-        //             << "              trigger  ID: " << std::right << std::setw(4) << (int)colGnd;
-        // }
+//        registry.get<ColliderComponent>(colObj).type = ColliderType::Capsule;
+//        registry.get<RenderComponent>(colObj).mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Capsule));
+         const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, true, "Ground trigger");
+
+         registry.emplace<GroundTriggerTag>(colGnd);
+
+         auto& trfColGnd = registry.get<TransformComponent>(colGnd);
+         trfColGnd.SetScale(Character::GROUND_TRIGGER_SCALE);
+
+         if (printInfo)
+         {
+             TMT_INFO << "[ Character ] " << std::left << std::setw(12) << name << "\n"
+                     << "              entity   ID: " << std::right << std::setw(4) << (int)obj << "\n"
+                     << "              collider ID: " << std::right << std::setw(4) << (int)colObj << "\n"
+                     << "              trigger  ID: " << std::right << std::setw(4) << (int)colGnd;
+         }
         return obj;
     }
 

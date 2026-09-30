@@ -24,7 +24,7 @@ namespace tomato
     {
         {ColliderType::Cube, support::Cube},
         {ColliderType::Sphere, support::Sphere},
-        {ColliderType::Capsule, support::Capsule}
+//        {ColliderType::Capsule, support::Capsule}
     };
 
     std::optional<ContactData> GJK::EvaluateContactPair(entt::registry& reg, const ContactPair& pair)

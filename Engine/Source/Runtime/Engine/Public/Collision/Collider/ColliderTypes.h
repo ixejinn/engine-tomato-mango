@@ -10,7 +10,7 @@ namespace tomato
 #define TMT_COLLISION_TYPE_LIST(X)  \
 X(Cube, "Cube")                 \
 X(Sphere, "Sphere")             \
-X(Capsule, "Capsule")
+//X(Capsule, "Capsule")
 
     enum class ColliderType : uint8_t
     {
@@ -39,7 +39,8 @@ X(Capsule, "Capsule")
         ColliderType,
         {
             { ColliderType::Cube, "Cube" },
-            { ColliderType::Sphere, "Sphere" }
+            { ColliderType::Sphere, "Sphere" },
+//            { ColliderType::Capsule, "Capsule"}
         }
     )
 }
