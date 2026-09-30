@@ -1,25 +1,26 @@
 ﻿set(CONTENTS_HEADERS
-        Source/TestState.h
-        Source/LoadState.h
+		Source/PlayTest/TestState.h
+		Source/PlayTest/LoadState.h
+		Source/PlayTest/CollisionTestComponent.h
         Source/MyState.h
-        Source/UIController.h
-        Source/jung/WaveManager.h
+		Source/PlayTest/UIController.h
+        Source/Game/WaveManager.h
+		Source/jung/WaveManagerFwd.h
 )
 
 set(CONTENTS_SOURCES
         Source/Main.cpp
-        Source/TestState.cpp
-        Source/LoadState.cpp
-        Source/CollisionTestComponent.h
-        Source/UIController.cpp
-        Source/TimerTestSystem.cpp
-        Source/jung/MyState.cpp
-        Source/jung/WaveSystem.cpp
-        Source/jung/WavePool.h
-        Source/jung/WavePool.cpp
-        Source/jung/WaveColliderPool.h
-        Source/jung/WaveColliderPool.cpp
-        Source/jung/WaveManager.cpp
+		Source/PlayTest/TestState.cpp
+		Source/PlayTest/LoadState.cpp
+		Source/PlayTest/UIController.cpp
+		Source/PlayTest/TimerTestSystem.cpp
+		Source/Game/GameState.cpp
+        Source/Game/WaveSystem.cpp
+        Source/Game/WavePool.h
+        Source/Game/WavePool.cpp
+        Source/Game/WaveColliderPool.h
+        Source/Game/WaveColliderPool.cpp
+        Source/Game/WaveManager.cpp
 )
 
 add_executable(contents

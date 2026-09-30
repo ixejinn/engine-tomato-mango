@@ -2,7 +2,8 @@
 #define MANGO_COLLISION_H
 
 #include "Math/AABB.h"
-#include "Collision/CollisionConstants.h"
+#include "Collision/Layer/CollisionLayerTypes.h"
+#include "Collision/Collider/ColliderTypes.h"
 
 namespace tomato
 {

@@ -3,7 +3,7 @@
 #include <glm/gtx/norm.hpp>
 #include "Math/Normal.h"
 
-#include "Collision/CollisionConfig.h"
+#include "Collision/CollisionTolerance.h"
 
 namespace tomato
 {

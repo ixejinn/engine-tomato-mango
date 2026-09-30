@@ -3,7 +3,7 @@
 
 #include <type_traits>
 #include "Input/InputIntentFwd.h"
-#include "Collision/CollisionConstantsFwd.h"
+#include "Collision/CollisionTypesFwd.h"
 #include "ECS/Forward/SystemFrameworkFwd.h"
 #include "ECS/Forward/TransformDirtyFwd.h"
 #include "Serialization/ComponentInfo.h"

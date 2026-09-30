@@ -1,26 +1,21 @@
 ﻿#ifndef MANGO_MYSTATE_H
 #define MANGO_MYSTATE_H
 
-#include <memory>
-#include <entt/fwd.hpp>
 #include "State/State.h"
-#include "Resource/ResourceFwd.h"
 #include "Collision/CollisionEventFwd.h"
-#include "../UIController.h"
+#include "PlayTest/UIController.h"
 #include "GameObject/Character/MovementMode.h"
-#include "jung/WaveManagerFwd.h"
 
-class MyState : public tomato::State {
+class GameState : public tomato::State {
 public:
-    explicit MyState(tomato::Engine& engine);
-    ~MyState();
+    explicit GameState(tomato::Engine& engine);
+    ~GameState() override;
 
     void Init() override;
     void Update() override;
     void Exit() override;
 
 private:
-    tomato::Audio* audioPtr_{ nullptr };
     UIController uiController_;
 
     static void WaveCollisionEnter(const tomato::TriggerEnterEvent& event);

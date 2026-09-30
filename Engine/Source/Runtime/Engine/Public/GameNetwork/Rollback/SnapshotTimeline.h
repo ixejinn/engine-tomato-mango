@@ -139,6 +139,13 @@ namespace tomato
     public:
         void Rollback(entt::registry& reg, uint32_t tick) override
         {
+            const uint32_t storedTick = data_[tick].tick;
+            if (storedTick != tick)
+            {
+                TMT_WARN << "Rollback tick mismatch (requested: " << tick << ", stored: " << storedTick << ")";
+                return;
+            }
+            
             auto* pool = reg.ctx().find<EntityPool<Traits>>();
             if (!pool)
             {
@@ -162,11 +169,10 @@ namespace tomato
             }
 
             auto& slice = data_[tick];
-
             slice.tick = tick;
             slice.entries = pool->entries_;
-            slice.freeIndices_ = pool->freeIndices_;
-            slice.freeEntityCount_ = pool->freeEntityCount_;
+            slice.freeIndices = pool->freeIndices_;
+            slice.freeEntityCount = pool->freeEntityCount_;
         }
 
     private:

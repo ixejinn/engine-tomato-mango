@@ -1,6 +1,7 @@
 #include <list>
 #include <entt/entt.hpp>
-#include "Collision/Broad/SAP.h"
+#include "Collision/Detection/Broad/SAP.h"
+#include "Collision/CollisionConstants.h"
 #include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"

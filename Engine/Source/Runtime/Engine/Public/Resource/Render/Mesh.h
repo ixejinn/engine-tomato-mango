@@ -31,7 +31,8 @@ namespace tomato
     X(Sphere,       "Sphere")       \
     X(Cylinder,     "Cylinder")     \
     X(OpenCylinder, "OpenCylinder") \
-    X(Cone, "Cone")
+    X(Cone, "Cone")                 \
+    X(Capsule, "Capsule")
 
     enum class Primitive
     {
@@ -78,6 +79,9 @@ namespace tomato
 
                 case Primitive::Cone:
                     return "Primitive::Cone";
+
+                case Primitive::Capsule:
+                    return "Primitive::Capsule";
             }
         }
 
@@ -108,7 +112,7 @@ namespace tomato
                 int sectorCnt = 8, int stackCnt = 6);
         static void Capsule(
                 std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
-                int sectorCnt = 8, int stackCnt = 6);
+                int sectorCnt = 8, int stackCnt = 7);
 
         static void Cylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int sectorCnt = 10);
         static void OpenCylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int sectorCnt = 10);

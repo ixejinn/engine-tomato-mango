@@ -2,7 +2,7 @@
 #define MANGO_COLLISIONLAYERMATRIX_H
 
 #include "Containers/EnumArray.h"
-#include "Collision/CollisionConstants.h"
+#include "Collision/Layer/CollisionLayerTypes.h"
 
 namespace tomato
 {

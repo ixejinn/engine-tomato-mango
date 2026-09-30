@@ -7,9 +7,10 @@
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Collision/CollisionEvent.h"
-#include "Collision/CollisionConfig.h"
-#include "Collision/Broad/SAP.h"
-#include "Collision/Narrow/GJK/GJK.h"
+#include "Collision/CollisionConstants.h"
+#include "Collision/CollisionTolerance.h"
+#include "Collision/Detection/Broad/SAP.h"
+#include "Collision/Detection/Narrow/GJK/GJK.h"
 #include "Simulation/SimulationConfig.h"
 #include "Event/EventDispatcher.h"
 #include "Utils/Logger.h"
@@ -148,8 +149,8 @@ namespace tomato
 
     void CollisionSystem::ResolveContact(ContactEvent& event)
     {
-        // std::cout << " ===== SOLVE COLLISION " << (int)event.a << " " << (int)event.b << "\n";
-        // std::cout << "       normal: " << glm::to_string(event.data.normal) << "\n";
+        std::cout << " ===== SOLVE COLLISION " << (int)event.a << " " << (int)event.b << "\n";
+        std::cout << "       normal: " << glm::to_string(event.data.normal) << "\n";
 
         auto& reg = *(event.reg);
         entt::entity rootA = GetRootEntity(reg, event.a);
@@ -215,7 +216,7 @@ namespace tomato
         TransformComponent& trf, VelocityComponent& vel,
         const glm::vec3& normal, const float weight, const float hitTime)
     {
-        // std::cout << "   CC     " << glm::to_string(normal) << " " << weight << " " << hitTime << "\n";
+        std::cout << "   CC     " << glm::to_string(normal) << " " << weight << " " << hitTime << "\n";
         // std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Move
@@ -239,7 +240,7 @@ namespace tomato
         TransformComponent& trf, VelocityComponent& vel,
         const glm::vec3& normal, const float weight, const float distance)
     {
-        // std::cout << "    DC    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
+        std::cout << "    DC    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
         // std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Move
@@ -270,7 +271,7 @@ namespace tomato
         TransformComponent& trf,
         const glm::vec3& normal, const float weight, const float distance)
     {
-        // std::cout << "    PE    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
+        std::cout << "    PE    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
         // std::cout << "         position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
         trf.AddPosition(normal * (-distance + COLLISION_SKIN) * weight);
         // std::cout << "         position P: " << glm::to_string(trf.GetLocalPosition()) << "\n";
