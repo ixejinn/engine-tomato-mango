@@ -41,10 +41,10 @@ namespace tomato
 
 	struct BlendState
 	{
-		bool enabled = false;
+		bool enabled = true;
 		GLenum srcColor = GL_SRC_ALPHA;
 		GLenum dstColor = GL_ONE_MINUS_SRC_ALPHA;
-		GLenum srcAlpha = GL_ONE;
+		GLenum srcAlpha = GL_SRC_ALPHA;
 		GLenum dstAlpha = GL_ONE_MINUS_SRC_ALPHA;
 		GLenum equation = GL_FUNC_ADD;
 
@@ -61,7 +61,7 @@ namespace tomato
 		bool operator==(const PipelineState&) const = default;
 	};
 
-	namespace PilelinePresets
+	namespace PipelinePresets
 	{
 		inline constexpr PipelineState Opaque{};
 
@@ -95,7 +95,11 @@ namespace tomato
 
 	private:
 		void ApplyDepth(const DepthState& depth);
+		void ApplyStencil(const StencilState& stencil);
+		void ApplyRaster(const RasterState& raster);
+		void ApplyBlend(const BlendState& blend);
 
+		void ForceApply(const PipelineState& state); // 기본 값으로 강제 적용, Invalidate에서 호출
 	private:
 		PipelineState current_;
 
