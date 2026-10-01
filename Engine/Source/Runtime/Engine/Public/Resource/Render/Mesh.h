@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
-
+#include "Render/SortIndex.h"
 #include "Math/AABB.h"
 
 namespace tomato
@@ -21,7 +21,7 @@ namespace tomato
             : position(pos), normal(normal), uv(uv) {}
     };
 
-    class Mesh
+    class Mesh : public SortIndexed<Mesh>
     {
     public:
 #define TMT_MESH_PRIMITIVE_LIST(X)  \

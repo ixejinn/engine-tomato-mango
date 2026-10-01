@@ -4,9 +4,12 @@
 #include <filesystem>
 #include <vector>
 #include <glad/glad.h>
+#include "Render/SortIndex.h"
 
-namespace tomato {
-    class Texture {
+namespace tomato
+{
+    class Texture : public SortIndexed<Texture>
+    {
     public:
         enum class Format
         {

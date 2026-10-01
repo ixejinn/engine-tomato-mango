@@ -216,6 +216,8 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Math/Angle.h
 		Source/Runtime/Engine/Public/Collision/Layer/CollisionLayerTypes.h
 		Source/Runtime/Engine/Public/Collision/Collider/ColliderTypes.h
+		Source/Runtime/Engine/Public/Render/SortKey.h
+		Source/Runtime/Engine/Public/Render/SortIndex.h
 )
 
 set(ENGINE_SOURCES
