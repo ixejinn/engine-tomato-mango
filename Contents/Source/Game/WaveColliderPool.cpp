@@ -7,7 +7,6 @@
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Target.h"
 #include "ECS/Components/Visibility.h"
-#include "ECS/Components/Lifetime.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/EditorTag.h"
 #include "WaveComponent.h"

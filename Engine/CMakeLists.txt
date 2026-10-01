@@ -218,7 +218,10 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Collision/Collider/ColliderTypes.h
         Source/Runtime/Engine/Public/Render/GLStateCache.h
         Source/Runtime/Engine/Public/Render/GLStateFwd.h
- )
+		Source/Runtime/Engine/Public/Render/SortKey.h
+		Source/Runtime/Engine/Public/Render/SortIndex.h
+		Source/Runtime/Engine/Private/ECS/Components/PendingDestroy.h
+)
 
 set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp

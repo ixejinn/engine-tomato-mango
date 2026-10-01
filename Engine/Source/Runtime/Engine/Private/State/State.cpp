@@ -3,7 +3,10 @@
 #include "State/StateRegistry.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/Entity/Entity.h"
+#include "ECS/Entity/Hierarchy.h"
 #include "ECS/Components/EditorTag.h"
+#include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/PendingDestroy.h"
 #include "Particle/ParticleEmitterPool.h"
 #include "Prefab/Prefab.h"
 #include "Utils/PassKey.h"
@@ -13,6 +16,10 @@ namespace tomato
 {
     State::State(Engine& engine) : engine_(engine)
     {
+        registry_.on_construct<PendingDestroyComponent>().template connect<&OnPendingDestroyComponentConstructed>();
+        registry_.on_destroy<ActiveTag>().template connect<&OnActiveTagDestroyed>();
+        registry_.on_destroy<HierarchyComponent>().template connect<&OnHierarchyComponentDestroyed>();
+
         registry_.ctx().emplace<RenderContext>();
         registry_.ctx().emplace<CollisionContext>();
         registry_.ctx().emplace<UIContext>();

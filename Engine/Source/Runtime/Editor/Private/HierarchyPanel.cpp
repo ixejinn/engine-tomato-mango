@@ -25,6 +25,7 @@
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Particle.h"
 #include "ECS/Components/EditorTag.h"
+#include "ECS/Components/PendingDestroy.h"
 #include "Particle/ParticleEmitterPool.h"
 
 #include "ECS/Entity/Hierarchy.h"
@@ -68,7 +69,7 @@ namespace tomato
 			{
 				int node_n = 0;
 
-				auto view = editorCtx.currentState->GetRegistry().view<RootEntityTag, NametagComponent>();
+				auto view = editorCtx.currentState->GetRegistry().view<ActiveTag, RootEntityTag, NametagComponent>();
 
 				for (auto [e, tag] : view.each())
 				{
@@ -347,7 +348,8 @@ namespace tomato
 		auto& reg = editorCtx.currentState->GetRegistry();
 		if (ImGui::MenuItem("Delete"))
 		{
-			DestroyHierarchySubtree(reg, editorCtx.selectedEntity);
+//			DestroyHierarchySubtree(reg, editorCtx.selectedEntity);
+            reg.emplace<PendingDestroyComponent>(editorCtx.selectedEntity, editorCtx.tick);
 			editorCtx.selectedEntity = entt::null;
 			editorCtx.sceneDirty = true;
 		}

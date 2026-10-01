@@ -255,10 +255,10 @@ namespace tomato::Serialization
 		auto view = reg.view<HierarchyComponent>();
 		for (auto [e, hierarchy] : view.each())
 		{
-			hierarchy.parent =
-				hierarchy.parentUUID == 0 ? entt::null : entityMap[hierarchy.parentUUID];
-			for (auto child : hierarchy.childrenUUID)
-				hierarchy.children.push_back(entityMap[child]);
+//			hierarchy.parent =
+//				hierarchy.parentUUID == 0 ? entt::null : entityMap[hierarchy.parentUUID];
+//			for (auto child : hierarchy.childrenUUID)
+//				hierarchy.children.push_back(entityMap[child]);
 		}
 	}
 
@@ -694,16 +694,16 @@ namespace tomato::Serialization
 
 	void Save(json& data, const HierarchyComponent& hierarchy)
 	{
-		data["parent"] = hierarchy.parentUUID;
-		data["children"] = hierarchy.childrenUUID;
+//		data["parent"] = hierarchy.parentUUID;
+//		data["children"] = hierarchy.childrenUUID;
 	}
 
 	void Load(const json& data, HierarchyComponent& hierarchy)
 	{
-		hierarchy.childrenUUID.clear();
-
-		hierarchy.parentUUID = data["parent"];
-		hierarchy.childrenUUID = data["children"].get<std::vector<UUID>>();
+//		hierarchy.childrenUUID.clear();
+//
+//		hierarchy.parentUUID = data["parent"];
+//		hierarchy.childrenUUID = data["children"].get<std::vector<UUID>>();
 	}
 
 	void Save(json& data, const RootEntityTag& rootTag) {}

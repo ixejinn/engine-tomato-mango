@@ -10,7 +10,7 @@ namespace tomato {
     void SetHierarchy(entt::registry& registry, entt::entity parent, entt::entity child);
     bool IsDescendant(entt::registry& registry, entt::entity descendant, entt::entity ancestor);
 
-    void DestroyHierarchySubtree(entt::registry& registry, entt::entity entity);
+    void OnHierarchyComponentDestroyed(entt::registry& registry, entt::entity entity);
 }
 
 #endif //MANGO_ENTITY_HIERARCHY_H

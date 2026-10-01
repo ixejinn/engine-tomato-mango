@@ -1,4 +1,4 @@
-#ifndef MANGO_GLSTATECACHE_H
+ï»¿#ifndef MANGO_GLSTATECACHE_H
 #define MANGO_GLSTATECACHE_H
 
 #include <cstdint>
@@ -13,7 +13,7 @@ namespace tomato
 		bool writeEnabled = true;
 		GLenum func = GL_LESS;
 
-		bool operator==(const DepthState&) const = default; // !=´Â ÀÚµ¿À¸·Î »ı¼º
+		bool operator==(const DepthState&) const = default; // !=ëŠ” ìë™ìœ¼ë¡œ ìƒì„±
 	};
 
 	struct StencilState
@@ -78,7 +78,7 @@ namespace tomato
 			.blend = {.enabled = true },
 		};
 
-		// RenderSystemÀÇ ±âº» 3D ·»´õ »óÅÂ
+		// RenderSystemì˜ ê¸°ë³¸ 3D ë Œë” ìƒíƒœ
 		inline constexpr PipelineState Default3D
 		{
 			.stencil = {.enabled = true, .dppass = GL_REPLACE },
@@ -114,14 +114,14 @@ namespace tomato
 		void ApplyRaster(const RasterState& raster);
 		void ApplyBlend(const BlendState& blend);
 
-		void ForceApply(const PipelineState& state); // ±âº» °ªÀ¸·Î °­Á¦ Àû¿ë, Invalidate¿¡¼­ È£Ãâ
+		void ForceApply(const PipelineState& state); // ê¸°ë³¸ ê°’ìœ¼ë¡œ ê°•ì œ ì ìš©, Invalidateì—ì„œ í˜¸ì¶œ
 	private:
 		PipelineState current_;
 
-		// ÇöÀç GL¿¡ ¹ÙÀÎµùµÈ ÇÚµé
+		// í˜„ì¬ GLì— ë°”ì¸ë”©ëœ í•¸ë“¤
 		GLuint program_{ 0 };
 		GLuint vao_{ 0 };
-		std::array<GLuint, 16> textures_{}; // ÇöÀç´Â unit 0¹ø ¹Û¿¡ ¾È ¾²Áö¸¸ È®Àå °í·ÁÇØ¼­ array »ç¿ë
+		std::array<GLuint, 16> textures_{}; // í˜„ì¬ëŠ” unit 0ë²ˆ ë°–ì— ì•ˆ ì“°ì§€ë§Œ í™•ì¥ ê³ ë ¤í•´ì„œ array ì‚¬ìš©
 	};
 }
 #endif // !MANGO_GLSTATECACHE_H

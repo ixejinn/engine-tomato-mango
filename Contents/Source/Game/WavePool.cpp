@@ -5,7 +5,6 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Visibility.h"
-#include "ECS/Components/Lifetime.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Character.h"
 #include "ECS/Components/EditorTag.h"

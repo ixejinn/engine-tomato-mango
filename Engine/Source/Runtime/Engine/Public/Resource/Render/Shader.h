@@ -4,9 +4,12 @@
 #include <filesystem>
 #include <glm/fwd.hpp>
 #include <glad/glad.h>
+#include "Render/SortIndex.h"
 
-namespace tomato {
-    class Shader {
+namespace tomato
+{
+    class Shader : public SortIndexed<Shader>
+    {
     public:
         constexpr static auto PrimitiveName = "Shader::Primitive";
 
@@ -39,7 +42,8 @@ namespace tomato {
         void SetUniformMat4(const char* name, glm::mat4 value) const;
 
     private:
-        enum Type {
+        enum Type
+        {
             Vertex,
             Fragment,
             Program
