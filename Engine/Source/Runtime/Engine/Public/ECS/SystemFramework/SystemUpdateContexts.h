@@ -8,6 +8,7 @@
 #include "Network/ClientNetwork.h"
 #include "Collision/CollisionFwd.h"
 #include "Collision/CollisionCache.h"
+#include "Render/GLStateCache.h"
 
 namespace tomato
 {
@@ -33,6 +34,8 @@ namespace tomato
 
         entt::entity skybox{entt::null};
         entt::entity viewGizmo{entt::null};
+
+        GLStateCache glState;
     };
 
     struct UIContext

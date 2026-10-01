@@ -2,6 +2,11 @@
 
 namespace tomato
 {
+	GLStateCache::GLStateCache()
+	{
+		Invalidate();
+	}
+
 	void GLStateCache::Apply(const PipelineState& state)
 	{
 		if (state == current_) return;
@@ -32,6 +37,7 @@ namespace tomato
 	{
 		if (unit >= textures_.size()) return;
 		if (textures_[unit] == tex) return;
+
 		glBindTextureUnit(unit, tex);
 		textures_[unit] = tex;
 	}
@@ -59,11 +65,13 @@ namespace tomato
 
 	void GLStateCache::Invalidate()
 	{
-		ForceApply(PipelineState{});
+		ForceApply(PipelineState{PipelinePresets::Default3D});
 
 		glUseProgram(0);
 		glBindVertexArray(0);
 		glBindTextures(0, static_cast<GLsizei>(textures_.size()), nullptr);
+		
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 		program_ = 0;
 		vao_ = 0;

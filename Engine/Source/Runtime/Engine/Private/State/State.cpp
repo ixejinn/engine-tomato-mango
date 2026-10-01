@@ -7,6 +7,7 @@
 #include "Particle/ParticleEmitterPool.h"
 #include "Prefab/Prefab.h"
 #include "Utils/PassKey.h"
+#include "Render/GLStateCache.h"
 
 namespace tomato
 {

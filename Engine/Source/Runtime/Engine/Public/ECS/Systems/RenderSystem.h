@@ -13,10 +13,10 @@ namespace tomato
 
         void Update(SimContext& simCtx) override;
 
-    private:
+    private:/*
         AssetID curMesh_;
         AssetID curShader_;
-        AssetID curTexture_;
+        AssetID curTexture_;*/
     };
 }
 

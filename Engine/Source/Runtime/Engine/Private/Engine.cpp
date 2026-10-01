@@ -3,6 +3,7 @@
 
 #include "Event/EventDispatcher.h"
 #include "Simulation/Tick/TickClock.h"
+#include "Render/GLStateCache.h"
 #include "State/DefaultState.h"
 #include "ECS/Systems/GarbageEntityCollectionSystem.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
@@ -184,6 +185,10 @@ namespace tomato {
         editor_.BeginFrame();
         editor_.Draw(currState_.get(), mode);
         editor_.EndFrame();
+
+        // GL 상태 값 초기화
+        if(currState_)
+            currState_.get()->GetRegistry().ctx().get<RenderContext>().glState.Invalidate();
     }
 
     void Engine::ChangeState(TickClock& tc)

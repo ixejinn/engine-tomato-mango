@@ -217,6 +217,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Collision/Layer/CollisionLayerTypes.h
 		Source/Runtime/Engine/Public/Collision/Collider/ColliderTypes.h
         Source/Runtime/Engine/Public/Render/GLStateCache.h
+        Source/Runtime/Engine/Public/Render/GLStateFwd.h
  )
 
 set(ENGINE_SOURCES

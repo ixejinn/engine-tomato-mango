@@ -20,22 +20,7 @@
 namespace tomato
 {
     RenderSystem::RenderSystem()
-    : curMesh_(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)))
-    , curShader_(GetAssetID(Shader::PrimitiveName))
-    , curTexture_(GetAssetID(Texture::PrimitiveName))
     {
-        glEnable(GL_STENCIL_TEST);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-        // Enable depth test
-        glEnable(GL_DEPTH_TEST);
-
-        // Enable color blending and set blend function for alpha transparency
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
         AssetRegistry<Mesh>::GetInstance().CreatePrimitives();
         AssetRegistry<Texture>::GetInstance().CreatePrimitives();
         AssetRegistry<Shader>::GetInstance().CreatePrimitives();
@@ -51,10 +36,11 @@ namespace tomato
         const entt::entity skybox = renderCtx.skybox;
         const entt::entity viewGizmo = renderCtx.viewGizmo;
 
+        auto& gl = renderCtx.glState;
         glClearColor(0.f, 0.f, 0.f, 1.0f);
-        //glStencilMask(0xFF);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        
+        gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        gl.Apply(PipelinePresets::Default3D);
+
         // Get main camera from render context
         if (mainCam == entt::null)
         {
@@ -63,13 +49,8 @@ namespace tomato
         }
         auto* mainCamComp = registry.try_get<CameraComponent>(mainCam);
 
-        Mesh* mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
-        mesh->Bind();
-
-        Shader* shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
-        shader->Use();
-
-        AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
+        AssetID curMesh = 0, curShader = 0, curTexture = 0;
+        Mesh* mesh = nullptr; Shader* shader = nullptr; Texture* texture = nullptr;
 
         auto group = registry.group<TransformComponent, RenderComponent>();
         for (auto [e, trf, render] : group.each()) {
@@ -78,69 +59,45 @@ namespace tomato
             if (!IsVisible(registry, e))
                 continue;
 
-            if (registry.get<NametagComponent>(e).name == "Ground")
-            {
-                //glDisable(GL_DEPTH_TEST);
-                glStencilFunc(GL_ALWAYS, 1, 0xFF);
-                glStencilMask(0xFF);
-                //std::cout << registry.get<NametagComponent>(e).name << '\n';
-            }
-            else if (registry.get<NametagComponent>(e).name == "Ground2")
-            {
-                glStencilFunc(GL_EQUAL, 1, 0xFF);
-                glStencilMask(0x00);
-                //glDisable(GL_DEPTH_TEST);
-               // std::cout << registry.get<NametagComponent>(e).name << '\n';
-            }
-            else
-            {
-                glStencilMask(0x00);
-                glStencilFunc(GL_ALWAYS, 1, 0xFF);
-                glEnable(GL_DEPTH_TEST);
-            }
-
             if (render.shader == 0)
                 render.shader = GetAssetID(Shader::PrimitiveName);
                 
-            if (curShader_ != render.shader)
+            if (curShader != render.shader)
             {
-                curShader_ = render.shader;
-                shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
-                shader->Use();
+                curShader = render.shader;
+                shader = AssetRegistry<Shader>::GetInstance().Get(curShader);
+                gl.UseShader(shader->GetHandle());
             }
 
             if (render.texture == 0)
                 render.texture = GetAssetID(Texture::PrimitiveName);
-            if (curTexture_ != render.texture)
+            if (curTexture != render.texture)
             {
-                curTexture_ = render.texture;
-                AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
+                curTexture = render.texture;
+                texture = AssetRegistry<Texture>::GetInstance().Get(curTexture);
+                gl.BindTexture(texture->GetHandle());
             }
             
             if (render.mesh == 0)
                 render.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube));
-            if (curMesh_ == GetAssetID("Primitive::OpenCylinder_50_10"))
-            {
-                glStencilFunc(GL_EQUAL, 1, 0xFF);
-                glStencilMask(0x00);
-                glDisable(GL_CULL_FACE);
-            }
-            else
-                glEnable(GL_CULL_FACE);
 
-            if (curMesh_ != render.mesh)
+            if (curMesh != render.mesh)
             {
-                curMesh_ = render.mesh;
-                if (curMesh_ == GetAssetID("Primitive::OpenCylinder_50_10"))
+                curMesh = render.mesh;
+                PipelineState state = PipelinePresets::Default3D;
+
+                if (curMesh == GetAssetID("Primitive::OpenCylinder_50_10"))
                 {
-                    glStencilFunc(GL_EQUAL, 1, 0xFF);
-                    glStencilMask(0x00);
-                    glDisable(GL_CULL_FACE);
+                    state.raster.cullEnabled = false;
+
+                    state.stencil.func = GL_EQUAL;
+                    state.stencil.ref = 1;
+                    state.stencil.writeMask = 0x00;
                 }
-                else
-                    glEnable(GL_CULL_FACE);
-                mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
-                mesh->Bind();
+                gl.Apply(state);
+
+                mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh);
+                gl.BindVertexArray(mesh->GetHandle());
             }
 
             const auto& mtx = trf.GetTransformMatrix();
@@ -162,17 +119,16 @@ namespace tomato
         {
             if (IsVisible(registry, skybox))
             {
-                glCullFace(GL_FRONT);
-                glDepthFunc(GL_LEQUAL);
+                gl.Apply(PipelinePresets::Skybox);
 
                 Shader* skyShader = AssetRegistry<Shader>::GetInstance().Get(GetAssetID("SkyboxShader"));
-                skyShader->Use();
+                gl.UseShader(skyShader->GetHandle());
 
                 Texture* skyTexture = AssetRegistry<Texture>::GetInstance().Get(GetAssetID("PrimitiveSkybox"));
-                skyTexture->Bind();
+                gl.BindTexture(skyTexture->GetHandle());
 
                 Mesh* skyMesh = AssetRegistry<Mesh>::GetInstance().Get(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube)));
-                skyMesh->Bind();
+                gl.BindVertexArray(skyMesh->GetHandle());
 
                 skyShader->SetUniformMat4("uModel", glm::mat4(1.f));
                 glm::mat4 viewProj{ 1.f };
@@ -186,15 +142,14 @@ namespace tomato
 
                 skyMesh->Draw();
 
-                glCullFace(GL_BACK);
-                glDepthFunc(GL_LESS);
+                gl.Apply(PipelinePresets::Default3D);
             }
         }
 
         if (viewGizmo != entt::null)
         {
-            glViewport(-80, -80, 300, 300);
-            glClear(GL_DEPTH_BUFFER_BIT);
+            gl.SetViewport(-80, -80, 300, 300);
+            gl.Clear(GL_DEPTH_BUFFER_BIT);
 
             glm::vec3 viewGizmoLight =
                     registry.get<TransformComponent>(mainCam).GetWorldQuaternion() * glm::vec3(0, 0, 1);
@@ -203,16 +158,17 @@ namespace tomato
             auto& viewGizmoTrfMtx = registry.get<TransformComponent>(viewGizmo).GetTransformMatrix();
             auto& viewGizmoRender = registry.get<RenderComponent>(viewGizmo);
 
-            curShader_ = viewGizmoRender.shader;
-            shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
-            shader->Use();
+            curShader = viewGizmoRender.shader;
+            shader = AssetRegistry<Shader>::GetInstance().Get(curShader);
+            gl.UseShader(shader->GetHandle());
 
-            curTexture_ = viewGizmoRender.texture;
-            AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
+            curTexture = viewGizmoRender.texture;
+            texture = AssetRegistry<Texture>::GetInstance().Get(curTexture);
+            gl.BindTexture(texture->GetHandle());
 
-            curMesh_ = viewGizmoRender.mesh;
-            mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
-            mesh->Bind();
+            curMesh = viewGizmoRender.mesh;
+            mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh);
+            gl.BindVertexArray(mesh->GetHandle());
 
             shader->SetUniformMat4("uModel", viewGizmoTrfMtx);
             shader->SetUniformMat4("uViewProj",
@@ -228,7 +184,7 @@ namespace tomato
 
             // Render view gizmo axis
             mesh = AssetRegistry<Mesh>::GetInstance().Get(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)));
-            mesh->Bind();
+            gl.BindVertexArray(mesh->GetHandle());
 
             auto& gizmoAxes = registry.get<HierarchyComponent>(viewGizmo).children;
             for (const entt::entity axis : gizmoAxes)
@@ -249,7 +205,7 @@ namespace tomato
                 mesh->Draw();
             }
 
-            glViewport(0, 0, Window::GetWidth(), Window::GetHeight());
+            gl.SetViewport(0, 0, Window::GetWidth(), Window::GetHeight());
         }
 
         CPU_PROFILER_BLOCK_END(RenderSystem::Update);

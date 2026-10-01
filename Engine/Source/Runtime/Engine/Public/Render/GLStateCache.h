@@ -41,7 +41,7 @@ namespace tomato
 
 	struct BlendState
 	{
-		bool enabled = true;
+		bool enabled = false;
 		GLenum srcColor = GL_SRC_ALPHA;
 		GLenum dstColor = GL_ONE_MINUS_SRC_ALPHA;
 		GLenum srcAlpha = GL_SRC_ALPHA;
@@ -63,24 +63,39 @@ namespace tomato
 
 	namespace PipelinePresets
 	{
-		inline constexpr PipelineState Opaque{};
+		inline constexpr PipelineState Opaque {};
 
 		inline constexpr PipelineState Transparent
 		{
 			.depth = {.testEnabled = true, .writeEnabled = false, .func = GL_LESS },
-			.blend = {.enabled = true},
+			.blend = {.enabled = true },
 		};
 
 		inline constexpr PipelineState Skybox
 		{
 			.depth = {.testEnabled = true, .writeEnabled = false, .func = GL_LEQUAL },
-			.raster = {.cullEnabled = true, .cullFace = GL_FRONT},
+			.raster = {.cullEnabled = true, .cullFace = GL_FRONT },
+			.blend = {.enabled = true },
+		};
+
+		// RenderSystem의 기본 3D 렌더 상태
+		inline constexpr PipelineState Default3D
+		{
+			.stencil = {.enabled = true, .dppass = GL_REPLACE },
+			.blend = {.enabled = true },
+		};
+
+		inline constexpr PipelineState ScreenUI
+		{
+
 		};
 	}
 
 	class GLStateCache
 	{
 	public:
+		GLStateCache();
+
 		void Apply(const PipelineState& state);
 
 		void UseShader(GLuint program);
@@ -106,7 +121,7 @@ namespace tomato
 		// 현재 GL에 바인딩된 핸들
 		GLuint program_{ 0 };
 		GLuint vao_{ 0 };
-		std::array<GLuint, 16> textures_{};
+		std::array<GLuint, 16> textures_{}; // 현재는 unit 0번 밖에 안 쓰지만 확장 고려해서 array 사용
 	};
 }
 #endif // !MANGO_GLSTATECACHE_H
