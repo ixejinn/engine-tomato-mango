@@ -8,6 +8,7 @@
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/ActiveTag.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Resource/AssetHash.h"
 #include "Resource/AssetRegistry.h"
@@ -232,9 +233,12 @@ namespace tomato
         auto& texRegistry = AssetRegistry<Texture>::GetInstance();
         auto& meshRegistry = AssetRegistry<Mesh>::GetInstance();
 
-        auto view = registry.view<ActiveTag, TransformComponent, RenderComponent>();
-        for (auto [e, trf, render] : view.each())
+        auto view = registry.view<ActiveTag, VisibilityComponent, TransformComponent, RenderComponent>();
+        for (const auto& [e, visibility, trf, render] : view.each())
         {
+            if (!visibility.visible)
+                continue;
+
             if (render.priority == RenderPriority::Transparent)
                 drawList_.emplace_back(GetTransparentSortKey(
                     render.priority,
