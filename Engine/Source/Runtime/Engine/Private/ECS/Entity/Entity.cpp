@@ -6,29 +6,12 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Visibility.h"
+#include "ECS/Components/ActiveTag.h"
 
 #include "Resource/AssetHash.h"
 
 namespace tomato
 {
-	bool ContainsUUID(entt::registry& reg, UUID id)
-	{
-		auto view = reg.view<NametagComponent>();
-		for (auto [e, tag] : view.each())
-			return tag.id == id;
-
-		return false;
-	}
-
-	bool ContainsName(entt::registry& reg, std::string_view name)
-	{
-		auto view = reg.view<NametagComponent>();
-		for (auto [e, tag] : view.each())
-			return tag.name == name;
-
-		return false;
-	}
-
 	entt::entity GetEntityByUUID(entt::registry& reg, UUID id)
 	{
 		if (id == 0)
@@ -51,6 +34,11 @@ namespace tomato
 		return e == entt::null ? 0 : tag->id;
 	}
 
+    bool IsVisible(const VisibilityComponent& visibility)
+    {
+        return visibility.visible && visibility.inheritedVisible;
+    }
+
 	bool IsVisible(entt::registry& reg, entt::entity e)
 	{
 		auto* v = reg.try_get<VisibilityComponent>(e);
@@ -60,11 +48,29 @@ namespace tomato
 		throw std::runtime_error("Not found Visibility Component");
 	}
 
-    void DestroyEntity(entt::registry& reg, entt::entity e) {
-        if (reg.try_get<HierarchyComponent>(e))
-            DestroyHierarchySubtree(reg, e);
-        else
-            reg.destroy(e);
+    void OnVisibilityComponentUpdated(entt::registry& registry, entt::entity e)
+    {
+        auto& visibility = registry.get<VisibilityComponent>(e);
+
+//        if (auto* hierarchy = registry.try_get<HierarchyComponent>(e))
+//        {
+//            for (entt::entity child : hierarchy->children)
+//                registry.remove<ActiveTag>(child);
+//        }
+    }
+
+    void OnPendingDestroyComponentConstructed(entt::registry& registry, entt::entity e)
+    {
+        registry.remove<ActiveTag>(e);
+    }
+
+    void OnActiveTagDestroyed(entt::registry& registry, entt::entity e)
+    {
+        if (auto* hierarchy = registry.try_get<HierarchyComponent>(e))
+        {
+            for (entt::entity child : hierarchy->children)
+                registry.remove<ActiveTag>(child);
+        }
     }
 
 	void EntityNameGenerator::Initialize(entt::registry& reg)

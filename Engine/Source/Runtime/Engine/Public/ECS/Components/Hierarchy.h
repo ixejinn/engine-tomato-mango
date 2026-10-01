@@ -12,8 +12,8 @@ namespace tomato
 
     struct HierarchyComponent
     {
-        UUID parentUUID{0};
-        std::vector<UUID> childrenUUID;
+//        UUID parentUUID{0};
+//        std::vector<UUID> childrenUUID;
 
         //cache
         entt::entity root{entt::null};

@@ -7,7 +7,6 @@
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/EditorTag.h"
 #include "ECS/Components/Hierarchy.h"
-#include "ECS/Components/Lifetime.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Particle.h"

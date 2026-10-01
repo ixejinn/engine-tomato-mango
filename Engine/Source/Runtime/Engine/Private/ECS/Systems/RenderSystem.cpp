@@ -236,7 +236,7 @@ namespace tomato
         auto view = registry.view<ActiveTag, VisibilityComponent, TransformComponent, RenderComponent>();
         for (const auto& [e, visibility, trf, render] : view.each())
         {
-            if (!visibility.visible)
+            if (!IsVisible(visibility))
                 continue;
 
             if (render.priority == RenderPriority::Transparent)

@@ -6,18 +6,19 @@
 #include <entt/fwd.hpp>
 #include "UUID.h"
 #include "Resource/ResourceFwd.h"
+#include "ECS/Forward/EntityCompFwd.h"
 
 namespace tomato
 {
-	bool ContainsUUID(entt::registry& reg, UUID id);
-	bool ContainsName(entt::registry& reg, std::string_view name);
-
 	entt::entity GetEntityByUUID(entt::registry& reg, UUID id);
 	UUID GetUUID(entt::registry& reg, entt::entity e);
 
+    bool IsVisible(const VisibilityComponent& visibility);
 	bool IsVisible(entt::registry& reg, entt::entity e);
 
-	void DestroyEntity(entt::registry& reg, entt::entity e);
+    void OnVisibilityComponentUpdated(entt::registry& registry, entt::entity e);
+    void OnPendingDestroyComponentConstructed(entt::registry& registry, entt::entity e);
+    void OnActiveTagDestroyed(entt::registry& registry, entt::entity e);
 
 	class EntityNameGenerator
 	{

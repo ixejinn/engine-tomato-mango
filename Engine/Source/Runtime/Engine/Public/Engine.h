@@ -72,7 +72,7 @@ namespace tomato
 
         void FixedUpdate(TickClock& tc, SimContext& simCtx, RunMode mode);
         void Update(SimContext& simCtx, RunMode mode);
-        void UpdateEditor(RunMode& mode);
+        void UpdateEditor(uint64_t tick, RunMode& mode);
 
         SystemManager systemManager_;
 
