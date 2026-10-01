@@ -1,18 +1,21 @@
-﻿#include <glm/glm.hpp>
+﻿#include <algorithm>
+#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "ECS/Systems/RenderSystem.h"
 #include "ECS/Entity/Entity.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Render.h"
-#include "ECS/Components/Visibility.h"
 #include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/ActiveTag.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Resource/AssetHash.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
+#include "Render/SortKey.h"
 #include "Services/Window.h"
 #include "Profiler/CPUProfiler.h"
 
@@ -40,6 +43,8 @@ namespace tomato
     void RenderSystem::Update(SimContext& simCtx)
     {
         CPU_PROFILER_BLOCK_BEGIN(RenderSystem::Update);
+        UpdateDrawList(simCtx);
+
         auto& registry = simCtx.state->GetRegistry();
 
         auto& renderCtx = registry.ctx().get<RenderContext>();
@@ -214,5 +219,39 @@ namespace tomato
         }
 
         CPU_PROFILER_BLOCK_END(RenderSystem::Update);
+    }
+
+    void RenderSystem::UpdateDrawList(SimContext& simCtx)
+    {
+        drawList_.clear();
+
+        auto& registry = simCtx.state->GetRegistry();
+        const entt::entity mainCam = registry.ctx().get<RenderContext>().mainCam;
+        const auto& posCam = registry.get<TransformComponent>(mainCam).GetWorldPosition();
+
+        auto& shaderRegistry = AssetRegistry<Shader>::GetInstance();
+        auto& texRegistry = AssetRegistry<Texture>::GetInstance();
+        auto& meshRegistry = AssetRegistry<Mesh>::GetInstance();
+
+        auto view = registry.view<ActiveTag, VisibilityComponent, TransformComponent, RenderComponent>();
+        for (const auto& [e, visibility, trf, render] : view.each())
+        {
+            if (!IsVisible(visibility))
+                continue;
+
+            if (render.priority == RenderPriority::Transparent)
+                drawList_.emplace_back(GetTransparentSortKey(
+                    render.priority,
+                    glm::length2(trf.GetWorldPosition() - posCam),
+                    shaderRegistry.Get(render.shader)->GetSortIndex()), e);
+            else
+                drawList_.emplace_back(GetOpaqueSortKey(
+                    render.priority,
+                    shaderRegistry.Get(render.shader)->GetSortIndex(),
+                    texRegistry.Get(render.texture)->GetSortIndex(),
+                    meshRegistry.Get(render.mesh)->GetSortIndex()), e);
+        }
+
+        std::ranges::sort(drawList_, std::ranges::less{}, &DrawItem::sortKey);
     }
 }

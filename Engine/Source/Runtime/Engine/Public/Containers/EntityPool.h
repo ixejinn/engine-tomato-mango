@@ -2,10 +2,10 @@
 #define MANGO_ENTITYPOOL_H
 
 #include <entt/entt.hpp>
-#include "Utils/PassKey.h"
 #include "ECS/Components/ActiveTag.h"
-#include "Prefab/Prefab.h"
+#include "Utils/PassKey.h"
 #include "Utils/Logger.h"
+#include "Prefab/Prefab.h"
 #include "GameNetwork/Rollback/RollbackFwd.h"
 
 namespace tomato
@@ -158,8 +158,7 @@ namespace tomato
 		entry.state = _entityPoolDetail::EntryState::Free;
 		freeIndices_[freeEntityCount_++] = entryIdx->index;
 
-		registry.erase<ActiveTag>(entity);		// Remove ActiveTag fast.
-		// registry_.remove<ActiveTag>(entity);	// Remove ActiveTag safely.
+		registry.remove<ActiveTag>(entity);
 		if constexpr (HasDeactivate<Traits>)
 		{
 			if (!Traits::Deactivate(registry, entity))

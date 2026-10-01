@@ -10,6 +10,8 @@ namespace tomato
 {
 	struct EditorContext
 	{
+        uint64_t tick;
+
 		State* currentState;
 		entt::entity selectedEntity;
 

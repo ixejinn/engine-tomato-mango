@@ -116,7 +116,7 @@ namespace tomato {
             FixedUpdate(tickClock, simCtx, runMode);
 
             Update(simCtx, runMode);
-            UpdateEditor(runMode);
+            UpdateEditor(tickClock.GetTick(), runMode);
 
             CPU_PROFILER_TOTAL_END()
 
@@ -179,10 +179,10 @@ namespace tomato {
         systemManager_.Update(simCtx, mode);
     }
 
-    void Engine::UpdateEditor(RunMode& mode)
+    void Engine::UpdateEditor(uint64_t tick, RunMode& mode)
     {
         editor_.BeginFrame();
-        editor_.Draw(currState_.get(), mode);
+        editor_.Draw(tick, currState_.get(), mode);
         editor_.EndFrame();
     }
 

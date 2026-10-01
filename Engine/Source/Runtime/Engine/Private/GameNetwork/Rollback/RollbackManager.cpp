@@ -1,16 +1,12 @@
 #include <entt/entt.hpp>
 #include "GameNetwork/Rollback/RollbackManager.h"
 #include "GameNetwork/Rollback/SnapshotTimeline.h"
-#include "ECS/Components/Lifetime.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 
 namespace tomato {
     RollbackManager::RollbackManager() {
         timelines_.emplace_back(std::make_unique<SnapshotTimeline<CollisionContext>>());
-
-        timelines_.emplace_back(std::make_unique<SnapshotTimeline<LifetimeComponent>>());
-        registered_.insert(typeid(LifetimeComponent));
 
         timelines_.emplace_back(std::make_unique<SnapshotTimeline<TransformComponent>>());
         registered_.insert(typeid(TransformComponent));

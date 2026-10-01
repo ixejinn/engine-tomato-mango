@@ -2,12 +2,14 @@
 #include "Prefab/Prefab.h"
 #include "GameObject/Character/CharacterConfig.h"
 #include "ECS/Components/Components.h"
+#include "ECS/Components/ActiveTag.h"
+#include "ECS/Components/Visibility.h"
 #include "ECS/Entity/Hierarchy.h"
+#include "ECS/Entity/Entity.h"
 #include "Resource/AssetHash.h"
 #include "Resource/Render/Mesh.h"
 #include "Resource/Render/Shader.h"
 #include "Resource/Render/Texture.h"
-#include "ECS/Entity/Entity.h"
 #include "Utils/Logger.h"
 
 namespace tomato::Prefab
