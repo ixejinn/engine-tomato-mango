@@ -388,17 +388,17 @@ namespace tomato::Serialization
 		ofs << root.dump(4);
 	}
 
-	void Save(json& data, const VisibilityComponent& visibility)
+	void Save(json& data, entt::registry& registry, const VisibilityComponent& visibility)
 	{
 		data["visible"] = visibility.visible;
 	}
 
-	void Load(const json& data, VisibilityComponent& visibility)
+	void Load(const json& data, entt::registry& registry, VisibilityComponent& visibility)
 	{
 		visibility.visible = data["visible"];
 	}
 
-	void Save(json& data, const CameraComponent& camera)
+	void Save(json& data, entt::registry& registry, const CameraComponent& camera)
 	{
 		data["mode"] = camera.mode;
 		data["degree"] = camera.degree;
@@ -406,7 +406,7 @@ namespace tomato::Serialization
 		data["zFar"] = camera.zFar;
 	}
 
-	void Load(const json& data, CameraComponent& camera)
+	void Load(const json& data, entt::registry& registry, CameraComponent& camera)
 	{
 		camera.mode = data["mode"];
 		camera.degree = data["degree"];
@@ -414,19 +414,19 @@ namespace tomato::Serialization
 		camera.zFar = data["zFar"];
 	}
 
-	void Save(json& data, const InputChannelComponent& channel)
+	void Save(json& data, entt::registry& registry, const InputChannelComponent& channel)
 	{
 		data["channel"] = channel.channel;
 		data["key Setting"] = channel.useWASD;
 	}
 
-	void Load(const json& data, InputChannelComponent& channel)
+	void Load(const json& data, entt::registry& registry, InputChannelComponent& channel)
 	{
 		channel.channel = data["channel"];
 		channel.useWASD = data["key Setting"];
 	}
 
-	void Save(json& data, const TransformComponent& transform)
+	void Save(json& data, entt::registry& registry, const TransformComponent& transform)
 	{
 		//TMT_DEBUG << "Save TransformComponent to Json";
 
@@ -443,7 +443,7 @@ namespace tomato::Serialization
 		};
 	}
 
-	void Load(const json& data, TransformComponent& transform)
+	void Load(const json& data, entt::registry& registry, TransformComponent& transform)
 	{
 		//TMT_DEBUG << "Load TransformComponent to Json";
 
@@ -460,15 +460,15 @@ namespace tomato::Serialization
 		);
 	}
 
-	void Save(json& data, const MovementComponent& movement)
+	void Save(json& data, entt::registry& registry, const MovementComponent& movement)
 	{
 	}
 
-	void Load(const json& data, MovementComponent& movement)
+	void Load(const json& data, entt::registry& registry, MovementComponent& movement)
 	{
 	}
 
-	void Save(json& data, const RenderComponent& render)
+	void Save(json& data, entt::registry& registry, const RenderComponent& render)
 	{
 		//TMT_DEBUG << "Save RenderComponent to Json";
 
@@ -478,7 +478,7 @@ namespace tomato::Serialization
 		data["texture"] = render.texture;
 	}
 
-	void Load(const json& data, RenderComponent& render)
+	void Load(const json& data, entt::registry& registry, RenderComponent& render)
 	{
 		//TMT_DEBUG << "Load RenderComponent to Json";
 
@@ -494,13 +494,13 @@ namespace tomato::Serialization
 		render.texture = data["texture"];
 	}
 
-	void Save(json& data, const VelocityComponent& velocity)
+	void Save(json& data, entt::registry& registry, const VelocityComponent& velocity)
 	{
 		data["speed"] = velocity.horizontalSpeed;
 		data["velocity"] = { velocity.velocity.x, velocity.velocity.y, velocity.velocity.z };
 	}
 
-	void Load(const json& data, VelocityComponent& velocity)
+	void Load(const json& data, entt::registry& registry, VelocityComponent& velocity)
 	{
 		velocity.horizontalSpeed = data["speed"];
 		velocity.velocity =
@@ -511,14 +511,14 @@ namespace tomato::Serialization
 		};
 	}
 
-	void Save(json& data, const ColliderComponent& collider)
+	void Save(json& data, entt::registry& registry, const ColliderComponent& collider)
 	{
 		data["layer"] = collider.layer;
 		data["type"] =  collider.type;
 		data["trigger"] = collider.trigger;
 	}
 
-	void Load(const json& data, ColliderComponent& collider)
+	void Load(const json& data, entt::registry& registry, ColliderComponent& collider)
 	{
 		collider.layer = data["layer"];
 		collider.type = data["type"];
@@ -526,21 +526,21 @@ namespace tomato::Serialization
 	}
 
 	
-	void Save(json& data, const UIComponent& ui)
+	void Save(json& data, entt::registry& registry, const UIComponent& ui)
 	{
 		data["canvas"] = ui.canvas;
 		data["sortOrder"] = ui.sortOrder;
 		data["type"] = ui.type;
 	}
 
-	void Load(const json& data, UIComponent& ui)
+	void Load(const json& data, entt::registry& registry, UIComponent& ui)
 	{
 		ui.canvas = data["canvas"];
 		ui.sortOrder = data["sortOrder"];
 		ui.type = data["type"];
 	}
 
-	void Save(json& data, const CanvasComponent& canvas)
+	void Save(json& data, entt::registry& registry, const CanvasComponent& canvas)
 	{
 		data["mode"] = canvas.mode;
 		data["refSize"] = { canvas.referenceSize.x, canvas.referenceSize.y };
@@ -548,7 +548,7 @@ namespace tomato::Serialization
 		data["sortOrder"] = canvas.sortOrder;
 	}
 
-	void Load(const json& data, CanvasComponent& canvas)
+	void Load(const json& data, entt::registry& registry, CanvasComponent& canvas)
 	{
 		canvas.mode = data["mode"];
 		canvas.referenceSize = { data["refSize"][0], data["refSize"][1] };
@@ -556,7 +556,7 @@ namespace tomato::Serialization
 		canvas.sortOrder = data["sortOrder"];
 	}
 
-	void Save(json& data, const RectTransformComponent& rectTransform)
+	void Save(json& data, entt::registry& registry, const RectTransformComponent& rectTransform)
 	{
 		data["anchorPos"] = { rectTransform.anchoredPosition.x, rectTransform.anchoredPosition.y };
 		data["offsetMin"] = { rectTransform.offsetMin.x, rectTransform.offsetMin.y };
@@ -567,7 +567,7 @@ namespace tomato::Serialization
 		data["pivot"] = { rectTransform.pivot.x, rectTransform.pivot.y };
 	}
 
-	void Load(const json& data, RectTransformComponent& rectTransform)
+	void Load(const json& data, entt::registry& registry, RectTransformComponent& rectTransform)
 	{
 		rectTransform.anchoredPosition = { data["anchorPos"][0], data["anchorPos"][1] };
 		rectTransform.offsetMin = { data["offsetMin"][0], data["offsetMin"][1] };
@@ -578,7 +578,7 @@ namespace tomato::Serialization
 		rectTransform.pivot = { data["pivot"][0], data["pivot"][1] };
 	}
 
-	void Save(json& data, const TextComponent& text)
+	void Save(json& data, entt::registry& registry, const TextComponent& text)
 	{
 		data["text"] = text.text;
 		data["color"] = { text.color.x, text.color.y, text.color.z, text.color.w };
@@ -586,7 +586,7 @@ namespace tomato::Serialization
 		data["font"] = text.font;
 	}
 
-	void Load(const json& data, TextComponent& text)
+	void Load(const json& data, entt::registry& registry, TextComponent& text)
 	{
 		text.text = data["text"];
 		text.color = {
@@ -599,13 +599,13 @@ namespace tomato::Serialization
 		text.font = data["font"];
 	}
 
-	void Save(json& data, const TargetComponent& target)
+	void Save(json& data, entt::registry& registry, const TargetComponent& target)
 	{
 		data["target"] = target.target;
 		data["offset"] = { target.headOffset.x, target.headOffset.y, target.headOffset.z };
 	}
 
-	void Load(const json& data, TargetComponent& target)
+	void Load(const json& data, entt::registry& registry, TargetComponent& target)
 	{
 		//target.target = data["taget"];
 		target.headOffset = {
@@ -615,10 +615,10 @@ namespace tomato::Serialization
 		};
 	}
 
-	void Save(json& data, const MouseEventComponent& mouseEvt) {}
-	void Load(const json& data, MouseEventComponent& mouseEvt) {}
+	void Save(json& data, entt::registry& registry, const MouseEventComponent& mouseEvt) {}
+	void Load(const json& data, entt::registry& registry, MouseEventComponent& mouseEvt) {}
 
-	void Save(json& data, const SelectableComponent& selectable)
+	void Save(json& data, entt::registry& registry, const SelectableComponent& selectable)
 	{
 		data["interactable"] = selectable.interactable;
 
@@ -627,7 +627,7 @@ namespace tomato::Serialization
 		data["pressed"] = { selectable.pressedColor.x, selectable.pressedColor.y, selectable.pressedColor.z, selectable.pressedColor.w };
 	}
 
-	void Load(const json& data, SelectableComponent& selectable)
+	void Load(const json& data, entt::registry& registry, SelectableComponent& selectable)
 	{
 		selectable.interactable = data["interactable"];
 
@@ -653,7 +653,7 @@ namespace tomato::Serialization
 		};
 	}
 
-	void Save(json& data, const ParticleEmitterComponent& particle)
+	void Save(json& data, entt::registry& registry, const ParticleEmitterComponent& particle)
 	{
 		data["duration"] = std::chrono::duration<float>(particle.emitter.duration).count();
 		data["looping"] = particle.looping;
@@ -676,9 +676,9 @@ namespace tomato::Serialization
 		}
 	}
 
-	void Load(const json& data, ParticleEmitterComponent& particle) {}
+	void Load(const json& data, entt::registry& registry, ParticleEmitterComponent& particle) {}
 
-	void Save(json& data, const ParticleRenderComponent& particle)
+	void Save(json& data, entt::registry& registry, const ParticleRenderComponent& particle)
 	{
 		data["texture"] = particle.texture;
 		data["size"] = particle.size;
@@ -690,34 +690,36 @@ namespace tomato::Serialization
 		};
 	}
 
-	void Load(const json& data, ParticleRenderComponent& particle) {}
+	void Load(const json& data, entt::registry& registry, ParticleRenderComponent& particle) {}
 
-	void Save(json& data, const HierarchyComponent& hierarchy)
+	void Save(json& data, entt::registry& registry, const HierarchyComponent& hierarchy)
 	{
-//		data["parent"] = hierarchy.parentUUID;
-//		data["children"] = hierarchy.childrenUUID;
+		data["parent"] = GetUUID(registry, hierarchy.parent);
+		for (auto child : hierarchy.children)
+			data["children"].push_back(GetUUID(registry, child));
 	}
 
-	void Load(const json& data, HierarchyComponent& hierarchy)
+	void Load(const json& data, entt::registry& registry, HierarchyComponent& hierarchy)
 	{
-//		hierarchy.childrenUUID.clear();
-//
-//		hierarchy.parentUUID = data["parent"];
-//		hierarchy.childrenUUID = data["children"].get<std::vector<UUID>>();
+		hierarchy.children.clear();
+
+		hierarchy.parent = GetEntityByUUID(registry, data["parent"]);
+		for (const auto& child : data["childern"])
+			hierarchy.children.push_back(GetEntityByUUID(registry, child));
 	}
 
-	void Save(json& data, const RootEntityTag& rootTag) {}
-	void Load(const json& data, RootEntityTag& rootTag) {}
+	void Save(json& data, entt::registry& registry, const RootEntityTag& rootTag) {}
+	void Load(const json& data, entt::registry& registry, RootEntityTag& rootTag) {}
 
-	void Save(json& data, const MainCameraTag& camTag) {}
-	void Load(const json& data, MainCameraTag& camTag) {}
+	void Save(json& data, entt::registry& registry, const MainCameraTag& camTag) {}
+	void Load(const json& data, entt::registry& registry, MainCameraTag& camTag) {}
 
-	void Save(json& data, const CharacterTag& charTag) {}
-	void Load(const json& data, CharacterTag& charTag) {}
+	void Save(json& data, entt::registry& registry, const CharacterTag& charTag) {}
+	void Load(const json& data, entt::registry& registry, CharacterTag& charTag) {}
 
-	void Save(json&, const EditorHidden&) {}
-	void Load(const json&, EditorHidden&) {}
+	void Save(json& data, entt::registry& registry, const EditorHidden& eHiddenTag) {}
+	void Load(const json& data, entt::registry& registry, EditorHidden&) {}
 
-	void Save(json&, const NoInspector&) {}
-	void Load(const json&, NoInspector&) {}
+	void Save(json& data, entt::registry& registry, const NoInspector& noInspectorTag) {}
+	void Load(const json& data, entt::registry& registry, NoInspector& noInspectorTag) {}
 }

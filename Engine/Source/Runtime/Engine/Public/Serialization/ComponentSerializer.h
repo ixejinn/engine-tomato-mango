@@ -40,75 +40,75 @@ namespace tomato::Serialization
 	void AttachParticles(const json&, entt::registry&);
 
 	//Component Save & Load Func
-	void Save(json&, const VisibilityComponent&);
-	void Load(const json&, VisibilityComponent&);
+	void Save(json&, entt::registry&, const VisibilityComponent&);
+	void Load(const json&, entt::registry&, VisibilityComponent&);
 
-	void Save(json&, const CameraComponent&);
-	void Load(const json&, CameraComponent&);
+	void Save(json&, entt::registry&, const CameraComponent&);
+	void Load(const json&, entt::registry&, CameraComponent&);
 
-	void Load(const json&, InputChannelComponent&);
-	void Save(json&, const InputChannelComponent&);
+	void Save(json&, entt::registry&, const InputChannelComponent&);
+	void Load(const json&, entt::registry&, InputChannelComponent&);
 
-	void Save(json&, const TransformComponent&);
-	void Load(const json&, TransformComponent&);
+	void Save(json&, entt::registry&, const TransformComponent&);
+	void Load(const json&, entt::registry&, TransformComponent&);
 
-	void Save(json&, const MovementComponent&);
-	void Load(const json&, MovementComponent&);
+	void Save(json&, entt::registry&, const MovementComponent&);
+	void Load(const json&, entt::registry&, MovementComponent&);
 
-	void Save(json&, const VelocityComponent&);
-	void Load(const json&, VelocityComponent&);
+	void Save(json&, entt::registry&, const VelocityComponent&);
+	void Load(const json&, entt::registry&, VelocityComponent&);
 
-	void Save(json&, const ColliderComponent&);
-	void Load(const json&, ColliderComponent&);
+	void Save(json&, entt::registry&, const ColliderComponent&);
+	void Load(const json&, entt::registry&, ColliderComponent&);
 
-	void Save(json&, const RenderComponent&);
-	void Load(const json&, RenderComponent&);
+	void Save(json&, entt::registry&, const RenderComponent&);
+	void Load(const json&, entt::registry&, RenderComponent&);
 
-	void Save(json&, const UIComponent&);
-	void Load(const json&, UIComponent&);
+	void Save(json&, entt::registry&, const UIComponent&);
+	void Load(const json&, entt::registry&, UIComponent&);
 
-	void Save(json&, const CanvasComponent&);
-	void Load(const json&, CanvasComponent&);
+	void Save(json&, entt::registry&, const CanvasComponent&);
+	void Load(const json&, entt::registry&, CanvasComponent&);
 
-	void Save(json&, const RectTransformComponent&);
-	void Load(const json&, RectTransformComponent&);
+	void Save(json&, entt::registry&, const RectTransformComponent&);
+	void Load(const json&, entt::registry&, RectTransformComponent&);
 
-	void Save(json&, const TextComponent&);
-	void Load(const json&, TextComponent&);
+	void Save(json&, entt::registry&, const TextComponent&);
+	void Load(const json&, entt::registry&, TextComponent&);
 
-	void Save(json&, const TargetComponent&);
-	void Load(const json&, TargetComponent&);
+	void Save(json&, entt::registry&, const TargetComponent&);
+	void Load(const json&, entt::registry&, TargetComponent&);
 
-	void Save(json&, const SelectableComponent&);
-	void Load(const json&, SelectableComponent&);
+	void Save(json&, entt::registry&, const SelectableComponent&);
+	void Load(const json&, entt::registry&, SelectableComponent&);
 
-	void Save(json&, const MouseEventComponent&);
-	void Load(const json&, MouseEventComponent&);
+	void Save(json&, entt::registry&, const MouseEventComponent&);
+	void Load(const json&, entt::registry&, MouseEventComponent&);
 
-	void Save(json&, const ParticleEmitterComponent&);
-	void Load(const json&, ParticleEmitterComponent&);
+	void Save(json&, entt::registry&, const ParticleEmitterComponent&);
+	void Load(const json&, entt::registry&, ParticleEmitterComponent&);
 
-	void Save(json&, const ParticleRenderComponent&);
-	void Load(const json&, ParticleRenderComponent&);
+	void Save(json&, entt::registry&, const ParticleRenderComponent&);
+	void Load(const json&, entt::registry&, ParticleRenderComponent&);
 
-	void Save(json&, const HierarchyComponent&);
-	void Load(const json&, HierarchyComponent&);
+	void Save(json&, entt::registry&, const HierarchyComponent&);
+	void Load(const json&, entt::registry&, HierarchyComponent&);
 
 
 	// For Tag
-	void Save(json&, const RootEntityTag&);
+	void Save(json&, entt::registry&, const RootEntityTag&);
 	void Load(const json&, RootEntityTag&);
 
-	void Save(json&, const MainCameraTag&);
+	void Save(json&, entt::registry&, const MainCameraTag&);
 	void Load(const json&, MainCameraTag&);
 
-	void Save(json&, const CharacterTag&);
+	void Save(json&, entt::registry&, const CharacterTag&);
 	void Load(const json&, CharacterTag&);
 
-	void Save(json&, const EditorHidden&);
+	void Save(json&, entt::registry&, const EditorHidden&);
 	void Load(const json&, EditorHidden&);
 
-	void Save(json&, const NoInspector&);
+	void Save(json&, entt::registry&, const NoInspector&);
 	void Load(const json&, NoInspector&);
 }
 

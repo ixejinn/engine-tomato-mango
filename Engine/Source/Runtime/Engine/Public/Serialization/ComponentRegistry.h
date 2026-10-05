@@ -96,7 +96,7 @@ namespace tomato::Serialization
 			info.serialization.Save =
 				[](json& j, entt::registry& reg, entt::entity e)
 				{
-					Serialization::Save(j, reg.get<T>(e));
+					Serialization::Save(j, reg, reg.get<T>(e));
 				};
 
 			info.serialization.Load =
@@ -104,7 +104,7 @@ namespace tomato::Serialization
 				{
 					T component;
 
-					Serialization::Load(j, component);
+					Serialization::Load(j, reg, component);
 					reg.emplace<T>(e, std::move(component));
 				};
 		}
