@@ -96,6 +96,9 @@ namespace tomato::Serialization
 
 
 	// For Tag
+	void Save(json&, entt::registry&, const ActiveTag&);
+	void Load(const json&, ActiveTag&);
+
 	void Save(json&, entt::registry&, const RootEntityTag&);
 	void Load(const json&, RootEntityTag&);
 

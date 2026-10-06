@@ -9,10 +9,11 @@
 #else
 #include "Resource/PathManager.h"
 #include "PlayTest/TestState.h"
+#include "PlayTest/LoadState.h"
 #include "Game/GameState.h"
 #endif
 
-#define TOMATO_GREENTEA
+//#define TOMATO_GREENTEA
 
 using namespace tomato;
 
@@ -26,7 +27,7 @@ int main() {
     Engine engine(1600, 900, "TOMATO", NetMode::NM_Alone);
 
 #if defined(TOMATO_GREENTEA)
-    engine.SetNextState(std::make_unique<GameState>(engine));
+    engine.SetNextState(std::make_unique<LoadState>(engine));
 
 #else //TOMATO_GREENTEA
     engine.SetNextState(std::make_unique<GameState>(engine));

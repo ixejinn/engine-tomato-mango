@@ -1,5 +1,6 @@
 ﻿#include "Serialization/ComponentRegistry.h"
 
+#include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Visibility.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Transform.h"
@@ -47,6 +48,7 @@ namespace tomato::Serialization
 		RegisterComponent<ParticleRenderComponent>("Particle Render", ComponentCategory::Particle, ComponentFlags::Hidden);
 		
 		//Tag
+		RegisterComponent<ActiveTag>("TagActive", ComponentCategory::Tag, ComponentFlags::Hidden);
 		RegisterComponent<RootEntityTag>("TagRoot", ComponentCategory::Tag, ComponentFlags::Hidden);
 		RegisterComponent<MainCameraTag>("TagMainCam", ComponentCategory::Tag);
 		RegisterComponent<CharacterTag>("TagCharacter", ComponentCategory::Tag, ComponentFlags::Hidden);

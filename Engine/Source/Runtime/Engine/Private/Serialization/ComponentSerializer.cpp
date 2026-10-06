@@ -150,7 +150,7 @@ namespace tomato::Serialization
 
 		LoadComponents(root, registry, newState->GetEntityMap());
 
-		ResolveHierarchy(registry, newState->GetEntityMap());
+		//ResolveHierarchy(registry, newState->GetEntityMap());
 
 		AttachParticles(root, registry);
 
@@ -224,7 +224,7 @@ namespace tomato::Serialization
 			entt::entity e = reg.create();
 
 			reg.emplace<NametagComponent>(e, id, name);
-
+			//reg.emplace<ActiveTag>(e);
 			entityMap[id] = e;
 		}
 	}
@@ -607,7 +607,7 @@ namespace tomato::Serialization
 
 	void Load(const json& data, entt::registry& registry, TargetComponent& target)
 	{
-		//target.target = data["taget"];
+		target.target = data["target"];
 		target.headOffset = {
 			data["offset"][0],
 			data["offset"][1],
@@ -695,6 +695,8 @@ namespace tomato::Serialization
 	void Save(json& data, entt::registry& registry, const HierarchyComponent& hierarchy)
 	{
 		data["parent"] = GetUUID(registry, hierarchy.parent);
+
+		data["children"] = nlohmann::json::array();
 		for (auto child : hierarchy.children)
 			data["children"].push_back(GetUUID(registry, child));
 	}
@@ -704,9 +706,13 @@ namespace tomato::Serialization
 		hierarchy.children.clear();
 
 		hierarchy.parent = GetEntityByUUID(registry, data["parent"]);
-		for (const auto& child : data["childern"])
+
+		for (const auto& child : data["children"])
 			hierarchy.children.push_back(GetEntityByUUID(registry, child));
+
 	}
+	void Save(json& data, entt::registry& registry, const ActiveTag& activeTag) {}
+	void Load(const json& data, entt::registry& registry, ActiveTag& activeTag) {}
 
 	void Save(json& data, entt::registry& registry, const RootEntityTag& rootTag) {}
 	void Load(const json& data, entt::registry& registry, RootEntityTag& rootTag) {}
