@@ -1,4 +1,4 @@
-#include "Render/GLStateCache.h"
+ï»¿#include "Render/GLStateCache.h"
 
 namespace tomato
 {
@@ -17,12 +17,13 @@ namespace tomato
 		ApplyBlend(state.blend);
 	}
 
-	void GLStateCache::UseShader(GLuint program)
+	bool GLStateCache::UseShader(GLuint program)
 	{
-		if (program_ == program) return;
+		if (program_ == program) return false;
 
 		glUseProgram(program);
 		program_ = program;
+        return true;
 	}
 
 	void GLStateCache::BindVertexArray(GLuint vao)
@@ -65,7 +66,7 @@ namespace tomato
 
 	void GLStateCache::Invalidate()
 	{
-		ForceApply(PipelineState{PipelinePresets::Default3D});
+		ForceApply(PipelineState{PipelinePresets::Opaque});
 
 		glUseProgram(0);
 		glBindVertexArray(0);
@@ -86,7 +87,7 @@ namespace tomato
 		if (d.testEnabled != c.testEnabled)
 			d.testEnabled ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
 
-		// Å×½ºÆ®°¡ ÄÑÁ® ÀÖÀ» ¶§¸¸ ¼³Á¤
+		// ï¿½×½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		if (d.testEnabled && (d.func != c.func || !c.testEnabled))
 			glDepthFunc(d.func);
 

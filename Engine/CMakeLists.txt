@@ -221,6 +221,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Render/SortKey.h
 		Source/Runtime/Engine/Public/Render/SortIndex.h
 		Source/Runtime/Engine/Private/ECS/Components/PendingDestroy.h
+		Source/Runtime/Engine/Private/Render/RenderPass.h
 )
 
 set(ENGINE_SOURCES

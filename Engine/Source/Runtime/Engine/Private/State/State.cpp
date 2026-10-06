@@ -38,7 +38,6 @@ namespace tomato
         // Skybox
         entt::entity& skybox = renderCtx.skybox;
         skybox = Prefab::CreateSkybox(registry_);
-        registry_.emplace<NoInspector>(skybox);
 
         // View gizmo
         entt::entity& viewGizmo = renderCtx.viewGizmo;

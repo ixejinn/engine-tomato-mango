@@ -140,16 +140,17 @@ namespace tomato::Prefab
         return col;
     }
 
-    /////////////// 구버전
-    entt::entity CreateSkybox(entt::registry& reg)
+    entt::entity CreateSkybox(entt::registry& registry)
     {
-        const entt::entity obj = reg.create();
+        const entt::entity obj = CreateStaticMesh(registry, true, "Skybox");
 
-        auto& generator = reg.ctx().get<EntityNameGenerator>();
-        reg.emplace<NametagComponent>(obj, GenerateUUID(), generator.Generate("Skybox"));
-        reg.emplace<TransformComponent>(obj);
-        reg.emplace<VisibilityComponent>(obj);
-        reg.emplace<RootEntityTag>(obj);
+        registry.emplace<NoInspector>(obj);
+
+        auto& render = registry.get<RenderComponent>(obj);
+        render.shader = GetAssetID("SkyboxShader");
+        render.texture = GetAssetID("PrimitiveSkybox");
+        render.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube));
+        render.priority = RenderPriority::Skybox;
 
         return obj;
     }
