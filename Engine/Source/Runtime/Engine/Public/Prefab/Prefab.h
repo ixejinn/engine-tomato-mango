@@ -52,10 +52,9 @@ namespace tomato::Prefab
         bool active = true, bool trigger = false,
         const std::string& name = "Collider");
 
-    ///////// 구버전
     entt::entity CreateSkybox(entt::registry& reg);
 
-    entt::entity CreateGizmo(entt::registry& reg);
+    entt::entity CreateGizmo(entt::registry& registry);
 }
 
 #endif //MANGO_PREFAB_H

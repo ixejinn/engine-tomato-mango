@@ -3,8 +3,10 @@
 
 #include "ECS/Forward/SystemFwd.h"
 
-namespace tomato {
-    class System {
+namespace tomato
+{
+    class System
+    {
     public:
         virtual ~System() = default;
 

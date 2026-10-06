@@ -16,6 +16,7 @@
 #include "ECS/Systems/TransformSystem.h"
 #include "ECS/Systems/UISystem.h"
 #include "ECS/Systems/UITransformSystem.h"
+#include "ECS/Systems/ViewGizmoRenderSystem.h"
 #include "ECS/Systems/WorldUIRenderSystem.h"
 
 #endif //MANGO_SYSTEMS_H

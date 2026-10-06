@@ -9,6 +9,7 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Visibility.h"
+#include "ECS/Components/Gizmo.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Resource/AssetHash.h"
 #include "Resource/AssetRegistry.h"
@@ -17,7 +18,6 @@
 #include "Resource/Render/Texture.h"
 #include "Render/SortKey.h"
 #include "Render/RenderPass.h"
-#include "Services/Window.h"
 #include "Profiler/CPUProfiler.h"
 
 namespace tomato
@@ -33,7 +33,7 @@ namespace tomato
 
     void RenderSystem::Update(SimContext& simCtx)
     {
-//        CPU_PROFILER_BLOCK_BEGIN(RenderSystem::Update);
+        CPU_PROFILER_BLOCK_BEGIN(RenderSystem::Update);
         UpdateDrawList(simCtx);
 
         auto& registry = simCtx.state->GetRegistry();
@@ -42,8 +42,8 @@ namespace tomato
         auto& gl = renderCtx.glState;
         gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        auto* camera = registry.try_get<CameraComponent>(renderCtx.mainCam);
-        if (renderCtx.mainCam == entt::null || !camera)
+        const auto* camera = registry.try_get<CameraComponent>(renderCtx.mainCam);
+        if (!camera)
         {
             TMT_WARN << "Main camera is missing or invalid.";
             return;
@@ -73,12 +73,12 @@ namespace tomato
                     {
                         shader->SetUniformMat4("uViewProj", camera->viewProjMat);
                         shader->SetUniformVec3("uLightPos", glm::vec3(0, 10, 0));
+                        shader->SetUniformInt("uTexture", 0);
                     }
 
                     const auto& mtx = trf.GetTransformMatrix();
                     shader->SetUniformMat4("uModel", mtx);
                     shader->SetUniformMat3("uNormal", glm::transpose(glm::inverse(glm::mat3(mtx))));
-                    shader->SetUniformInt("uTexture", 0);
                     shader->SetUniformVec4("uColor", render.color);
 
                     gl.BindTexture(texture->GetHandle());
@@ -135,70 +135,7 @@ namespace tomato
                     break;
             }
         }
-
-//        if (viewGizmo != entt::null)
-//        {
-//            gl.SetViewport(-80, -80, 300, 300);
-//            gl.Clear(GL_DEPTH_BUFFER_BIT);
-//
-//            glm::vec3 viewGizmoLight =
-//                    registry.get<TransformComponent>(mainCam).GetWorldQuaternion() * glm::vec3(0, 0, 1);
-//
-//            // Render view gizmo center
-//            auto& viewGizmoTrfMtx = registry.get<TransformComponent>(viewGizmo).GetTransformMatrix();
-//            auto& viewGizmoRender = registry.get<RenderComponent>(viewGizmo);
-//
-//            curShader = viewGizmoRender.shader;
-//            shader = AssetRegistry<Shader>::GetInstance().Get(curShader);
-//            gl.UseShader(shader->GetHandle());
-//
-//            curTexture = viewGizmoRender.texture;
-//            texture = AssetRegistry<Texture>::GetInstance().Get(curTexture);
-//            gl.BindTexture(texture->GetHandle());
-//
-//            curMesh = viewGizmoRender.mesh;
-//            mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh);
-//            gl.BindVertexArray(mesh->GetHandle());
-//
-//            shader->SetUniformMat4("uModel", viewGizmoTrfMtx);
-//            shader->SetUniformMat4("uViewProj",
-//                glm::ortho(-1.5f, 1.5f, -1.5f, 1.5f, -1.5f, 1.5f)
-//                * glm::mat4(glm::mat3(mainCamComp == nullptr ? glm::mat4(1.f) : mainCamComp->view)));
-//            shader->SetUniformMat3("uNormal", glm::transpose(glm::inverse(glm::mat3(viewGizmoTrfMtx))));
-//
-//            shader->SetUniformInt("uTexture", 0);
-//            shader->SetUniformVec3("uLightPos", viewGizmoLight);
-//            shader->SetUniformVec4("uColor", viewGizmoRender.color);
-//
-//            mesh->Draw();
-//
-//            // Render view gizmo axis
-//            mesh = AssetRegistry<Mesh>::GetInstance().Get(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone)));
-//            gl.BindVertexArray(mesh->GetHandle());
-//
-//            auto& gizmoAxes = registry.get<HierarchyComponent>(viewGizmo).children;
-//            for (const entt::entity axis : gizmoAxes)
-//            {
-//                auto& axisTrfMtx = registry.get<TransformComponent>(axis).GetTransformMatrix();
-//                auto& axisRender = registry.get<RenderComponent>(axis);
-//
-//                shader->SetUniformMat4("uModel", axisTrfMtx);
-//                shader->SetUniformMat4("uViewProj",
-//                    glm::ortho(-1.5f, 1.5f, -1.5f, 1.5f, -1.5f, 1.5f)
-//                    * glm::mat4(glm::mat3(mainCamComp == nullptr ? glm::mat4(1.f) : mainCamComp->view)));
-//                shader->SetUniformMat3("uNormal", glm::transpose(glm::inverse(glm::mat3(axisTrfMtx))));
-//
-//                shader->SetUniformInt("uTexture", 0);
-//                shader->SetUniformVec3("uLightPos", viewGizmoLight);
-//                shader->SetUniformVec4("uColor", axisRender.color);
-//
-//                mesh->Draw();
-//            }
-//
-//            gl.SetViewport(0, 0, Window::GetWidth(), Window::GetHeight());
-//        }
-
-//        CPU_PROFILER_BLOCK_END(RenderSystem::Update);
+        CPU_PROFILER_BLOCK_END(RenderSystem::Update);
     }
 
     void RenderSystem::UpdateDrawList(SimContext& simCtx)
@@ -213,7 +150,7 @@ namespace tomato
         auto& texRegistry = AssetRegistry<Texture>::GetInstance();
         auto& meshRegistry = AssetRegistry<Mesh>::GetInstance();
 
-        auto view = registry.view<ActiveTag, VisibilityComponent, TransformComponent, RenderComponent>();
+        auto view = registry.view<ActiveTag, VisibilityComponent, TransformComponent, RenderComponent>(entt::exclude<GizmoTag>);
         for (const auto& [e, visibility, trf, render] : view.each())
         {
             if (!IsVisible(visibility))

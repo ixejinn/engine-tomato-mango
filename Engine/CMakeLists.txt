@@ -222,6 +222,8 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Render/SortIndex.h
 		Source/Runtime/Engine/Private/ECS/Components/PendingDestroy.h
 		Source/Runtime/Engine/Private/Render/RenderPass.h
+		Source/Runtime/Engine/Public/ECS/Systems/ViewGizmoRenderSystem.h
+		Source/Runtime/Engine/Private/ECS/Components/Gizmo.h
 )
 
 set(ENGINE_SOURCES
@@ -314,6 +316,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/ECS/Systems/CharacterScaleSystem.cpp
 		Source/Runtime/Engine/Private/Math/Angle.cpp
         Source/Runtime/Engine/Private/Render/GLStateCache.cpp
+		Source/Runtime/Engine/Private/ECS/Systems/ViewGizmoRenderSystem.cpp
 )
 
 add_library(engine STATIC
