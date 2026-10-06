@@ -16,6 +16,7 @@
 #include "Resource/Render/ParticleEffect.h"
 
 #include "ECS/Components/Nametag.h"
+#include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Visibility.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Transform.h"
@@ -66,44 +67,6 @@ namespace tomato::Serialization
 
 		return data;
 	}
-
-	/*
-	void SaveScene(entt::registry& reg, const char* path)
-	{
-		json root;
-
-		root["Entities"] = json::array();
-
-		auto view = reg.view<NametagComponent>();
-		for (auto entity : view)
-		{
-			json entityJson;
-
-			SaveEntity(entityJson, reg, entity);
-
-			root["Entities"].push_back(entityJson);
-		}
-
-		std::ofstream ofs(path);
-		ofs << root.dump(4);
-	}
-
-	void LoadScene(entt::registry& reg, const char* path, std::unordered_map<UUID, entt::entity>& entityMap)
-	{
-		json root = LoadJsonData(path);
-		if (root == nullptr)
-			return;
-
-		reg.clear();
-
-		CreateEntity(root, reg, entityMap);
-
-		LoadComponents(root, reg, entityMap);
-
-		ResolveHierarchy(reg, entityMap);
-
-		//AttachParticles(root, reg);
-	}*/
 
 	void SaveScene(State* state, const char* path)
 	{

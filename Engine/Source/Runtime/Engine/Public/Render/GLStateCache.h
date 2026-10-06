@@ -81,7 +81,8 @@ namespace tomato
 		// RenderSystem의 기본 3D 렌더 상태
 		inline constexpr PipelineState Default3D
 		{
-			.stencil = {.enabled = true, .dppass = GL_REPLACE },
+			//.stencil = {.enabled = true, .ref = 1, .dppass = GL_REPLACE },
+			.stencil = {.enabled = false },
 			.blend = {.enabled = true },
 		};
 

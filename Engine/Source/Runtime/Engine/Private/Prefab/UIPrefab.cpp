@@ -3,6 +3,7 @@
 #include "Prefab/UIPrefab.h"
 
 #include "ECS/Components/Nametag.h"
+#include "ECS/Components/Activetag.h"
 #include "ECS/Components/Visibility.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/Text.h"
@@ -38,7 +39,7 @@ namespace tomato::UIPrefab
             GetAssetID("UIShader"),
             GetAssetID(Texture::PrimitiveName));*/
         reg.emplace<tomato::VisibilityComponent>(canvas);
-
+        reg.emplace<tomato::ActiveTag>(canvas);
         return canvas;
 	}
 
@@ -62,6 +63,7 @@ namespace tomato::UIPrefab
             GetAssetID("UIShader"),
             GetAssetID(Texture::PrimitiveName));
         reg.emplace<VisibilityComponent>(button);
+        reg.emplace<tomato::ActiveTag>(button);
 
         const auto buttonText = reg.create();
         reg.emplace<NametagComponent>(buttonText, GenerateUUID(), generator.Generate("Text"));
@@ -73,6 +75,7 @@ namespace tomato::UIPrefab
         reg.emplace<VisibilityComponent>(buttonText);
         reg.emplace<HierarchyComponent>(buttonText);
         SetHierarchy(reg, button, buttonText);
+        reg.emplace<tomato::ActiveTag>(buttonText);
 
         return button;
     }
@@ -94,6 +97,7 @@ namespace tomato::UIPrefab
         reg.emplace<VisibilityComponent>(text);
         reg.emplace<HierarchyComponent>(text);
         SetHierarchy(reg, canvas, text);
+        reg.emplace<tomato::ActiveTag>(text);
 
         return text;
     }
@@ -132,7 +136,8 @@ namespace tomato::UIPrefab
         reg.emplace<VisibilityComponent>(img);
         reg.emplace<HierarchyComponent>(img);
         SetHierarchy(reg, canvas, img);
-        
+        reg.emplace<tomato::ActiveTag>(img);
+
         return img;
     }
 

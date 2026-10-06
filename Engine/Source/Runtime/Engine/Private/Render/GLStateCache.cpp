@@ -1,4 +1,4 @@
-#include "Render/GLStateCache.h"
+ï»¿#include "Render/GLStateCache.h"
 
 namespace tomato
 {
@@ -86,7 +86,7 @@ namespace tomato
 		if (d.testEnabled != c.testEnabled)
 			d.testEnabled ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
 
-		// Å×½ºÆ®°¡ ÄÑÁ® ÀÖÀ» ¶§¸¸ ¼³Á¤
+		// í…ŒìŠ¤íŠ¸ê°€ ì¼œì ¸ ìˆì„ ë•Œë§Œ ì„¤ì •
 		if (d.testEnabled && (d.func != c.func || !c.testEnabled))
 			glDepthFunc(d.func);
 

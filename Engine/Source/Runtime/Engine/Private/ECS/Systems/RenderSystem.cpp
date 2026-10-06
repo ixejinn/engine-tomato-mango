@@ -18,6 +18,8 @@
 #include "Render/SortKey.h"
 #include "Services/Window.h"
 #include "Profiler/CPUProfiler.h"
+#include <ECS/Components/Nametag.h>
+#include <Render/GLStateCache.h>
 
 namespace tomato
 {
@@ -63,6 +65,19 @@ namespace tomato
             if (!IsVisible(registry, e))
                 continue;
 
+            PipelineState state = PipelinePresets::Default3D;
+            if (registry.get<NametagComponent>(e).name == "Ground")
+            {
+                //state.depth.testEnabled = false;
+                state.stencil.enabled = true;
+                state.stencil.ref = 1;
+                state.stencil.dppass = GL_REPLACE;
+                //glDisable(GL_DEPTH_TEST);
+                /*glStencilFunc(GL_ALWAYS, 1, 0xFF);
+                glStencilMask(0xFF);*/
+                //std::cout << registry.get<NametagComponent>(e).name << '\n';
+            }
+
             if (render.shader == 0)
                 render.shader = GetAssetID(Shader::PrimitiveName);
                 
@@ -88,21 +103,37 @@ namespace tomato
             if (curMesh != render.mesh)
             {
                 curMesh = render.mesh;
-                PipelineState state = PipelinePresets::Default3D;
+                //PipelineState state = PipelinePresets::Default3D;
 
                 if (curMesh == GetAssetID("Primitive::OpenCylinder_50_10"))
                 {
+                    //glDisable(GL_CULL_FACE);
                     state.raster.cullEnabled = false;
 
+                    state.stencil.enabled = true;
                     state.stencil.func = GL_EQUAL;
                     state.stencil.ref = 1;
+                    state.stencil.dppass = GL_REPLACE;
                     state.stencil.writeMask = 0x00;
+                    //std::cout << "OepnCylinder\n";
                 }
-                gl.Apply(state);
+                //gl.Apply(state);
 
                 mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh);
                 gl.BindVertexArray(mesh->GetHandle());
             }
+
+            //if (curMesh == GetAssetID("Primitive::OpenCylinder_50_10"))
+            //{
+            //    //glDisable(GL_CULL_FACE);
+            //    state.raster.cullEnabled = false;
+            //    state.stencil.enabled = true;
+            //    state.stencil.func = GL_EQUAL;
+            //    state.stencil.ref = 1;
+            //    state.stencil.dppass = GL_REPLACE;
+            //    state.stencil.writeMask = 0x00;
+            //    //std::cout << "OepnCylinder\n";
+            //}
 
             const auto& mtx = trf.GetTransformMatrix();
             shader->SetUniformMat4("uModel", mtx);
@@ -112,6 +143,8 @@ namespace tomato
             shader->SetUniformInt("uTexture", 0);
             shader->SetUniformVec3("uLightPos", glm::vec3(0, 10, 0));
             shader->SetUniformVec4("uColor", render.color);
+
+            gl.Apply(state);
 
             if (registry.all_of<RootEntityTag>(e))
                 mesh->Draw();

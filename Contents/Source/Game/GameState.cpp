@@ -77,6 +77,9 @@ void GameState::Init()
     auto& colp1 = registry_.get<ColliderComponent>(colObj1);
     colp1.layer = CollisionLayer::Wave2;
 
+    auto& wavePool = EntityPool<WavePoolTraits>::EmplaceInContext(registry_);
+    auto& colliderPool = EntityPool<WaveColliderPoolTraits>::EmplaceInContext(registry_);
+    registry_.ctx().emplace<WaveManager>(wavePool, colliderPool);
     //// Ground2
     //entt::entity ground2 = Prefab::CreateWorldObject(registry_, true, false, true, "Ground2");
     //auto& trfGnd2 = registry_.get<TransformComponent>(ground2);
@@ -96,9 +99,7 @@ void GameState::Init()
 
     engine_.collisionLayerMtx_.SetCollisionLayer(CollisionLayer::Wave1, CollisionLayer::Wave2, true);
 
-    auto& wavePool = EntityPool<WavePoolTraits>::EmplaceInContext(registry_);
-    auto& colliderPool = EntityPool<WaveColliderPoolTraits>::EmplaceInContext(registry_);
-    registry_.ctx().emplace<WaveManager>(wavePool, colliderPool);
+
 
     EventDispatcher::GetInstance().Connect<TriggerEnterEvent, &WaveCollisionEnter>();
     EventDispatcher::GetInstance().Connect<TriggerExitEvent, &WaveCollisionExit>();

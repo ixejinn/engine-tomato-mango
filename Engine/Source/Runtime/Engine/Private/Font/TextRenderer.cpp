@@ -21,36 +21,39 @@ namespace tomato
 	{
 		shader_ = shader;
 
-		shader_->Use();
-		//shader->SetUniformMat4("projection", projection);
+		//shader_->Use();
+		////shader->SetUniformMat4("projection", projection);
 
-		glUseProgram(0);
+		//glUseProgram(0);
 
 		// 1. Create and bind VAO
-		glGenVertexArrays(1, &vao_);
-		glGenBuffers(1, &vbo_);
-		glBindVertexArray(vao_);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+		glCreateVertexArrays(1, &vao_);
+		glCreateBuffers(1, &vbo_);
 
 		// 2. Pre-allocate VBO memory (e.g., space for 1000 characters)
 		// 1 char = 6 vertices (2 triangles)
 		size_t reservedSize = sizeof(TextVertex) * 6 * 1000;
-		glBufferData(GL_ARRAY_BUFFER, reservedSize, nullptr, GL_DYNAMIC_DRAW);
+		glNamedBufferData(vbo_, reservedSize, nullptr, GL_DYNAMIC_DRAW);
 
-		// 3. Set Vertex Attributes
+		// 3. Bind VBO to vertex binding slot 0
+		glVertexArrayVertexBuffer(vao_, 0, vbo_, 0, sizeof(TextVertex));
+
 		// Position (vec3)
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(TextVertex), (void*)offsetof(TextVertex, position));
+		glEnableVertexArrayAttrib(vao_, 0);
+		glVertexArrayAttribBinding(vao_, 0, 0);
+		glVertexArrayAttribFormat(vao_, 0, 3, GL_FLOAT, GL_FALSE, offsetof(TextVertex, position));
 	
 		// UV (vec2)
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(TextVertex), (void*)offsetof(TextVertex, uv));
+		glEnableVertexArrayAttrib(vao_, 1);
+		glVertexArrayAttribBinding(vao_, 1, 0);
+		glVertexArrayAttribFormat(vao_, 1, 2, GL_FLOAT, GL_FALSE, offsetof(TextVertex, uv));
 
 		// Color (vec4)
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(TextVertex), (void*)offsetof(TextVertex, color));
+		glEnableVertexArrayAttrib(vao_, 2);
+		glVertexArrayAttribBinding(vao_, 2, 0);
+		glVertexArrayAttribFormat(vao_, 2, 4, GL_FLOAT, GL_FALSE, offsetof(TextVertex, color));
 
-		glBindVertexArray(0);
+		//glBindVertexArray(0);
 		
 		TMT_INFO << "TextRenderer initialized with reserved capacity: 1000 chars.";
 	}
@@ -100,8 +103,7 @@ namespace tomato
 
 		AtlasManager::GetInstance().BindAtlas(currentAtlasIndex_);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, vertices_.size() * sizeof(TextVertex), vertices_.data());
+		glNamedBufferSubData(vbo_, 0, vertices_.size() * sizeof(TextVertex), vertices_.data());
 
 		glBindVertexArray(vao_);
 		glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertices_.size()));
