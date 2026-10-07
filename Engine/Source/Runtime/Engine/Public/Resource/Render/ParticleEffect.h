@@ -9,7 +9,7 @@
 #include "Resource/ResourceFwd.h"
 #include "Serialization/Json.h"
 #include "Particle/ParticleType.h"
-#include "UUID.h"
+#include "Serialization/UUID.h"
 
 namespace tomato
 {

@@ -141,7 +141,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Serialization/ComponentSerializer.h
         Source/Runtime/Engine/Public/Serialization/ComponentInfo.h
         Source/Runtime/Engine/Public/ECS/Components/Nametag.h
-        Source/Runtime/Core/Public/UUID.h
+        Source/Runtime/Core/Public/Serialization/UUID.h
         
         Source/Runtime/Engine/Public/Serialization/ComponentRegistry.h
         Source/Runtime/Engine/Public/Serialization/Json.h
@@ -284,7 +284,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Prefab/UIPrefab.cpp
         Source/Runtime/Engine/Private/ECS/Systems/UITransformSystem.cpp
         Source/Runtime/Engine/Private/Serialization/ComponentSerializer.cpp
-        Source/Runtime/Core/Private/UUID.cpp
+		Source/Runtime/Core/Private/Serialization/UUID.cpp
         Source/Runtime/Engine/Private/Serialization/ComponentRegistry.cpp
         Source/Runtime/Editor/Private/Editor.cpp
         Source/Runtime/Editor/Private/HierarchyPanel.cpp

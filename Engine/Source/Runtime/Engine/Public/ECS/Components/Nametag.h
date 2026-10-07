@@ -2,7 +2,7 @@
 #define MANGO_NAMETAG_H
 
 #include <string>
-#include "UUID.h"
+#include "Serialization/UUID.h"
 
 namespace tomato
 {

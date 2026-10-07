@@ -2,7 +2,7 @@
 #define MANGO_TARGETCOMPONENT_H
 
 #include <glm/glm.hpp>
-#include "UUID.h"
+#include "Serialization/UUID.h"
 
 namespace tomato
 {

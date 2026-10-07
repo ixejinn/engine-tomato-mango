@@ -6,7 +6,7 @@
 
 #include "Containers/EntityPool.h"
 #include "Resource/ResourceFwd.h"
-#include "UUID.h"
+#include "Serialization/UUID.h"
 
 namespace tomato
 {

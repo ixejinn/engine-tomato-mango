@@ -9,7 +9,7 @@
 #include "State/StateFwd.h"
 #include "Services/ServiceFwd.h"
 #include "Resource/ResourceFwd.h"
-#include "UUID.h"
+#include "Serialization/UUID.h"
 #include "TomatoFwd.h"
 #include "Collision/Layer/CollisionLayerMatrix.h"
 #include "Utils/PassKey.h"
