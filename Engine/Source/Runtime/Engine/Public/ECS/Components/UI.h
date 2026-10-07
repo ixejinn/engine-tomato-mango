@@ -54,7 +54,7 @@ namespace tomato
 
 		int sortOrder{0};
 
-		UUID camera; // optinal
+		UUID camera; // optional
 	};
 
 #define TMT_UI_TYPE_LIST(X)	\
@@ -95,12 +95,11 @@ namespace tomato
 
 	struct UIComponent
 	{
-		//entt::entity canvas{ entt::null };
 		UUID canvas{ 0 };
 		int sortOrder{ 0 };
 
 		UIType type{ UIType::Default };
-	}; // Tag
+	};
 
 	struct UIRect
 	{
@@ -138,12 +137,6 @@ namespace tomato
 
 		//bool dirty{ true };
 	};
-
-	/*struct TargetComponent
-	{
-		UUID target{ 0 };
-		glm::vec3 headOffset{ 0.f, 100.f, 0.f };
-	};*/
 
 	struct SelectableComponent
 	{

@@ -72,10 +72,6 @@ namespace tomato
                 state.stencil.enabled = true;
                 state.stencil.ref = 1;
                 state.stencil.dppass = GL_REPLACE;
-                //glDisable(GL_DEPTH_TEST);
-                /*glStencilFunc(GL_ALWAYS, 1, 0xFF);
-                glStencilMask(0xFF);*/
-                //std::cout << registry.get<NametagComponent>(e).name << '\n';
             }
 
             if (render.shader == 0)

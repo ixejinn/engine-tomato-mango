@@ -346,8 +346,7 @@ namespace tomato
 
 				ImPlot::EndPlot();
 			}
-
-			ImGui::End();
 		}
+		ImGui::End();
 	}
 }

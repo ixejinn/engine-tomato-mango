@@ -10,6 +10,13 @@
 
 namespace tomato::UIPrefab
 {
+	entt::entity CreateBaseUIEntity(
+		entt::registry& reg,
+		const std::string& name,
+		entt::entity canvas = entt::null,
+		UIType type = UIType::Default
+	);
+
 	entt::entity CreateCanvas(entt::registry& reg, RenderMode mode = RenderMode::ScreenOverlay);
 
 	entt::entity CreateButton(

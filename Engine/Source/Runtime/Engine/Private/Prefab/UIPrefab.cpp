@@ -22,24 +22,34 @@
 
 namespace tomato::UIPrefab
 {
-	entt::entity CreateCanvas(entt::registry& reg, RenderMode mode)
-	{
-		const entt::entity canvas = reg.create();
+    entt::entity CreateBaseUIEntity(entt::registry& reg, const std::string& name, entt::entity canvas, UIType type)
+    {
+        const entt::entity uiEntity = reg.create();
 
         auto& generator = reg.ctx().get<EntityNameGenerator>();
-        reg.emplace<NametagComponent>(canvas, GenerateUUID(), generator.Generate("Canvas"));
+        reg.emplace<NametagComponent>(uiEntity, GenerateUUID(), generator.Generate(name));
+        reg.emplace<tomato::UIComponent>(uiEntity, GetUUID(reg, canvas), 0, type);
+        reg.emplace<tomato::RectTransformComponent>(uiEntity);
+
+        reg.emplace<tomato::VisibilityComponent>(uiEntity);
+        reg.emplace<tomato::ActiveTag>(uiEntity);
+
+        if(canvas != entt::null)
+        {
+            reg.emplace<HierarchyComponent>(uiEntity);
+            SetHierarchy(reg, canvas, uiEntity);
+        }
+
+        return uiEntity;
+    }
+
+	entt::entity CreateCanvas(entt::registry& reg, RenderMode mode)
+	{
+        const entt::entity canvas = CreateBaseUIEntity(reg, "Canvas", entt::null, UIType::Canvas);
         reg.emplace<tomato::CanvasComponent>(canvas, mode);
-        reg.emplace<tomato::UIComponent>(canvas, (UUID)0, 0, UIType::Canvas);
-        reg.emplace<tomato::RectTransformComponent>(canvas);
         reg.emplace<tomato::RootEntityTag>(canvas);
         reg.emplace<tomato::HierarchyComponent>(canvas);
-        /*reg.emplace<tomato::RenderComponent>(canvas,
-            glm::vec4{ 1.f, 1.f, 1.f, 0.0f },
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
-            GetAssetID("UIShader"),
-            GetAssetID(Texture::PrimitiveName));*/
-        reg.emplace<tomato::VisibilityComponent>(canvas);
-        reg.emplace<tomato::ActiveTag>(canvas);
+
         return canvas;
 	}
 
@@ -47,35 +57,23 @@ namespace tomato::UIPrefab
     {
         canvas = canvas == entt::null ? GetCanvas(reg) : canvas;
 
-        const auto button = reg.create();
+        const entt::entity button = CreateBaseUIEntity(reg, "Button", canvas);
 
-        auto& generator = reg.ctx().get<EntityNameGenerator>();
-        reg.emplace<NametagComponent>(button, GenerateUUID(), generator.Generate("Button"));
-        reg.emplace<UIComponent>(button, GetUUID(reg, canvas), 0);
-        reg.emplace<RectTransformComponent>(button, pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(100.f, 100.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
         auto& selectable = reg.emplace<SelectableComponent>(button);
         reg.emplace<MouseEventComponent>(button);
-        reg.emplace<HierarchyComponent>(button);
-        SetHierarchy(reg, canvas, button);
         reg.emplace<RenderComponent>(button,
-            selectable.normalColor,
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
-            GetAssetID("UIShader"),
-            GetAssetID(Texture::PrimitiveName));
-        reg.emplace<VisibilityComponent>(button);
-        reg.emplace<tomato::ActiveTag>(button);
+                selectable.normalColor,
+                GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
+                GetAssetID("UIShader"),
+                GetAssetID(Texture::PrimitiveName));
+        reg.emplace_or_replace<RectTransformComponent>(button,
+            pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f),
+            glm::vec2(100.f, 100.f), glm::vec2(0.5f, 0.5f),
+            glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
 
-        const auto buttonText = reg.create();
-        reg.emplace<NametagComponent>(buttonText, GenerateUUID(), generator.Generate("Text"));
-        reg.emplace<UIComponent>(buttonText, GetUUID(reg, canvas), 0, UIType::Text);
-        auto& btnTxtComp = reg.emplace<TextComponent>(buttonText, "Button");
-        btnTxtComp.color = glm::vec4{ 0.3, 0.7f, 0.9f, 1.0f };
-	    btnTxtComp.fontSize = 30.f;
-	    reg.emplace<RectTransformComponent>(buttonText, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
-        reg.emplace<VisibilityComponent>(buttonText);
-        reg.emplace<HierarchyComponent>(buttonText);
+        const entt::entity buttonText = CreateText(reg, canvas, { 0.f, 0.f }, "Button", { 0.3, 0.7f, 0.9f, 1.0f }, 30.f);
+
         SetHierarchy(reg, button, buttonText);
-        reg.emplace<tomato::ActiveTag>(buttonText);
 
         return button;
     }
@@ -84,20 +82,17 @@ namespace tomato::UIPrefab
     {
         canvas = canvas == entt::null ? GetCanvas(reg) : canvas;
 
-        const auto text = reg.create();
+        const entt::entity text = CreateBaseUIEntity(reg, "Text", canvas, UIType::Text);
 
-        auto& generator = reg.ctx().get<EntityNameGenerator>();
-        reg.emplace<NametagComponent>(text, GenerateUUID(), generator.Generate("Text"));
-        reg.emplace<UIComponent>(text, GetUUID(reg, canvas), 0, UIType::Text);
         auto& txtComp = reg.emplace<TextComponent>(text, inText);
-	    txtComp.color = color;
-	    txtComp.fontSize = size;
-	    txtComp.font = GetAssetID(fontName);
-        reg.emplace<RectTransformComponent>(text, pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
-        reg.emplace<VisibilityComponent>(text);
-        reg.emplace<HierarchyComponent>(text);
-        SetHierarchy(reg, canvas, text);
-        reg.emplace<tomato::ActiveTag>(text);
+        txtComp.color = color;
+        txtComp.fontSize = size;
+        txtComp.font = GetAssetID(fontName);
+
+        reg.emplace_or_replace<RectTransformComponent>(text,
+            pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f),
+            glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f),
+            glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
 
         return text;
     }
@@ -105,23 +100,19 @@ namespace tomato::UIPrefab
     entt::entity CreateImage(entt::registry& reg, entt::entity canvas, const std::filesystem::path& textureName, glm::vec2 pos, glm::vec2 size)
     {
         canvas = canvas == entt::null ? GetCanvas(reg) : canvas;
-        
-        const auto img = reg.create();
 
-        auto& generator = reg.ctx().get<EntityNameGenerator>();
-        reg.emplace<NametagComponent>(img, GenerateUUID(), generator.Generate("Image"));
-        reg.emplace<UIComponent>(img, GetUUID(reg, canvas), 0);
+        const entt::entity img = CreateBaseUIEntity(reg, "Image", canvas);
 
         auto texture = AssetRegistry<Texture>::GetInstance().Get(GetAssetID(textureName));
         if (textureName == Texture::PrimitiveName)
             size = glm::vec2{ 100.f, 100.f };
 
-        reg.emplace<RectTransformComponent>(
+        reg.emplace_or_replace<RectTransformComponent>(
             img,
             pos,
             glm::vec2(0.f, 0.f),
             glm::vec2(0.f, 0.f),
-            size == glm::vec2(0.f, 0.f) ? glm::vec2{texture->GetWidth(), texture->GetHeight()} : glm::vec2{100.f, 100.f},
+            size == glm::vec2(0.f, 0.f) ? glm::vec2{ texture->GetWidth(), texture->GetHeight() } : glm::vec2{ 100.f, 100.f },
             glm::vec2(0.5f, 0.5f),
             glm::vec2(0.5f, 0.5f),
             glm::vec2(0.5f, 0.5f)
@@ -133,10 +124,6 @@ namespace tomato::UIPrefab
             GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
             GetAssetID("UIShader"),
             GetAssetID(textureName));
-        reg.emplace<VisibilityComponent>(img);
-        reg.emplace<HierarchyComponent>(img);
-        SetHierarchy(reg, canvas, img);
-        reg.emplace<tomato::ActiveTag>(img);
 
         return img;
     }

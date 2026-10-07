@@ -152,7 +152,6 @@ namespace tomato
 		{
 			if (ui.type == UIType::Text)
 			{
-				auto& text = registry.get<TextComponent>(e);
 				if (text.dirty)
 				{
 					text.codepoints = UTF8ToUTF32(text.text);
@@ -225,9 +224,8 @@ namespace tomato
 
 					 if (!registry.ctx().find<RenderContext>())
 					 	continue;
-					auto renderCtx = registry.ctx().get<RenderContext>();
+					auto& renderCtx = registry.ctx().get<RenderContext>();
 					if (renderCtx.mainCam == entt::null)
-
 					{
 						TMT_WARN << "Main camera not present";
 						continue;
@@ -279,27 +277,6 @@ namespace tomato
 		if (uiCtx.worldDrawList.empty())
 			return;
 
-		/*CanvasComponent* currentCanvas = nullptr;
-		for (auto entity : uiCtx.worldDrawList)
-		{
-			auto& hierarchy = registry.get<HierarchyComponent>(entity);
-
-			// entity is canvas(root).
-			if (hierarchy.parent == entt::null)
-			{
-				currentCanvas = &registry.get<CanvasComponent>(entity);
-
-				auto& rect = registry.get<RectTransformComponent>(entity);
-				rect.computedSize = currentCanvas->actualSize;
-				rect.position = glm::vec3(rect.computedSize * rect.pivot, 0.f);
-				rect.scale = glm::vec3(1.f);
-
-				rect.screenPosition = rect.position;
-				break;
-			}
-		}
-
-		if (!currentCanvas) return;*/
 		for (auto entity : uiCtx.worldDrawList)
 		{
 			auto& hierarchy = registry.get<HierarchyComponent>(entity);

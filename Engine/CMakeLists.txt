@@ -207,6 +207,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Profiler/ProfilerConfig.h
 		Source/Runtime/Engine/Public/EngineConfig.h
 		Source/Runtime/Engine/Private/ECS/Components/TransformDirty.h
+		Source/Runtime/Engine/Private/ECS/Components/UIDirty.h
 		Source/Runtime/Engine/Public/ECS/Forward/TransformDirtyFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/CharacterScaleSystem.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterConfig.h

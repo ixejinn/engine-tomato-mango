@@ -259,25 +259,6 @@ void TestState::PlayTest()
         }
     };
 
-
-    //UIPrefab::CreateText(registry_, entt::null, { 100.f, 0.f });
-    //UIPrefab::CreateImage(registry_, entt::null, PathManager::ProjectImage("WATER_GAME_LOGO.png"), {200.f, 300.f});
-    //UIPrefab::CreateCanvas(registry_);
-    //UIPrefab::CreateCanvas(registry_);
-    //UIPrefab::CreateCanvas(registry_);
-#if 0
-    auto targetLabel = UIPrefab::CreateText(registry_, entt::null, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 20.f);
-    registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0), glm::vec3{ 0.f, 1.f, 0.f });
-    SetHierarchy(registry_, UIPrefab::GetCanvas(registry_), targetLabel);
-    auto& uiCmp = registry_.get<UIComponent>(targetLabel);
-    uiCmp.sortOrder = 1;
-
-    auto targetLabel1 = UIPrefab::CreateText(registry_, entt::null, { 0.f, 0.f }, "player1", { 1.0f, 1.0f, 0.f, 1.f }, 20.f);
-    registry_.emplace<TargetComponent>(targetLabel1, GetUUID(registry_, player1), glm::vec3{ 0.f, 1.f, 0.f });
-    SetHierarchy(registry_, UIPrefab::GetCanvas(registry_), targetLabel1);
-    auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
-    uiCmp1.sortOrder = 1;
-#elif 1
     auto worldCanvas = UIPrefab::CreateCanvas(registry_, RenderMode::World);
 
     auto targetLabel = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
@@ -291,7 +272,6 @@ void TestState::PlayTest()
     // SetHierarchy(registry_, worldCanvas, targetLabel1);
     // auto& uiCmp1 = registry_.get<UIComponent>(targetLabel1);
     // uiCmp1.sortOrder = 1;
-#endif
 
     auto& eventDispatcher = EventDispatcher::GetInstance();
     // eventDispatcher.Connect<CollisionEnterEvent, &TEST_CollisionEnter>();
