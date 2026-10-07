@@ -27,11 +27,9 @@ void WavePoolTraits::Assemble(entt::registry& registry_, entt::entity wave)
     transform.SetPosition(glm::vec3{ 0, -2.9f, 0 });
     transform.SetScale(glm::vec3{ 0, 0.1f, 0 });
 
-    registry_.emplace<RenderComponent>(wave,
-        glm::vec4(1.f),
-        GetAssetID("Primitive::OpenCylinder_50_10"),
-        GetAssetID(Shader::PrimitiveName),
-        GetAssetID(Texture::PrimitiveName));
+    auto& render = registry_.emplace<RenderComponent>(wave);
+    render.mesh = GetAssetID("Primitive::OpenCylinder_50_10");
+    render.doubleSided = true;
     registry_.emplace<EditorHidden>(wave);
 
     auto& waveCmp = registry_.emplace<WaveComponent>(wave, false, glm::vec3{ 0, -2.9f, 0 }, 10.f, 0.01f);

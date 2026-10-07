@@ -17,12 +17,13 @@ namespace tomato
 		ApplyBlend(state.blend);
 	}
 
-	void GLStateCache::UseShader(GLuint program)
+	bool GLStateCache::UseShader(GLuint program)
 	{
-		if (program_ == program) return;
+		if (program_ == program) return false;
 
 		glUseProgram(program);
 		program_ = program;
+        return true;
 	}
 
 	void GLStateCache::BindVertexArray(GLuint vao)
@@ -65,7 +66,7 @@ namespace tomato
 
 	void GLStateCache::Invalidate()
 	{
-		ForceApply(PipelineState{PipelinePresets::Default3D});
+		ForceApply(PipelineState{PipelinePresets::Opaque});
 
 		glUseProgram(0);
 		glBindVertexArray(0);

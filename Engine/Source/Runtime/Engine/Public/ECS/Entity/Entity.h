@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <entt/fwd.hpp>
-#include "UUID.h"
+#include "Serialization/UUID.h"
 #include "Resource/ResourceFwd.h"
 #include "ECS/Forward/EntityCompFwd.h"
 

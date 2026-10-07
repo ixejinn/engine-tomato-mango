@@ -3,8 +3,10 @@
 
 #include "ECS/Systems/System.h"
 
-namespace tomato {
-    class GravitySystem : public System {
+namespace tomato
+{
+    class GravitySystem : public System
+    {
     public:
         void Update(SimContext& simCtx);
 

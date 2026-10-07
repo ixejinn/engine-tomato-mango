@@ -36,13 +36,10 @@ namespace tomato
         registry_.emplace<EditorHidden>(editCam);
 
         // Skybox
-        entt::entity& skybox = renderCtx.skybox;
-        skybox = Prefab::CreateSkybox(registry_);
-        registry_.emplace<NoInspector>(skybox);
+        Prefab::CreateSkybox(registry_);
 
         // View gizmo
-        entt::entity& viewGizmo = renderCtx.viewGizmo;
-        viewGizmo = Prefab::CreateGizmo(registry_);
+        Prefab::CreateGizmo(registry_);
 
         //// Set collision context
         auto& collisionCtx = registry_.ctx().get<CollisionContext>();

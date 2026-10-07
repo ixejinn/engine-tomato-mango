@@ -63,7 +63,13 @@ namespace tomato
 
 	namespace PipelinePresets
 	{
-		inline constexpr PipelineState Opaque {};
+		inline constexpr PipelineState Default {};
+
+        // RenderSystem의 기본 3D 렌더 상태
+        inline constexpr PipelineState Opaque
+        {
+            .stencil = {.enabled = true, .dppass = GL_REPLACE },
+        };
 
 		inline constexpr PipelineState Transparent
 		{
@@ -75,7 +81,6 @@ namespace tomato
 		{
 			.depth = {.testEnabled = true, .writeEnabled = false, .func = GL_LEQUAL },
 			.raster = {.cullEnabled = true, .cullFace = GL_FRONT },
-			.blend = {.enabled = true },
 		};
 
 		// RenderSystem의 기본 3D 렌더 상태
@@ -83,7 +88,6 @@ namespace tomato
 		{
 			//.stencil = {.enabled = true, .ref = 1, .dppass = GL_REPLACE },
 			.stencil = {.enabled = false },
-			.blend = {.enabled = true },
 		};
 
 		inline constexpr PipelineState ScreenUI
@@ -99,7 +103,7 @@ namespace tomato
 
 		void Apply(const PipelineState& state);
 
-		void UseShader(GLuint program);
+		bool UseShader(GLuint program);
 		void BindVertexArray(GLuint vao);
 		void BindTexture(GLuint tex, GLuint unit = 0);
 

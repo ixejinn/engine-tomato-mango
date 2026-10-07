@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <entt/fwd.hpp>
 #include "Serialization/Json.h"
-#include "UUID.h"
+#include "Serialization/UUID.h"
 #include "State/StateFwd.h"
 #include "ECS/Forward/ComponentFwd.h"
 #include "Particle/ParticleEmitterPool.h"

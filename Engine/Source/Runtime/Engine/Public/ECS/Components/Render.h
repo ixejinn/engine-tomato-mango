@@ -20,6 +20,20 @@ namespace tomato
         AssetID texture{GetAssetID(Texture::PrimitiveName)};
 
         RenderPriority priority{RenderPriority::Opaque};
+
+        bool doubleSided{false};
+    };
+
+    enum class StencilMask : uint8_t
+    {
+        None = 0,
+
+    };
+
+    struct StencilComponent
+    {
+        uint8_t write{0};
+        uint8_t read{0};
     };
 }
 

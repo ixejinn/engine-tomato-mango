@@ -4,6 +4,7 @@
 #include "ECS/Components/Components.h"
 #include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Visibility.h"
+#include "ECS/Components/Gizmo.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/Entity/Entity.h"
 #include "Resource/AssetHash.h"
@@ -140,97 +141,78 @@ namespace tomato::Prefab
         return col;
     }
 
-    /////////////// 구버전
-    entt::entity CreateSkybox(entt::registry& reg)
+    entt::entity CreateSkybox(entt::registry& registry)
     {
-        const entt::entity obj = reg.create();
+        const entt::entity obj = CreateStaticMesh(registry, true, "Skybox");
 
-        auto& generator = reg.ctx().get<EntityNameGenerator>();
-        reg.emplace<NametagComponent>(obj, GenerateUUID(), generator.Generate("Skybox"));
-        reg.emplace<TransformComponent>(obj);
-        reg.emplace<VisibilityComponent>(obj);
-        reg.emplace<RootEntityTag>(obj);
+        registry.emplace<NoInspector>(obj);
+
+        auto& render = registry.get<RenderComponent>(obj);
+        render.shader = GetAssetID("SkyboxShader");
+        render.texture = GetAssetID("PrimitiveSkybox");
+        render.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cube));
+        render.priority = RenderPriority::Skybox;
 
         return obj;
     }
 
-    entt::entity CreateGizmo(entt::registry& reg)
+    entt::entity CreateGizmo(entt::registry& registry)
     {
         // Center(root)
-        const entt::entity center = CreateStaticMesh(reg, true, "Gizmo");
+        const entt::entity center = CreateStaticMesh(registry, true, "Gizmo");
+
+        registry.emplace<GizmoTag>(center);
 
         // X axis
-        const entt::entity x = CreateStaticMesh(reg, true, "X");
-        auto& trfX = reg.get<TransformComponent>(x);
+        const entt::entity x = CreateStaticMesh(registry, true, "X");
+
+        registry.emplace<GizmoTag>(x);
+
+        auto& trfX = registry.get<TransformComponent>(x);
         trfX.SetPosition(3, 0, 0);
         trfX.SetRotationDegree(0, 0, 90);
         trfX.SetScale(2.5, 5, 2.5);
-        auto& rndrX = reg.get<RenderComponent>(x);
+
+        auto& rndrX = registry.get<RenderComponent>(x);
         rndrX.color = glm::vec4(1.f, 0.f, 0.f, 1.f);
         rndrX.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone));
-        SetHierarchy(reg, center, x);
+
+        SetHierarchy(registry, center, x);
 
         // Y axis
-        const entt::entity y = CreateStaticMesh(reg, true, "Y");
-        auto& trfY = reg.get<TransformComponent>(y);
+        const entt::entity y = CreateStaticMesh(registry, true, "Y");
+
+        registry.emplace<GizmoTag>(y);
+
+        auto& trfY = registry.get<TransformComponent>(y);
         trfY.SetPosition(0, 3, 0);
         trfY.SetRotationDegree(-180, 0, 0);
         trfY.SetScale(2.5, 5, 2.5);
-        auto& rndrY = reg.get<RenderComponent>(y);
+
+        auto& rndrY = registry.get<RenderComponent>(y);
         rndrY.color = glm::vec4(0.f, 1.f, 0.f, 1.f);
         rndrY.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone));
-        SetHierarchy(reg, center, y);
+
+        SetHierarchy(registry, center, y);
 
         // Z axis
-        const entt::entity z = CreateStaticMesh(reg, true, "Z");
-        auto& trfZ = reg.get<TransformComponent>(z);
+        const entt::entity z = CreateStaticMesh(registry, true, "Z");
+
+        registry.emplace<GizmoTag>(z);
+
+        auto& trfZ = registry.get<TransformComponent>(z);
         trfZ.SetPosition(0, 0, 3);
         trfZ.SetRotationDegree(-90, 0, 0);
         trfZ.SetScale(2.5, 5, 2.5);
-        auto& rndrZ = reg.get<RenderComponent>(z);
+
+        auto& rndrZ = registry.get<RenderComponent>(z);
         rndrZ.color = glm::vec4(0.f, 0.f, 1.f, 1.f);
         rndrZ.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Cone));
-        SetHierarchy(reg, center, z);
 
-        reg.get<TransformComponent>(center).SetScale(0.1f, 0.1f, 0.1f);
+        SetHierarchy(registry, center, z);
+
+        registry.get<TransformComponent>(center).SetScale(0.1f, 0.1f, 0.1f);
+        std::cout << "gizmo: " << (int)center << " " << (int)x << " " << (int)y << " " << (int)z << "\n";
         return center;
     }
-
-    // entt::entity AttachCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
-    //     const entt::entity col = reg.create();
-    //
-    //     auto& generator = reg.ctx().get<EntityNameGenerator>();
-    //     reg.emplace<NametagComponent>(col, GenerateUUID(), generator.Generate("Collider"));
-    //
-    //     SetHierarchy(reg, parent, col);
-    //
-    //     reg.emplace<TransformComponent>(col);
-    //     reg.emplace<ColliderComponent>(col, type);
-    //     reg.emplace<RenderComponent>(col,
-    //                                  glm::vec4(1.f),
-    //                                  GetAssetID(Mesh::GetPrimitiveName(
-    //                                          type == ColliderType::Cube ? Mesh::Primitive::Cube : Mesh::Primitive::Sphere)),
-    //                                  GetAssetID(Shader::PrimitiveName),
-    //                                  GetAssetID(Texture::PrimitiveName));
-    //     reg.emplace<VisibilityComponent>(col);
-    //
-    //     TMT_INFO << "Create collider: " << (int)col;
-    //     return col;
-    // }
-    //
-    // entt::entity AttachCharacterCollider(entt::registry& reg, entt::entity parent, ColliderType type) {
-    //     const entt::entity col = AttachCollider(reg, parent, type);
-    //     TransformComponent& trfP = reg.get<TransformComponent>(parent);
-    //
-    //     const entt::entity ground = AttachCollider(reg, col, type);
-    //     TransformComponent& trfC = reg.get<TransformComponent>(ground);
-    //
-    //     trfC.SetScale(trfP.GetLocalScale() * 0.8f);
-    //     trfC.AddPosition({0.f, -(trfP.GetLocalScale().y * 0.1 + COLLISION_SKIN + 0.001f), 0.f});
-    //
-    //     reg.get<ColliderComponent>(ground).trigger = true;
-    //
-    //     TMT_INFO << "Create character collider, ground: " << (int)col << ", " << (int)ground;
-    //     return col;
-    // }
 }

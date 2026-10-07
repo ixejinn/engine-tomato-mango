@@ -67,6 +67,8 @@ namespace tomato
             manager.AddSystem(FramePhase::UI, factory.mode, factory.factory());
 
         // Post
+        manager.AddSystem(FramePhase::PostRender, RunMode::Editor,
+            std::make_unique<ViewGizmoRenderSystem>());
         for (const auto& factory : frameFactories_[FramePhase::PostRender])
             manager.AddSystem(FramePhase::PostRender, factory.mode, factory.factory());
     }

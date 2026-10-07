@@ -3,6 +3,7 @@
 
 #include <entt/fwd.hpp>
 #include <vector>
+#include <glad/glad.h>
 #include "ECS/Systems/System.h"
 #include "Resource/ResourceFwd.h"
 
