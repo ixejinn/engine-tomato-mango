@@ -69,7 +69,7 @@ namespace tomato
         inline constexpr PipelineState Opaque
         {
             .stencil = {.enabled = true, .dppass = GL_REPLACE },
-            .blend = {.enabled = true },
+//            .blend = {.enabled = true },
         };
 
 		inline constexpr PipelineState Transparent
@@ -82,7 +82,7 @@ namespace tomato
 		{
 			.depth = {.testEnabled = true, .writeEnabled = false, .func = GL_LEQUAL },
 			.raster = {.cullEnabled = true, .cullFace = GL_FRONT },
-			.blend = {.enabled = true },
+//			.blend = {.enabled = true },
 		};
 
 		inline constexpr PipelineState ScreenUI

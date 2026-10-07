@@ -33,7 +33,7 @@ namespace tomato
 
     void RenderSystem::Update(SimContext& simCtx)
     {
-        CPU_PROFILER_BLOCK_BEGIN(RenderSystem::Update);
+//        CPU_PROFILER_BLOCK_BEGIN(RenderSystem::Update);
         UpdateDrawList(simCtx);
 
         auto& registry = simCtx.state->GetRegistry();
@@ -67,6 +67,18 @@ namespace tomato
                 case RenderPass::Opaque:
                 default:
                 {
+                    PipelineState state{PipelinePresets::Opaque};
+                    if (render.doubleSided)
+                        state.raster.cullEnabled = false;
+
+                    if (auto* stencil = registry.try_get<StencilComponent>(drawItem.entity))
+                    {
+                        if (stencil->write != 0)
+                        {
+
+                        }
+                    }
+
                     auto& trf = registry.get<TransformComponent>(drawItem.entity);
 
                     if (gl.UseShader(shader->GetHandle()))
@@ -84,7 +96,7 @@ namespace tomato
                     gl.BindTexture(texture->GetHandle());
                     gl.BindVertexArray(mesh->GetHandle());
 
-                    gl.Apply(PipelinePresets::Opaque);
+                    gl.Apply(state);
 #ifdef TOMATO_DEBUG
                     if (!registry.all_of<RootEntityTag>(drawItem.entity))
                         mesh->Draw(true);
@@ -135,7 +147,7 @@ namespace tomato
                     break;
             }
         }
-        CPU_PROFILER_BLOCK_END(RenderSystem::Update);
+//        CPU_PROFILER_BLOCK_END(RenderSystem::Update);
     }
 
     void RenderSystem::UpdateDrawList(SimContext& simCtx)
