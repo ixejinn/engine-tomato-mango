@@ -30,6 +30,13 @@ void WavePoolTraits::Assemble(entt::registry& registry_, entt::entity wave)
     auto& render = registry_.emplace<RenderComponent>(wave);
     render.mesh = GetAssetID("Primitive::OpenCylinder_50_10");
     render.doubleSided = true;
+    render.color.a = 0.8f;
+
+    auto& stencil = registry_.emplace<StencilComponent>(wave);
+    stencil.func = GL_NOTEQUAL;
+    stencil.readRef = 1 << 0;
+    stencil.readRef = 1 << 0;
+
     registry_.emplace<EditorHidden>(wave);
 
     auto& waveCmp = registry_.emplace<WaveComponent>(wave, false, glm::vec3{ 0, -2.9f, 0 }, 10.f, 0.01f);

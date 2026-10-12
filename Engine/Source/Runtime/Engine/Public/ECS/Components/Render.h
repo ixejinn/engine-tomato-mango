@@ -24,16 +24,12 @@ namespace tomato
         bool doubleSided{false};
     };
 
-    enum class StencilMask : uint8_t
-    {
-        None = 0,
-
-    };
-
+    // Bitmask
     struct StencilComponent
     {
-        uint8_t write{0};
-        uint8_t read{0};
+        GLenum func{GL_ALWAYS};
+        uint8_t writeRef{0};
+        uint8_t readRef{0};
     };
 }
 

@@ -95,6 +95,8 @@ void GameState::Init()
     auto& renderGnd = registry_.get<RenderComponent>(ground);
     //renderGnd.color = { 0.639f, 0.8f, 0.639f, 1.f };
     renderGnd.color = { 0.710f, 0.839f, 0.573f, 1.f };
+    auto& stencilGnd = registry_.emplace<StencilComponent>(ground);
+    stencilGnd.writeRef = 1 << 0;
 
 
     engine_.collisionLayerMtx_.SetCollisionLayer(CollisionLayer::Wave1, CollisionLayer::Wave2, true);

@@ -4,5 +4,7 @@
 namespace tomato
 {
 	class GLStateCache;
+
+	struct PipelineState;
 }
 #endif // !MANGO_GLSTATEFWD_H

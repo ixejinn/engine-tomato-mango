@@ -5,7 +5,7 @@
 #include <vector>
 #include <glad/glad.h>
 #include "ECS/Systems/System.h"
-#include "Resource/ResourceFwd.h"
+#include "Render/GLStateFwd.h"
 
 namespace tomato
 {
@@ -25,6 +25,8 @@ namespace tomato
             entt::entity entity;
         };
         std::vector<DrawItem> drawList_;
+
+        void RenderDrawItem(PipelineState state, entt::registry& registry, const DrawItem& drawItem);
     };
 }
 

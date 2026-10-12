@@ -75,10 +75,12 @@ namespace tomato
 
                     if (auto* stencil = registry.try_get<StencilComponent>(drawItem.entity))
                     {
-                        if (stencil->write != 0)
-                        {
-
-                        }
+                        state.stencil.enabled = true;
+                        state.stencil.func = stencil->func;
+                        state.stencil.ref = stencil->writeRef;
+                        state.stencil.readMask = stencil->readRef;
+                        state.stencil.writeMask = stencil->writeRef;
+                        state.stencil.dppass = GL_REPLACE;
                     }
 
                     auto& trf = registry.get<TransformComponent>(drawItem.entity);
@@ -126,6 +128,20 @@ namespace tomato
 
                 case RenderPass::Transparent:
                 {
+                    PipelineState state{PipelinePresets::Transparent};
+                    if (render.doubleSided)
+                        state.raster.cullEnabled = false;
+
+                    if (auto* stencil = registry.try_get<StencilComponent>(drawItem.entity))
+                    {
+                        state.stencil.enabled = true;
+                        state.stencil.func = GL_NOTEQUAL;
+                        state.stencil.ref = stencil->writeRef;
+                        state.stencil.readMask = stencil->readRef;
+                        state.stencil.writeMask = stencil->writeRef;
+                        state.stencil.dppass = GL_REPLACE;
+                    }
+
                     auto& trf = registry.get<TransformComponent>(drawItem.entity);
 
                     if (gl.UseShader(shader->GetHandle()))
@@ -143,7 +159,7 @@ namespace tomato
                     gl.BindTexture(texture->GetHandle());
                     gl.BindVertexArray(mesh->GetHandle());
 
-                    gl.Apply(PipelinePresets::Transparent);
+                    gl.Apply(state);
                     mesh->Draw();
                 }
                     break;
@@ -203,5 +219,10 @@ namespace tomato
         }
 
         std::ranges::sort(drawList_, std::ranges::less{}, &DrawItem::sortKey);
+    }
+
+    void RenderSystem::RenderDrawItem(PipelineState state, entt::registry& registry, const DrawItem& drawItem)
+    {
+
     }
 }
