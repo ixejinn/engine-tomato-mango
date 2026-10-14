@@ -7,9 +7,9 @@ namespace tomato::UI
 	enum class Dirty : uint8_t
 	{
 		None = 0,
-		Local = 1 << 0,
-		Hierarchy = 1 << 1,
-		Size = 1 << 2
+		Layout = 1 << 0,
+		Matrix = 1 << 1,
+		All = Layout | Matrix,
 	};
 }
 

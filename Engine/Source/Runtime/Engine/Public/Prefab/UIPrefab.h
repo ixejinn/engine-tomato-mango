@@ -45,7 +45,7 @@ namespace tomato::UIPrefab
 		glm::vec2		size = { 0.f, 0.f }
 	);
 
-	entt::entity GetCanvas(entt::registry& reg);
+	entt::entity GetCanvas(entt::registry& reg, RenderMode mode = RenderMode::ScreenOverlay);
 
 }
 

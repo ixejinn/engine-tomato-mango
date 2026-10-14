@@ -118,7 +118,13 @@ namespace tomato
 
 	void InspectorPanel::ShowEntityUID(EditorContext& editorCtx)
 	{
-		auto& nametag = editorCtx.currentState->GetRegistry().get<NametagComponent>(editorCtx.selectedEntity);
+		auto nametag = editorCtx.currentState->GetRegistry().try_get<NametagComponent>(editorCtx.selectedEntity);
+		if (!nametag)
+		{
+			editorCtx.selectedEntity = entt::null;
+			return;
+		}
+
 		if(ImGui::BeginTable("EntityInformation", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersInner))
 		{
 			ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, ImGui::CalcTextSize("Name").x + 20.f);
@@ -130,7 +136,7 @@ namespace tomato
 
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
-			if (ImGui::InputText("##input text", &nametag.name, ImGuiInputTextFlags_ElideLeft))
+			if (ImGui::InputText("##input text", &nametag->name, ImGuiInputTextFlags_ElideLeft))
 				editorCtx.sceneDirty = true;
 			//ImGui::Text("%s", nametag.name.c_str());
 
@@ -138,7 +144,7 @@ namespace tomato
 			ImGui::Text("%d", entt::to_entity(editorCtx.selectedEntity));
 
 			ImGui::TableSetColumnIndex(2);
-			ImGui::Text("%llu", nametag.id);
+			ImGui::Text("%llu", nametag->id);
 
 			ImGui::PopStyleVar();
 

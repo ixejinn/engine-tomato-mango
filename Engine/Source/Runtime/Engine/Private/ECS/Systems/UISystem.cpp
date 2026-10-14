@@ -6,6 +6,7 @@
 #include "ECS/Components/Target.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Text.h"
+#include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Entity/Entity.h"
@@ -54,6 +55,8 @@ namespace tomato
 	void UISystem::Traverse(SimContext& ctx, entt::entity e, std::vector<entt::entity>& drawList)
 	{
 		auto& registry = ctx.state->GetRegistry();
+		if (!registry.all_of<ActiveTag>(e))
+			return;
 		auto* ui = registry.try_get<UIComponent>(e);
 		if (!ui) return;
 
@@ -74,9 +77,9 @@ namespace tomato
 
 		std::vector<entt::entity> canvases, screenDrawList, worldDrawList;
 
-		auto canvasView = registry.view<CanvasComponent>();
-		for (auto canvas : canvasView)
-			canvases.push_back(canvas);
+		auto canvasView = registry.view<ActiveTag, CanvasComponent>();
+		for (auto [e, canvas] : canvasView.each())
+			canvases.push_back(e);
 
 		std::sort(canvases.begin(), canvases.end(),
 			[&](entt::entity a, entt::entity b)
@@ -147,7 +150,7 @@ namespace tomato
 	void UISystem::UpdateTextContentSize(SimContext& ctx)
 	{
 		auto& registry = ctx.state->GetRegistry();
-		auto textView = registry.view<UIComponent, RectTransformComponent, TextComponent>();
+		auto textView = registry.view<ActiveTag, UIComponent, RectTransformComponent, TextComponent>();
 		for (auto [e, ui, rect, text] : textView.each())
 		{
 			if (ui.type == UIType::Text)

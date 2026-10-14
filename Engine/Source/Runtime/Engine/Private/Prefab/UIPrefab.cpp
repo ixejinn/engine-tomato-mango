@@ -61,11 +61,11 @@ namespace tomato::UIPrefab
 
         auto& selectable = reg.emplace<SelectableComponent>(button);
         reg.emplace<MouseEventComponent>(button);
-        reg.emplace<RenderComponent>(button,
-                selectable.normalColor,
-                GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
-                GetAssetID("UIShader"),
-                GetAssetID(Texture::PrimitiveName));
+        auto& render = reg.emplace<RenderComponent>(button);
+        render.color = selectable.normalColor;
+        render.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain));
+        render.shader = GetAssetID("UIShader");
+
         reg.emplace_or_replace<RectTransformComponent>(button,
             pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f),
             glm::vec2(100.f, 100.f), glm::vec2(0.5f, 0.5f),
@@ -118,17 +118,15 @@ namespace tomato::UIPrefab
             glm::vec2(0.5f, 0.5f)
         );
 
-        reg.emplace<RenderComponent>(
-            img,
-            glm::vec4{ 1.f, 1.f, 1.f, 1.f },
-            GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)),
-            GetAssetID("UIShader"),
-            GetAssetID(textureName));
+        auto& render = reg.emplace<RenderComponent>(img);
+        render.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain));
+        render.shader = GetAssetID("UIShader");
+        render.texture = GetAssetID(textureName);
 
         return img;
     }
 
-    entt::entity GetCanvas(entt::registry& reg)
+    entt::entity GetCanvas(entt::registry& reg, RenderMode mode)
     {
         std::vector<entt::entity> canvases;
         auto canvasView = reg.view<CanvasComponent>();
@@ -138,17 +136,11 @@ namespace tomato::UIPrefab
         
         else
         {
-            for (auto canvas : canvasView)
-                canvases.push_back(canvas);
-
-            std::sort(canvases.begin(), canvases.end(),
-                [&](entt::entity a, entt::entity b)
-                {
-                    return reg.get<CanvasComponent>(a).sortOrder <
-                        reg.get<CanvasComponent>(b).sortOrder;
-                });
-
-            return canvases[0];
+            for (auto [e, canvas] : canvasView.each())
+            {
+                if (mode == canvas.mode)
+                    return e;
+            }
         }
     }
 }
