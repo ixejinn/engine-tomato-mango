@@ -171,6 +171,9 @@ void GameState::WaveCollisionExit(const tomato::TriggerExitEvent& event)
 
 void GameState::MakeWaveJump(const LandingEvent& event)
 {
+    if (event.isLandedOnCharacter)
+        return;
+
     if (event.remainingJumpCount == 0)
         registry_.ctx().get<WaveManager>().Acquire(registry_, event.e, event.position, 0.01f);
 }

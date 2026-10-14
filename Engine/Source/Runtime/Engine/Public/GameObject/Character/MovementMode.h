@@ -26,6 +26,7 @@ namespace tomato
         entt::registry* reg;
         glm::vec3 position;
         unsigned int remainingJumpCount;
+        bool isLandedOnCharacter;
     };
 }
 
