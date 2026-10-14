@@ -6,6 +6,7 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Particle.h"
 
+#include "Render/GLStateCache.h"
 #include "Resource/AssetHash.h"
 #include "Resource/AssetRegistry.h"
 
@@ -17,7 +18,6 @@
 #include "Particle/ParticleEmitterPool.h"
 
 #include "Simulation/SimulationConfig.h"
-
 using namespace std::chrono_literals;
 
 namespace tomato
@@ -34,6 +34,14 @@ namespace tomato
     void ParticleRenderSystem::Update(SimContext& simCtx)
     {
         auto& registry = simCtx.state->GetRegistry();
+        auto& renderCtx = registry.ctx().get<RenderContext>();
+
+        const auto* camera = registry.try_get<CameraComponent>(renderCtx.mainCam);
+        if (!camera)
+        {
+            TMT_WARN << "Main camera is missing or invalid.";
+            return;
+        }
 
         // 활성화된 파티클 엔티티가 없으면 종료
         if (registry.ctx().get<ParticleEmitterPool>().GetActiveEntityCount() == 0)
@@ -44,15 +52,18 @@ namespace tomato
             TMT_ERR << "Invalid mesh or shader.";
             return;
         }
-        mesh2D_->Bind();
-        shader_->Use();
-        AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
+
+        auto& gl = renderCtx.glState;
+        gl.Apply(PipelinePresets::Opaque);
+
+        Texture* texture = AssetRegistry<Texture>::GetInstance().Get(curTexture_);
+
+        gl.UseShader(shader_->GetHandle());
+        gl.BindVertexArray(mesh2D_->GetHandle());
+        gl.BindTexture(texture->GetHandle());
 
         // 카메라 축 설정
-        auto& mainCam = registry.ctx().get<RenderContext>().mainCam;
-        if (mainCam == entt::null)
-            return;
-        auto& viewProjMat = registry.try_get<CameraComponent>(mainCam)->viewProjMat;
+        auto& viewProjMat = camera->viewProjMat;
 
         shader_->SetUniformMat4("uViewProj", viewProjMat);
         shader_->SetUniformVec3(
@@ -76,11 +87,8 @@ namespace tomato
                 continue;
 
             // 파티클 그리기
-            if (curTexture_ != render.texture)
-            {
-                curTexture_ = render.texture;
-                AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
-            }
+            texture = AssetRegistry<Texture>::GetInstance().Get(render.texture);
+            gl.BindTexture(texture->GetHandle());
 
             for (int i = 0; i < runtime.activeCnt; )
             {

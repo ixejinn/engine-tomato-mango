@@ -92,7 +92,10 @@ namespace tomato
 
 		inline constexpr PipelineState ScreenUI
 		{
-
+			.depth		= {.testEnabled = false },
+			.stencil	= {.enabled = false },
+			.raster		= {.cullEnabled = false },
+			.blend		= {.enabled = true },
 		};
 	}
 

@@ -13,7 +13,7 @@ namespace tomato {
         void Bind(unsigned int unit = 0) const;
         void Clear();
 
-        unsigned int GetID() const { return textureID_; }
+        unsigned int GetHandle() const { return textureID_; }
 
         int GetWidth() const { return width_; }
         int GetHeight() const { return height_; }

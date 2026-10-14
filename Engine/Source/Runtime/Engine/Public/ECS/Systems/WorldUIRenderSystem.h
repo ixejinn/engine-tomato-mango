@@ -16,10 +16,6 @@ namespace tomato
 
 	private:
 		TextRenderer textRenderer_;
-
-		AssetID curMesh_;
-		AssetID curShader_;
-		AssetID curTexture_;
 	};
 }
 

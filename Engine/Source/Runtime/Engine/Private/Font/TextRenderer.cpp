@@ -7,8 +7,8 @@
 #include "Font/AtlasManager.h"
 #include "Resource/AssetRegistry.h"
 #include "Resource/Render/Shader.h"
+#include "Render/GLStateCache.h"
 #include "Utils/Utf.h"
-
 namespace tomato
 {
 	TextRenderer::~TextRenderer()
@@ -17,15 +17,8 @@ namespace tomato
 		if (vbo_ != 0) glDeleteBuffers(1, &vbo_);
 	}
 
-	void TextRenderer::Init(Shader* shader)
+	void TextRenderer::Init()
 	{
-		shader_ = shader;
-
-		//shader_->Use();
-		////shader->SetUniformMat4("projection", projection);
-
-		//glUseProgram(0);
-
 		// 1. Create and bind VAO
 		glCreateVertexArrays(1, &vao_);
 		glCreateBuffers(1, &vbo_);
@@ -58,11 +51,8 @@ namespace tomato
 		TMT_INFO << "TextRenderer initialized with reserved capacity: 1000 chars.";
 	}
 
-	void TextRenderer::DrawString(const std::u32string& text, float x, float y, float size, const glm::vec4& color, Font* font, const glm::mat4 model, const glm::mat4 projection)
+	void TextRenderer::DrawString(GLStateCache& glState, const std::u32string& text, float x, float y, float size, const glm::vec4& color, Font* font, const glm::mat4& model)
 	{
-		//@TODO
-		shader_->SetUniformMat4("projection", projection);
-
 		// @NOTE :
 		// Pixel perfect handling is not implemented yet.
 		// May cause minor visual issues (e.g. blurriness or jitter).
@@ -75,7 +65,7 @@ namespace tomato
 
 			// If the atlas changes, draw the current batch and clear it (Flush).
 			if (currentAtlasIndex_ != -1 && currentAtlasIndex_ != glyph.atlasIndex)
-				Flush();
+				Flush(glState);
 
 			currentAtlasIndex_ = glyph.atlasIndex;
 
@@ -97,15 +87,18 @@ namespace tomato
 		}
 	}
 
-	void TextRenderer::Flush()
+	void TextRenderer::Flush(GLStateCache& glState)
 	{
 		if (vertices_.empty()) return;
 
-		AtlasManager::GetInstance().BindAtlas(currentAtlasIndex_);
+		auto& atlasManager = AtlasManager::GetInstance();
+		atlasManager.BindAtlas(currentAtlasIndex_);
+		glState.BindTexture(atlasManager.GetAtlas(currentAtlasIndex_)->GetHandle());
 
 		glNamedBufferSubData(vbo_, 0, vertices_.size() * sizeof(TextVertex), vertices_.data());
 
-		glBindVertexArray(vao_);
+		glState.BindVertexArray(vao_);
+		//glBindVertexArray(vao_);
 		glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertices_.size()));
 
 		vertices_.clear();

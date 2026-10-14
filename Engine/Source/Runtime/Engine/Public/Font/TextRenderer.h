@@ -9,6 +9,7 @@
 #include <glm/mat4x4.hpp>
 
 #include "Resource/Render/Font.h"
+#include "Render/GLStateFwd.h"
 
 namespace tomato
 {
@@ -25,13 +26,13 @@ namespace tomato
 	public:
 		~TextRenderer();
 		
-		void Init(Shader* shader);
+		void Init();
 
 		// Add text data to the buffer
-		void DrawString(const std::u32string& text, float x, float y, float size, const glm::vec4& color, Font* font, const glm::mat4 model, const glm::mat4 projection);
+		void DrawString(GLStateCache& glState, const std::u32string& text, float x, float y, float size, const glm::vec4& color, Font* font, const glm::mat4& model);
 		
 		// Actually send data to GPU and Draw
-		void Flush();
+		void Flush(GLStateCache& glState);
 
 		int GetVertexCount() { return vertices_.size(); }
 	private:
@@ -39,8 +40,6 @@ namespace tomato
 		void AddQuad(float x, float y, float size, const Glyph& glyph, const glm::vec4& color, const glm::mat4 model);
 
 	private:
-		Shader* shader_{ nullptr };
-
 		GLuint vao_{ 0 }, vbo_{ 0 };
 		int currentAtlasIndex_{ -1 };
 

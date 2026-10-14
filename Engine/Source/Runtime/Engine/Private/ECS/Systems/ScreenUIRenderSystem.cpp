@@ -20,117 +20,102 @@
 #include "Resource/Render/Texture.h"
 #include "Resource/Render/Font.h"
 
+#include "Render/GLStateCache.h"
 namespace tomato
 {
 	ScreenUIRenderSystem::ScreenUIRenderSystem()
-    : curMesh_(GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain)))
-    , curShader_(GetAssetID("UIShader"))
-    , curTexture_(GetAssetID(Texture::PrimitiveName))
 	{
         AssetRegistry<Font>::GetInstance().CreatePrimitives();
-        textRenderer_.Init(AssetRegistry<Shader>::GetInstance().Get(GetAssetID("FontShader")));
+        textRenderer_.Init();
 	}
 
 	void ScreenUIRenderSystem::Update(SimContext& simCtx)
 	{
-        glDisable(GL_DEPTH_TEST);
-
 	    auto& registry = simCtx.state->GetRegistry();
         auto* uiCtx = registry.ctx().find<UIContext>();
         if (uiCtx == nullptr)
             return;
 
-        Mesh* mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
-        mesh->Bind();
+        auto& gl = registry.ctx().get<RenderContext>().glState;
+        gl.Apply(PipelinePresets::ScreenUI);
 
-        Shader* shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
-        shader->Use();
+        auto& shaderRegistry = AssetRegistry<Shader>::GetInstance();
+        auto& texRegistry = AssetRegistry<Texture>::GetInstance();
+        auto& meshRegistry = AssetRegistry<Mesh>::GetInstance();
 
-        glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(Window::GetWidth()), 0.0f, static_cast<float>(Window::GetHeight()), -1.0f, 1.0f);
-        shader->SetUniformInt("tex", 0);
-        shader->SetUniformMat4("uView", glm::mat4(1.0f));
-        shader->SetUniformMat4("uProjection", projection);
-
-        AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
+        glm::mat4 projection = glm::ortho(
+            0.0f, static_cast<float>(Window::GetWidth()),
+            0.0f, static_cast<float>(Window::GetHeight()),
+            -1.0f, 1.0f);
 
         for (auto e : uiCtx->screenDrawList)
         {
+            if (!IsVisible(registry, e))
+                continue;
+
             auto& ui = registry.get<UIComponent>(e);
             if (ui.type == UIType::Text)
                 continue; //text
 
-            auto& rect = registry.get<RectTransformComponent>(e);
             auto* render = registry.try_get<RenderComponent>(e);
             if (!render) continue;
 
-            if (!IsVisible(registry, e))
-                continue;
+            Shader* shader = shaderRegistry.Get(render->shader);
+            Mesh* mesh = meshRegistry.Get(render->mesh);
+            Texture* texture = texRegistry.Get(render->texture);
 
-            if (curShader_ != render->shader)
+            if (gl.UseShader(shader->GetHandle()))
             {
-                curShader_ = render->shader;
-                shader = AssetRegistry<Shader>::GetInstance().Get(curShader_);
-                shader->Use();
-
                 shader->SetUniformInt("tex", 0);
                 shader->SetUniformMat4("uView", glm::mat4(1.0f));
                 shader->SetUniformMat4("uProjection", projection);
             }
 
-            if (curTexture_ != render->texture)
-            {
-                curTexture_ = render->texture;
-                AssetRegistry<Texture>::GetInstance().Get(curTexture_)->Bind();
-            }
-
-            if (curMesh_ != render->mesh)
-            {
-                curMesh_ = render->mesh;
-                mesh = AssetRegistry<Mesh>::GetInstance().Get(curMesh_);
-                mesh->Bind();
-            }
-
+            auto& rect = registry.get<RectTransformComponent>(e);
             shader->SetUniformMat4("uModel", rect.model_matrix);
             shader->SetUniformVec4("uColor", render->color);
+
+            gl.BindTexture(texture->GetHandle());
+            gl.BindVertexArray(mesh->GetHandle());
 
             mesh->Draw();
         }
 
         //TextComponent Render
-        shader = AssetRegistry<Shader>::GetInstance().Get(GetAssetID("FontShader"));
-        shader->Use();
-        shader->SetUniformInt("text", 0);
+        Shader* FontShader = shaderRegistry.Get(GetAssetID("FontShader"));
+        if (gl.UseShader(FontShader->GetHandle()))
+        {
+            FontShader->SetUniformInt("text", 0);
+            FontShader->SetUniformMat4("projection", projection);
+        }
 
         for (auto e : uiCtx->screenDrawList)
         {
+            if (!IsVisible(registry, e))
+                continue;
+
             auto& ui = registry.get<UIComponent>(e);
             if (ui.type != UIType::Text)
                 continue; //text
 
             auto& text = registry.get<TextComponent>(e);
-            auto& rect = registry.get<RectTransformComponent>(e);
-
-            if (!IsVisible(registry, e))
-                continue;
-
             Font* font = AssetRegistry<Font>::GetInstance().Get(text.font);
             if (!font)
                 continue;
+
+            auto& rect = registry.get<RectTransformComponent>(e);
             glm::vec2 pivotOffset = -(rect.computedSize * rect.pivot);
 
             textRenderer_.DrawString(
+                gl,
                 text.codepoints,
                 pivotOffset.x, pivotOffset.y,
                 text.fontSize / 64.f,
                 text.color,
                 font,
-                rect.model_matrix,
-                projection
+                rect.model_matrix
             );
         }
-        textRenderer_.Flush();
-
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        textRenderer_.Flush(gl);
 	}
 }

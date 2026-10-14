@@ -71,7 +71,7 @@ namespace tomato::UIPrefab
             glm::vec2(100.f, 100.f), glm::vec2(0.5f, 0.5f),
             glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
 
-        const entt::entity buttonText = CreateText(reg, canvas, { 0.f, 0.f }, "Button", { 0.3, 0.7f, 0.9f, 1.0f }, 30.f);
+        const entt::entity buttonText = CreateText(reg, canvas, { 0.f, 0.f }, "Button", { 0.9f, 0.32f, 0.3f, 1.0f }, 30.f);
 
         SetHierarchy(reg, button, buttonText);
 
