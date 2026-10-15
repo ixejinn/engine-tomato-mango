@@ -161,11 +161,11 @@ namespace tomato
 
         auto velA = reg.try_get<VelocityComponent>(rootA);
         if (velA)
-            vA = velA->input;
+            vA = velA->Get();
 
         auto velB = reg.try_get<VelocityComponent>(rootB);
         if (velB)
-            vB = velB->input;
+            vB = velB->Get();
 
         float lenVA = glm::length2(vA);
         float lenVB = glm::length2(vB);
