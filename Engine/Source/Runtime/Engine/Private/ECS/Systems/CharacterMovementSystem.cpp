@@ -3,12 +3,13 @@
 #include "ECS/Systems/CharacterMovementSystem.h"
 #include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Transform.h"
-#include "ECS/Components/Rigidbody.h"
+#include "ECS/Components/Velocity.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 #include "GameObject/Character/CharacterMovement.h"
 #include "GameObject/Character/CharacterMovementConfig.h"
+#include "Simulation/SimulationConfig.h"
 
 namespace tomato {
     void CharacterMovementSystem::Update(SimContext &simCtx)
@@ -35,11 +36,26 @@ namespace tomato {
             if (HasFlag(keypress, ch.useWASD ? InputIntent::Right : InputIntent::Right2))
                 ++x;
 
-            velocity.input = {x, 0, -y};
+            glm::vec2 input{x, -y};
             if (x != 0 && y != 0)
-                velocity.input = glm::normalize(velocity.input);
+                input = glm::normalize(input);
 
-            velocity.input *= velocity.horizontalSpeed;
+            switch (move.control)
+            {
+                case InputControl::Direct:
+                    velocity.input = glm::vec3(input.x, 0, input.y) * velocity.horizontalSpeed;
+                    break;
+                case InputControl::Accelerate:
+                {
+                    velocity.input = glm::vec3(0.0f);
+
+                    float curSpeed = glm::dot(glm::vec2(velocity.velocity.x, velocity.velocity.z), input);
+                    float addSpeed = velocity.horizontalSpeed - curSpeed;
+                    if (addSpeed > 0)
+                        velocity.velocity += std::min(velocity.acceleration * FIXED_DELTA_TIME, addSpeed) * glm::vec3(input.x, 0, input.y);
+                }
+                    break;
+            }
 
             // Rotation (!!!!TEST!!!!)
 //            x = 0; y = 0;

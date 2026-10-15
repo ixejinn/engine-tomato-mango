@@ -5,7 +5,7 @@
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Movement.h"
-#include "ECS/Components/Rigidbody.h"
+#include "ECS/Components/Velocity.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UI.h"

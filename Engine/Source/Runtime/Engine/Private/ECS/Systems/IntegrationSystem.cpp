@@ -1,7 +1,7 @@
 ﻿#include "ECS/Systems/IntegrationSystem.h"
 #include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Transform.h"
-#include "ECS/Components/Rigidbody.h"
+#include "ECS/Components/Velocity.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Simulation/SimulationConfig.h"
@@ -16,7 +16,10 @@ namespace tomato
         {
             auto velocity = vel.Get();
             if (glm::length2(velocity) > VELOCITY_SQ_EPSILON)
+            {
+                std::cout << glm::length(velocity) << "\n";
                 trf.AddPosition(velocity * FIXED_DELTA_TIME);
+            }
         }
     }
 }

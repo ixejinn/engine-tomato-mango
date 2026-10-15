@@ -9,7 +9,7 @@
 #include "GameNetwork/Rollback/RollbackConfig.h"
 #include "ECS/Components/Rollback.h"
 #include "ECS/Components/Transform.h"
-#include "ECS/Components/Rigidbody.h"
+#include "ECS/Components/Velocity.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Utils/Logger.h"
 

@@ -2,7 +2,7 @@
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Movement.h"
-#include "ECS/Components/Rigidbody.h"
+#include "ECS/Components/Velocity.h"
 #include "Utils/Logger.h"
 
 namespace tomato

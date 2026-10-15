@@ -2,7 +2,7 @@
 #include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
-#include "ECS/Components/Rigidbody.h"
+#include "ECS/Components/Velocity.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Particle.h"

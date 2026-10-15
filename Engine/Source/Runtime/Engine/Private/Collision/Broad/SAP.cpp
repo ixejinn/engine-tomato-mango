@@ -5,7 +5,7 @@
 #include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
-#include "ECS/Components/Rigidbody.h"
+#include "ECS/Components/Velocity.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "Simulation/SimulationConfig.h"
 #include "Math/AABB.h"

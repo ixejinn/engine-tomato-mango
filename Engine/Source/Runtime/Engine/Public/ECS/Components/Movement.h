@@ -15,9 +15,11 @@ namespace tomato
 
     struct MovementComponent
     {
-        MovementMode mode{Falling};
         int gndStayCnt{0};
         unsigned int jumpCnt{0};
+
+        MovementMode mode{Falling};
+        InputControl control{Direct};
     };
 }
 

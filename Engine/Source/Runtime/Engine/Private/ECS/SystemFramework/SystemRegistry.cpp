@@ -18,6 +18,8 @@ namespace tomato
 
         // Update
         manager.AddSystem(TickPhase::Update, RunMode::Game | RunMode::Rollback,
+            std::make_unique<FrictionSystem>());
+        manager.AddSystem(TickPhase::Update, RunMode::Game | RunMode::Rollback,
             std::make_unique<CharacterMovementSystem>());
         manager.AddSystem(TickPhase::Update, RunMode::Game | RunMode::Rollback,
             std::make_unique<GravitySystem>());

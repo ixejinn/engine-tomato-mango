@@ -62,6 +62,8 @@ void GameState::Init()
     entt::entity colObj = registry_.get<HierarchyComponent>(player).children[0];
     auto& colp = registry_.get<ColliderComponent>(colObj);
     colp.layer = CollisionLayer::Wave1;
+    auto& moveP0 = registry_.get<MovementComponent>(player);
+    moveP0.control = InputControl::Accelerate;
 
     entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player");
     auto& trfP1 = registry_.get<TransformComponent>(player1);

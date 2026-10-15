@@ -37,7 +37,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Components/Movement.h
         Source/Runtime/Engine/Public/ECS/Components/Render.h
         Source/Runtime/Engine/Public/Resource/ResourceFwd.h
-        Source/Runtime/Engine/Public/ECS/Components/Rigidbody.h
+		Source/Runtime/Engine/Public/ECS/Components/Velocity.h
         Source/Runtime/Engine/Public/ECS/Components/Text.h
         Source/Runtime/Engine/Public/ECS/Components/Target.h
         Source/Runtime/Engine/Public/Resource/AssetHash.h
@@ -225,6 +225,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Private/Render/RenderPass.h
 		Source/Runtime/Engine/Public/ECS/Systems/ViewGizmoRenderSystem.h
 		Source/Runtime/Engine/Private/ECS/Components/Gizmo.h
+		Source/Runtime/Engine/Public/ECS/Systems/FrictionSystem.h
 )
 
 set(ENGINE_SOURCES
@@ -318,6 +319,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Math/Angle.cpp
         Source/Runtime/Engine/Private/Render/GLStateCache.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/ViewGizmoRenderSystem.cpp
+		Source/Runtime/Engine/Private/ECS/Systems/FrictionSystem.cpp
 )
 
 add_library(engine STATIC

@@ -11,7 +11,7 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Entity/Hierarchy.h"
-#include "ECS/Components/Rigidbody.h"
+#include "ECS/Components/Velocity.h"
 #include "Simulation/SimulationConfig.h"
 #include "Math/Normal.h"
 #include "Utils/Logger.h"
@@ -180,7 +180,7 @@ namespace tomato
     std::optional<ContactData> GJK::GJKRaycast(
             entt::registry& reg, const ContactPair& pair)
     {
-        // std::cout << "========== GJK raycast " << pair << "\n";
+//        std::cout << "========== GJK raycast " << pair << "\n";
 
         auto& col1 = reg.get<ColliderComponent>(pair.a);
         auto& col2 = reg.get<ColliderComponent>(pair.b);
