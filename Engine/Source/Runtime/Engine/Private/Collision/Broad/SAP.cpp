@@ -84,7 +84,7 @@ namespace tomato
     void SAP::UpdateAABBs(entt::registry& reg)
     {
         // Update AABB
-        auto view = reg.view<ColliderComponent, TransformComponent>();
+        auto view = reg.view<ActiveTag, ColliderComponent, TransformComponent>();
         for (auto [e, col, trf] : view.each())
         {
             if (!col.aabbDirty)
@@ -94,7 +94,7 @@ namespace tomato
             // Sweep AABB center
             glm::vec3 wPos = trf.GetWorldPosition();
             if (const auto velPtr = reg.try_get<VelocityComponent>(GetRootEntity(reg, e)))
-                wPos += velPtr->velocity * FIXED_DELTA_TIME;
+                wPos += velPtr->Get() * FIXED_DELTA_TIME;
 
             UpdateAABB(col.aabb, wPos, trf.GetWorldScale() * 0.5f,
                 glm::toMat4(trf.GetWorldQuaternion()), HALF_COLLISION_SKIN + 1e-6f);

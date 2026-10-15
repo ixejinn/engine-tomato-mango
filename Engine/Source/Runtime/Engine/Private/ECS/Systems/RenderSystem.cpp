@@ -35,7 +35,7 @@ namespace tomato
 
     void RenderSystem::Update(SimContext& simCtx)
     {
-//        CPU_PROFILER_BLOCK_BEGIN(RenderSystem::Update);
+        CPU_PROFILER_BLOCK_BEGIN(RenderSystem::Update);
         UpdateDrawList(simCtx);
 
         auto& registry = simCtx.state->GetRegistry();
@@ -165,7 +165,7 @@ namespace tomato
                     break;
             }
         }
-//        CPU_PROFILER_BLOCK_END(RenderSystem::Update);
+        CPU_PROFILER_BLOCK_END(RenderSystem::Update);
     }
 
     void RenderSystem::UpdateDrawList(SimContext& simCtx)

@@ -27,7 +27,7 @@ int main() {
     Engine engine(1600, 900, "TOMATO", NetMode::NM_Alone);
 
 #if defined(TOMATO_GREENTEA)
-    engine.SetNextState(std::make_unique<LoadState>(engine));
+    engine.SetNextState(std::make_unique<TestState>(engine));
 
 #else //TOMATO_GREENTEA
     engine.SetNextState(std::make_unique<GameState>(engine));

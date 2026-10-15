@@ -14,8 +14,9 @@ namespace tomato
         auto view = simCtx.state->GetRegistry().view<ActiveTag, TransformComponent, VelocityComponent>();
         for (auto [e, trf, vel] : view.each())
         {
-            if (glm::length2(vel.velocity) > VELOCITY_SQ_EPSILON)
-                trf.AddPosition(vel.velocity * FIXED_DELTA_TIME);
+            auto velocity = vel.Get();
+            if (glm::length2(velocity) > VELOCITY_SQ_EPSILON)
+                trf.AddPosition(velocity * FIXED_DELTA_TIME);
         }
     }
 }

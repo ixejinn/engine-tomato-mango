@@ -7,7 +7,7 @@
 #include "ECS/Systems/EditorCameraSystem.h"
 #include "ECS/Systems/GravitySystem.h"
 #include "ECS/Systems/IntegrationSystem.h"
-#include "ECS/Systems/KinematicMovementSystem.h"
+#include "ECS/Systems/CharacterMovementSystem.h"
 #include "ECS/Systems/ParticleEmissionSystem.h"
 #include "ECS/Systems/ParticleRenderSystem.h"
 #include "ECS/Systems/PlayerCameraSystem.h"

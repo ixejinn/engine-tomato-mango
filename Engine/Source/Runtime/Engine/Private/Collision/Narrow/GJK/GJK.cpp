@@ -190,9 +190,9 @@ namespace tomato
         glm::vec3 v1{0.f};
         glm::vec3 v2{0.f};
         if (auto vel1 = reg.try_get<VelocityComponent>(GetRootEntity(reg, pair.a)))
-            v1 = vel1->velocity;
+            v1 = vel1->input;
         if (auto vel2 = reg.try_get<VelocityComponent>(GetRootEntity(reg, pair.b)))
-            v2 = vel2->velocity;
+            v2 = vel2->input;
 
         glm::vec3 relVel = v1 - v2;
         glm::vec3 ray = -relVel * FIXED_DELTA_TIME;

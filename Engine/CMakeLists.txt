@@ -69,7 +69,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemUpdateContexts.h
         Source/Runtime/Engine/Public/ECS/Systems/CollisionSystem.h
         Source/Runtime/Engine/Public/Collision/CollisionEventFwd.h
-        Source/Runtime/Engine/Public/ECS/Systems/KinematicMovementSystem.h
+        Source/Runtime/Engine/Public/ECS/Systems/CharacterMovementSystem.h
         Source/Runtime/Engine/Public/ECS/Systems/RenderSystem.h
         Source/Runtime/Engine/Public/Resource/Render/Mesh.h
         Source/Runtime/Engine/Public/Resource/AssetRegistry.h
@@ -237,7 +237,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Services/Input.cpp
 		Source/Runtime/Engine/Private/Simulation/Tick/TickClock.cpp
         Source/Runtime/Engine/Private/ECS/Systems/CollisionSystem.cpp
-        Source/Runtime/Engine/Private/ECS/Systems/KinematicMovementSystem.cpp
+		Source/Runtime/Engine/Private/ECS/Systems/CharacterMovementSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/RenderSystem.cpp
         Source/Runtime/Engine/Private/Resource/Render/Font.cpp
         Source/Runtime/Engine/Private/Resource/Render/Mesh.cpp

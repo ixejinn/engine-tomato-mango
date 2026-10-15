@@ -7,8 +7,12 @@ namespace tomato
 {
     struct VelocityComponent
     {
-        float horizontalSpeed{ 2.f };
         glm::vec3 velocity;
+        glm::vec3 input;
+
+        float horizontalSpeed{ 2.f };
+
+        glm::vec3 Get() const { return velocity + input; }
     };
 }
 
