@@ -8,6 +8,7 @@
 #include "Serialization/Json.h"
 #include "Services/Window.h"
 #include "Serialization/UUID.h"
+#include "ECS/Forward/UIDirtyFwd.h"
 
 namespace tomato
 {
@@ -109,6 +110,14 @@ namespace tomato
 
 	struct RectTransformComponent
 	{
+		void SetPosition(const glm::vec2& pos);
+		void SetOffsetMin(const glm::vec2& min);
+		void SetOffsetMax(const glm::vec2& max);
+		void SetSize(const glm::vec2& size);
+		void SetAnchor(const glm::vec2& min, const glm::vec2& max);
+		void SetPivot(const glm::vec2& pivot);
+
+		//void SetOffset
 		glm::vec2 anchoredPosition{ 0.f, 0.f }; // anchorMin == anchorMax, posX, posY
 
 		glm::vec2 offsetMin{ 0.f, 0.f }; // stretch, left, bottom
@@ -136,6 +145,7 @@ namespace tomato
 		UIRect screenRect;
 
 		//bool dirty{ true };
+		UI::Dirty dirty;
 	};
 
 	struct SelectableComponent

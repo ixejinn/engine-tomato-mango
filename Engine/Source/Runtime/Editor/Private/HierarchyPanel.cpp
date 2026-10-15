@@ -229,20 +229,6 @@ namespace tomato
 
 		if (ImGui::BeginMenu("Game Object"))
 		{
-			//if (ImGui::BeginMenu("Static"))
-			//{
-			//	if (ImGui::MenuItem("Cube"))
-			//		CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateStaticObject(reg), isPopup);
-
-			//	if (ImGui::MenuItem("Sphere"))
-			//		CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateStaticObject(reg, Prefab::Sphere), isPopup);
-
-			//	ImGui::EndMenu();
-			//}
-
-			//if (ImGui::MenuItem("Character"))
-			//	CreateAndSetHierarchyEntity(editorCtx, selected = Prefab::CreateCharacter(reg), isPopup);
-
 			if (ImGui::MenuItem("Camera"))
 			{
 				auto view = reg.view<MainCameraTag>();

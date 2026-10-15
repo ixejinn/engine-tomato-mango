@@ -275,6 +275,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Systems/IntegrationSystem.cpp
         Source/Runtime/Engine/Private/Collision/Broad/BroadPhase.cpp
         Source/Runtime/Engine/Private/ECS/Components/Transform.cpp
+        Source/Runtime/Engine/Private/ECS/Components/UI.cpp
         Source/Runtime/Engine/Private/Prefab/Prefab.cpp
         Source/Runtime/Engine/Private/ECS/Systems/GravitySystem.cpp
         Source/Runtime/Engine/Private/GameObject/Character/CharacterMovement.cpp

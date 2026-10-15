@@ -429,30 +429,46 @@ namespace tomato
 
 		if (rect.anchorMin == rect.anchorMax)
 		{
+			glm::vec2 pos = rect.anchoredPosition;
+
 			ImGui::SeparatorText("Position");
 			ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(60.f);
-			if(ImGui::DragFloat("##anchoredPosx", &rect.anchoredPosition.x, 1.f, 0.f, 0.f, "%g"))
+			if (ImGui::DragFloat("##anchoredPosx", &pos.x, 1.f, 0.f, 0.f, "%g"))
+			{
+				rect.SetPosition(pos);
 				changed = true; 
+			}
 
 			ImGui::SameLine();
 			ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(60.f);
-			if(ImGui::DragFloat("##anchoredPosy", &rect.anchoredPosition.y, 1.f, 0.f, 0.f, "%g"))
+			if (ImGui::DragFloat("##anchoredPosy", &pos.y, 1.f, 0.f, 0.f, "%g"))
+			{
+				rect.SetPosition(pos);
 				changed = true;
+			}
 
 			if (ui && ui->type != UIType::Text)
 			{
+				glm::vec2 size = rect.sizeDelta;
+
 				ImGui::SeparatorText("Size");
 				ImGui::Text("Width"); ImGui::SameLine(); ImGui::SetCursorPosX(95.f);
 				ImGui::Text("Height"); ImGui::SetNextItemWidth(80.f);
-				if(ImGui::DragFloat("##sizewidth", &rect.sizeDelta.x, 1.f, 0.f, 0.f, "%g"))
+				if (ImGui::DragFloat("##sizewidth", &size.x, 1.f, 0.f, 0.f, "%g"))
+				{
+					rect.SetSize(size);
 					changed = true;
+				}
 
 				ImGui::SameLine(); ImGui::SetNextItemWidth(80.f);
-				if(ImGui::DragFloat("##sizeheight", &rect.sizeDelta.y, 1.f, 0.f, 0.f, "%g"))
+				if (ImGui::DragFloat("##sizeheight", &size.y, 1.f, 0.f, 0.f, "%g"))
+				{
+					rect.SetSize(size);
 					changed = true;
+				}
 			}
 
-			ImGui::SeparatorText("Offset");
+			/*ImGui::SeparatorText("Offset");
 			ImGui::Text("Min"); ImGui::SameLine(); ImGui::SetCursorPosX(50.f); ImGui::SameLine();
 			ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
 			if(ImGui::DragFloat("##offsetMinX", &rect.offsetMin.x, 0.1f, 0.f, 1.f, "%.1f"))
@@ -471,10 +487,11 @@ namespace tomato
 			ImGui::SameLine();
 			ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
 			if(ImGui::DragFloat("##offsetMaxY", &rect.offsetMax.x, 0.1f, 0.f, 1.f, "%.1f"))
-				changed = true;
+				changed = true;*/
 		}
 		else
 		{
+			glm::vec2 offsetMin{ rect.offsetMin.x, rect.offsetMin.y };
 			float offsetRight{ std::abs(rect.offsetMax.x) }, offsetTop{ std::abs(rect.offsetMax.y) };
 
 			ImGui::SeparatorText("Margin"); // Offset? Margin?
@@ -483,14 +500,18 @@ namespace tomato
 			ImGui::Text("Top");
 
 			ImGui::SetNextItemWidth(80.f);
-			if(ImGui::InputFloat("##Left", &rect.offsetMin.x, 0.0f, 0.0f, "%g"))
+			if (ImGui::InputFloat("##Left", &offsetMin.x, 0.0f, 0.0f, "%g"))
+			{
+				rect.SetOffsetMin(offsetMin);
 				changed = true; 
+			}
 			
 			ImGui::SameLine();
 			ImGui::SetNextItemWidth(80.f);
 			if (ImGui::InputFloat("##Top", &offsetTop, 0.0f, 0.0f, "%g"))
 			{
-				rect.offsetMax.y = -offsetTop;
+				rect.SetOffsetMax({ rect.offsetMax.x, -offsetTop });
+				//rect.offsetMax.y = -offsetTop;
 				changed = true;
 			}
 
@@ -501,44 +522,68 @@ namespace tomato
 
 			if(ImGui::InputFloat("##Right", &offsetRight, 0.0f, 0.0f, "%g"))
 			{
-				rect.offsetMax.x = -offsetRight;
+				rect.SetOffsetMax({ -offsetRight, rect.offsetMax.y });
+				//rect.offsetMax.x = -offsetRight;
 				changed = true;
 			}
 			ImGui::SameLine(); ImGui::SetNextItemWidth(80.f);
-			if(ImGui::InputFloat("##Bottom", &rect.offsetMin.y, 0.0f, 0.0f, "%g"))
+			if (ImGui::InputFloat("##Bottom", &offsetMin.y, 0.0f, 0.0f, "%g"))
+			{
+				rect.SetOffsetMin(offsetMin);
 				changed = true;
+			}
 		}
 
+		glm::vec2 anchorMin{ rect.anchorMin }, anchorMax{ rect.anchorMax };
 		ImGui::SeparatorText("Anchor");
 		ImGui::Text("Min"); ImGui::SameLine(); ImGui::SetCursorPosX(50.f); ImGui::SameLine();
 		ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
-		if(ImGui::DragFloat("##anchorMinX", &rect.anchorMin.x, 0.1f, 0.f, 1.f, "%.1f"))
+		if(ImGui::DragFloat("##anchorMinX", &anchorMin.x, 0.1f, 0.f, 1.f, "%.1f"))
+		{
+			rect.SetAnchor(anchorMin, anchorMax);
 			changed = true; 
+		}
 		
 		ImGui::SameLine();
 		ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
-		if(ImGui::DragFloat("##anchorMinY", &rect.anchorMin.y, 0.1f, 0.f, 1.f, "%.1f"))
+		if (ImGui::DragFloat("##anchorMinY", &anchorMin.y, 0.1f, 0.f, 1.f, "%.1f"))
+		{
+			rect.SetAnchor(anchorMin, anchorMax);
 			changed = true;
+		}
 
 		ImGui::Text("Max");ImGui::SameLine(); ImGui::SetCursorPosX(40.f); ImGui::SameLine();
 		ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
-		if(ImGui::DragFloat("##anchorMaxX", &rect.anchorMax.x, 0.1f, 0.f, 1.f, "%.1f"))
+		if (ImGui::DragFloat("##anchorMaxX", &anchorMax.x, 0.1f, 0.f, 1.f, "%.1f"))
+		{
+			rect.SetAnchor(anchorMin, anchorMax);
 			changed = true; 
+		}
 		
 		ImGui::SameLine();
 		ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(50.f);
-		if(ImGui::DragFloat("##anchorMaxY", &rect.anchorMax.y, 0.1f, 0.f, 1.f, "%.1f"))
+		if (ImGui::DragFloat("##anchorMaxY", &anchorMax.y, 0.1f, 0.f, 1.f, "%.1f"))
+		{
+			rect.SetAnchor(anchorMin, anchorMax);
 			changed = true;
+		}
 
+		glm::vec2 pivot{ rect.pivot };
 		ImGui::SeparatorText("Pivot");
 		ImGui::Text("X"); ImGui::SameLine(); ImGui::SetNextItemWidth(60.f);
-		if(ImGui::DragFloat("##pivotx", &rect.pivot.x, 0.1f, 0.f, 1.f, "%.1f"))
+		if (ImGui::DragFloat("##pivotx", &pivot.x, 0.1f, 0.f, 1.f, "%.1f"))
+		{
+			rect.SetPivot(pivot);
 			changed = true; 
+		}
 		
 		ImGui::SameLine();
 		ImGui::Text("Y"); ImGui::SameLine(); ImGui::SetNextItemWidth(60.f);
-		if(ImGui::DragFloat("##pivoty", &rect.pivot.y, 0.1f, 0.f, 1.f, "%.1f"))
+		if (ImGui::DragFloat("##pivoty", &pivot.y, 0.1f, 0.f, 1.f, "%.1f"))
+		{
+			rect.SetPivot(pivot);
 			changed = true;
+		}
 
 		ImGui::NewLine();
 

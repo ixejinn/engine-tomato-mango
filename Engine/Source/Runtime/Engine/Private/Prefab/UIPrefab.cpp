@@ -10,6 +10,7 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UIEvents.h"
+#include "ECS/Components/UIDirty.h"
 
 #include "Resource/AssetHash.h"
 #include "Resource/Render/Mesh.h"
@@ -29,7 +30,13 @@ namespace tomato::UIPrefab
         auto& generator = reg.ctx().get<EntityNameGenerator>();
         reg.emplace<NametagComponent>(uiEntity, GenerateUUID(), generator.Generate(name));
         reg.emplace<tomato::UIComponent>(uiEntity, GetUUID(reg, canvas), 0, type);
-        reg.emplace<tomato::RectTransformComponent>(uiEntity);
+        auto& rect = reg.emplace<tomato::RectTransformComponent>(uiEntity);
+        rect.SetPosition({ 0.f, 0.f });
+        rect.SetOffsetMin({ 0.f, 0.f }); rect.SetOffsetMax({ 0.f, 0.f });
+        rect.SetSize({ 0.f, 0.f });
+        rect.SetAnchor({ 0.5f, 0.5f }, { 0.5f, 0.5f });
+        rect.SetPivot({ 0.5f, 0.5f });
+        rect.dirty = UI::Dirty::All;
 
         reg.emplace<tomato::VisibilityComponent>(uiEntity);
         reg.emplace<tomato::ActiveTag>(uiEntity);
@@ -66,10 +73,9 @@ namespace tomato::UIPrefab
         render.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain));
         render.shader = GetAssetID("UIShader");
 
-        reg.emplace_or_replace<RectTransformComponent>(button,
-            pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f),
-            glm::vec2(100.f, 100.f), glm::vec2(0.5f, 0.5f),
-            glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+        auto& rect = reg.get<RectTransformComponent>(button);
+        rect.SetPosition({ pos });
+        rect.SetSize({ 100.f, 100.f });
 
         const entt::entity buttonText = CreateText(reg, canvas, { 0.f, 0.f }, "Button", { 0.9f, 0.32f, 0.3f, 1.0f }, 30.f);
 
@@ -89,10 +95,9 @@ namespace tomato::UIPrefab
         txtComp.fontSize = size;
         txtComp.font = GetAssetID(fontName);
 
-        reg.emplace_or_replace<RectTransformComponent>(text,
-            pos, glm::vec2(0.f, 0.f), glm::vec2(0.f, 0.f),
-            glm::vec2(0.f, 0.f), glm::vec2(0.5f, 0.5f),
-            glm::vec2(0.5f, 0.5f), glm::vec2(0.5f, 0.5f));
+        auto& rect = reg.get<RectTransformComponent>(text);
+        rect.SetPosition({ pos });
+        rect.SetSize({ 0.f, 0.f });
 
         return text;
     }
@@ -107,16 +112,10 @@ namespace tomato::UIPrefab
         if (textureName == Texture::PrimitiveName)
             size = glm::vec2{ 100.f, 100.f };
 
-        reg.emplace_or_replace<RectTransformComponent>(
-            img,
-            pos,
-            glm::vec2(0.f, 0.f),
-            glm::vec2(0.f, 0.f),
-            size == glm::vec2(0.f, 0.f) ? glm::vec2{ texture->GetWidth(), texture->GetHeight() } : glm::vec2{ 100.f, 100.f },
-            glm::vec2(0.5f, 0.5f),
-            glm::vec2(0.5f, 0.5f),
-            glm::vec2(0.5f, 0.5f)
-        );
+        auto& rect = reg.get<RectTransformComponent>(img);
+        rect.SetPosition({ pos });
+        rect.SetSize(size == glm::vec2(0.f, 0.f) ?
+            glm::vec2{ texture->GetWidth(), texture->GetHeight() } : glm::vec2{ 100.f, 100.f });
 
         auto& render = reg.emplace<RenderComponent>(img);
         render.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::LBPlain));

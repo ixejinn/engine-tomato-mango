@@ -7,6 +7,7 @@
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
+#include "ECS/Components/ActiveTag.h"
 #include "Services/Input.h"
 #include "Services/Window.h"
 #include "Event/EventDispatcher.h"
@@ -113,6 +114,7 @@ namespace tomato
 
 		for (auto it = uiCtx->selectableList.begin(); it != uiCtx->selectableList.end(); ++it)
 		{
+			if (!r.all_of<ActiveTag>(*it)) continue;
 			if (!r.all_of<SelectableComponent>(*it)) continue;
 
 			auto& rect = r.get<RectTransformComponent>(*it);

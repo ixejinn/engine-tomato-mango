@@ -1,4 +1,6 @@
-﻿#include "ECS/Systems/UISystem.h"
+﻿#include <entt/entt.hpp>
+
+#include "ECS/Systems/UISystem.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 
 #include "ECS/Components/Transform.h"
@@ -9,6 +11,7 @@
 #include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Camera.h"
+#include "ECS/Components/UIDirty.h"
 #include "ECS/Entity/Entity.h"
 
 #include "Services/Window.h"
@@ -21,6 +24,7 @@
 
 #include "Utils/Utf.h"
 #include "Utils/Logger.h"
+#include "Utils/Bitmask/BitmaskOperators.h"
 
 namespace tomato
 {
@@ -34,43 +38,54 @@ namespace tomato
 		if (this->ctx != &ctx)
 			this->ctx = &ctx;
 
-		BuildDrawList(ctx);
+		auto& registry = ctx.state->GetRegistry();
+		
+		UpdateTextContentSize(registry);
 
-		UpdateTextContentSize(ctx);
-		UpdateScreenRectTransform(ctx);
-		UpdateWorldRectTransform(ctx);
+		BuildDrawList(registry);
 
-		BulidSelectableList(ctx);
+		UpdateScreenRectTransform(registry);
+		UpdateWorldRectTransform(registry);
+
+		BulidSelectableList(registry);
 	}
 
 	void UISystem::OnChangeWindowSize()
 	{
+		if (!ctx) return;
 		auto& registry = ctx->state->GetRegistry();
 		auto canvasView = registry.view<CanvasComponent>();
 
 		for (auto [e, canvas] : canvasView.each())
+		{
+			if (canvas.mode != RenderMode::ScreenOverlay)
+				continue;
+
 			canvas.actualSize = { Window::GetWidth(), Window::GetHeight() };
+			registry.get<RectTransformComponent>(e).dirty |= UI::Dirty::Layout;
+		}
 	}
 
-	void UISystem::Traverse(SimContext& ctx, entt::entity e, std::vector<entt::entity>& drawList)
+	void UISystem::Traverse(entt::registry& registry, entt::entity e, std::vector<entt::entity>& drawList, UI::Dirty dirty)
 	{
-		auto& registry = ctx.state->GetRegistry();
 		if (!registry.all_of<ActiveTag>(e))
 			return;
-		auto* ui = registry.try_get<UIComponent>(e);
+		/*auto* ui = registry.try_get<UIComponent>(e);
 		if (!ui) return;
+		std::cout << ui.type << " ";*/
 
-		//std::cout << ui.type << " ";
 		drawList.push_back(e);
+
+		auto& rect = registry.get<RectTransformComponent>(e);
+		rect.dirty |= dirty;
 
 		auto& hierarchy = registry.get<HierarchyComponent>(e);
 		for (auto child : hierarchy.children)
-			Traverse(ctx, child, drawList);
+			Traverse(registry, child, drawList, rect.dirty);
 	}
 
-	void UISystem::BuildDrawList(SimContext& ctx)
+	void UISystem::BuildDrawList(entt::registry& registry)
 	{
-		auto& registry = ctx.state->GetRegistry();
 		auto* uiCtx = registry.ctx().find<UIContext>();
 		if (uiCtx == nullptr)
 			uiCtx = &registry.ctx().emplace<UIContext>();
@@ -91,13 +106,15 @@ namespace tomato
 		for (auto canvas : canvases)
 		{
 			auto& canvasCmp = registry.get<CanvasComponent>(canvas);
+			auto& rect = registry.get<RectTransformComponent>(canvas);
+
 			if (canvasCmp.mode == RenderMode::ScreenOverlay)
-				Traverse(ctx, canvas, screenDrawList);
+				Traverse(registry, canvas, screenDrawList, rect.dirty);
 			else
-				Traverse(ctx, canvas, worldDrawList);
+				Traverse(registry, canvas, worldDrawList, rect.dirty);
 		}
 
-		std::stable_sort(
+		/*std::stable_sort(
 			screenDrawList.begin(),
 			screenDrawList.end(),
 			[&](entt::entity a, entt::entity b)
@@ -119,7 +136,7 @@ namespace tomato
 
 				return uiA.sortOrder < uiB.sortOrder;
 			}
-		);
+		);*/
 
 		uiCtx->screenDrawList.clear();
 		uiCtx->screenDrawList = std::move(screenDrawList);
@@ -128,9 +145,8 @@ namespace tomato
 		uiCtx->worldDrawList = std::move(worldDrawList);
 	}
 
-	void UISystem::BulidSelectableList(SimContext& ctx)
+	void UISystem::BulidSelectableList(entt::registry& registry)
 	{
-		auto& registry = ctx.state->GetRegistry();
 		auto* uiCtx = registry.ctx().find<UIContext>();
 
 		if (uiCtx == nullptr)
@@ -147,29 +163,26 @@ namespace tomato
 		uiCtx->selectableDirty = false;
 	}
 
-	void UISystem::UpdateTextContentSize(SimContext& ctx)
+	void UISystem::UpdateTextContentSize(entt::registry& registry)
 	{
-		auto& registry = ctx.state->GetRegistry();
 		auto textView = registry.view<ActiveTag, UIComponent, RectTransformComponent, TextComponent>();
 		for (auto [e, ui, rect, text] : textView.each())
 		{
-			if (ui.type == UIType::Text)
+			if (text.dirty)
 			{
-				if (text.dirty)
-				{
-					text.codepoints = UTF8ToUTF32(text.text);
-					Font* font = AssetRegistry<Font>::GetInstance().Get(text.font);
+				text.codepoints = UTF8ToUTF32(text.text);
+				Font* font = AssetRegistry<Font>::GetInstance().Get(text.font);
 
-					rect.sizeDelta = font->MeasureText(text.codepoints, text.fontSize / 64.f);
-					text.dirty = false;
-				}
+				rect.sizeDelta = font->MeasureText(text.codepoints, text.fontSize / 64.f);
+				text.dirty = false;
+
+				rect.dirty |= UI::Dirty::All;
 			}
 		}
 	}
 
-	void UISystem::UpdateScreenRectTransform(SimContext& ctx)
+	void UISystem::UpdateScreenRectTransform(entt::registry& registry)
 	{
-		auto& registry = ctx.state->GetRegistry();
 		auto& uiCtx = registry.ctx().get<UIContext>();
 
 		if (uiCtx.screenDrawList.empty())
@@ -186,12 +199,18 @@ namespace tomato
 				currentCanvas = &registry.get<CanvasComponent>(entity);
 
 				auto& rect = registry.get<RectTransformComponent>(entity);
-				rect.computedSize = currentCanvas->actualSize;
-				rect.position = glm::vec3(rect.computedSize * rect.pivot, 0.f);
-				rect.scale = glm::vec3(1.f);
+				if(HasFlag(rect.dirty, UI::Dirty::Layout))
+				{
+					rect.computedSize = currentCanvas->actualSize;
+					rect.position = glm::vec3(rect.computedSize * rect.pivot, 0.f);
+					rect.scale = glm::vec3(1.f);
 
-				rect.screenPosition = rect.position;
-				break;
+					rect.screenPosition = rect.position;
+
+					rect.dirty = UI::Dirty::Matrix;
+
+					break;
+				}
 			}
 		}
 
@@ -200,10 +219,17 @@ namespace tomato
 		{
 			auto& hierarchy = registry.get<HierarchyComponent>(entity);
 			if (hierarchy.parent == entt::null)
+			{
+				currentCanvas = &registry.get<CanvasComponent>(entity);
 				continue;
+			}
 
 			// children
 			auto& rect = registry.get<RectTransformComponent>(entity);
+			const bool tracking = registry.all_of<TargetComponent>(entity);
+			if (!HasFlag(rect.dirty, UI::Dirty::Layout) && !tracking)
+				continue;
+			
 			auto& parentRect = registry.get<RectTransformComponent>(hierarchy.parent);
 
 			glm::vec2 scaleFactor = currentCanvas->actualSize / currentCanvas->referenceSize;
@@ -243,6 +269,9 @@ namespace tomato
 					rect.position = screenPos + target->headOffset;
 
 					rect.computedSize = rect.sizeDelta;
+
+					rect.dirty = UI::Dirty::Matrix;
+
 					continue;
 				}
 
@@ -269,12 +298,14 @@ namespace tomato
 
 			rect.screenRect.max.x = rect.screenRect.min.x + rect.computedSize.x;
 			rect.screenRect.max.y = rect.screenRect.min.y + rect.computedSize.y;
+
+			rect.dirty = UI::Dirty::Matrix;
 		}
 	}
 
-	void UISystem::UpdateWorldRectTransform(SimContext& ctx)
+	void UISystem::UpdateWorldRectTransform(entt::registry& registry)
 	{
-		auto& registry = ctx.state->GetRegistry();
+		//@TODO : 현재 World에는 target text만 다루고 있어 dirty 적용 X
 		auto& uiCtx = registry.ctx().get<UIContext>();
 
 		if (uiCtx.worldDrawList.empty())
@@ -283,14 +314,12 @@ namespace tomato
 		for (auto entity : uiCtx.worldDrawList)
 		{
 			auto& hierarchy = registry.get<HierarchyComponent>(entity);
-			if (hierarchy.parent == entt::null)
-				continue;
+			if (hierarchy.parent == entt::null) continue;
 
 			// children
 			auto& rect = registry.get<RectTransformComponent>(entity);
 
 			// Target-based World UI
-				
 			if (auto* target = registry.try_get<TargetComponent>(entity))
 			{
 				auto* targetTransform = registry.try_get<TransformComponent>(GetEntityByUUID(registry, target->target));
