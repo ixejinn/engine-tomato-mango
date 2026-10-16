@@ -40,21 +40,39 @@ namespace tomato {
             if (x != 0 && y != 0)
                 input = glm::normalize(input);
 
-            switch (move.control)
+            if (x != 0 || y != 0)
             {
-                case InputControl::Direct:
-                    velocity.input = glm::vec3(input.x, 0, input.y) * velocity.horizontalSpeed;
-                    break;
-                case InputControl::Accelerate:
+                switch (move.control)
                 {
-                    velocity.input = glm::vec3(0.0f);
+                    case InputControl::Direct:
+                        velocity.input = glm::vec3(input.x, 0, input.y) * velocity.horizontalSpeed;
+                        break;
+                    case InputControl::Accelerate:
+                    {
+                        velocity.input = glm::vec3(0.0f);
 
-                    float curSpeed = glm::dot(glm::vec2(velocity.velocity.x, velocity.velocity.z), input);
-                    float addSpeed = velocity.horizontalSpeed - curSpeed;
-                    if (addSpeed > 0)
-                        velocity.velocity += std::min(velocity.acceleration * FIXED_DELTA_TIME, addSpeed) * glm::vec3(input.x, 0, input.y);
+                        glm::vec2 horizontal{velocity.velocity.x, velocity.velocity.z};
+                        float prevSpeed = glm::length(horizontal);
+                        float speedAlongInput = glm::dot(horizontal, input);
+                        float addSpeed = velocity.horizontalSpeed - speedAlongInput;
+
+                        if (addSpeed > 0)
+                        {
+                            horizontal += std::min(velocity.acceleration * FIXED_DELTA_TIME, addSpeed) * input;
+
+                            // 입력으로 속력이 최고 속도(velocity.horizontalSpeed) 이상으로 빨라지지 않도록 제한
+                            // prevSpeed가 입력 이외 요소로 더 빨라진 경우는 그대로 유지
+                            float limit = std::max(velocity.horizontalSpeed, prevSpeed);
+                            float speed = glm::length(horizontal);
+                            if (speed > limit)
+                                horizontal *= limit / speed;
+
+                            velocity.velocity.x = horizontal.x;
+                            velocity.velocity.z = horizontal.y;
+                        }
+                    }
+                        break;
                 }
-                    break;
             }
 
             // Rotation (!!!!TEST!!!!)
