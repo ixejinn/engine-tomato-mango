@@ -2,12 +2,13 @@
 #define MANGO_SYSTEMS_H
 
 #include "ECS/Systems/CameraTransformSystem.h"
+#include "ECS/Systems/CharacterMovementSystem.h"
 #include "ECS/Systems/CharacterScaleSystem.h"
 #include "ECS/Systems/CollisionSystem.h"
 #include "ECS/Systems/EditorCameraSystem.h"
+#include "ECS/Systems/FrictionSystem.h"
 #include "ECS/Systems/GravitySystem.h"
 #include "ECS/Systems/IntegrationSystem.h"
-#include "ECS/Systems/KinematicMovementSystem.h"
 #include "ECS/Systems/ParticleEmissionSystem.h"
 #include "ECS/Systems/ParticleRenderSystem.h"
 #include "ECS/Systems/PlayerCameraSystem.h"

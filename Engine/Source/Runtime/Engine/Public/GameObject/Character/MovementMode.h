@@ -7,10 +7,16 @@
 
 namespace tomato
 {
-    enum MovementMode
+    enum MovementMode : uint8_t
     {
         Walking,
         Falling
+    };
+
+    enum InputControl : uint8_t
+    {
+        Direct,
+        Accelerate
     };
 
     struct ChangeMovementModeEvent
@@ -26,6 +32,7 @@ namespace tomato
         entt::registry* reg;
         glm::vec3 position;
         unsigned int remainingJumpCount;
+        bool isLandedOnCharacter;
     };
 }
 

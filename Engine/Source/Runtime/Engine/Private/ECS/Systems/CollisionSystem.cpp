@@ -70,7 +70,7 @@ namespace tomato
 
                     if (result->trigger)
                     {
-                         // std::cout << "      trg ENTER " << candidate << "\n";
+//                        std::cout << "      trg ENTER " << candidate << "\n";
                         eventDispatcher.Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
                     }
                     else
@@ -121,7 +121,7 @@ namespace tomato
                 {
                     if (col1->trigger || col2->trigger)
                     {
-                        // std::cout << "      trg EXIT " << it->first << "\n";
+//                        std::cout << "      trg EXIT " << it->first << "\n";
                         EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{ it->first.a, it->first.b, &registry });
                     }
                     else
@@ -161,11 +161,11 @@ namespace tomato
 
         auto velA = reg.try_get<VelocityComponent>(rootA);
         if (velA)
-            vA = velA->velocity;
+            vA = velA->Get();
 
         auto velB = reg.try_get<VelocityComponent>(rootB);
         if (velB)
-            vB = velB->velocity;
+            vB = velB->Get();
 
         float lenVA = glm::length2(vA);
         float lenVB = glm::length2(vB);
@@ -220,10 +220,20 @@ namespace tomato
         // std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Move
-        trf.AddPosition((vel.velocity * FIXED_DELTA_TIME * hitTime + normal * COLLISION_SKIN) * weight);
+        trf.AddPosition((vel.Get() * FIXED_DELTA_TIME * hitTime + normal * COLLISION_SKIN) * weight);
         // std::cout << "          position C: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Slide
+        glm::vec3 remainingInput = (1 - hitTime * weight) * vel.input;
+        vel.input = remainingInput + glm::dot(remainingInput, -normal) * normal;
+
+        if (std::abs(vel.input.x) < EPSILON)
+            vel.input.x = 0.f;
+        if (std::abs(vel.input.y) < EPSILON)
+            vel.input.y = 0.f;
+        if (std::abs(vel.input.z) < EPSILON)
+            vel.input.z = 0.f;
+
         glm::vec3 remainingMove = (1 - hitTime * weight) * vel.velocity;
         vel.velocity = remainingMove + glm::dot(remainingMove, -normal) * normal;
 
@@ -250,6 +260,21 @@ namespace tomato
         // std::cout << "          position D: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Slide
+        float lenI = glm::length(vel.input);
+        if (lenI > EPSILON)
+        {
+            float hitTime = distance / lenI;
+            glm::vec3 remainingInput = (1 - hitTime * weight) * vel.input;
+            vel.input = remainingInput + glm::dot(remainingInput, -normal) * normal;
+
+            if (std::abs(vel.input.x) < EPSILON)
+                vel.input.x = 0.f;
+            if (std::abs(vel.input.y) < EPSILON)
+                vel.input.y = 0.f;
+            if (std::abs(vel.input.z) < EPSILON)
+                vel.input.z = 0.f;
+        }
+
         float lenV = glm::length(vel.velocity);
         if (lenV > EPSILON)
         {

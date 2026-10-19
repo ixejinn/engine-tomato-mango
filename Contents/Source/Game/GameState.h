@@ -6,6 +6,8 @@
 #include "PlayTest/UIController.h"
 #include "GameObject/Character/MovementMode.h"
 
+#include "Wave/WaveEventFwd.h"
+
 class GameState : public tomato::State {
 public:
     explicit GameState(tomato::Engine& engine);
@@ -16,11 +18,14 @@ public:
     void Exit() override;
 
 private:
-    UIController uiController_;
+    static void OnTriggerEnter(const tomato::TriggerEnterEvent& event);
+    static void OnTriggerExit(const tomato::TriggerExitEvent& event);
 
-    static void WaveCollisionEnter(const tomato::TriggerEnterEvent& event);
-    static void WaveCollisionExit(const tomato::TriggerExitEvent& event);
+    static void OnWaveCollision(const WaveCollisionEvent& event);
+
     void MakeWaveJump(const tomato::LandingEvent& event);
+
+    UIController uiController_;
 };
 
 #endif //MANGO_MYSTATE_H

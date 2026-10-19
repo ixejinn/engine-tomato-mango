@@ -28,6 +28,7 @@
 #include "WavePool.h"
 #include "WaveColliderPool.h"
 #include "WaveManager.h"
+#include "Wave/WaveEvent.h"
 
 REGISTER_STATE(GameState)
 
@@ -61,6 +62,8 @@ void GameState::Init()
     entt::entity colObj = registry_.get<HierarchyComponent>(player).children[0];
     auto& colp = registry_.get<ColliderComponent>(colObj);
     colp.layer = CollisionLayer::Wave1;
+    auto& moveP0 = registry_.get<MovementComponent>(player);
+    moveP0.control = InputControl::Accelerate;
 
     entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player");
     auto& trfP1 = registry_.get<TransformComponent>(player1);
@@ -102,10 +105,11 @@ void GameState::Init()
     engine_.collisionLayerMtx_.SetCollisionLayer(CollisionLayer::Wave1, CollisionLayer::Wave2, true);
 
 
-
-    EventDispatcher::GetInstance().Connect<TriggerEnterEvent, &WaveCollisionEnter>();
-    EventDispatcher::GetInstance().Connect<TriggerExitEvent, &WaveCollisionExit>();
-    EventDispatcher::GetInstance().Connect<LandingEvent, &GameState::MakeWaveJump>(*this);
+    auto& eventDispatcher = EventDispatcher::GetInstance();
+    eventDispatcher.Connect<TriggerEnterEvent, &OnTriggerEnter>();
+//    eventDispatcher.Connect<TriggerExitEvent, &OnTriggerExit>();
+    eventDispatcher.Connect<WaveCollisionEvent, &OnWaveCollision>();
+    eventDispatcher.Connect<LandingEvent, &GameState::MakeWaveJump>(*this);
 }
 
 void GameState::Update()
@@ -115,38 +119,46 @@ void GameState::Update()
 void GameState::Exit()
 {}
 
-void GameState::WaveCollisionEnter(const tomato::TriggerEnterEvent& event) {
+void GameState::OnTriggerEnter(const tomato::TriggerEnterEvent& event) {
+    entt::entity a = GetRootEntity(event.reg, event.a);
+    entt::entity b = GetRootEntity(event.reg, event.b);
+
+    if (event.reg->all_of<WaveColliderTag>(b))
+        EventDispatcher::GetInstance().Enqueue(WaveCollisionEvent{a, event.reg});
+    else if (event.reg->all_of<WaveColliderTag>(a))
+        EventDispatcher::GetInstance().Enqueue(WaveCollisionEvent{b, event.reg});
+
     entt::entity root1 = GetRootEntity(event.reg, event.a);
     entt::entity root2 = GetRootEntity(event.reg, event.b);
 
-    {
-        auto* testComp = event.reg->try_get<WaveCollisionComponent>(root1);
-        if (testComp && event.reg->all_of<WaveColliderTag>(root2))
-        {
-            if (auto* render = event.reg->try_get<RenderComponent>(root1))
-            {
-                if (!testComp->color.has_value())
-                    testComp->color = render->color;
-                render->color = WaveCollisionComponent::COLLISION_COLOR;
-            }
-        }
-    }
-
-    {
-        auto* testComp = event.reg->try_get<WaveCollisionComponent>(root2);
-        if (testComp && event.reg->all_of<WaveColliderTag>(root1))
-        {
-            if (auto* render = event.reg->try_get<RenderComponent>(root2))
-            {
-                if (!testComp->color.has_value())
-                    testComp->color = render->color;
-                render->color = WaveCollisionComponent::COLLISION_COLOR;
-            }
-        }
-    }
+//    {
+//        auto* testComp = event.reg->try_get<WaveCollisionComponent>(root1);
+//        if (testComp && event.reg->all_of<WaveColliderTag>(root2))
+//        {
+//            if (auto* render = event.reg->try_get<RenderComponent>(root1))
+//            {
+//                if (!testComp->color.has_value())
+//                    testComp->color = render->color;
+//                render->color = WaveCollisionComponent::COLLISION_COLOR;
+//            }
+//        }
+//    }
+//
+//    {
+//        auto* testComp = event.reg->try_get<WaveCollisionComponent>(root2);
+//        if (testComp && event.reg->all_of<WaveColliderTag>(root1))
+//        {
+//            if (auto* render = event.reg->try_get<RenderComponent>(root2))
+//            {
+//                if (!testComp->color.has_value())
+//                    testComp->color = render->color;
+//                render->color = WaveCollisionComponent::COLLISION_COLOR;
+//            }
+//        }
+//    }
 }
 
-void GameState::WaveCollisionExit(const tomato::TriggerExitEvent& event)
+void GameState::OnTriggerExit(const tomato::TriggerExitEvent& event)
 {
     entt::entity root = GetRootEntity(event.reg, event.a);
     if (auto* testComp = event.reg->try_get<WaveCollisionComponent>(root))
@@ -169,8 +181,16 @@ void GameState::WaveCollisionExit(const tomato::TriggerExitEvent& event)
     }
 }
 
+void GameState::OnWaveCollision(const WaveCollisionEvent& event)
+{
+    std::cout << "wave collision\n";
+}
+
 void GameState::MakeWaveJump(const LandingEvent& event)
 {
+    if (event.isLandedOnCharacter)
+        return;
+
     if (event.remainingJumpCount == 0)
         registry_.ctx().get<WaveManager>().Acquire(registry_, event.e, event.position, 0.01f);
 }

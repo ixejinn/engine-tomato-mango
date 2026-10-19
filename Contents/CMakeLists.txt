@@ -21,6 +21,8 @@ set(CONTENTS_SOURCES
         Source/Game/WaveColliderPool.h
         Source/Game/WaveColliderPool.cpp
         Source/Game/WaveManager.cpp
+		Source/Game/Wave/WaveEvent.h
+		Source/Game/Wave/WaveEventFwd.h
 )
 
 add_executable(contents

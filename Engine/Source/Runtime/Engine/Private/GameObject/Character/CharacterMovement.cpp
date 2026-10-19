@@ -1,6 +1,7 @@
 ﻿#include "CharacterMovement.h"
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Hierarchy.h"
+#include "ECS/Components/Character.h"
 #include "ECS/Components/ComponentsPhys.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "Collision/CollisionEvent.h"
@@ -31,7 +32,8 @@ namespace tomato::CharacterMovement
         {
             EventDispatcher::GetInstance().Enqueue(
                     LandingEvent{
-                        root1, event.reg, event.reg->get<TransformComponent>(root1).GetWorldPosition(), JUMP_COUNT_MAX - move1->jumpCnt});
+                        root1, event.reg, event.reg->get<TransformComponent>(root1).GetWorldPosition(),
+                        JUMP_COUNT_MAX - move1->jumpCnt, event.reg->all_of<CharacterTag>(root2)});
             Land(*event.reg, root1, *move1, *vel1);
         }
 
@@ -39,7 +41,8 @@ namespace tomato::CharacterMovement
         {
             EventDispatcher::GetInstance().Enqueue(
                     LandingEvent{
-                        root2, event.reg, event.reg->get<TransformComponent>(root2).GetWorldPosition(), JUMP_COUNT_MAX - move2->jumpCnt});
+                        root2, event.reg, event.reg->get<TransformComponent>(root2).GetWorldPosition(),
+                        JUMP_COUNT_MAX - move2->jumpCnt, event.reg->all_of<CharacterTag>(root1)});
             Land(*event.reg, root2, *move2, *vel2);
         }
     }
@@ -74,7 +77,7 @@ namespace tomato::CharacterMovement
             entt::registry& reg, entt::entity e,
             MovementComponent& move, VelocityComponent& vel, float jumpSpeed)
     {
-        // TMT_INFO << "Jump";
+//        TMT_INFO << "Jump";
 
         vel.velocity.y = std::max(vel.velocity.y, 0.f) + jumpSpeed;
 
@@ -86,7 +89,7 @@ namespace tomato::CharacterMovement
             entt::registry& reg, entt::entity e,
             MovementComponent& move, VelocityComponent& vel)
     {
-         TMT_INFO << "Land";
+//        TMT_INFO << "Land";
 
         vel.velocity.y = 0;
 
