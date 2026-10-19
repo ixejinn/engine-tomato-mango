@@ -338,20 +338,20 @@ namespace tomato
 	{
 		bool changed = false;
 
-		if (ui.canvas != 0)
+		if (ui.canvas != entt::null)
 		{
 			ImGui::SeparatorText("Canvas");
 			auto canvasView = reg.view<CanvasComponent, NametagComponent>();
-			auto curCanvas = reg.try_get<NametagComponent>(GetEntityByUUID(reg, ui.canvas));
+			auto curCanvas = reg.try_get<NametagComponent>(ui.canvas);
 			const char* canvasPreview = curCanvas != nullptr ? curCanvas->name.c_str() : "null";
 			if (ImGui::BeginCombo("##canvas", canvasPreview))
 			{
 				for (auto [e, canvas, tag] : canvasView.each())
 				{
-					if (ImGui::Selectable(tag.name.c_str(), ui.canvas == tag.id))
+					if (ImGui::Selectable(tag.name.c_str(), ui.canvas == e))
 					{
-						ui.canvas = tag.id;
-						SetHierarchy(reg, GetEntityByUUID(reg, ui.canvas), eCtx.selectedEntity);
+						ui.canvas = e;
+						SetHierarchy(reg, ui.canvas, eCtx.selectedEntity);
 						changed = true;
 					}
 				}
@@ -643,22 +643,22 @@ namespace tomato
 
 		ImGui::SeparatorText("Target");
 		
-		entt::entity targetEntity = GetEntityByUUID(reg, target.target);
+		entt::entity targetEntity = target.target;
 		const char* namePreview = targetEntity == entt::null ? "None" : reg.try_get<NametagComponent>(targetEntity)->name.c_str();
 		if (ImGui::BeginCombo("##entityCombo", namePreview))
 		{
 			auto view = reg.view<NametagComponent, TransformComponent>();
 			for (auto [e, tag, transform] : view.each())
 			{
-				if (ImGui::Selectable(tag.name.c_str(), target.target == tag.id))
+				if (ImGui::Selectable(tag.name.c_str(), target.target == e))
 				{
-					target.target = tag.id;
+					target.target = e;
 					changed = true;
 				}
 			}
-			if (ImGui::Selectable("None", target.target == 0))
+			if (ImGui::Selectable("None", target.target == entt::null))
 			{
-				target.target = 0;
+				target.target = entt::null;
 				changed = true;
 			}
 			ImGui::EndCombo();

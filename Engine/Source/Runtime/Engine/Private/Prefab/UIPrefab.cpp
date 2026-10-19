@@ -29,7 +29,7 @@ namespace tomato::UIPrefab
 
         auto& generator = reg.ctx().get<EntityNameGenerator>();
         reg.emplace<NametagComponent>(uiEntity, GenerateUUID(), generator.Generate(name));
-        reg.emplace<tomato::UIComponent>(uiEntity, GetUUID(reg, canvas), 0, type);
+        reg.emplace<UIComponent>(uiEntity, canvas, 0, type);
         auto& rect = reg.emplace<tomato::RectTransformComponent>(uiEntity);
         rect.SetPosition({ 0.f, 0.f });
         rect.SetOffsetMin({ 0.f, 0.f }); rect.SetOffsetMax({ 0.f, 0.f });
@@ -141,5 +141,6 @@ namespace tomato::UIPrefab
                     return e;
             }
         }
+        return CreateCanvas(reg);
     }
 }

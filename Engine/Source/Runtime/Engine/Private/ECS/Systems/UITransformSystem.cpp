@@ -48,7 +48,7 @@ namespace tomato
 
             rect.local_matrix = T * R * S;
 
-            if (GetEntityByUUID(registry, ui.canvas) == e)
+            if (ui.canvas == e)
                 rect.world_matrix = rect.local_matrix;
 
             else if (hierarchy.parent != entt::null)
@@ -91,7 +91,7 @@ namespace tomato
             rect.local_matrix = T * R * S;
 
             //World Canvas
-            if (GetEntityByUUID(registry, ui.canvas) == e)
+            if (ui.canvas == e)
             {
                 rect.world_matrix = rect.local_matrix;
                 rect.model_matrix = rect.world_matrix;
@@ -101,7 +101,7 @@ namespace tomato
             //Target-based World UI
             if (auto* target = registry.try_get<TargetComponent>(e))
             {
-                auto targetEntity = GetEntityByUUID(registry, target->target);
+                auto targetEntity = target->target;
                 auto* targetTransform = registry.try_get<TransformComponent>(targetEntity);
                 if (!targetTransform)
                     continue;

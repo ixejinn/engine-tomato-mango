@@ -55,7 +55,7 @@ namespace tomato
 
 		int sortOrder{0};
 
-		UUID camera; // optional
+		entt::entity camera{ entt::null }; // optional
 	};
 
 #define TMT_UI_TYPE_LIST(X)	\
@@ -96,7 +96,7 @@ namespace tomato
 
 	struct UIComponent
 	{
-		UUID canvas{ 0 };
+		entt::entity canvas{ entt::null };
 		int sortOrder{ 0 };
 
 		UIType type{ UIType::Default };

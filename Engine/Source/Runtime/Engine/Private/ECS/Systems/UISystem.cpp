@@ -247,7 +247,7 @@ namespace tomato
 					auto* target = registry.try_get<TargetComponent>(entity);
 					if (!target) continue;
 
-					auto* targetTransform = registry.try_get<TransformComponent>(GetEntityByUUID(registry, target->target));
+					auto* targetTransform = registry.try_get<TransformComponent>(target->target);
 					if (!targetTransform)
 						continue;
 
@@ -322,7 +322,7 @@ namespace tomato
 			// Target-based World UI
 			if (auto* target = registry.try_get<TargetComponent>(entity))
 			{
-				auto* targetTransform = registry.try_get<TransformComponent>(GetEntityByUUID(registry, target->target));
+				auto* targetTransform = registry.try_get<TransformComponent>(target->target);
 				if (!targetTransform) continue;
 
 				rect.position = targetTransform->GetWorldPosition() + target->headOffset;

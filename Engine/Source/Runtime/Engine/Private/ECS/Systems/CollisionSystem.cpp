@@ -70,12 +70,12 @@ namespace tomato
 
                     if (result->trigger)
                     {
-                         // std::cout << "      trg ENTER " << candidate << "\n";
+                          std::cout << "      trg ENTER " << candidate << "\n";
                         eventDispatcher.Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
                     }
                     else
                     {
-                         // std::cout << "      col ENTER " << candidate << "\n";
+                          std::cout << "      col ENTER " << candidate << "\n";
                         eventDispatcher.Enqueue(
                             CollisionEnterEvent{candidate.a, candidate.b, &registry, result.value()});
                         contacts_.push_back(ContactEvent{candidate.a, candidate.b, &registry, result.value()});
@@ -91,12 +91,12 @@ namespace tomato
 
                     if (result->trigger)
                     {
-                        // std::cout << "      trg STAY " << candidate << "\n";
+                         std::cout << "      trg STAY " << candidate << "\n";
                         eventDispatcher.Enqueue(TriggerStayEvent{candidate.a, candidate.b, &registry});
                     }
                     else
                     {
-                        // std::cout << "      col STAY " << candidate << "\n";
+                         std::cout << "      col STAY " << candidate << "\n";
                         eventDispatcher.Enqueue(CollisionStayEvent{
                             candidate.a, candidate.b, &registry, result.value()
                         });
@@ -121,12 +121,12 @@ namespace tomato
                 {
                     if (col1->trigger || col2->trigger)
                     {
-                        // std::cout << "      trg EXIT " << it->first << "\n";
+                         std::cout << "      trg EXIT " << it->first << "\n";
                         EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{ it->first.a, it->first.b, &registry });
                     }
                     else
                     {
-                        // std::cout << "      col EXIT " << it->first << "\n";
+                         std::cout << "      col EXIT " << it->first << "\n";
                         EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{ it->first.a, it->first.b, &registry });
                     }
                 }

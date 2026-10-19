@@ -116,9 +116,9 @@ void WaveSystem::Update(SimContext& simCtx)
 	auto waveColliderView = reg.view<ActiveTag, TransformComponent, TargetComponent, WaveColliderComponent>();
 	for (auto [e, transform, target, waveCol] : waveColliderView.each())
 	{
-		if (target.target == 0) continue;
+		if (target.target == entt::null) continue;
 		if (waveCol.wave == entt::null || !reg.valid(waveCol.wave)) continue;
-		auto tEntity = GetEntityByUUID(reg, target.target);
+		auto tEntity = target.target;
 		auto& targetTransform = reg.get<TransformComponent>(tEntity);
 		auto& waveTransform = reg.get<TransformComponent>(waveCol.wave);
 		auto& wave = reg.get<WaveComponent>(waveCol.wave);

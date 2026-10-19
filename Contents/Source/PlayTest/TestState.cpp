@@ -173,8 +173,8 @@ void TestState::PlayTest()
     registry_.emplace<CollisionTestComponent>(player0);
 
     auto& particlePool = registry_.ctx().get<ParticleEmitterPool>();
-    particlePool.Acquire(registry_, GetAssetID("Resources\\Contents\\Particle\\burst_test.tmt.ptc"), GetUUID(registry_, player0));
-    particlePool.Acquire(registry_, GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), GetUUID(registry_, player0));
+    particlePool.Acquire(registry_, GetAssetID("Resources\\Contents\\Particle\\burst_test.tmt.ptc"), player0);
+    particlePool.Acquire(registry_, GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), player0);
 
     // Player1 character
     // entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player 1");
@@ -262,7 +262,7 @@ void TestState::PlayTest()
     auto worldCanvas = UIPrefab::CreateCanvas(registry_, RenderMode::World);
 
     auto targetLabel = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
-    registry_.emplace<TargetComponent>(targetLabel, GetUUID(registry_, player0), glm::vec3{ 0.f, 1.f, 0.f });
+    registry_.emplace<TargetComponent>(targetLabel, player0, glm::vec3{ 0.f, 1.f, 0.f });
     SetHierarchy(registry_, worldCanvas, targetLabel);
     auto& uiCmp = registry_.get<UIComponent>(targetLabel);
     uiCmp.sortOrder = 1;
