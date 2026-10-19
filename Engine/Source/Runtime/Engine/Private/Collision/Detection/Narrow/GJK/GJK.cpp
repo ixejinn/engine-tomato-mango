@@ -42,17 +42,24 @@ namespace tomato
 
         if (auto distanceRes = GJKDistance(reg, pair))
         {
-            if ((int)pair.b == 18)
-                std::cout << "box dist: " << distanceRes->distance << "\n";
-            else if ((int)pair.b == 15)
-                std::cout << "other dist: " << distanceRes->distance << "\n";
+            glm::vec3 vA{0};
+            glm::vec3 vB{0};
+            if (auto* velA = reg.try_get<VelocityComponent>(GetRootEntity(reg, pair.a)))
+                vA = velA->input;
+            if (auto* velB = reg.try_get<VelocityComponent>(GetRootEntity(reg, pair.b)))
+                vB = velB->input;
+            glm::vec3 rv = vA - vB;
 
-            constexpr float SAFETY = 1.28f;
-            if (distanceRes->distance < 0 ||   // EPA
-                distanceRes->distance * distanceRes->distance <= SAFETY * SAFETY * RELATIVE_TOLERANCE_SQ * distanceRes->maxDistSq)
+            constexpr float SAFETY_COEF = 1.28f;
+            constexpr float SAFETY_COEF_SQ = SAFETY_COEF * SAFETY_COEF;
+
+            if (distanceRes->distance < 0 ||                // EPA
+                distanceRes->distance * distanceRes->distance <= SAFETY_COEF_SQ * RELATIVE_TOLERANCE_SQ * distanceRes->maxDistSq ||
+                // Scale-dependent termination may produce unreliable results at close distances
+                glm::length2(rv) < RELATIVE_TOLERANCE_SQ)   // GJK-raycast only targets moving objects
                 return ContactData{distanceRes->normal, distanceRes->distance};
 
-            return GJKRaycast(reg, pair);
+            return GJKRaycast(reg, pair, -rv * FIXED_DELTA_TIME);
         }
 
         return std::nullopt;
@@ -183,7 +190,7 @@ namespace tomato
     }
 
     std::optional<ContactData> GJK::GJKRaycast(
-            entt::registry& reg, const ContactPair& pair)
+            entt::registry& reg, const ContactPair& pair, const glm::vec3& ray)
     {
 //        std::cout << "========== GJK raycast " << pair << "\n";
 
@@ -191,16 +198,6 @@ namespace tomato
         auto& col2 = reg.get<ColliderComponent>(pair.b);
         auto& trf1 = reg.get<TransformComponent>(pair.a);
         auto& trf2 = reg.get<TransformComponent>(pair.b);
-
-        glm::vec3 v1{0.f};
-        glm::vec3 v2{0.f};
-        if (auto vel1 = reg.try_get<VelocityComponent>(GetRootEntity(reg, pair.a)))
-            v1 = vel1->input;
-        if (auto vel2 = reg.try_get<VelocityComponent>(GetRootEntity(reg, pair.b)))
-            v2 = vel2->input;
-
-        glm::vec3 relVel = v1 - v2;
-        glm::vec3 ray = -relVel * FIXED_DELTA_TIME;
 
         float hitFraction = 0.f;
         glm::vec3 rayOrigin{0.f};

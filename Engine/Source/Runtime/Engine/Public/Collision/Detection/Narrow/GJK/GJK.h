@@ -29,7 +29,7 @@ namespace tomato
                 entt::registry& reg, const ContactPair& pair);
 
         static std::optional<ContactData> GJKRaycast(
-                entt::registry& reg, const ContactPair& pair);
+                entt::registry& reg, const ContactPair& pair, const glm::vec3& ray);
 
         static glm::vec3 Support(
             const glm::vec3& worldDir,

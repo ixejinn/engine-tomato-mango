@@ -229,7 +229,7 @@ set(ENGINE_HEADERS
 )
 
 set(ENGINE_SOURCES
-        Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
+		Source/Runtime/Engine/Private/Collision/Layer/CollisionLayerMatrix.cpp
         Source/Runtime/Core/Private/Collision/ColliderSupport.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/CameraTransformSystem.cpp
         Source/Runtime/Engine/Private/Engine.cpp
@@ -253,10 +253,10 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Systems/TransformSystem.cpp
 		Source/Runtime/Engine/Private/ECS/SystemFramework/SystemRegistry.cpp
 		Source/Runtime/Engine/Private/ECS/SystemFramework/SystemManager.cpp
-		Source/Runtime/Engine/Private/Collision/Narrow/GJK/GJK.cpp
-		Source/Runtime/Engine/Private/Collision/Narrow/GJK/EPA.cpp
+		Source/Runtime/Engine/Private/Collision/Detection/Narrow/GJK/GJK.cpp
+		Source/Runtime/Engine/Private/Collision/Detection/Narrow/GJK/EPA.cpp
         Source/Runtime/Engine/Private/Math/Normal.cpp
-        Source/Runtime/Engine/Private/Collision/Broad/SAP.cpp
+        Source/Runtime/Engine/Private/Collision/Detection/Broad/SAP.cpp
         Source/Runtime/Engine/Private/Utils/Utf.cpp
         Source/Runtime/Engine/Private/Input/InputUI.cpp
         Source/Runtime/Engine/Private/ECS/Systems/UISystem.cpp
@@ -274,7 +274,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/GameNetwork/Message/InputMessage.cpp
         Source/Runtime/Engine/Private/GameNetwork/GamePlayNetSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/IntegrationSystem.cpp
-        Source/Runtime/Engine/Private/Collision/Broad/BroadPhase.cpp
+        Source/Runtime/Engine/Private/Collision/Detection/Broad/BroadPhase.cpp
         Source/Runtime/Engine/Private/ECS/Components/Transform.cpp
         Source/Runtime/Engine/Private/Prefab/Prefab.cpp
         Source/Runtime/Engine/Private/ECS/Systems/GravitySystem.cpp
