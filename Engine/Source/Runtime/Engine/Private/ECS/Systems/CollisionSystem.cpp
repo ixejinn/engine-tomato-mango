@@ -149,7 +149,7 @@ namespace tomato
 
     void CollisionSystem::ResolveContact(ContactEvent& event)
     {
-//        std::cout << " ===== SOLVE COLLISION " << (int)event.a << " " << (int)event.b << "\n";
+        std::cout << " ===== SOLVE COLLISION " << (int)event.a << " " << (int)event.b << "\n";
 //        std::cout << "       normal: " << glm::to_string(event.data.normal) << "\n";
 
         auto& reg = *(event.reg);
@@ -178,7 +178,7 @@ namespace tomato
             weightA = 0;
         else if (sumV >= EPSILON_SQ)
             weightA = lenVA / sumV;
-         // std::cout << "       weightA: " << weightA << "\n";
+        std::cout << "       weightA: " << weightA << "\n";
         float weightB = 1 - weightA;
 
         auto& trfRootA = reg.get<TransformComponent>(rootA);
@@ -216,7 +216,7 @@ namespace tomato
         TransformComponent& trf, VelocityComponent& vel,
         const glm::vec3& normal, const float weight, const float hitTime)
     {
-//        std::cout << "   CC     " << glm::to_string(normal) << " " << weight << " " << hitTime << "\n";
+        std::cout << "   CC     " << glm::to_string(normal) << " " << weight << " " << hitTime << "\n";
         // std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Move
@@ -250,7 +250,7 @@ namespace tomato
         TransformComponent& trf, VelocityComponent& vel,
         const glm::vec3& normal, const float weight, const float distance)
     {
-//        std::cout << "    DC    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
+        std::cout << "    DC    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
         // std::cout << "          position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
 
         // Move
@@ -296,7 +296,7 @@ namespace tomato
         TransformComponent& trf,
         const glm::vec3& normal, const float weight, const float distance)
     {
-//        std::cout << "    PE    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
+        std::cout << "    PE    " << glm::to_string(normal) << " " << weight << " " << distance << "\n";
         // std::cout << "         position 1: " << glm::to_string(trf.GetLocalPosition()) << "\n";
         trf.AddPosition(normal * (-distance + COLLISION_SKIN) * weight);
         // std::cout << "         position P: " << glm::to_string(trf.GetLocalPosition()) << "\n";

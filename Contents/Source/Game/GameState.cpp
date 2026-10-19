@@ -80,6 +80,10 @@ void GameState::Init()
     auto& colp1 = registry_.get<ColliderComponent>(colObj1);
     colp1.layer = CollisionLayer::Wave2;
 
+    entt::entity box = Prefab::CreateWorldObject(registry_, true, false, true, "Box");
+    auto& trfBox = registry_.get<TransformComponent>(box);
+    trfBox.SetPosition(-0.5, -2.425, -0.1);
+
     auto& wavePool = EntityPool<WavePoolTraits>::EmplaceInContext(registry_);
     auto& colliderPool = EntityPool<WaveColliderPoolTraits>::EmplaceInContext(registry_);
     registry_.ctx().emplace<WaveManager>(wavePool, colliderPool);

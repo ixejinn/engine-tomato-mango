@@ -42,8 +42,13 @@ namespace tomato
 
         if (auto distanceRes = GJKDistance(reg, pair))
         {
+            if ((int)pair.b == 18)
+                std::cout << "box dist: " << distanceRes->distance << "\n";
+            else if ((int)pair.b == 15)
+                std::cout << "other dist: " << distanceRes->distance << "\n";
+
             constexpr float SAFETY = 1.28f;
-            if (distanceRes->maxDistSq < 0 ||   // EPA
+            if (distanceRes->distance < 0 ||   // EPA
                 distanceRes->distance * distanceRes->distance <= SAFETY * SAFETY * RELATIVE_TOLERANCE_SQ * distanceRes->maxDistSq)
                 return ContactData{distanceRes->normal, distanceRes->distance};
 

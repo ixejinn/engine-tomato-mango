@@ -17,7 +17,7 @@ namespace tomato
             auto velocity = vel.Get();
             if (glm::length2(velocity) > VELOCITY_SQ_EPSILON)
             {
-                std::cout << glm::length(velocity) << "\n";
+//                std::cout << glm::length(velocity) << "\n";
                 trf.AddPosition(velocity * FIXED_DELTA_TIME);
             }
         }
