@@ -7,6 +7,7 @@
 #include "Collision/CollisionEvent.h"
 #include "Collision/CollisionConstants.h"
 #include "Collision/CollisionTolerance.h"
+#include "Collision/CollisionDebug.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
@@ -45,9 +46,9 @@ namespace tomato
             glm::vec3 vA{0};
             glm::vec3 vB{0};
             if (auto* velA = reg.try_get<VelocityComponent>(GetRootEntity(reg, pair.a)))
-                vA = velA->input;
+                vA = velA->Get();
             if (auto* velB = reg.try_get<VelocityComponent>(GetRootEntity(reg, pair.b)))
-                vB = velB->input;
+                vB = velB->Get();
             glm::vec3 rv = vA - vB;
 
             constexpr float SAFETY_COEF = 1.28f;
@@ -76,7 +77,7 @@ namespace tomato
     bool GJK::GJKBool(
             entt::registry& reg, const ContactPair& pair)
     {
-//        std::cout << "========== GJK bool " << pair << "\n";
+        COL_DETECT_VERBOSE_LOG("===== GJK bool " << pair);
 
         auto& col1 = reg.get<ColliderComponent>(pair.a);
         auto& col2 = reg.get<ColliderComponent>(pair.b);
@@ -115,7 +116,7 @@ namespace tomato
     std::optional<DistanceResult> GJK::GJKDistance(
             entt::registry& reg, const ContactPair& pair)
     {
-        // std::cout << "========== GJK distance " << pair << "\n";
+        COL_DETECT_VERBOSE_LOG("===== GJK distance " << pair);
 
         auto& col1 = reg.get<ColliderComponent>(pair.a);
         auto& col2 = reg.get<ColliderComponent>(pair.b);
@@ -192,7 +193,7 @@ namespace tomato
     std::optional<ContactData> GJK::GJKRaycast(
             entt::registry& reg, const ContactPair& pair, const glm::vec3& ray)
     {
-//        std::cout << "========== GJK raycast " << pair << "\n";
+        COL_DETECT_VERBOSE_LOG("===== GJK raycast " << pair);
 
         auto& col1 = reg.get<ColliderComponent>(pair.a);
         auto& col2 = reg.get<ColliderComponent>(pair.b);
@@ -250,7 +251,7 @@ namespace tomato
                 searchDir = result.value();
             else
             {
-                TMT_DEBUG << "Degenerate simplex. iter = " << iteration;
+                COL_DETECT_VERBOSE_LOG("GJK raycast Degenerate simplex. iter = " << iteration);
                 break;
             }
 
@@ -402,7 +403,7 @@ namespace tomato
             }
 
             default:
-                TMT_ERR << "Incorrect simplex size: " << simplex.size();
+                COL_DETECT_VERBOSE_LOG("FindClosestPointOnSimplex Incorrect simplex size: " << simplex.size());
                 return glm::vec3{0.f};
         }
     }

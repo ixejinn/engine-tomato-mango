@@ -29,7 +29,6 @@ namespace tomato
 
         for (const auto& [e, col] : group.each())
         {
-            // std::cout << (int)e << "\n";
             AABB& aabb = col.aabb;
 
             if (activeMaxX < aabb.min.x)
@@ -78,7 +77,6 @@ namespace tomato
                 activeMaxX = std::max(activeMaxX, aabb.max.x);
             }
         }
-        // std::cout << "\n";
     }
 
     void SAP::UpdateAABBs(entt::registry& reg)

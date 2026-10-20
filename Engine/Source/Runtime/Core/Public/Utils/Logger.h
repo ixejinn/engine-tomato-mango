@@ -5,7 +5,7 @@
 #include <sstream>
 #include <string>
 #include <source_location>
-#include "EngineConfig.h"
+#include "EngineDebug.h"
 
 namespace tomato {
     class Logger {

@@ -19,8 +19,7 @@
 #include "Render/SortKey.h"
 #include "Render/RenderPass.h"
 #include "Profiler/CPUProfiler.h"
-#include <ECS/Components/Nametag.h>
-#include <Render/GLStateCache.h>
+#include "Render/GLStateCache.h"
 
 namespace tomato
 {

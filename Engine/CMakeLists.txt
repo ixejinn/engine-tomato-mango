@@ -226,6 +226,8 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Systems/ViewGizmoRenderSystem.h
 		Source/Runtime/Engine/Private/ECS/Components/Gizmo.h
 		Source/Runtime/Engine/Public/ECS/Systems/FrictionSystem.h
+		Source/Runtime/Engine/Public/Collision/CollisionDebug.h
+		Source/Runtime/Engine/Public/EngineDebug.h
 )
 
 set(ENGINE_SOURCES
