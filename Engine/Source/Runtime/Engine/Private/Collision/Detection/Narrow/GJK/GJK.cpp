@@ -55,10 +55,12 @@ namespace tomato
             constexpr float SAFETY_COEF_SQ = SAFETY_COEF * SAFETY_COEF;
 
             if (distanceRes->distance < 0 ||                // EPA
-                distanceRes->distance * distanceRes->distance <= SAFETY_COEF_SQ * RELATIVE_TOLERANCE_SQ * distanceRes->maxDistSq ||
+                distanceRes->distance * distanceRes->distance <= SAFETY_COEF_SQ * RELATIVE_TOLERANCE_SQ * distanceRes->maxDistSq)
                 // Scale-dependent termination may produce unreliable results at close distances
-                glm::length2(rv) < RELATIVE_TOLERANCE_SQ)   // GJK-raycast only targets moving objects
                 return ContactData{distanceRes->normal, distanceRes->distance};
+
+            if (glm::length2(rv) < RELATIVE_TOLERANCE_SQ)   // GJK-raycast only targets moving objects
+                return std::nullopt;
 
             return GJKRaycast(reg, pair, -rv * FIXED_DELTA_TIME);
         }
@@ -158,15 +160,6 @@ namespace tomato
             const float length = glm::sqrt(lengthSq);
             auto normal = closestP / length;
 
-            if (std::abs(normal.x) < NORMAL_SNAP_THRESHOLD)
-                closestP.x = 0.f;
-            if (std::abs(normal.z) < NORMAL_SNAP_THRESHOLD)
-                closestP.z = 0.f;
-            if (std::abs(normal.y) < NORMAL_SNAP_THRESHOLD)
-                closestP.y = 0.f;
-
-            normal = glm::normalize(normal);
-
             //                       ↓ normal 방향이 원점에서 CSO를 향하는 방향이므로 raycast, EPA와 방향을 맞추기위해 부호 반전
             return DistanceResult{-normal, length, maxDistSq};
         }
@@ -263,16 +256,6 @@ namespace tomato
         if (hitFraction > 0 && hitFraction <= 1)
         {
             hitNormal = glm::normalize(hitNormal);
-
-            if (std::abs(hitNormal.x) < NORMAL_SNAP_THRESHOLD)
-                hitNormal.x = 0.f;
-            if (std::abs(hitNormal.z) < NORMAL_SNAP_THRESHOLD)
-                hitNormal.z = 0.f;
-            if (std::abs(hitNormal.y) < NORMAL_SNAP_THRESHOLD)
-                hitNormal.y = 0.f;
-
-            hitNormal = glm::normalize(hitNormal);
-
             return ContactData{hitNormal, hitFraction, 0.f};
         }
 

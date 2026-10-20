@@ -41,10 +41,6 @@ namespace tomato
             TransformComponent& trf, VelocityComponent& vel,
             const glm::vec3& normal, float weight, float distance);
 
-        static void ResolvePenetration(
-            TransformComponent& trf,
-            const glm::vec3& normal, float weight, float distance);
-
         static void UpdateCollisionEvents();
     };
 }

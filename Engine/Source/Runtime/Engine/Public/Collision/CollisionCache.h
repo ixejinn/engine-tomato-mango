@@ -7,7 +7,7 @@ namespace tomato
 {
     struct ContactCache
     {
-        glm::vec3 normal;
+        // glm::vec3 normal;
         int exitCnt;
     };
 }

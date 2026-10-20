@@ -5,13 +5,13 @@
 #include "EngineDebug.h"
 
 #ifdef TOMATO_DEBUG
-#define TOMATO_DEBUG_COLLISION
+// #define TOMATO_DEBUG_COLLISION
 #endif
 
 #ifdef TOMATO_DEBUG_COLLISION
 #define TOMATO_DEBUG_COLLISION_DETECT   // for collision detection
-// #define TOMATO_DEBUG_COLLISION_DETECT_VERBOSE
-// #define TOMATO_DEBUG_COLLISION_RESOLVE  // for collision resolution
+#define TOMATO_DEBUG_COLLISION_DETECT_VERBOSE
+#define TOMATO_DEBUG_COLLISION_RESOLVE  // for collision resolution
 #endif
 
 #ifdef TOMATO_DEBUG_COLLISION_DETECT_VERBOSE

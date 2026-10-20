@@ -17,6 +17,15 @@
 #include "Utils/Logger.h"
 #include "Profiler/CPUProfiler.h"
 
+namespace
+{
+    glm::vec3 ComputeSlideVector(const glm::vec3& v, const glm::vec3& n)
+    {
+        const float dot = glm::dot(v, n);
+        return dot < 0 ? v - dot * n : v;
+    }
+}
+
 namespace tomato
 {
     CollisionSystem::CollisionSystem()
@@ -67,8 +76,6 @@ namespace tomato
                 {
                     // Enter
                     // Detect new contact pair
-                    contactCache[candidate].normal = result->normal;
-
                     if (result->trigger)
                     {
                         COL_DETECT_LOG("      TRG ENTER " << candidate);
@@ -85,19 +92,14 @@ namespace tomato
                 else
                 {
                     // Stay
-                    if (!result->hitTime.has_value())
-                        result->normal = contactCache[candidate].normal;
-                    else
-                        contactCache[candidate].normal = result->normal;
-
                     if (result->trigger)
                     {
-                        // COL_DETECT_LOG("      TRG STAY  " << candidate);
+                        COL_DETECT_VERBOSE_LOG("      TRG STAY  " << candidate);
                         eventDispatcher.Enqueue(TriggerStayEvent{candidate.a, candidate.b, &registry});
                     }
                     else
                     {
-                        // COL_DETECT_LOG("      COL STAY  " << candidate);
+                        COL_DETECT_VERBOSE_LOG("      COL STAY  " << candidate);
                         eventDispatcher.Enqueue(CollisionStayEvent{
                             candidate.a, candidate.b, &registry, result.value()
                         });
@@ -127,7 +129,7 @@ namespace tomato
                     }
                     else
                     {
-                        COL_DETECT_LOG("      COL EXIT " << it->first);
+                        COL_DETECT_LOG("      COL EXIT  " << it->first);
                         EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{ it->first.a, it->first.b, &registry });
                     }
                 }
@@ -193,20 +195,14 @@ namespace tomato
             if (velB)
                 ResolveContinuousContact(trfRootB, *velB, event.data.normal, weightB, event.data.hitTime.value());
         }
-        else if (event.data.distance >= 0)
+        else
         {
-            // COLLISION_SKIN 만큼만 떨어져 있어서 GJK Distance로부터 받은 충돌 정보
+            // COLLISION_SKIN 만큼만 떨어져 있거나 겹치는 경우 GJK Distance로부터 받은 충돌 정보
             if (velA)
                 ResolveDiscreteContact(trfRootA, *velA, -event.data.normal, weightA, event.data.distance);
 
             if (velB)
                 ResolveDiscreteContact(trfRootB, *velB, event.data.normal, weightB, event.data.distance);
-        }
-        else
-        {
-            // 겹침 보정
-            ResolvePenetration(trfRootA, -event.data.normal, weightA, event.data.distance);
-            ResolvePenetration(trfRootB,  event.data.normal, weightB, event.data.distance);
         }
     }
 
@@ -215,15 +211,16 @@ namespace tomato
         const glm::vec3& normal, const float weight, const float hitTime)
     {
         COL_RESOLVE_LOG("===== CC " << glm::to_string(normal) << " " << weight << " " << hitTime);
-        COL_RESOLVE_LOG("      pos before: " << glm::to_string(trf.GetLocalPosition()));
 
         // Move
-        trf.AddPosition((vel.Get() * FIXED_DELTA_TIME * hitTime + normal * COLLISION_SKIN) * weight);
+        COL_RESOLVE_LOG("      pos before: " << glm::to_string(trf.GetLocalPosition()));
+        trf.AddPosition(vel.Get() * FIXED_DELTA_TIME * hitTime + normal * COLLISION_SKIN * weight);
         COL_RESOLVE_LOG("      pos after : " << glm::to_string(trf.GetLocalPosition()));
 
         // Slide
-        glm::vec3 remainingInput = (1 - hitTime * weight) * vel.input;
-        vel.input = remainingInput + glm::dot(remainingInput, -normal) * normal;
+        COL_RESOLVE_LOG("      vel before: " << glm::to_string(vel.Get()));
+        glm::vec3 remainingInput = (1 - hitTime) * vel.input;
+        vel.input = ComputeSlideVector(remainingInput, normal);
 
         if (std::abs(vel.input.x) < EPSILON)
             vel.input.x = 0.f;
@@ -232,8 +229,8 @@ namespace tomato
         if (std::abs(vel.input.z) < EPSILON)
             vel.input.z = 0.f;
 
-        glm::vec3 remainingMove = (1 - hitTime * weight) * vel.velocity;
-        vel.velocity = remainingMove + glm::dot(remainingMove, -normal) * normal;
+        glm::vec3 remainingMove = (1 - hitTime) * vel.velocity;
+        vel.velocity = ComputeSlideVector(remainingMove, normal);
 
         if (std::abs(vel.velocity.x) < EPSILON)
             vel.velocity.x = 0.f;
@@ -241,6 +238,7 @@ namespace tomato
             vel.velocity.y = 0.f;
         if (std::abs(vel.velocity.z) < EPSILON)
             vel.velocity.z = 0.f;
+        COL_RESOLVE_LOG("      vel after : " << glm::to_string(vel.Get()));
     }
 
     void CollisionSystem::ResolveDiscreteContact(
@@ -248,21 +246,22 @@ namespace tomato
         const glm::vec3& normal, const float weight, const float distance)
     {
         COL_RESOLVE_LOG("===== DC " << glm::to_string(normal) << " " << weight << " " << distance);
-        COL_RESOLVE_LOG("      pos before: " << glm::to_string(trf.GetLocalPosition()));
 
         // Move
+        COL_RESOLVE_LOG("      pos before: " << glm::to_string(trf.GetLocalPosition()));
         float moveDist = COLLISION_SKIN - distance;
         if (moveDist > 0)
             trf.AddPosition(normal * moveDist * weight);
         COL_RESOLVE_LOG("      pos after : " << glm::to_string(trf.GetLocalPosition()));
 
         // Slide
+        COL_RESOLVE_LOG("      vel before: " << glm::to_string(vel.Get()));
         float lenI = glm::length(vel.input);
         if (lenI > EPSILON)
         {
             float hitTime = distance / lenI;
             glm::vec3 remainingInput = (1 - hitTime * weight) * vel.input;
-            vel.input = remainingInput + glm::dot(remainingInput, -normal) * normal;
+            vel.input = ComputeSlideVector(remainingInput, normal);
 
             if (std::abs(vel.input.x) < EPSILON)
                 vel.input.x = 0.f;
@@ -277,7 +276,7 @@ namespace tomato
         {
             float hitTime = distance / lenV;
             glm::vec3 remainingMove = (1 - hitTime * weight) * vel.velocity;
-            vel.velocity = remainingMove + glm::dot(remainingMove, -normal) * normal;
+            vel.velocity = ComputeSlideVector(remainingMove, normal);
 
             if (std::abs(vel.velocity.x) < EPSILON)
                 vel.velocity.x = 0.f;
@@ -286,18 +285,7 @@ namespace tomato
             if (std::abs(vel.velocity.z) < EPSILON)
                 vel.velocity.z = 0.f;
         }
-    }
-
-    void CollisionSystem::ResolvePenetration(
-        TransformComponent& trf,
-        const glm::vec3& normal, const float weight, const float distance)
-    {
-        COL_RESOLVE_LOG("===== PE " << glm::to_string(normal) << " " << weight << " " << distance);
-        COL_RESOLVE_LOG("      pos before: " << glm::to_string(trf.GetLocalPosition()));
-
-        // Move
-        trf.AddPosition(normal * (-distance + COLLISION_SKIN) * weight);
-        COL_RESOLVE_LOG("      pos after : " << glm::to_string(trf.GetLocalPosition()));
+        COL_RESOLVE_LOG("      vel after : " << glm::to_string(vel.Get()));
     }
 
     void CollisionSystem::UpdateCollisionEvents()
