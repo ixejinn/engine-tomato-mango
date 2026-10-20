@@ -2,6 +2,7 @@
 #define MANGO_MATCH_H
 
 #include <bitset>
+#include <vector>
 
 #include "Containers/SPSCQueue.h"
 #include "Network/NetConnection.h"
@@ -27,20 +28,21 @@ namespace tomato
 
 		MatchUpdateResult Update(float dt, SPSCQueue<SendCommandPtr, 256>& sendRequestQ);
 
-		MatchState CollectNetConnection(const MatchRequest* matchRequest);
-		MatchState RequestToSendNetConnection(SPSCQueue<SendCommandPtr, 256>& sendRequestQ, const MatchRequest* matchRequest);
+		MatchState CollectNetConnection(const std::vector<MatchRequest>& matchRequest);
+		MatchState RequestToSendNetConnection(SPSCQueue<SendCommandPtr, 256>& sendRequestQ, const std::vector<MatchRequest>& matchRequest);
 
 		void SetPeerAck(int idx, int set);
 
+		const uint8_t GetMatchPlayerNum() const { return ctx_.playerNum; }
 		const int GetPlayerId(const SessionId& client) const;
 		MatchState GetState() const { return ctx_.state; }
 		MatchId GetMatchId() const { return ctx_.matchId; }
-		const MatchRequest* GetMatchRequest() const { return ctx_.players; }
-		const NetConnection* GetNetConnection() const { return conn; }
+		const std::vector<MatchRequest>& GetMatchRequest() const { return ctx_.players; }
+		const std::vector<NetConnection>& GetNetConnection() const { return conn; }
 
 	private:
 		MatchContext ctx_;
-		NetConnection conn[MatchConstants::MAX_MATCH_PLAYER];
+		std::vector<NetConnection> conn;
 
 		std::bitset<MatchConstants::MAX_MATCH_PLAYER> peerAck;
 

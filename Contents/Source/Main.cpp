@@ -2,7 +2,7 @@
 #include "Engine.h"
 #include "EngineConfig.h"
 
-//#define TOMATO_SERVER
+#define TOMATO_SERVER
 #ifdef TOMATO_SERVER
 #include "Server/MatchServer.h"
 
@@ -11,6 +11,7 @@
 #include "PlayTest/TestState.h"
 #include "PlayTest/LoadState.h"
 #include "Game/GameState.h"
+#include "Game/LobbyState.h"
 #endif
 
 //#define TOMATO_GREENTEA
@@ -30,7 +31,7 @@ int main() {
     engine.SetNextState(std::make_unique<LoadState>(engine));
 
 #else //TOMATO_GREENTEA
-    engine.SetNextState(std::make_unique<TestState>(engine));
+    engine.SetNextState(std::make_unique<LobbyState>(engine));
 
 #endif //TOMATO_GREENTEA
     engine.Run();

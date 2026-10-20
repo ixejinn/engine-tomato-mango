@@ -21,8 +21,10 @@ namespace tomato::UIPrefab
 
 	entt::entity CreateButton(
 		entt::registry& reg,
-		entt::entity canvas = entt::null,
-		glm::vec2		pos = {0.f, 0.f}
+		std::string	text = "Button",
+		glm::vec2 size = {100.f, 100.f},
+		glm::vec2		pos = {0.f, 0.f},
+		entt::entity canvas = entt::null
 	);
 
 	entt::entity CreateText(

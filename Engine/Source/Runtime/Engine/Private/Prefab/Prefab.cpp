@@ -217,7 +217,7 @@ namespace tomato::Prefab
         SetHierarchy(registry, center, z);
 
         registry.get<TransformComponent>(center).SetScale(0.1f, 0.1f, 0.1f);
-        std::cout << "gizmo: " << (int)center << " " << (int)x << " " << (int)y << " " << (int)z << "\n";
+        //std::cout << "gizmo: " << (int)center << " " << (int)x << " " << (int)y << " " << (int)z << "\n";
         return center;
     }
 }

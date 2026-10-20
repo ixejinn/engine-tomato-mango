@@ -227,7 +227,7 @@ void TestState::PlayTest()
     //         uiController_.onClick(e);
     //     };
 
-    auto tBtn = UIPrefab::CreateButton(registry_, entt::null, { -700.f, 350.f });
+    auto tBtn = UIPrefab::CreateButton(registry_, "Button", { 100.f, 100.f}, { -700.f, 350.f });
     auto& tBtnUIComp = registry_.get<UIComponent>(tBtn);
     tBtnUIComp.sortOrder = 100;
     auto& tMouseEvt = registry_.get<MouseEventComponent>(tBtn);

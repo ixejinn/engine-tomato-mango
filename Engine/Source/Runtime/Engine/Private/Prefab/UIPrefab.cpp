@@ -60,11 +60,11 @@ namespace tomato::UIPrefab
         return canvas;
 	}
 
-    entt::entity CreateButton(entt::registry& reg, entt::entity canvas, glm::vec2 pos)
+    entt::entity CreateButton(entt::registry& reg, std::string text, glm::vec2 size, glm::vec2 pos, entt::entity canvas)
     {
         canvas = canvas == entt::null ? GetCanvas(reg) : canvas;
 
-        const entt::entity button = CreateBaseUIEntity(reg, "Button", canvas);
+        const entt::entity button = CreateBaseUIEntity(reg, text, canvas);
 
         auto& selectable = reg.emplace<SelectableComponent>(button);
         reg.emplace<MouseEventComponent>(button);
@@ -75,9 +75,9 @@ namespace tomato::UIPrefab
 
         auto& rect = reg.get<RectTransformComponent>(button);
         rect.SetPosition({ pos });
-        rect.SetSize({ 100.f, 100.f });
+        rect.SetSize(size);
 
-        const entt::entity buttonText = CreateText(reg, canvas, { 0.f, 0.f }, "Button", { 0.9f, 0.32f, 0.3f, 1.0f }, 30.f);
+        const entt::entity buttonText = CreateText(reg, canvas, { 0.f, 0.f }, text, { 0.9f, 0.32f, 0.3f, 1.0f }, 30.f);
 
         SetHierarchy(reg, button, buttonText);
 

@@ -12,6 +12,7 @@ namespace tomato
 	namespace MatchConstants
 	{
 		constexpr uint8_t		MAX_MATCH_PLAYER = 2;
+		constexpr float			MATCH_WAIT_TIME = 20.0f;
 		constexpr float			CONNECT_TIMEOUT_SEC = 10.0f;
 		constexpr ServerTimeMs	START_SERVER_TIME = 10000;
 	}
@@ -63,7 +64,8 @@ namespace tomato
 	{
 		MatchId matchId;
 		MatchState state;
-		MatchRequest players[MatchConstants::MAX_MATCH_PLAYER];
+		uint8_t playerNum;
+		std::vector<MatchRequest> players;
 	};
 
 	enum class MatchUpdateResult
