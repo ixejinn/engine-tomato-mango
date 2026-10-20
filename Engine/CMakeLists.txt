@@ -228,6 +228,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Systems/FrictionSystem.h
 		Source/Runtime/Engine/Public/Collision/CollisionDebug.h
 		Source/Runtime/Engine/Public/EngineDebug.h
+		Source/Runtime/Engine/Public/ECS/Components/PhysicsBody.h
 )
 
 set(ENGINE_SOURCES

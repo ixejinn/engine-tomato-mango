@@ -82,6 +82,9 @@ namespace tomato::Prefab
         const std::string& name)
     {
         const entt::entity obj = CreateStaticMesh(registry, active, name);
+
+        registry.emplace<PhysicsBodyComponent>(obj);
+
         const entt::entity col = AttachColliderEntity(registry, obj, true, trigger);
 
         if (printInfo)
@@ -90,6 +93,21 @@ namespace tomato::Prefab
                      << "              entity   ID: " << std::right << std::setw(4) << (int)obj << "\n"
                      << "              collider ID: " << std::right << std::setw(4) << (int)col;
         }
+        return obj;
+    }
+
+    entt::entity CreateGround(
+        entt::registry& registry,
+        bool active,
+        const std::string& name,
+        bool printInfo)
+    {
+        const entt::entity obj = CreateWorldObject(registry, active, false, printInfo, name);
+
+        registry.emplace<SurfaceComponent>(obj).friction = 10;
+
+        registry.get<PhysicsBodyComponent>(obj).inverseMass = 0;
+
         return obj;
     }
 
@@ -112,22 +130,22 @@ namespace tomato::Prefab
         registry.get<ColliderComponent>(colObj).type = ColliderType::Sphere;
         registry.get<RenderComponent>(colObj).mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
 
-         const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, true, "Ground trigger");
+        const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, true, "Ground trigger");
         registry.get<ColliderComponent>(colGnd).type = ColliderType::Sphere;
         registry.get<RenderComponent>(colGnd).mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
 
-         registry.emplace<GroundTriggerTag>(colGnd);
+        registry.emplace<GroundTriggerTag>(colGnd);
 
-         auto& trfColGnd = registry.get<TransformComponent>(colGnd);
-         trfColGnd.SetScale(Character::GROUND_TRIGGER_SCALE);
+        auto& trfColGnd = registry.get<TransformComponent>(colGnd);
+        trfColGnd.SetScale(Character::GROUND_TRIGGER_SCALE);
 
-         if (printInfo)
-         {
-             TMT_INFO << "[ Character ] " << std::left << std::setw(12) << name << "\n"
-                     << "              entity   ID: " << std::right << std::setw(4) << (int)obj << "\n"
-                     << "              collider ID: " << std::right << std::setw(4) << (int)colObj << "\n"
-                     << "              trigger  ID: " << std::right << std::setw(4) << (int)colGnd;
-         }
+        if (printInfo)
+        {
+         TMT_INFO << "[ Character ] " << std::left << std::setw(12) << name << "\n"
+                 << "              entity   ID: " << std::right << std::setw(4) << (int)obj << "\n"
+                 << "              collider ID: " << std::right << std::setw(4) << (int)colObj << "\n"
+                 << "              trigger  ID: " << std::right << std::setw(4) << (int)colGnd;
+        }
         return obj;
     }
 

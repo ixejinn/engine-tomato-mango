@@ -3,6 +3,7 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Velocity.h"
+#include "ECS/Components/PhysicsBody.h"
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 
@@ -24,7 +25,9 @@ namespace tomato
         if (rootA == rootB)
             return false;
 
-        if (!reg.try_get<VelocityComponent>(rootA) && !reg.try_get<VelocityComponent>(rootB))
+        auto* bodyA = reg.try_get<PhysicsBodyComponent>(rootA);
+        auto* bodyB = reg.try_get<PhysicsBodyComponent>(rootB);
+        if ((!bodyA || bodyA->inverseMass == 0) && (!bodyB || bodyB->inverseMass == 0))
             return false;
 
         return true;

@@ -158,51 +158,44 @@ namespace tomato
         entt::entity rootA = GetRootEntity(reg, event.a);
         entt::entity rootB = GetRootEntity(reg, event.b);
 
-        glm::vec3 vA{0.f};
-        glm::vec3 vB{0.f};
-
-        auto velA = reg.try_get<VelocityComponent>(rootA);
-        if (velA)
-            vA = velA->Get();
-
-        auto velB = reg.try_get<VelocityComponent>(rootB);
-        if (velB)
-            vB = velB->Get();
-
-        float lenVA = glm::length2(vA);
-        float lenVB = glm::length2(vB);
-        float sumV = lenVA + lenVB;
-
-        float weightA = 0.5f;
-        if (velA && !velB)
-            weightA = 1;
-        else if (!velA && velB)
-            weightA = 0;
-        else if (sumV >= EPSILON_SQ)
-            weightA = lenVA / sumV;
-        float weightB = 1 - weightA;
-        COL_RESOLVE_LOG("      weightA: " << weightA);
-
         auto& trfRootA = reg.get<TransformComponent>(rootA);
         auto& trfRootB = reg.get<TransformComponent>(rootB);
+
+        auto* velA = reg.try_get<VelocityComponent>(rootA);
+        auto* velB = reg.try_get<VelocityComponent>(rootB);
+
+        auto* bodyA = reg.try_get<PhysicsBodyComponent>(rootA);
+        auto* bodyB = reg.try_get<PhysicsBodyComponent>(rootB);
+
+        float invMassA{0};
+        float invMassB{0};
+
+        if (velA && bodyA)
+            invMassA = bodyA->inverseMass;
+        if (velB && bodyB)
+            invMassB = bodyB->inverseMass;
+
+        float wA = invMassA / (invMassA + invMassB);
+        float wB = 1 - wA;
+        COL_RESOLVE_LOG("      weightA: " << wA);
 
         if (event.data.hitTime.has_value())
         {
             // CCD contact data
-            if (velA)
-                ResolveContinuousContact(trfRootA, *velA, -event.data.normal, weightA, event.data.hitTime.value());
+            if (wA > 0)
+                ResolveContinuousContact(trfRootA, *velA, -event.data.normal, wA, event.data.hitTime.value());
 
-            if (velB)
-                ResolveContinuousContact(trfRootB, *velB, event.data.normal, weightB, event.data.hitTime.value());
+            if (wB > 0)
+                ResolveContinuousContact(trfRootB, *velB, event.data.normal, wB, event.data.hitTime.value());
         }
         else
         {
             // COLLISION_SKIN 만큼만 떨어져 있거나 겹치는 경우 GJK Distance로부터 받은 충돌 정보
-            if (velA)
-                ResolveDiscreteContact(trfRootA, *velA, -event.data.normal, weightA, event.data.distance);
+            if (wA > 0)
+                ResolveDiscreteContact(trfRootA, *velA, -event.data.normal, wA, event.data.distance);
 
-            if (velB)
-                ResolveDiscreteContact(trfRootB, *velB, event.data.normal, weightB, event.data.distance);
+            if (wB > 0)
+                ResolveDiscreteContact(trfRootB, *velB, event.data.normal, wB, event.data.distance);
         }
     }
 
