@@ -222,22 +222,8 @@ namespace tomato
         glm::vec3 remainingInput = (1 - hitTime) * vel.input;
         vel.input = ComputeSlideVector(remainingInput, normal);
 
-        if (std::abs(vel.input.x) < EPSILON)
-            vel.input.x = 0.f;
-        if (std::abs(vel.input.y) < EPSILON)
-            vel.input.y = 0.f;
-        if (std::abs(vel.input.z) < EPSILON)
-            vel.input.z = 0.f;
-
         glm::vec3 remainingMove = (1 - hitTime) * vel.velocity;
         vel.velocity = ComputeSlideVector(remainingMove, normal);
-
-        if (std::abs(vel.velocity.x) < EPSILON)
-            vel.velocity.x = 0.f;
-        if (std::abs(vel.velocity.y) < EPSILON)
-            vel.velocity.y = 0.f;
-        if (std::abs(vel.velocity.z) < EPSILON)
-            vel.velocity.z = 0.f;
         COL_RESOLVE_LOG("      vel after : " << glm::to_string(vel.Get()));
     }
 
@@ -257,33 +243,19 @@ namespace tomato
         // Slide
         COL_RESOLVE_LOG("      vel before: " << glm::to_string(vel.Get()));
         float lenI = glm::length(vel.input);
-        if (lenI > EPSILON)
+        if (lenI > 0)
         {
             float hitTime = distance / lenI;
             glm::vec3 remainingInput = (1 - hitTime * weight) * vel.input;
             vel.input = ComputeSlideVector(remainingInput, normal);
-
-            if (std::abs(vel.input.x) < EPSILON)
-                vel.input.x = 0.f;
-            if (std::abs(vel.input.y) < EPSILON)
-                vel.input.y = 0.f;
-            if (std::abs(vel.input.z) < EPSILON)
-                vel.input.z = 0.f;
         }
 
         float lenV = glm::length(vel.velocity);
-        if (lenV > EPSILON)
+        if (lenV > 0)
         {
             float hitTime = distance / lenV;
             glm::vec3 remainingMove = (1 - hitTime * weight) * vel.velocity;
             vel.velocity = ComputeSlideVector(remainingMove, normal);
-
-            if (std::abs(vel.velocity.x) < EPSILON)
-                vel.velocity.x = 0.f;
-            if (std::abs(vel.velocity.y) < EPSILON)
-                vel.velocity.y = 0.f;
-            if (std::abs(vel.velocity.z) < EPSILON)
-                vel.velocity.z = 0.f;
         }
         COL_RESOLVE_LOG("      vel after : " << glm::to_string(vel.Get()));
     }

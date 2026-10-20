@@ -109,9 +109,12 @@ namespace tomato::Prefab
         registry.emplace<RollbackEntityTag>(obj);
 
         const entt::entity colObj = registry.get<HierarchyComponent>(obj).children[0];
-//        registry.get<ColliderComponent>(colObj).type = ColliderType::Capsule;
-//        registry.get<RenderComponent>(colObj).mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Capsule));
+        registry.get<ColliderComponent>(colObj).type = ColliderType::Sphere;
+        registry.get<RenderComponent>(colObj).mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+
          const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, true, "Ground trigger");
+        registry.get<ColliderComponent>(colGnd).type = ColliderType::Sphere;
+        registry.get<RenderComponent>(colGnd).mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
 
          registry.emplace<GroundTriggerTag>(colGnd);
 
