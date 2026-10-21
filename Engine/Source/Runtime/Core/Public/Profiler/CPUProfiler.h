@@ -52,16 +52,9 @@ namespace tomato
     };
 }
 
-#ifdef TOMATO_DEBUG
 #define CPU_PROFILER_BLOCK_BEGIN(BLOCK_NAME) tomato::CPUProfiler<#BLOCK_NAME>::Begin();
 #define CPU_PROFILER_BLOCK_END(BLOCK_NAME)   tomato::CPUProfiler<#BLOCK_NAME>::End();
 #define CPU_PROFILER_TOTAL_BEGIN() tomato::CPUProfiler<"TOTAL">::Begin();
 #define CPU_PROFILER_TOTAL_END()   tomato::CPUProfiler<"TOTAL">::End();
-#else
-#define CPU_PROFILER_BLOCK_BEGIN(BLOCK_NAME)
-#define CPU_PROFILER_BLOCK_END(BLOCK_NAME)
-#define CPU_PROFILER_TOTAL_BEGIN()
-#define CPU_PROFILER_TOTAL_END()
-#endif
 
 #endif //MANGO_CPUPROFILER_H

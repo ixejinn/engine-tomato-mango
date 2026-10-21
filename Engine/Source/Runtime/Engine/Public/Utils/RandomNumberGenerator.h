@@ -8,6 +8,8 @@ namespace tomato
     class RandomNumberGenerator
     {
     public:
+        RandomNumberGenerator() = delete;
+
         /// [min, max]
         template<std::integral T = int>
         static T GetUniformIntDistribution(T min, T max)

@@ -56,10 +56,10 @@ namespace tomato {
 #define TMT_WARN Logger(tomato::Logger::Level::Warn)
 #define TMT_ERR Logger(tomato::Logger::Level::Error)
 #else
-#define TMT_INFO
-#define TMT_DEBUG
-#define TMT_WARN
-#define TMT_ERR
+#define TMT_INFO while (false) Logger(tomato::Logger::Level::Info)
+#define TMT_DEBUG while (false) Logger(tomato::Logger::Level::Debug)
+#define TMT_WARN while (false) Logger(tomato::Logger::Level::Warn)
+#define TMT_ERR while (false) Logger(tomato::Logger::Level::Error)
 #endif
 
 #endif //MANGO_LOGGER_H

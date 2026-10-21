@@ -40,13 +40,6 @@ GameState::~GameState() = default;
 
 void GameState::Init()
 {
-    // Camera
-    Prefab::CreateCamera(registry_, true, true,
-        "Camera",
-        glm::vec3(0.f, 4.f, 10.f),
-        glm::vec3(-30.f, 0.f, 0.f)
-    );
-
     Mesh::Create(Mesh::Primitive::OpenCylinder, 50, 10);
 
     entt::entity player = Prefab::CreateCharacter(registry_, true, "Player");

@@ -30,10 +30,18 @@ namespace tomato
         //// Set render context
         auto& renderCtx = registry_.ctx().get<RenderContext>();
 
-        // Create editor mode camera
+        // Create editor camera
         entt::entity& editCam = renderCtx.editorCam;
         editCam = Prefab::CreateCamera(registry_, true, false, "Edit Camera");
         registry_.emplace<EditorHidden>(editCam);
+
+        // Create player camera
+        entt::entity& playerCam = renderCtx.playerCam;
+        playerCam = Prefab::CreateCamera(registry_, true, true,
+            "Camera",
+            glm::vec3(0.f, 4.f, 10.f),
+            glm::vec3(-30.f, 0.f, 0.f)
+        );
 
         // Skybox
         Prefab::CreateSkybox(registry_);
