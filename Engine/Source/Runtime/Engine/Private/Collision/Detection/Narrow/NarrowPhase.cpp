@@ -2,6 +2,7 @@
 #include "Collision/Detection/Narrow/NarrowPhase.h"
 #include "Collision/Detection/Narrow/GJK/GJK.h"
 #include "Collision/CollisionTolerance.h"
+#include "Collision/Detection/Narrow/Pairs/SphereSphere.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
@@ -10,6 +11,12 @@
 
 namespace tomato
 {
+    NarrowPhase::NarrowPhase()
+    {
+        RegisterOverlap(ColliderType::Sphere, ColliderType::Sphere, &SphereSphere::Overlap);
+        RegisterSweep(ColliderType::Sphere, ColliderType::Sphere, &SphereSphere::Sweep);
+    }
+
     void NarrowPhase::RegisterOverlap(ColliderType a, ColliderType b, OverlapFn fn)
     {
         Register(overlap_, a, b, fn);

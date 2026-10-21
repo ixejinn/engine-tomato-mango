@@ -2,7 +2,7 @@
 #include <cmath>
 #include <glm/gtx/string_cast.hpp>
 #include "Collision/Detection/Narrow/GJK/GJK.h"
-#include "Collision/Detection/Narrow/GJK/EPA.h"
+#include "EPA.h"
 #include "Collision/ColliderSupport.h"
 #include "Collision/CollisionEvent.h"
 #include "Collision/CollisionConstants.h"
@@ -250,8 +250,6 @@ namespace tomato
             return false;
 
         // Scale-dependent termination may produce unreliable results at close distances
-        constexpr float SAFETY_COEF = 1.28f;
-        constexpr float SAFETY_COEF_SQ = SAFETY_COEF * SAFETY_COEF;
         return result.distance * result.distance > SAFETY_COEF_SQ * RELATIVE_TOLERANCE_SQ * result.maxDistSq;
     }
 

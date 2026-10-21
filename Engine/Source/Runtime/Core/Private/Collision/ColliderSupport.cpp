@@ -16,6 +16,11 @@ namespace tomato::support
         };
     }
 
+    float SphereRadius(const TransformComponent& trf)
+    {
+        return trf.GetWorldScale().x * 0.5f;
+    }
+
     glm::vec3 Sphere(const glm::vec3 &dir, const TransformComponent &trf)
     {
         float dirLenSq = glm::length2(dir);
@@ -32,7 +37,7 @@ namespace tomato::support
         }
         else
             offset = (dir / std::sqrt(dirLenSq));
-        return (trf.GetWorldScale().x * 0.5f) * offset;
+        return SphereRadius(trf) * offset;
     }
 
     glm::vec3 Capsule(const glm::vec3 &dir, const TransformComponent &trf)

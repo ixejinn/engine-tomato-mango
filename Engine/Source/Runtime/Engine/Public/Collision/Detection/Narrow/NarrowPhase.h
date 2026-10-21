@@ -17,6 +17,8 @@ namespace tomato
     class NarrowPhase
     {
     public:
+        NarrowPhase();
+        
         void RegisterOverlap(ColliderType a, ColliderType b, OverlapFn fn);
         void RegisterSweep(ColliderType a, ColliderType b, SweepFn fn);
 

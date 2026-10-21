@@ -11,7 +11,7 @@
 #include "Collision/CollisionTolerance.h"
 #include "Collision/CollisionDebug.h"
 #include "Collision/Detection/Broad/SAP.h"
-#include "Collision/Detection/Narrow/GJK/GJK.h"
+#include "../../Collision/Detection/Narrow/GJK/GJK.h"
 #include "Simulation/SimulationConfig.h"
 #include "Event/EventDispatcher.h"
 #include "Utils/Logger.h"
