@@ -12,90 +12,56 @@
 
 namespace tomato
 {
-    void SAP::FindContactPairCandidates(entt::registry &reg, std::vector<ContactPair> &candidates)
+    void SAP::FindOverlappingPairs(std::vector<BroadPhaseProxy>& proxies, std::vector<OverlapEntryPair>& out)
     {
-        UpdateAABBs(reg);
-
-        auto group = reg.group<ColliderComponent>(entt::get<ActiveTag>);
-
-        // Sort by AABB.min.x for x-axis SAP
-        group.sort<ColliderComponent>(
-            [](const auto& a, const auto& b) { return a.aabb.min.x < b.aabb.min.x; },
-            entt::insertion_sort{});
+        // Sort proxies by AABB.min.x for x-axis SAP and OverlapEntryPair::sortKey
+        std::ranges::sort(proxies, [](const BroadPhaseProxy& a, const BroadPhaseProxy& b)
+        {
+            return std::tie(a.aabb.min.x, a.sortKey) < std::tie(b.aabb.min.x, b.sortKey);
+            // if (a.aabb.min.x != b.aabb.min.x)
+            //     return a.aabb.min.x < b.aabb.min.x;
+            // return a.sortKey < b.sortKey;
+        });
 
         // Active list contains AABBs that are currently open on the sweep axis.
-        std::list<entt::entity> active;
+        active_.clear();    // for proxies index
         float activeMaxX = std::numeric_limits<float>::lowest();
 
-        for (const auto& [e, col] : group.each())
+        for (uint32_t i = 0; i < proxies.size(); ++i)
         {
-            AABB& aabb = col.aabb;
+            AABB& aabb = proxies[i].aabb;
 
             if (activeMaxX < aabb.min.x)
             {
-                // Initialize active list
-                active.clear();
-
-                active.push_back(e);
+                // Clear the active_ if no overlapping AABBs remain
+                active_.clear();
+                active_.push_back(i);
                 activeMaxX = aabb.max.x;
-            }
-            else
-            {
-                // Check active list
-                for (auto it = active.begin(); it != active.end();)
-                {
-                    auto& colAct = reg.get<ColliderComponent>(*it);
-                    AABB& aabbAct = colAct.aabb;
-
-                    // If active AABB.max < current AABB.min
-                    // active AABB does not overlap on the sweep axis and cannot collide.
-                    if (aabbAct.max.x < aabb.min.x)
-                    {
-                        active.erase(it++);
-                        continue;
-                    }
-
-                    // Test AABB (for axis y and z)
-                    if (!TestAABBAABB(aabbAct, aabb))
-                    {
-                        ++it;
-                        continue;
-                    }
-
-                    // Check collision layer
-                    if (!CanCollide(reg, e, *it, col, colAct))
-                    {
-                        ++it;
-                        continue;
-                    }
-
-                    candidates.emplace_back(e, *it);
-                    ++it;
-                }
-
-                active.push_back(e);
-                activeMaxX = std::max(activeMaxX, aabb.max.x);
-            }
-        }
-    }
-
-    void SAP::UpdateAABBs(entt::registry& reg)
-    {
-        // Update AABB
-        auto view = reg.view<ActiveTag, ColliderComponent, TransformComponent>();
-        for (auto [e, col, trf] : view.each())
-        {
-            if (!col.aabbDirty)
                 continue;
-            col.aabbDirty = false;
+            }
 
-            // Sweep AABB center
-            glm::vec3 wPos = trf.GetWorldPosition();
-            if (const auto velPtr = reg.try_get<VelocityComponent>(GetRootEntity(reg, e)))
-                wPos += velPtr->Get() * FIXED_DELTA_TIME;
+            // Check active_
+            size_t write = 0;
+            for (size_t read = 0; read < active_.size(); ++read)
+            {
+                const uint32_t act = active_[read];
+                AABB& aabbAct = proxies[act].aabb;
 
-            UpdateAABB(col.aabb, wPos, trf.GetWorldScale() * 0.5f,
-                glm::toMat4(trf.GetWorldQuaternion()), HALF_COLLISION_SKIN + 1e-6f);
+                // If active AABB.max < current AABB.min
+                // active AABB does not overlap on the sweep axis and cannot collide
+                if (aabbAct.max.x < aabb.min.x)
+                    continue;
+
+                active_[write++] = act; // read 위치의 원소(현재 AABB와 겹침)를 write 위치에 덮어쓰며 겹치지 않는 원소 제거 (압축)
+
+                // Test AABB (for axis y and z)
+                if (TestAABBAABB(aabbAct, aabb))
+                    out.emplace_back(proxies[act].entryIndex, proxies[i].entryIndex);
+            }
+            active_.resize(write);
+            active_.emplace_back(i);
+
+            activeMaxX = std::max(activeMaxX, aabb.max.x);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace tomato {
         }
     }
 
-    bool CollisionLayerMatrix::CanCollide(const CollisionLayer a, const CollisionLayer b) {
+    bool CollisionLayerMatrix::CanCollide(const CollisionLayer a, const CollisionLayer b) const {
         return HasFlag(matrix_[a], GetCollisionLayerFlag(b));
     }
 

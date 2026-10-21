@@ -28,10 +28,6 @@ namespace
 
 namespace tomato
 {
-    CollisionSystem::CollisionSystem()
-    : broadPhase_(std::make_unique<SAP>())
-    , narrowPhase_(std::make_unique<GJK>()) {}
-
     CollisionSystem::~CollisionSystem() = default;
 
     void CollisionSystem::Update(SimContext& simCtx)
@@ -49,8 +45,7 @@ namespace tomato
     void CollisionSystem::RunBroadPhase(SimContext& simCtx)
     {
         candidates_.clear();
-
-        broadPhase_->FindContactPairCandidates(simCtx.state->GetRegistry(), candidates_);
+        broad_.FindContactPairCandidates(simCtx.state->GetRegistry(), candidates_);
     }
 
     void CollisionSystem::RunNarrowPhase(SimContext& simCtx)
@@ -68,7 +63,7 @@ namespace tomato
                 continue;
 
             // Test narrow phase
-            if (auto result = narrowPhase_->EvaluateContactPair(registry, candidate))
+            if (auto result = narrow_.EvaluateContactPair(registry, candidate))
             {
                 // Collision detected
 

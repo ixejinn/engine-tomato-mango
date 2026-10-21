@@ -229,6 +229,8 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Collision/CollisionDebug.h
 		Source/Runtime/Engine/Public/EngineDebug.h
 		Source/Runtime/Engine/Public/ECS/Components/PhysicsBody.h
+		Source/Runtime/Engine/Public/Collision/Detection/Narrow/ShapeView.h
+		Source/Runtime/Engine/Public/Collision/Detection/Broad/BroadPhaseProxy.h
 )
 
 set(ENGINE_SOURCES
@@ -323,6 +325,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Render/GLStateCache.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/ViewGizmoRenderSystem.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/FrictionSystem.cpp
+		Source/Runtime/Engine/Private/Collision/Detection/Narrow/NarrowPhase.cpp
 )
 
 add_library(engine STATIC
