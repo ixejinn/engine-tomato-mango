@@ -1,12 +1,13 @@
+#define GLM_ENABLE_EXPERIMENTAL
 #include <unordered_set>
 #include <glm/glm.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Collision.h"
-#include "Collision/Detection/Narrow/GJK/EPA.h"
+#include "EPA.h"
 #include "Collision/Detection/Narrow/GJK/GJK.h"
 #include "Collision/CollisionTolerance.h"
+#include "Collision/CollisionDebug.h"
 #include "Containers/UnorderedPair.h"
 #include "Math/Normal.h"
 #include "Utils/Logger.h"
@@ -25,7 +26,7 @@ namespace tomato
         const ColliderComponent& col1, const TransformComponent& trf1,
         const ColliderComponent& col2, const TransformComponent& trf2)
     {
-        // std::cout << "========== EPA\n";
+        COL_DETECT_VERBOSE_LOG("===== EPA");
 
         //// Extend points to 3-simplex
         while (points.size() < 4)
@@ -78,13 +79,13 @@ namespace tomato
                     supportP = GJK::GetSupportPoint(-normal, col1, trf1, col2, trf2);
                 if (!EPA::IsOffPlane(supportP, normal, a))
                 {
-                    TMT_WARN << "Degenerate 3-simplex";
+                    COL_DETECT_VERBOSE_LOG("EPA Degenerate 3-simplex : return nullopt");
                     return std::nullopt;
                 }
 
                 points.emplace_back(supportP);
             }
-            break;
+                break;
             }
         }
 
@@ -112,7 +113,7 @@ namespace tomato
             }
             else
             {
-                TMT_WARN << "Degenerate polytope plane";
+                COL_DETECT_VERBOSE_LOG("EPA Degenerate polytope plane0 : return nullopt");
                 return std::nullopt;
             }
         }
@@ -134,7 +135,7 @@ namespace tomato
 
             if (!nearest)
             {
-                TMT_ERR << "Incorrect polytope";
+                COL_DETECT_VERBOSE_LOG("EPA Incorrect polytope : return nullopt");
                 return std::nullopt;
             }
 
@@ -148,10 +149,7 @@ namespace tomato
             if (depth < 0 ||
                 std::abs(diff) < RELATIVE_TOLERANCE * glm::sqrt(maxDistSq) ||
                 iteration++ > 20)
-            {
-//                std::cout << " *** EPA *** " << glm::to_string(nearest->normal) << " " << nearest->distance << "\n";
                 return DistanceResult{nearest->normal, -nearest->distance};
-            }
 
             //// Expand polytope
             // Remove visible faces from the new support point, extracting the boundary edges.
@@ -186,7 +184,7 @@ namespace tomato
                 }
                 else
                 {
-                    TMT_WARN << "Degenerate polytope plane";
+                    COL_DETECT_VERBOSE_LOG("EPA Degenerate polytope plane1 : return nullopt");
                     return std::nullopt;
                 }
             }

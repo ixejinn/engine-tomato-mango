@@ -19,8 +19,7 @@
 #include "Render/SortKey.h"
 #include "Render/RenderPass.h"
 #include "Profiler/CPUProfiler.h"
-
-#include <Render/GLStateCache.h>
+#include "Render/GLStateCache.h"
 
 namespace tomato
 {
@@ -36,7 +35,8 @@ namespace tomato
     void RenderSystem::Update(SimContext& simCtx)
     {
         CPU_PROFILER_BLOCK_BEGIN(RenderSystem::Update);
-        UpdateDrawList(simCtx);
+        if (!UpdateDrawList(simCtx))
+            return;
 
         auto& registry = simCtx.state->GetRegistry();
         auto& renderCtx = registry.ctx().get<RenderContext>();
@@ -46,10 +46,7 @@ namespace tomato
 
         const auto* camera = registry.try_get<CameraComponent>(renderCtx.mainCam);
         if (!camera)
-        {
-            TMT_WARN << "Main camera is missing or invalid.";
             return;
-        }
 
         gl.Apply(PipelinePresets::Opaque);
 
@@ -101,11 +98,10 @@ namespace tomato
                     gl.BindVertexArray(mesh->GetHandle());
 
                     gl.Apply(state);
-#ifdef TOMATO_DEBUG
+
                     if (!registry.all_of<RootEntityTag>(drawItem.entity))
                         mesh->Draw(true);
                     else
-#endif
                         mesh->Draw();
                 }
                     break;
@@ -168,12 +164,18 @@ namespace tomato
         CPU_PROFILER_BLOCK_END(RenderSystem::Update);
     }
 
-    void RenderSystem::UpdateDrawList(SimContext& simCtx)
+    bool RenderSystem::UpdateDrawList(SimContext& simCtx)
     {
         drawList_.clear();
 
         auto& registry = simCtx.state->GetRegistry();
         const entt::entity mainCam = registry.ctx().get<RenderContext>().mainCam;
+        if (!registry.valid(mainCam))
+        {
+            TMT_WARN << "Main camera is missing or invalid.";
+            return false;
+        }
+
         const auto& posCam = registry.get<TransformComponent>(mainCam).GetWorldPosition();
 
         auto& shaderRegistry = AssetRegistry<Shader>::GetInstance();
@@ -219,6 +221,7 @@ namespace tomato
         }
 
         std::ranges::sort(drawList_, std::ranges::less{}, &DrawItem::sortKey);
+        return true;
     }
 
     void RenderSystem::RenderDrawItem(PipelineState state, entt::registry& registry, const DrawItem& drawItem)

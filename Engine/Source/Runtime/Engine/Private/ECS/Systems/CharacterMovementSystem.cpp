@@ -1,4 +1,6 @@
-﻿#include <entt/entt.hpp>
+﻿#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+#include <entt/entt.hpp>
 #include <glm/glm.hpp>
 #include "ECS/Systems/CharacterMovementSystem.h"
 #include "ECS/Components/ActiveTag.h"
@@ -40,6 +42,7 @@ namespace tomato {
             if (x != 0 && y != 0)
                 input = glm::normalize(input);
 
+            velocity.input = glm::vec3(0);
             if (x != 0 || y != 0)
             {
                 switch (move.control)

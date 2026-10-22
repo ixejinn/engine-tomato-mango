@@ -10,6 +10,7 @@
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Nametag.h"
 #include "ECS/Components/Particle.h"
+#include "ECS/Components/PhysicsBody.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/Rollback.h"
 #include "ECS/Components/Target.h"

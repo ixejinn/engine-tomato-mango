@@ -6,7 +6,10 @@
 
 namespace tomato::support {
     glm::vec3 Cube(const glm::vec3& dir, const TransformComponent& trf);
+
+    float SphereRadius(const TransformComponent& trf);
     glm::vec3 Sphere(const glm::vec3& dir, const TransformComponent& trf);
+
     glm::vec3 Capsule(const glm::vec3& dir, const TransformComponent& trf);
 }
 

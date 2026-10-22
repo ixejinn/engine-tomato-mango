@@ -40,13 +40,6 @@ GameState::~GameState() = default;
 
 void GameState::Init()
 {
-    // Camera
-    Prefab::CreateCamera(registry_, true, true,
-        "Camera",
-        glm::vec3(0.f, 4.f, 10.f),
-        glm::vec3(-30.f, 0.f, 0.f)
-    );
-
     Mesh::Create(Mesh::Primitive::OpenCylinder, 50, 10);
 
     entt::entity player = Prefab::CreateCharacter(registry_, true, "Player");
@@ -63,11 +56,11 @@ void GameState::Init()
     auto& colp = registry_.get<ColliderComponent>(colObj);
     colp.layer = CollisionLayer::Wave1;
     auto& moveP0 = registry_.get<MovementComponent>(player);
-    moveP0.control = InputControl::Accelerate;
+    // moveP0.control = InputControl::Accelerate;
 
     entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player");
     auto& trfP1 = registry_.get<TransformComponent>(player1);
-    trfP1.SetPosition(-1, -1, 1);
+    trfP1.SetPosition(-1, -1, 0);
 
     auto& renderp1 = registry_.get<RenderComponent>(player1);
     renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
@@ -80,18 +73,16 @@ void GameState::Init()
     auto& colp1 = registry_.get<ColliderComponent>(colObj1);
     colp1.layer = CollisionLayer::Wave2;
 
+    // entt::entity box = Prefab::CreateWorldObject(registry_, true, false, true, "Box");
+    // auto& trfBox = registry_.get<TransformComponent>(box);
+    // trfBox.SetPosition(-0.5, -2.425, -0.1);
+
     auto& wavePool = EntityPool<WavePoolTraits>::EmplaceInContext(registry_);
     auto& colliderPool = EntityPool<WaveColliderPoolTraits>::EmplaceInContext(registry_);
     registry_.ctx().emplace<WaveManager>(wavePool, colliderPool);
-    //// Ground2
-    //entt::entity ground2 = Prefab::CreateWorldObject(registry_, true, false, true, "Ground2");
-    //auto& trfGnd2 = registry_.get<TransformComponent>(ground2);
-    //trfGnd2.SetPosition(0, -3, 0);
-    //trfGnd2.SetScale(20, 0.2, 40);
-    //auto& renderGnd2 = registry_.get<RenderComponent>(ground2);
-    //renderGnd2.color = { 0.573f, 0.839f, 0.710f, 1.f };
+
     // Ground
-    entt::entity ground = Prefab::CreateWorldObject(registry_, true, false, true, "Ground");
+    entt::entity ground = Prefab::CreateGround(registry_);
     auto& trfGnd = registry_.get<TransformComponent>(ground);
     trfGnd.SetPosition(0, -3, 0);
     trfGnd.SetScale(20, 0.1, 20);

@@ -40,6 +40,13 @@ namespace tomato::Prefab
         bool printInfo = true,
         const std::string& name = "GameObject");
 
+    /// Base + render + surface components + collider entity
+    entt::entity CreateGround(
+        entt::registry& registry,
+        bool active = true,
+        const std::string& name = "Ground",
+        bool printInfo = true);
+
     /// Base + render + character base components + collider entity + ground trigger collider entity
     entt::entity CreateCharacter(
         entt::registry& registry,

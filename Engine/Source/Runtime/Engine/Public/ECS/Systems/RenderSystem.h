@@ -17,7 +17,7 @@ namespace tomato
         void Update(SimContext& simCtx) override;
 
     private:
-        void UpdateDrawList(SimContext& simCtx);
+        bool UpdateDrawList(SimContext& simCtx);
 
         struct DrawItem
         {

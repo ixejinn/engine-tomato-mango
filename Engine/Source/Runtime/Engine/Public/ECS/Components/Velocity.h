@@ -18,7 +18,7 @@ namespace tomato
 
     struct FrictionComponent
     {
-        float groundFriction{1.0f};
+        float groundFriction{10.0f};
         float airDrag{0.5f};
     };
 

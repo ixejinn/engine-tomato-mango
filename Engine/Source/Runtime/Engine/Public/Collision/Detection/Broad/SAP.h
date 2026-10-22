@@ -1,20 +1,20 @@
 #ifndef MANGO_SAP_H
 #define MANGO_SAP_H
 
-#include "BroadPhase.h"
+#include "Collision/Detection/Broad/BroadPhaseProxy.h"
 
 namespace tomato
 {
     /**
      * @brief Sweep and Prune
      */
-    class SAP : public BroadPhase
+    class SAP
     {
     public:
-        void FindContactPairCandidates(entt::registry& reg, std::vector<ContactPair> &candidates) override;
+        void FindOverlappingPairs(std::vector<BroadPhaseProxy>& proxies, std::vector<OverlapEntryPair>& out);
 
     private:
-        static void UpdateAABBs(entt::registry& reg);
+        std::vector<uint32_t> active_;
     };
 }
 

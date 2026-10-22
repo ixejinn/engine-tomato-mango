@@ -92,8 +92,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/TomatoFwd.h
         Source/Runtime/Core/Public/Containers/UnorderedPair.h
 
-		Source/Runtime/Engine/Public/Collision/Detection/Narrow/GJK/GJK.h
-		Source/Runtime/Engine/Public/Collision/Detection/Narrow/GJK/EPA.h
+		Source/Runtime/Engine/Private/Collision/Detection/Narrow/GJK/GJK.h
+		Source/Runtime/Engine/Private/Collision/Detection/Narrow/GJK/EPA.h
 		Source/Runtime/Engine/Public/Collision/Detection/Broad/BroadPhase.h
         Source/Runtime/Engine/Public/Collision/CollisionFwd.h
 		Source/Runtime/Engine/Public/Collision/Detection/Broad/SAP.h
@@ -183,7 +183,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Input/InputIntentFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/Systems.h
 		Source/Runtime/Engine/Public/Collision/CollisionCache.h
-		Source/Runtime/Engine/Public/Collision/Detection/Narrow/GJK/GJKResult.h
+		Source/Runtime/Engine/Private/Collision/Detection/Narrow/GJK/GJKResult.h
 		Source/Runtime/Engine/Public/Collision/CollisionTolerance.h
 		Source/Runtime/Engine/Public/ECS/Forward/CharacterCompFwd.h
         Source/Runtime/Engine/Public/ECS/Systems/ParticleEmissionSystem.h
@@ -226,10 +226,16 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Systems/ViewGizmoRenderSystem.h
 		Source/Runtime/Engine/Private/ECS/Components/Gizmo.h
 		Source/Runtime/Engine/Public/ECS/Systems/FrictionSystem.h
+		Source/Runtime/Engine/Public/Collision/CollisionDebug.h
+		Source/Runtime/Engine/Public/EngineDebug.h
+		Source/Runtime/Engine/Public/ECS/Components/PhysicsBody.h
+		Source/Runtime/Engine/Public/Collision/Detection/Narrow/ShapeView.h
+		Source/Runtime/Engine/Public/Collision/Detection/Broad/BroadPhaseProxy.h
+		Source/Runtime/Engine/Private/Collision/Detection/Narrow/Pairs/SphereSphere.h
 )
 
 set(ENGINE_SOURCES
-        Source/Runtime/Engine/Private/Collision/CollisionLayerMatrix.cpp
+		Source/Runtime/Engine/Private/Collision/Layer/CollisionLayerMatrix.cpp
         Source/Runtime/Core/Private/Collision/ColliderSupport.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/CameraTransformSystem.cpp
         Source/Runtime/Engine/Private/Engine.cpp
@@ -253,10 +259,10 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/ECS/Systems/TransformSystem.cpp
 		Source/Runtime/Engine/Private/ECS/SystemFramework/SystemRegistry.cpp
 		Source/Runtime/Engine/Private/ECS/SystemFramework/SystemManager.cpp
-		Source/Runtime/Engine/Private/Collision/Narrow/GJK/GJK.cpp
-		Source/Runtime/Engine/Private/Collision/Narrow/GJK/EPA.cpp
+		Source/Runtime/Engine/Private/Collision/Detection/Narrow/GJK/GJK.cpp
+		Source/Runtime/Engine/Private/Collision/Detection/Narrow/GJK/EPA.cpp
         Source/Runtime/Engine/Private/Math/Normal.cpp
-        Source/Runtime/Engine/Private/Collision/Broad/SAP.cpp
+        Source/Runtime/Engine/Private/Collision/Detection/Broad/SAP.cpp
         Source/Runtime/Engine/Private/Utils/Utf.cpp
         Source/Runtime/Engine/Private/Input/InputUI.cpp
         Source/Runtime/Engine/Private/ECS/Systems/UISystem.cpp
@@ -274,7 +280,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/GameNetwork/Message/InputMessage.cpp
         Source/Runtime/Engine/Private/GameNetwork/GamePlayNetSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/IntegrationSystem.cpp
-        Source/Runtime/Engine/Private/Collision/Broad/BroadPhase.cpp
+        Source/Runtime/Engine/Private/Collision/Detection/Broad/BroadPhase.cpp
         Source/Runtime/Engine/Private/ECS/Components/Transform.cpp
         Source/Runtime/Engine/Private/Prefab/Prefab.cpp
         Source/Runtime/Engine/Private/ECS/Systems/GravitySystem.cpp
@@ -320,6 +326,8 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Render/GLStateCache.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/ViewGizmoRenderSystem.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/FrictionSystem.cpp
+		Source/Runtime/Engine/Private/Collision/Detection/Narrow/NarrowPhase.cpp
+		Source/Runtime/Engine/Private/Collision/Detection/Narrow/Pairs/SphereSphere.cpp
 )
 
 add_library(engine STATIC

@@ -1,6 +1,6 @@
 ﻿#include "Engine.h"
 #include "EngineConfig.h"
-
+#include "EngineDebug.h"
 #include "Event/EventDispatcher.h"
 #include "Simulation/Tick/TickClock.h"
 #include "Render/GLStateCache.h"
@@ -158,7 +158,7 @@ namespace tomato {
         while (cnt--)
         {
             simCtx.tick = tc.GetTick();
-            //std::cout << "\n       *--------- " << simCtx.tick << " ---------*\n";
+            TICK_LOG("\n *--------- " << simCtx.tick << " ---------*\n");
 
             systemManager_.FixedUpdate(simCtx, mode);
 

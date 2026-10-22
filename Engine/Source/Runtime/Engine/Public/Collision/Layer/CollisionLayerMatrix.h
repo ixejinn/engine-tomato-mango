@@ -12,7 +12,7 @@ namespace tomato
 
 		void SetCollisionLayer(CollisionLayer a, CollisionLayer b, bool enabled);
 
-		bool CanCollide(CollisionLayer a, CollisionLayer b);
+		bool CanCollide(CollisionLayer a, CollisionLayer b) const;
 
 	private:
 		void Initialize();

@@ -7,14 +7,14 @@
 #include "ECS/Systems/System.h"
 #include "Collision/CollisionEventFwd.h"
 #include "Collision/CollisionFwd.h"
-#include "Collision/Detection/Narrow/GJK/GJK.h"
+#include "Collision/Detection/Broad/BroadPhase.h"
+#include "Collision/Detection/Narrow/NarrowPhase.h"
 
 namespace tomato
 {
     class CollisionSystem : public System
     {
     public:
-        CollisionSystem();
         ~CollisionSystem() override;
 
         void Update(SimContext& simCtx) override;
@@ -24,8 +24,8 @@ namespace tomato
 
         void RunBroadPhase(SimContext& simCtx);
         void RunNarrowPhase(SimContext& simCtx);
-        std::unique_ptr<BroadPhase> broadPhase_;
-        std::unique_ptr<NarrowPhase> narrowPhase_;
+        BroadPhase broad_;
+        NarrowPhase narrow_;
 
         std::vector<ContactPair> candidates_;
 
@@ -39,10 +39,6 @@ namespace tomato
 
         static void ResolveDiscreteContact(
             TransformComponent& trf, VelocityComponent& vel,
-            const glm::vec3& normal, float weight, float distance);
-
-        static void ResolvePenetration(
-            TransformComponent& trf,
             const glm::vec3& normal, float weight, float distance);
 
         static void UpdateCollisionEvents();

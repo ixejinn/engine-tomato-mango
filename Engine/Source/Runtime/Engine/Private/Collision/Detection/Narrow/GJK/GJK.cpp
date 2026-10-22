@@ -2,11 +2,12 @@
 #include <cmath>
 #include <glm/gtx/string_cast.hpp>
 #include "Collision/Detection/Narrow/GJK/GJK.h"
-#include "Collision/Detection/Narrow/GJK/EPA.h"
+#include "EPA.h"
 #include "Collision/ColliderSupport.h"
 #include "Collision/CollisionEvent.h"
 #include "Collision/CollisionConstants.h"
 #include "Collision/CollisionTolerance.h"
+#include "Collision/CollisionDebug.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Hierarchy.h"
@@ -27,27 +28,56 @@ namespace tomato
 //        {ColliderType::Capsule, support::Capsule}
     };
 
-    std::optional<ContactData> GJK::EvaluateContactPair(entt::registry& reg, const ContactPair& pair)
+    bool GJK::Overlap(const ShapeView& a, const ShapeView& b)
     {
-        const auto& colA = reg.get<ColliderComponent>(pair.a);
-        const auto& colB = reg.get<ColliderComponent>(pair.b);
+        COL_DETECT_VERBOSE_LOG("===== GJK overlap " << pair);
 
-        if (colA.trigger || colB.trigger)
-        {
-            if (GJKBool(reg, pair))
-                return ContactData{};
+        const auto& colA = a.col;
+        const auto& colB = b.col;
 
-            return std::nullopt;
+        const auto& trfA = a.trf;
+        const auto& trfB = b.trf;
+
+        static std::vector<glm::vec3> simplex(4);
+        simplex.clear();
+
+        glm::vec3 closestP = GetSupportPoint(
+            trfA.GetWorldPosition() - trfB.GetWorldPosition(),
+            colA, trfA, colB, trfB);
+        glm::vec3 supportP = GetSupportPoint(
+            -closestP,
+            colA, trfA, colB, trfB);
+        simplex.push_back(supportP);
+
+        float maxDistSq = glm::length2(supportP);
+        int iteration = 0;
+        while (iteration++ < 20) {
+            if (auto result = FindClosestPointOnSimplex(simplex))
+                closestP = *result;
+            else
+                return true;
+
+            supportP = GetSupportPoint(-closestP, colA, trfA, colB, trfB);
+            simplex.push_back(supportP);
+
+            maxDistSq = std::max(maxDistSq, glm::length2(supportP));
+            if (glm::dot(-closestP, supportP) < RELATIVE_TOLERANCE_SQ * maxDistSq)
+                return false;   // 심플렉스를 더 수렴시켜도 원점에 도달할 수 없으므로 비충돌
         }
+        return true;
+    }
 
-        if (auto distanceRes = GJKDistance(reg, pair))
+    std::optional<ContactData> GJK::Sweep(const ShapeView& a, const ShapeView& b, const glm::vec3& ray)
+    {
+        if (auto distanceRes = Distance(a, b))
         {
-            constexpr float SAFETY = 1.28f;
-            if (distanceRes->maxDistSq < 0 ||   // EPA
-                distanceRes->distance * distanceRes->distance <= SAFETY * SAFETY * RELATIVE_TOLERANCE_SQ * distanceRes->maxDistSq)
+            if (!IsReliableContact(distanceRes.value()))
                 return ContactData{distanceRes->normal, distanceRes->distance};
 
-            return GJKRaycast(reg, pair);
+            if (ray == glm::vec3{0})   // GJK-raycast only targets moving objects
+                return std::nullopt;
+
+            return Raycast(a, b, ray);
         }
 
         return std::nullopt;
@@ -61,64 +91,25 @@ namespace tomato
         return Support(worldDir, col1, trf1) - Support(-worldDir, col2, trf2);
     }
 
-    bool GJK::GJKBool(
-            entt::registry& reg, const ContactPair& pair)
+    std::optional<DistanceResult> GJK::Distance(const ShapeView& a, const ShapeView& b)
     {
-//        std::cout << "========== GJK bool " << pair << "\n";
+        COL_DETECT_VERBOSE_LOG("===== GJK distance " << pair);
 
-        auto& col1 = reg.get<ColliderComponent>(pair.a);
-        auto& col2 = reg.get<ColliderComponent>(pair.b);
-        auto& trf1 = reg.get<TransformComponent>(pair.a);
-        auto& trf2 = reg.get<TransformComponent>(pair.b);
+        const auto& colA = a.col;
+        const auto& colB = b.col;
+
+        const auto& trfA = a.trf;
+        const auto& trfB = b.trf;
 
         static std::vector<glm::vec3> simplex(4);
         simplex.clear();
 
         glm::vec3 closestP = GetSupportPoint(
-            trf1.GetWorldPosition() - trf2.GetWorldPosition(),
-            col1, trf1, col2, trf2);
+            trfA.GetWorldPosition() - trfB.GetWorldPosition(),
+            colA, trfA, colB, trfB);
         glm::vec3 supportP = GetSupportPoint(
             -closestP,
-            col1, trf1, col2, trf2);
-        simplex.push_back(supportP);
-
-        float maxDistSq = glm::length2(supportP);
-        int iteration = 0;
-        while (iteration++ < 20) {
-            if (auto result = FindClosestPointOnSimplex(simplex))
-                closestP = *result;
-            else
-                return true;
-
-            supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
-            simplex.push_back(supportP);
-
-            maxDistSq = std::max(maxDistSq, glm::length2(supportP));
-            if (glm::dot(-closestP, supportP) < RELATIVE_TOLERANCE_SQ * maxDistSq)
-                return false;   // 심플렉스를 더 수렴시켜도 원점에 도달할 수 없으므로 비충돌
-        }
-        return true;
-    }
-
-    std::optional<DistanceResult> GJK::GJKDistance(
-            entt::registry& reg, const ContactPair& pair)
-    {
-        // std::cout << "========== GJK distance " << pair << "\n";
-
-        auto& col1 = reg.get<ColliderComponent>(pair.a);
-        auto& col2 = reg.get<ColliderComponent>(pair.b);
-        auto& trf1 = reg.get<TransformComponent>(pair.a);
-        auto& trf2 = reg.get<TransformComponent>(pair.b);
-
-        static std::vector<glm::vec3> simplex(4);
-        simplex.clear();
-
-        glm::vec3 closestP = GetSupportPoint(
-            trf1.GetWorldPosition() - trf2.GetWorldPosition(),
-            col1, trf1, col2, trf2);
-        glm::vec3 supportP = GetSupportPoint(
-            -closestP,
-            col1, trf1, col2, trf2);
+            colA, trfA, colB, trfB);
 
         float maxDistSq = glm::length2(closestP);
         int iteration = 0;
@@ -130,13 +121,18 @@ namespace tomato
             if (auto result = FindClosestPointOnSimplex(simplex))
                 closestP = *result;
             else
-                return RunEPA(simplex, col1, trf1, col2, trf2);
+                return RunEPA(simplex, colA, trfA, colB, trfB);
 
-            supportP = GetSupportPoint(-closestP, col1, trf1, col2, trf2);
+            supportP = GetSupportPoint(-closestP, colA, trfA, colB, trfB);
 
             maxDistSq = 0;
             for (const glm::vec3& p : simplex)
                 maxDistSq = std::max(maxDistSq, glm::length2(p));
+        }
+
+        if (simplex.empty())
+        {
+            return std::nullopt;
         }
 
         const float lengthSq = glm::length2(closestP);
@@ -144,15 +140,6 @@ namespace tomato
         {
             const float length = glm::sqrt(lengthSq);
             auto normal = closestP / length;
-
-            if (std::abs(normal.x) < NORMAL_SNAP_THRESHOLD)
-                closestP.x = 0.f;
-            if (std::abs(normal.z) < NORMAL_SNAP_THRESHOLD)
-                closestP.z = 0.f;
-            if (std::abs(normal.y) < NORMAL_SNAP_THRESHOLD)
-                closestP.y = 0.f;
-
-            normal = glm::normalize(normal);
 
             //                       ↓ normal 방향이 원점에서 CSO를 향하는 방향이므로 raycast, EPA와 방향을 맞추기위해 부호 반전
             return DistanceResult{-normal, length, maxDistSq};
@@ -174,33 +161,23 @@ namespace tomato
             }
         }
 
-        return RunEPA(simplex, col1, trf1, col2, trf2);
+        return RunEPA(simplex, colA, trfA, colB, trfB);
     }
 
-    std::optional<ContactData> GJK::GJKRaycast(
-            entt::registry& reg, const ContactPair& pair)
+    std::optional<ContactData> GJK::Raycast(const ShapeView& a, const ShapeView& b, const glm::vec3& ray)
     {
-//        std::cout << "========== GJK raycast " << pair << "\n";
+        COL_DETECT_VERBOSE_LOG("===== GJK raycast " << pair);
 
-        auto& col1 = reg.get<ColliderComponent>(pair.a);
-        auto& col2 = reg.get<ColliderComponent>(pair.b);
-        auto& trf1 = reg.get<TransformComponent>(pair.a);
-        auto& trf2 = reg.get<TransformComponent>(pair.b);
+        const auto& colA = a.col;
+        const auto& colB = b.col;
 
-        glm::vec3 v1{0.f};
-        glm::vec3 v2{0.f};
-        if (auto vel1 = reg.try_get<VelocityComponent>(GetRootEntity(reg, pair.a)))
-            v1 = vel1->input;
-        if (auto vel2 = reg.try_get<VelocityComponent>(GetRootEntity(reg, pair.b)))
-            v2 = vel2->input;
+        const auto& trfA = a.trf;
+        const auto& trfB = b.trf;
 
-        glm::vec3 relVel = v1 - v2;
-        glm::vec3 ray = -relVel * FIXED_DELTA_TIME;
-
-        float hitFraction = 0.f;
-        glm::vec3 rayOrigin{0.f};
+        float hitFraction{0};
+        glm::vec3 rayOrigin{0};
         glm::vec3 curRayPos = rayOrigin;
-        glm::vec3 searchDir = curRayPos - GetSupportPoint(ray, col1, trf1, col2, trf2);
+        glm::vec3 searchDir = curRayPos - GetSupportPoint(ray, colA, trfA, colB, trfB);
         glm::vec3 hitNormal = searchDir;
         std::vector<glm::vec3> simplex;  // curRayPos - supportP 상대 좌표를 저장
         simplex.reserve(4);
@@ -210,7 +187,7 @@ namespace tomato
         while (glm::length2(searchDir) > RELATIVE_TOLERANCE_SQ * maxDistSq // searchDir의 크기가 충분히 큰 경우에만 반복
             && iteration++ < 20)
         {
-            glm::vec3 supportP = GetSupportPoint(searchDir, col1, trf1, col2, trf2);    // (절대)
+            glm::vec3 supportP = GetSupportPoint(searchDir, colA, trfA, colB, trfB);    // (절대)
             glm::vec3 supportToRay = curRayPos - supportP;                                    // (상대 - curRayPos 기준)
 
             // searchDir에 수직하고 supportP를 포함하는 평면이 CSO와 curRayPos를 분리시키면
@@ -248,7 +225,7 @@ namespace tomato
                 searchDir = result.value();
             else
             {
-                TMT_DEBUG << "Degenerate simplex. iter = " << iteration;
+                COL_DETECT_VERBOSE_LOG("GJK raycast Degenerate simplex. iter = " << iteration);
                 break;
             }
 
@@ -260,20 +237,20 @@ namespace tomato
         if (hitFraction > 0 && hitFraction <= 1)
         {
             hitNormal = glm::normalize(hitNormal);
-
-            if (std::abs(hitNormal.x) < NORMAL_SNAP_THRESHOLD)
-                hitNormal.x = 0.f;
-            if (std::abs(hitNormal.z) < NORMAL_SNAP_THRESHOLD)
-                hitNormal.z = 0.f;
-            if (std::abs(hitNormal.y) < NORMAL_SNAP_THRESHOLD)
-                hitNormal.y = 0.f;
-
-            hitNormal = glm::normalize(hitNormal);
-
             return ContactData{hitNormal, hitFraction, 0.f};
         }
 
         return std::nullopt;
+    }
+
+    bool GJK::IsReliableContact(const DistanceResult& result)
+    {
+        // EPA
+        if (result.distance < 0)
+            return false;
+
+        // Scale-dependent termination may produce unreliable results at close distances
+        return result.distance * result.distance > SAFETY_COEF_SQ * RELATIVE_TOLERANCE_SQ * result.maxDistSq;
     }
 
     glm::vec3 GJK::Support(
@@ -400,7 +377,7 @@ namespace tomato
             }
 
             default:
-                TMT_ERR << "Incorrect simplex size: " << simplex.size();
+                COL_DETECT_VERBOSE_LOG("FindClosestPointOnSimplex Incorrect simplex size: " << simplex.size());
                 return glm::vec3{0.f};
         }
     }

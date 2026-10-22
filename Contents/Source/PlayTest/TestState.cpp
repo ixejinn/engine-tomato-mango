@@ -50,11 +50,6 @@ void TestState::Init() {
     engine_.SetRollbackComponent<VelocityComponent>();
 
     //// Create game object
-    // Main camera
-    entt::entity cam = Prefab::CreateCamera(registry_, true, true);
-    auto& trfCam = registry_.get<TransformComponent>(cam);
-    trfCam.SetPosition(0, 8, 8);
-    trfCam.SetRotationDegree(-50, 0, 0);
 
     PlayTest();
     // BottleneckTest();
