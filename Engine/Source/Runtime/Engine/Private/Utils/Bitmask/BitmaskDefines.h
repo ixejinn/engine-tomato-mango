@@ -6,6 +6,7 @@
 #include "Collision/CollisionTypesFwd.h"
 #include "ECS/Forward/SystemFrameworkFwd.h"
 #include "ECS/Forward/TransformDirtyFwd.h"
+#include "ECS/Forward/UIDirtyFwd.h"
 #include "Serialization/ComponentInfo.h"
 
 namespace tomato {
@@ -19,6 +20,7 @@ namespace tomato {
     template<> struct is_bitmask<CollisionLayerFlag>: std::true_type {};
     template<> struct is_bitmask<ColliderType>      : std::true_type {};
     template<> struct is_bitmask<Transform::Dirty>  : std::true_type {};
+    template<> struct is_bitmask<UI::Dirty>  : std::true_type {};
 
     template<> struct is_bitmask<RunMode>           : std::true_type {};
 

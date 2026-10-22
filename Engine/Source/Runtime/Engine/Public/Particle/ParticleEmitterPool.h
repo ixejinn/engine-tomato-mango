@@ -18,7 +18,7 @@ namespace tomato
         static void Reset(entt::registry& registry_, entt::entity e,
             AssetID ptcID, glm::vec3 pos);
         static void Reset(entt::registry& registry_, entt::entity e,
-            AssetID ptcID, UUID target, glm::vec3 offset = { 0.f, 0.f, 0.f });
+            AssetID ptcID, entt::entity target, glm::vec3 offset = { 0.f, 0.f, 0.f });
         static bool Deactivate(entt::registry& registry_, entt::entity e);
     };
 

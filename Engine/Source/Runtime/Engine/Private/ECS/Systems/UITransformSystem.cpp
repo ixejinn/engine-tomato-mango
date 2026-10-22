@@ -4,31 +4,42 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/Target.h"
+#include "ECS/Components/UIDirty.h"
 
 #include "ECS/Components/Camera.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/Entity/Entity.h"
 
+#include "Utils/Bitmask/BitmaskOperators.h"
+#include "Profiler/CPUProfiler.h"
 namespace tomato
 {
 	void UITransformSystem::Update(SimContext& simCtx)
 	{
-		UpdateScreenUI(simCtx);
-        UpdateWorldUI(simCtx);
+        CPU_PROFILER_BLOCK_BEGIN(UITransformSystem::Update);
+
+        auto& registry = simCtx.state->GetRegistry();
+
+		UpdateScreenUI(registry);
+        UpdateWorldUI(registry);
+
+        CPU_PROFILER_BLOCK_END(UITransformSystem::Update);
 	}
 
-    void UITransformSystem::UpdateScreenUI(SimContext& simCtx)
+    void UITransformSystem::UpdateScreenUI(entt::registry& registry)
     {
-        auto& r = simCtx.state->GetRegistry();
-        auto* uiCtx = r.ctx().find<UIContext>();
+        auto* uiCtx = registry.ctx().find<UIContext>();
         if (uiCtx == nullptr)
-            uiCtx = &r.ctx().emplace<UIContext>();
+            uiCtx = &registry.ctx().emplace<UIContext>();
 
         for (auto e : uiCtx->screenDrawList)
         {
-            auto& hierarchy = r.get<HierarchyComponent>(e);
-            auto& rect = r.get<RectTransformComponent>(e);
-            auto& ui = r.get<UIComponent>(e);
+            auto& rect = registry.get<RectTransformComponent>(e);
+            if(!HasFlag(rect.dirty, UI::Dirty::Matrix))
+                continue;
+
+            auto& hierarchy = registry.get<HierarchyComponent>(e);
+            auto& ui = registry.get<UIComponent>(e);
 
             // Scale → Rotate → Translate
             auto T = glm::translate(glm::mat4(1.f), rect.position);
@@ -37,12 +48,12 @@ namespace tomato
 
             rect.local_matrix = T * R * S;
 
-            if (GetEntityByUUID(r, ui.canvas) == e)
+            if (ui.canvas == e)
                 rect.world_matrix = rect.local_matrix;
 
             else if (hierarchy.parent != entt::null)
             {
-                auto* parentRect = r.try_get<RectTransformComponent>(hierarchy.parent);
+                auto* parentRect = registry.try_get<RectTransformComponent>(hierarchy.parent);
                 if(parentRect)
                 //std::cout << "child rect " << ui.type << " pos(" << rect.position.x << ", " << rect.position.y << ")\n";
                     rect.world_matrix = parentRect->world_matrix * rect.local_matrix;
@@ -57,19 +68,20 @@ namespace tomato
                 renderM = glm::translate(renderM, glm::vec3(-rect.pivot, 0.f));
             }
             rect.model_matrix = renderM;
+
+            rect.dirty = UI::Dirty::None;
         }
     }
-    void UITransformSystem::UpdateWorldUI(SimContext& simCtx)
+    void UITransformSystem::UpdateWorldUI(entt::registry& registry)
     {
-        auto& r = simCtx.state->GetRegistry();
-        auto* uiCtx = r.ctx().find<UIContext>();
+        auto* uiCtx = registry.ctx().find<UIContext>();
         if (!uiCtx)
             return;
 
         for (auto e : uiCtx->worldDrawList)
         {
-            auto& rect = r.get<RectTransformComponent>(e);
-            auto& ui = r.get<UIComponent>(e);
+            auto& rect = registry.get<RectTransformComponent>(e);
+            auto& ui = registry.get<UIComponent>(e);
 
             // Scale → Rotate → Translate
             auto T = glm::translate(glm::mat4(1.f), rect.position);
@@ -79,7 +91,7 @@ namespace tomato
             rect.local_matrix = T * R * S;
 
             //World Canvas
-            if (GetEntityByUUID(r, ui.canvas) == e)
+            if (ui.canvas == e)
             {
                 rect.world_matrix = rect.local_matrix;
                 rect.model_matrix = rect.world_matrix;
@@ -87,15 +99,15 @@ namespace tomato
             }
 
             //Target-based World UI
-            if (auto* target = r.try_get<TargetComponent>(e))
+            if (auto* target = registry.try_get<TargetComponent>(e))
             {
-                auto targetEntity = GetEntityByUUID(r, target->target);
-                auto* targetTransform = r.try_get<TransformComponent>(targetEntity);
+                auto targetEntity = target->target;
+                auto* targetTransform = registry.try_get<TransformComponent>(targetEntity);
                 if (!targetTransform)
                     continue;
 
-                auto& renderCtx = r.ctx().get<RenderContext>();
-                auto* camera = r.try_get<CameraComponent>(renderCtx.mainCam);
+                auto& renderCtx = registry.ctx().get<RenderContext>();
+                auto* camera = registry.try_get<CameraComponent>(renderCtx.mainCam);
 
                 if (!camera) continue;
 
@@ -109,6 +121,7 @@ namespace tomato
 
                 rect.world_matrix = billboard;
                 rect.model_matrix = rect.world_matrix;
+
                 continue;
             }
 

@@ -5,5 +5,6 @@ namespace tomato
 {
 	struct EditorHidden{};
 	struct NoInspector {};
+	struct NoSave {};
 }
 #endif // !MANGO_EDITORTAG_H

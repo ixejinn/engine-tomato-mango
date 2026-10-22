@@ -33,7 +33,8 @@ namespace tomato
 		{
 			// 모든 피어들의 피어간 연결 성공 패킷이 다 도착할 때까지 대기
 			// 일정 시간이 지나면 timeout으로 Failed 처리
-			if (peerAck.all())
+			
+			if (peerAck.count() == ctx_.playerNum)
 			{
 				ctx_.state = MatchState::AllReady;
 				return MatchUpdateResult::ReadyToStart;
@@ -41,7 +42,7 @@ namespace tomato
 
 			if (timer_ >= MatchConstants::CONNECT_TIMEOUT_SEC)
 			{
-				std::cout << "!!!!TIMEOUT";
+				std::cout << "!!!!TIMEOUT!!!!\n";
 				peerAck.reset();
 				ctx_.state = MatchState::Failed;
 				return MatchUpdateResult::Failed;
@@ -64,33 +65,40 @@ namespace tomato
 		return MatchUpdateResult::None;
 	}
 
-	MatchState Match::CollectNetConnection(const MatchRequest* matchRequest)
+	MatchState Match::CollectNetConnection(const std::vector<MatchRequest>& matchRequest)
 	{
-		for (int i = 0; i < MatchConstants::MAX_MATCH_PLAYER; i++)
+		for (int i = 0; i < ctx_.playerNum; i++)
 		{
-			(conn + i)->sessionId = (matchRequest + i)->sessionId;
-			(conn + i)->matchId = ctx_.matchId;
-			(conn + i)->playerId = i;
-			(conn + i)->name = (matchRequest + i)->name;
-			(conn + i)->addr = (matchRequest + i)->address;
+			conn.push_back(NetConnection{
+				.sessionId = matchRequest[i].sessionId,
+				.matchId = ctx_.matchId,
+				.playerId = (uint8_t)i,
+				.name = matchRequest[i].name,
+				.addr = matchRequest[i].address
+				});
+			//(conn + i)->sessionId = (matchRequest + i)->sessionId;
+			//(conn + i)->matchId = ctx_.matchId;
+			//(conn + i)->playerId = i;
+			//(conn + i)->name = (matchRequest + i)->name;
+			//(conn + i)->addr = (matchRequest + i)->address;
 		}
 
 		return MatchState::InfoSent;
 	}
 
-	MatchState Match::RequestToSendNetConnection(SPSCQueue<SendCommandPtr, 256>& sendRequestQ, const MatchRequest* matchRequest)
+	MatchState Match::RequestToSendNetConnection(SPSCQueue<SendCommandPtr, 256>& sendRequestQ, const std::vector<MatchRequest>& matchRequest)
 	{
 		//len + type + match id + player num + connection * player num + player id
-		for (int i = 0; i < MatchConstants::MAX_MATCH_PLAYER; i++)
+		for (int i = 0; i < ctx_.playerNum; i++)
 		{
 			RawBuffer buf{};
 			tomato::NetBitWriter writer{ &buf };
 			writer.WriteInt(static_cast<uint16_t>(0), std::numeric_limits<uint16_t>::max()); //packet len
 			writer.WriteInt(static_cast<uint16_t>(TCPPacketType::MATCH_INTRO), static_cast<uint16_t>(TCPPacketType::COUNT));
 			writer.WriteInt(static_cast<uint16_t>(ctx_.matchId), std::numeric_limits<uint16_t>::max());
-			writer.WriteInt(static_cast<uint16_t>(MatchConstants::MAX_MATCH_PLAYER), std::numeric_limits<uint8_t>::max());
+			writer.WriteInt(static_cast<uint16_t>(ctx_.playerNum), std::numeric_limits<uint8_t>::max());
 
-			for (int k = 0; k < MatchConstants::MAX_MATCH_PLAYER; k++)
+			for (int k = 0; k < ctx_.playerNum; k++)
 			{
 				writer.WriteInt(static_cast<uint8_t>(conn[k].playerId), std::numeric_limits<uint8_t>::max());
 				writer.WriteInt(static_cast<uint16_t>(conn[k].name.size()), std::numeric_limits<uint16_t>::max());
@@ -105,7 +113,7 @@ namespace tomato
 			uint16_t size = writer.GetByteSize();
 			memcpy(buf.data(), &size, sizeof(uint16_t));
 
-			auto sendCmd = std::make_unique<SendRequestCommand>((matchRequest + i)->sessionId, size);
+			auto sendCmd = std::make_unique<SendRequestCommand>(matchRequest[i].sessionId, size);
 			std::memcpy(sendCmd.get()->data.data(), buf.data(), size);
 
 			sendRequestQ.Emplace(std::move(sendCmd));
@@ -116,7 +124,7 @@ namespace tomato
 
 	const int Match::GetPlayerId(const SessionId& client) const
 	{
-		for (int i = 0; i < MatchConstants::MAX_MATCH_PLAYER; i++)
+		for (int i = 0; i < conn.size(); i++)
 		{
 			if (conn[i].sessionId == client)
 				return conn[i].playerId;

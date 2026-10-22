@@ -54,8 +54,8 @@ namespace tomato
 
         for (auto [e, trf, runtime, target] : rootView.each())
         {
-            if (target.target == 0) continue;
-            auto& targetTrf = reg.get<TransformComponent>(GetEntityByUUID(reg, target.target));
+            if (target.target == entt::null) continue;
+            auto& targetTrf = reg.get<TransformComponent>(target.target);
 
             auto T = glm::translate(glm::mat4(1.f), trf.GetLocalPosition());
             auto R = glm::toMat4(trf.GetLocalQuaternion());

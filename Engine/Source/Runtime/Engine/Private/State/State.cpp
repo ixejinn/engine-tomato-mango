@@ -7,6 +7,7 @@
 #include "ECS/Components/EditorTag.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/PendingDestroy.h"
+#include "ECS/Components/UI.h"
 #include "Particle/ParticleEmitterPool.h"
 #include "Prefab/Prefab.h"
 #include "Utils/PassKey.h"
@@ -17,8 +18,10 @@ namespace tomato
     State::State(Engine& engine) : engine_(engine)
     {
         registry_.on_construct<PendingDestroyComponent>().template connect<&OnPendingDestroyComponentConstructed>();
+        registry_.on_construct<SelectableComponent>().template connect<&OnSelectableComponentConstructed>();
         registry_.on_destroy<ActiveTag>().template connect<&OnActiveTagDestroyed>();
         registry_.on_destroy<HierarchyComponent>().template connect<&OnHierarchyComponentDestroyed>();
+        registry_.on_destroy<SelectableComponent>().template connect<&OnSelectableComponentConstructed>();
 
         registry_.ctx().emplace<RenderContext>();
         registry_.ctx().emplace<CollisionContext>();

@@ -26,10 +26,12 @@
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
+#include "ECS/Components/UIDirty.h"
 #include "ECS/Components/Text.h"
 #include "ECS/Components/Target.h"
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Particle.h"
+#include "ECS/Components/EditorTag.h"
 
 #include "Particle/ParticleEmitterPool.h"
 
@@ -185,9 +187,8 @@ namespace tomato::Serialization
 			std::string name = entityData["Name"];
 
 			entt::entity e = reg.create();
-
 			reg.emplace<NametagComponent>(e, id, name);
-			//reg.emplace<ActiveTag>(e);
+			
 			entityMap[id] = e;
 		}
 	}
@@ -230,8 +231,8 @@ namespace tomato::Serialization
 		for (auto& particle : particleData["Particle"])
 		{
 			AssetID asset = particle["particle"];
-			UUID target = particle["target"];
-
+			entt::entity target = GetEntityByUUID(reg, particle["target"]);
+			
 			reg.ctx().get<ParticleEmitterPool>().Acquire(reg, asset, target);
 		}
 	}
@@ -297,7 +298,7 @@ namespace tomato::Serialization
 		{
 			json particle;
 			particle["particle"] = attach.particle;
-			particle["target"] = attach.target;
+			particle["target"] = GetUUID(reg, attach.target);
 
 			data["Particle"].push_back(particle);
 		}
@@ -305,6 +306,9 @@ namespace tomato::Serialization
 
 	void SaveEntity(json& data, entt::registry& reg, entt::entity entity)
 	{
+		if (reg.all_of<NoSave>(entity))
+			return;
+
 		// particle
 		if (reg.all_of<ParticleEmitterComponent>(entity))
 			return;
@@ -491,14 +495,14 @@ namespace tomato::Serialization
 	
 	void Save(json& data, entt::registry& registry, const UIComponent& ui)
 	{
-		data["canvas"] = ui.canvas;
+		data["canvas"] = GetUUID(registry, ui.canvas);
 		data["sortOrder"] = ui.sortOrder;
 		data["type"] = ui.type;
 	}
 
 	void Load(const json& data, entt::registry& registry, UIComponent& ui)
 	{
-		ui.canvas = data["canvas"];
+		ui.canvas = GetEntityByUUID(registry, data["canvas"]);
 		ui.sortOrder = data["sortOrder"];
 		ui.type = data["type"];
 	}
@@ -539,6 +543,8 @@ namespace tomato::Serialization
 		rectTransform.anchorMin = { data["anchorMin"][0], data["anchorMin"][1] };
 		rectTransform.anchorMax = { data["anchorMax"][0], data["anchorMax"][1] };
 		rectTransform.pivot = { data["pivot"][0], data["pivot"][1] };
+
+		rectTransform.dirty = UI::Dirty::All;
 	}
 
 	void Save(json& data, entt::registry& registry, const TextComponent& text)
@@ -564,13 +570,13 @@ namespace tomato::Serialization
 
 	void Save(json& data, entt::registry& registry, const TargetComponent& target)
 	{
-		data["target"] = target.target;
+		data["target"] = GetUUID(registry, target.target);
 		data["offset"] = { target.headOffset.x, target.headOffset.y, target.headOffset.z };
 	}
 
 	void Load(const json& data, entt::registry& registry, TargetComponent& target)
 	{
-		target.target = data["target"];
+		target.target = GetEntityByUUID(registry, data["target"]);
 		target.headOffset = {
 			data["offset"][0],
 			data["offset"][1],

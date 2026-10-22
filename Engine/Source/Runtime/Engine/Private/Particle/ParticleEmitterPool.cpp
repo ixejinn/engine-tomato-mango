@@ -54,7 +54,7 @@ namespace tomato
     }
 
     void ParticlePoolTraits::Reset(entt::registry& registry_, entt::entity e,
-        AssetID ptcID, UUID target, glm::vec3 offset)
+        AssetID ptcID, entt::entity target, glm::vec3 offset)
     {
         ParticleEffect* ptcEffect = AssetRegistry<ParticleEffect>::GetInstance().Get(ptcID);
 
@@ -90,7 +90,7 @@ namespace tomato
         particle->active = false;
 
         auto& pTarget = registry_.get<TargetComponent>(e);
-        pTarget.target = 0;
+        pTarget.target = entt::null;
 
         return true;
     }

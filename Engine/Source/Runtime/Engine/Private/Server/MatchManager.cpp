@@ -10,11 +10,12 @@ namespace tomato
 		ProcessMatchRequest();
 
 		// Create a match when people get together
-		if (CheckPopulation())
+		if (CheckPopulation() || CheckMatchTime(dt))
 		{
 			MatchContext ctx;
 			CreateMatchContext(ctx);
 			matches.try_emplace(ctx.matchId, ctx);
+			matchPlayerNum = 0;
 
 			for (const auto& c : ctx.players)
 				std::cout << c.sessionId << " ";
@@ -58,6 +59,8 @@ namespace tomato
 
 		requests.try_emplace(client, mRequest);
 		pq.emplace(mRequest);
+
+		waitTime = 0.f;
 	}
 
 	void MatchManager::HandleCancel(const SessionId& client)
@@ -90,7 +93,26 @@ namespace tomato
 	bool MatchManager::CheckPopulation()
 	{
 		if (requests.size() >= MatchConstants::MAX_MATCH_PLAYER)
+		{
+			waitTime = 0.f;
+			matchPlayerNum = MatchConstants::MAX_MATCH_PLAYER;
+
 			return true;
+		}
+		return false;
+	}
+
+	bool MatchManager::CheckMatchTime(float dt)
+	{
+		waitTime += dt;
+		if (requests.size() > 0 && waitTime >= MatchConstants::MATCH_WAIT_TIME)
+		{
+			waitTime = 0.f;
+			matchPlayerNum = requests.size();
+
+			return true;
+		}
+
 		return false;
 	}
 
@@ -117,13 +139,14 @@ namespace tomato
 	{
 		ctx.matchId = nextMatchID_++;
 		ctx.state = MatchState::Init;
+		ctx.playerNum = matchPlayerNum;
 
 		MatchRequest out;
-		for (int i = 0; i < MatchConstants::MAX_MATCH_PLAYER; i++)
+		for (int i = 0; i < matchPlayerNum; i++)
 		{
 			if (GetMatchRequestFromPQ(out))
 			{
-				ctx.players[i] = out;
+				ctx.players.push_back(out);
 				requests.erase(out.sessionId);
 			}
 		}
@@ -157,7 +180,7 @@ namespace tomato
 					).count());
 				ServerTimeMs startServerTime = serverSteadyTime + MatchConstants::START_SERVER_TIME;
 
-				const MatchRequest* req = it->second.GetMatchRequest();
+				const std::vector<MatchRequest>& req = it->second.GetMatchRequest();
 
 				RawBuffer buf{};
 				tomato::NetBitWriter writer{ &buf };
@@ -168,9 +191,9 @@ namespace tomato
 
 				memcpy(buf.data(), &size, sizeof(uint16_t));
 
-				for (int i = 0; i < MatchConstants::MAX_MATCH_PLAYER; i++)
+				for (int i = 0; i < it->second.GetMatchPlayerNum(); i++)
 				{
-					auto sendCmd = std::make_unique<SendRequestCommand>((req + i)->sessionId, size);
+					auto sendCmd = std::make_unique<SendRequestCommand>(req[i].sessionId, size);
 					std::memcpy(sendCmd.get()->data.data(), buf.data(), size);
 
 					NetSendRequestQueue.Emplace(std::move(sendCmd));
@@ -199,21 +222,20 @@ namespace tomato
 		auto it = matches.find(matchId);
 		if (it != matches.end())
 		{
-			const MatchRequest* request = it->second.GetMatchRequest();
-
-			for (int i = 0; i < MatchConstants::MAX_MATCH_PLAYER; i++)
+			const std::vector<MatchRequest>& request = it->second.GetMatchRequest();
+			uint8_t playerNum = it->second.GetMatchPlayerNum();
+			for (int i = 0; i < playerNum; i++)
 			{
 				MatchRequest reRequest
 				{
-					.sessionId = (request + i)->sessionId,
-					.name = (request + i)->name,
-					.requestId = (request + i)->requestId,
-					.enqueueTime = static_cast<ServerTimeMs>(
-						duration_cast<std::chrono::milliseconds>(
-							std::chrono::steady_clock::now().time_since_epoch()
-						).count()
-					),
-					.retryCount = (request + i)->retryCount + 1,
+					.sessionId		= request[i].sessionId,
+					.name			= request[i].name,
+					.requestId		= request[i].requestId,
+					.enqueueTime	= static_cast<ServerTimeMs>(
+									duration_cast<std::chrono::milliseconds>(
+										std::chrono::steady_clock::now().time_since_epoch()
+									).count()),
+					.retryCount		= request[i].retryCount + 1,
 				};
 
 				if (reRequest.retryCount > 3)

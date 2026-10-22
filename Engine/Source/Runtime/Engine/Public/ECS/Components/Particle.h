@@ -88,7 +88,7 @@ namespace tomato
 
     struct ParticleAttachmentComponent
     {
-        UUID target{ 0 };
+        entt::entity target{ entt::null };
         AssetID particle;
     };
 }

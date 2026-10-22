@@ -8,6 +8,7 @@
 #include "ECS/Components/Visibility.h"
 #include "ECS/Components/ActiveTag.h"
 
+#include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Resource/AssetHash.h"
 
 namespace tomato
@@ -72,6 +73,11 @@ namespace tomato
                 registry.remove<ActiveTag>(child);
         }
     }
+
+	void OnSelectableComponentConstructed(entt::registry& registry, entt::entity e)
+	{
+		registry.ctx().get<UIContext>().selectableDirty = true;
+	}
 
 	void EntityNameGenerator::Initialize(entt::registry& reg)
 	{

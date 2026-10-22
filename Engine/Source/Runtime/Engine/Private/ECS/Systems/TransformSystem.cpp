@@ -103,11 +103,11 @@ namespace tomato
 
         for (auto [e, trf, runtime, target] : rootView.each())
         {
-            if (target.target == 0) continue;
-            if (!reg.valid(GetEntityByUUID(reg, target.target)))
+            if (target.target == entt::null) continue;
+            if (!reg.valid(target.target))
                 continue;
 
-            auto& targetTrf = reg.get<TransformComponent>(GetEntityByUUID(reg, target.target));
+            auto& targetTrf = reg.get<TransformComponent>(target.target);
 
             auto T = glm::translate(glm::mat4(1.f), trf.position);
             auto R = glm::toMat4(trf.rotation);

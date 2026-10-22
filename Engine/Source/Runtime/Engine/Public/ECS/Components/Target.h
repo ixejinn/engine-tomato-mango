@@ -8,7 +8,7 @@ namespace tomato
 {
 	struct TargetComponent
 	{
-		UUID target{ 0 };
+		entt::entity target{ entt::null };
 		glm::vec3 headOffset{ 0.f, 0.f, 0.f };
 	};
 }

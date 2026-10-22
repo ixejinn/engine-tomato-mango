@@ -74,11 +74,13 @@ namespace tomato
                     if (result->trigger)
                     {
                         COL_DETECT_LOG("      TRG ENTER " << candidate);
+
                         eventDispatcher.Enqueue(TriggerEnterEvent{candidate.a, candidate.b, &registry});
                     }
                     else
                     {
                         COL_DETECT_LOG("      COL ENTER " << candidate);
+
                         eventDispatcher.Enqueue(
                             CollisionEnterEvent{candidate.a, candidate.b, &registry, result.value()});
                         contacts_.push_back(ContactEvent{candidate.a, candidate.b, &registry, result.value()});
@@ -90,11 +92,13 @@ namespace tomato
                     if (result->trigger)
                     {
                         COL_DETECT_VERBOSE_LOG("      TRG STAY  " << candidate);
+
                         eventDispatcher.Enqueue(TriggerStayEvent{candidate.a, candidate.b, &registry});
                     }
                     else
                     {
                         COL_DETECT_VERBOSE_LOG("      COL STAY  " << candidate);
+
                         eventDispatcher.Enqueue(CollisionStayEvent{
                             candidate.a, candidate.b, &registry, result.value()
                         });
@@ -120,11 +124,13 @@ namespace tomato
                     if (col1->trigger || col2->trigger)
                     {
                         COL_DETECT_LOG("      TRG EXIT  " << it->first);
+
                         EventDispatcher::GetInstance().Enqueue(TriggerExitEvent{ it->first.a, it->first.b, &registry });
                     }
                     else
                     {
                         COL_DETECT_LOG("      COL EXIT  " << it->first);
+
                         EventDispatcher::GetInstance().Enqueue(CollisionExitEvent{ it->first.a, it->first.b, &registry });
                     }
                 }

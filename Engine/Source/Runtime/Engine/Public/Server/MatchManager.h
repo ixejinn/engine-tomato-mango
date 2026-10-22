@@ -26,6 +26,7 @@ namespace tomato
 		void HandleIntroResult(const SessionId&, MatchId& matchId, const int& set);
 
 		bool CheckPopulation();
+		bool CheckMatchTime(float dt);
 		bool GetMatchRequestFromPQ(MatchRequest& req);
 		bool CreateMatchContext(MatchContext& ctx);
 
@@ -52,6 +53,9 @@ namespace tomato
 		std::unordered_map<SessionId, MatchRequest> requests;
 		std::priority_queue<MatchRequest, std::vector<MatchRequest>, Compare> pq;
 		std::unordered_map<MatchId, Match> matches;
+
+		float waitTime{ 0.f };
+		uint8_t matchPlayerNum;
 	};
 }
 

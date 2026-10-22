@@ -11,6 +11,7 @@
 #include "PlayTest/TestState.h"
 #include "PlayTest/LoadState.h"
 #include "Game/GameState.h"
+#include "Game/LobbyState.h"
 #endif
 
 // #define TOMATO_GREENTEA

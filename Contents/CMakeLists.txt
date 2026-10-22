@@ -2,10 +2,10 @@
 		Source/PlayTest/TestState.h
 		Source/PlayTest/LoadState.h
 		Source/PlayTest/CollisionTestComponent.h
-        Source/MyState.h
 		Source/PlayTest/UIController.h
         Source/Game/WaveManager.h
 		Source/jung/WaveManagerFwd.h
+
 )
 
 set(CONTENTS_SOURCES
@@ -23,6 +23,7 @@ set(CONTENTS_SOURCES
         Source/Game/WaveManager.cpp
 		Source/Game/Wave/WaveEvent.h
 		Source/Game/Wave/WaveEventFwd.h
+        Source/Game/LobbyState.cpp
 )
 
 add_executable(contents

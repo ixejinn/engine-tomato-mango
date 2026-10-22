@@ -13,8 +13,8 @@ namespace tomato
 		void Update(SimContext& simCtx) override;
 
 	private:
-		void UpdateScreenUI(SimContext& simCtx);
-		void UpdateWorldUI(SimContext& simCtx);
+		void UpdateScreenUI(entt::registry&);
+		void UpdateWorldUI (entt::registry&);
 	};
 }
 #endif // !MANGO_UITRANSFORMSYSTEM_H

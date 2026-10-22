@@ -19,6 +19,7 @@ namespace tomato
     void OnVisibilityComponentUpdated(entt::registry& registry, entt::entity e);
     void OnPendingDestroyComponentConstructed(entt::registry& registry, entt::entity e);
     void OnActiveTagDestroyed(entt::registry& registry, entt::entity e);
+	void OnSelectableComponentConstructed(entt::registry& registry, entt::entity e);
 
 	class EntityNameGenerator
 	{
