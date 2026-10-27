@@ -39,8 +39,9 @@ namespace tomato
 		if (editorCtx.currentState->GetRegistry().all_of<NoInspector>(editorCtx.selectedEntity))
 			return;
 
-		ImGui::SetNextWindowPos(ImVec2(posX_, posY_), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
-		ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_FirstUseEver);
+		// ImGui::SetNextWindowPos(ImVec2(posX_, posY_), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
+		ImGui::SetNextWindowPos(ImVec2(posX_, posY_ + ImGui::GetFrameHeight()), ImGuiCond_Once, ImVec2(1.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_Once);
 		
 		if (ImGui::Begin("Inspector", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize))
 		{

@@ -68,8 +68,10 @@ namespace tomato
 		LoadResources();
 
 		eCtx.selectedEntity = entt::null;
-		panels.push_back(std::make_unique<HierarchyPanel>(400.f, 300.f, Window::GetWidth(), 320.f));
-		panels.push_back(std::make_unique<InspectorPanel>(300.f, 600.f, Window::GetWidth(), 900.f));
+		// panels.push_back(std::make_unique<HierarchyPanel>(400.f, 300.f, Window::GetWidth(), 320.f));
+		// panels.push_back(std::make_unique<InspectorPanel>(300.f, 600.f, Window::GetWidth(), 900.f));
+		panels.push_back(std::make_unique<HierarchyPanel>(300.f, 300.f, Window::GetWidth(), 0.f));
+		panels.push_back(std::make_unique<InspectorPanel>(300.f, 600.f, Window::GetWidth(), 300.f));
 	}
 
 	void Editor::ShutdownImGui(Input& input)
