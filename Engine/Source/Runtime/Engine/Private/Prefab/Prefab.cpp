@@ -134,7 +134,7 @@ namespace tomato::Prefab
         registry.get<ColliderComponent>(colGnd).type = ColliderType::Sphere;
         registry.get<RenderComponent>(colGnd).mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
 
-        registry.emplace<GroundTriggerTag>(colGnd);
+        //registry.emplace<GroundTriggerTag>(colGnd);
 
         auto& trfColGnd = registry.get<TransformComponent>(colGnd);
         trfColGnd.SetScale(Character::GROUND_TRIGGER_SCALE);

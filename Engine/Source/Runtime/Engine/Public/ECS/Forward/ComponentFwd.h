@@ -11,6 +11,7 @@ namespace tomato
 	struct MovementComponent;
 	struct VelocityComponent;
 	struct ColliderComponent;
+	struct PhysicsBodyComponent;
 	struct RenderComponent;
 
 	struct UIComponent;

@@ -38,6 +38,7 @@ void WavePoolTraits::Assemble(entt::registry& registry_, entt::entity wave)
     stencil.readRef = 1 << 0;
 
     registry_.emplace<EditorHidden>(wave);
+    registry_.emplace<NoSave>(wave);
 
     auto& waveCmp = registry_.emplace<WaveComponent>(wave, false, glm::vec3{ 0, -2.9f, 0 }, 10.f, 0.01f);
 }
