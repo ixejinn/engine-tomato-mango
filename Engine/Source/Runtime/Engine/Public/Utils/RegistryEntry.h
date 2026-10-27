@@ -37,15 +37,15 @@ namespace tomato
 }
 
 #define REGISTER_BUILT_IN_SYSTEM(PHASE, MODE, CLASS)\
-namespace { static tomato::RegistryEntry CLASS##Entry{PHASE, MODE, []() { return std::make_unique<tomato::CLASS>(); }}; }
+namespace { tomato::RegistryEntry CLASS##Entry{PHASE, MODE, []() { return std::make_unique<tomato::CLASS>(); }}; }
 
 #define REGISTER_SYSTEM(PHASE, MODE, CLASS)\
-namespace { static tomato::RegistryEntry CLASS##Entry{PHASE, MODE, []() { return std::make_unique<CLASS>(); }}; }
+namespace { tomato::RegistryEntry CLASS##Entry{PHASE, MODE, []() { return std::make_unique<CLASS>(); }}; }
 
 #define REGISTER_BUILT_IN_STATE(CLASS) \
-namespace { static tomato::RegistryEntry CLASS##Entry{std::type_index(typeid(tomato::CLASS)), "tomato::"#CLASS, [](tomato::Engine& engine) { return std::make_unique<tomato::CLASS>(engine); }}; }
+namespace { tomato::RegistryEntry CLASS##Entry{std::type_index(typeid(tomato::CLASS)), "tomato::"#CLASS, [](tomato::Engine& engine) { return std::make_unique<tomato::CLASS>(engine); }}; }
 
 #define REGISTER_STATE(CLASS) \
-namespace { static tomato::RegistryEntry CLASS##Entry{std::type_index(typeid(CLASS)), #CLASS, [](tomato::Engine& engine) { return std::make_unique<CLASS>(engine); }}; }
+namespace { tomato::RegistryEntry CLASS##Entry{std::type_index(typeid(CLASS)), #CLASS, [](tomato::Engine& engine) { return std::make_unique<CLASS>(engine); }}; }
 
 #endif //MANGO_REGISTRYENTRY_H

@@ -83,6 +83,7 @@ namespace tomato::Prefab
     {
         const entt::entity obj = CreateStaticMesh(registry, active, name);
 
+        registry.emplace<VelocityComponent>(obj);
         registry.emplace<PhysicsBodyComponent>(obj);
 
         const entt::entity col = AttachColliderEntity(registry, obj, true, trigger);
@@ -90,8 +91,8 @@ namespace tomato::Prefab
         if (printInfo)
         {
             TMT_INFO << "[WorldObject] " << std::left << std::setw(12) << name << "\n"
-                     << "              entity   ID: " << std::right << std::setw(4) << (int)obj << "\n"
-                     << "              collider ID: " << std::right << std::setw(4) << (int)col;
+                     << "              entity   ID: " << std::right << std::setw(4) << entt::to_integral(obj) << "\n"
+                     << "              collider ID: " << std::right << std::setw(4) << entt::to_integral(col);
         }
         return obj;
     }
@@ -117,22 +118,25 @@ namespace tomato::Prefab
         const std::string& name,
         bool printInfo)
     {
+        constexpr auto sphereID = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+
         const entt::entity obj = CreateWorldObject(registry, active, false, false, name);
 
-        registry.emplace<VelocityComponent>(obj);
         registry.emplace<FrictionComponent>(obj);
         registry.emplace<InputChannelComponent>(obj);
         registry.emplace<MovementComponent>(obj);
         registry.emplace<CharacterTag>(obj);
         registry.emplace<RollbackEntityTag>(obj);
 
+        registry.get<RenderComponent>(obj).mesh = sphereID;
+
         const entt::entity colObj = registry.get<HierarchyComponent>(obj).children[0];
         registry.get<ColliderComponent>(colObj).type = ColliderType::Sphere;
-        registry.get<RenderComponent>(colObj).mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+        registry.get<RenderComponent>(colObj).mesh = sphereID;
 
         const entt::entity colGnd = AttachColliderEntity(registry, colObj, true, true, "Ground trigger");
         registry.get<ColliderComponent>(colGnd).type = ColliderType::Sphere;
-        registry.get<RenderComponent>(colGnd).mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
+        registry.get<RenderComponent>(colGnd).mesh = sphereID;
 
         registry.emplace<GroundTriggerTag>(colGnd);
 
@@ -142,9 +146,9 @@ namespace tomato::Prefab
         if (printInfo)
         {
          TMT_INFO << "[ Character ] " << std::left << std::setw(12) << name << "\n"
-                 << "              entity   ID: " << std::right << std::setw(4) << (int)obj << "\n"
-                 << "              collider ID: " << std::right << std::setw(4) << (int)colObj << "\n"
-                 << "              trigger  ID: " << std::right << std::setw(4) << (int)colGnd;
+                 << "              entity   ID: " << std::right << std::setw(4) << entt::to_integral(obj) << "\n"
+                 << "              collider ID: " << std::right << std::setw(4) << entt::to_integral(colObj) << "\n"
+                 << "              trigger  ID: " << std::right << std::setw(4) << entt::to_integral(colGnd);
         }
         return obj;
     }

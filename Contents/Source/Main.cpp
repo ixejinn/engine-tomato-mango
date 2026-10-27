@@ -10,11 +10,13 @@
 #include "Resource/PathManager.h"
 #include "PlayTest/TestState.h"
 #include "PlayTest/LoadState.h"
+#include "PlayTest/ExampleState.h"
+#include "PlayTest/RenderTestState.h"
 #include "Game/GameState.h"
 #include "Game/LobbyState.h"
 #endif
 
-// #define TOMATO_GREENTEA
+#define TOMATO_GREENTEA
 
 using namespace tomato;
 
@@ -25,10 +27,10 @@ int main() {
 
 #else //TOMATO_SERVER
     PathManager::SetProjectRoot(TMT_PROJECT_ROOT);
-    Engine engine(1600, 900, "TOMATO", NetMode::NM_Alone);
+    Engine engine(1920, 1080, "TOMATO", NetMode::NM_Alone);
 
 #if defined(TOMATO_GREENTEA)
-    engine.SetNextState(std::make_unique<TestState>(engine));
+    engine.SetNextState(std::make_unique<ExampleState>(engine));
 
 #else //TOMATO_GREENTEA
     engine.SetNextState(std::make_unique<GameState>(engine));

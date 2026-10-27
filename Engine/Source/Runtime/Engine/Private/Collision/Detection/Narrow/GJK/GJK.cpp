@@ -67,17 +67,17 @@ namespace tomato
         return true;
     }
 
-    std::optional<ContactData> GJK::Sweep(const ShapeView& a, const ShapeView& b, const glm::vec3& ray)
+    std::optional<ContactData> GJK::Sweep(const ShapeView& a, const ShapeView& b, const glm::vec3& ray, bool reversed)
     {
         if (auto distanceRes = Distance(a, b))
         {
-            if (!IsReliableContact(distanceRes.value()))
-                return ContactData{distanceRes->normal, distanceRes->distance};
+            if (IsTouching(distanceRes.value()))
+                return ContactData{(reversed ? -1.0f : 1.0f) * distanceRes->normal, distanceRes->distance};
 
             if (ray == glm::vec3{0})   // GJK-raycast only targets moving objects
                 return std::nullopt;
 
-            return Raycast(a, b, ray);
+            return Raycast(a, b, ray, reversed);
         }
 
         return std::nullopt;
@@ -164,7 +164,7 @@ namespace tomato
         return RunEPA(simplex, colA, trfA, colB, trfB);
     }
 
-    std::optional<ContactData> GJK::Raycast(const ShapeView& a, const ShapeView& b, const glm::vec3& ray)
+    std::optional<ContactData> GJK::Raycast(const ShapeView& a, const ShapeView& b, const glm::vec3& ray, bool reversed)
     {
         COL_DETECT_VERBOSE_LOG("===== GJK raycast " << pair);
 
@@ -237,20 +237,20 @@ namespace tomato
         if (hitFraction > 0 && hitFraction <= 1)
         {
             hitNormal = glm::normalize(hitNormal);
-            return ContactData{hitNormal, hitFraction, 0.f};
+            return ContactData{(reversed ? -1.0f : 1.0f) * hitNormal, hitFraction, 0.f};
         }
 
         return std::nullopt;
     }
 
-    bool GJK::IsReliableContact(const DistanceResult& result)
+    bool GJK::IsTouching(const DistanceResult& result)
     {
         // EPA
         if (result.distance < 0)
-            return false;
+            return true;
 
         // Scale-dependent termination may produce unreliable results at close distances
-        return result.distance * result.distance > SAFETY_COEF_SQ * RELATIVE_TOLERANCE_SQ * result.maxDistSq;
+        return result.distance * result.distance <= SAFETY_COEF_SQ * RELATIVE_TOLERANCE_SQ * result.maxDistSq;
     }
 
     glm::vec3 GJK::Support(

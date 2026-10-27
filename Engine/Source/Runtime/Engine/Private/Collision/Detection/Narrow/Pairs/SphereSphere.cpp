@@ -13,7 +13,7 @@ namespace tomato::SphereSphere
         return glm::length2(d) <= r * r;
     }
 
-    std::optional<ContactData> Sweep(const ShapeView& sphereA, const ShapeView& sphereB, const glm::vec3& ray)
+    std::optional<ContactData> Sweep(const ShapeView& sphereA, const ShapeView& sphereB, const glm::vec3& ray, bool reversed)
     {
         // 두 구의 CSO는 중심이 d, 반지름이 r인 구
         const glm::vec3 d = sphereA.trf.GetWorldPosition() - sphereB.trf.GetWorldPosition();

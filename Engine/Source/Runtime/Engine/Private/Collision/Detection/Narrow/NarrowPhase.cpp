@@ -64,7 +64,7 @@ namespace tomato
     {
         const auto& entry = sweep_[a.col.type][b.col.type];
         if (!entry.fn)
-            return GJK::Sweep(a, b, ray);
-        return entry.reversed ? entry.fn(b, a, ray) : entry.fn(a, b, ray);
+            return GJK::Sweep(a, b, ray, entry.reversed);
+        return entry.reversed ? entry.fn(b, a, -ray, true) : entry.fn(a, b, ray, false);
     }
 }

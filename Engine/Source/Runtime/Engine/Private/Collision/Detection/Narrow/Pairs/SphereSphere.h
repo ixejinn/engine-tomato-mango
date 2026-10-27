@@ -8,7 +8,7 @@ namespace tomato::SphereSphere
 {
     bool Overlap(const ShapeView& a, const ShapeView& b);
 
-    std::optional<ContactData> Sweep(const ShapeView& sphereA, const ShapeView& sphereB, const glm::vec3& ray);
+    std::optional<ContactData> Sweep(const ShapeView& sphereA, const ShapeView& sphereB, const glm::vec3& ray, bool reversed = false);
 }
 
 #endif //MANGO_SPHERESPHERE_H

@@ -96,7 +96,7 @@ namespace tomato
 
 	void Editor::Draw(uint64_t tick, State* state, RunMode& mode)
 	{
-		ImGui::ShowDemoWindow();
+		// ImGui::ShowDemoWindow();
         eCtx.tick = tick;
 		if (eCtx.currentState != state)
 		{

@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <algorithm>
+#include <bit>
 
 namespace tomato
 {
@@ -21,14 +22,22 @@ namespace tomato
 
     constexpr uint64_t GetOpaqueSortKey(RenderPriority p, uint16_t shader, uint16_t tex, uint16_t mesh) noexcept
     {
-        return (static_cast<uint64_t>(p) << 56) | (static_cast<uint64_t>(shader) << 40) | (static_cast<uint64_t>(tex) << 24) | (static_cast<uint64_t>(mesh) << 8);
+        return (static_cast<uint64_t>(p) << 56)
+             | (static_cast<uint64_t>(shader) << 40)
+             | (static_cast<uint64_t>(tex) << 24)
+             | (static_cast<uint64_t>(mesh) << 8);
     }
 
     constexpr uint64_t GetTransparentSortKey(RenderPriority p, float distSq, uint16_t shader) noexcept
     {
-        uint32_t distSqBits = static_cast<uint32_t>(std::max(distSq, 0.f));
+        uint32_t distSqBits = std::bit_cast<uint32_t>(std::max(distSq, 0.f));
+
+        if (p == RenderPriority::Transparent)
+            distSqBits = ~distSqBits;
         // 렌더 정렬은 오름차순이므로 distSq의 비트를 뒤집어 거리가 멀수록 앞 순서가 되도록
-        return (static_cast<uint64_t>(p) << 56) | (static_cast<uint64_t>(~distSqBits) << 24) | (static_cast<uint64_t>(shader) << 8);
+        return (static_cast<uint64_t>(p) << 56)
+             | (static_cast<uint64_t>(~distSqBits) << 24)
+             | (static_cast<uint64_t>(shader) << 8);
     }
 
     constexpr RenderPriority GetPriority(uint64_t sortKey) noexcept

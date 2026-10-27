@@ -18,7 +18,7 @@ namespace tomato
         GJK() = delete;
 
         static bool Overlap(const ShapeView& a, const ShapeView& b);
-        static std::optional<ContactData> Sweep(const ShapeView& a, const ShapeView& b, const glm::vec3& ray);
+        static std::optional<ContactData> Sweep(const ShapeView& a, const ShapeView& b, const glm::vec3& ray, bool reversed);
 
         // for EPA
         static glm::vec3 GetSupportPoint(
@@ -28,9 +28,9 @@ namespace tomato
 
     private:
         static std::optional<DistanceResult> Distance(const ShapeView& a, const ShapeView& b);
-        static std::optional<ContactData>    Raycast(const ShapeView& a, const ShapeView& b, const glm::vec3& ray);
+        static std::optional<ContactData>    Raycast(const ShapeView& a, const ShapeView& b, const glm::vec3& ray, bool reversed);
 
-        static bool IsReliableContact(const DistanceResult& result);
+        static bool IsTouching(const DistanceResult& result);
 
         static glm::vec3 Support(
             const glm::vec3& worldDir,

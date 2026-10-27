@@ -10,15 +10,15 @@ namespace tomato
         glm::vec3 velocity;
         glm::vec3 input;
 
-        float horizontalSpeed{2.0f};
-        float acceleration{10.0f};
+        float horizontalSpeed{3.0f};
+        float acceleration{20.0f};
 
         glm::vec3 Get() const { return velocity + input; }
     };
 
     struct FrictionComponent
     {
-        float groundFriction{10.0f};
+        float groundFriction{5.0f};
         float airDrag{0.5f};
     };
 

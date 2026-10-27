@@ -24,6 +24,10 @@ set(CONTENTS_SOURCES
 		Source/Game/Wave/WaveEvent.h
 		Source/Game/Wave/WaveEventFwd.h
         Source/Game/LobbyState.cpp
+		Source/PlayTest/ExampleState.cpp
+		Source/PlayTest/ExampleState.h
+		Source/PlayTest/RenderTestState.h
+		Source/PlayTest/RenderTestState.cpp
 )
 
 add_executable(contents

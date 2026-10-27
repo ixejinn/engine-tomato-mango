@@ -12,7 +12,7 @@
 namespace tomato
 {
     using OverlapFn = bool (*)(const ShapeView& a, const ShapeView& b); // for trigger
-    using SweepFn   = std::optional<ContactData> (*)(const ShapeView& a, const ShapeView& b, const glm::vec3& ray);
+    using SweepFn   = std::optional<ContactData> (*)(const ShapeView& a, const ShapeView& b, const glm::vec3& ray, bool reversed);
 
     class NarrowPhase
     {

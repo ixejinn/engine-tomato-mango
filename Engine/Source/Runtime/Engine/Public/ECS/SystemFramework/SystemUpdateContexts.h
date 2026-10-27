@@ -9,6 +9,8 @@
 #include "Collision/CollisionFwd.h"
 #include "Collision/CollisionCache.h"
 #include "Render/GLStateCache.h"
+#include "ECS/SystemFramework/SystemConstants.h"
+#include "EngineConfig.h"
 
 namespace tomato
 {
@@ -33,6 +35,12 @@ namespace tomato
         entt::entity playerCam{entt::null};
 
         GLStateCache glState;
+
+#ifdef TOMATO_ENGINE
+        RunMode runMode{RunMode::Editor};
+#else
+        RunMode runMode{RunMode::Game};
+#endif
     };
 
     struct UIContext

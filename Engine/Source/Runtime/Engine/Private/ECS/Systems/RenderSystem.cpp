@@ -99,10 +99,14 @@ namespace tomato
 
                     gl.Apply(state);
 
-                    if (!registry.all_of<RootEntityTag>(drawItem.entity))
-                        mesh->Draw(true);
-                    else
+                    if (registry.all_of<RootEntityTag>(drawItem.entity))
                         mesh->Draw();
+#ifndef TOMATO_DEBUG
+                    else if (renderCtx.runMode == RunMode::Editor)
+#else
+                    else
+#endif
+                        mesh->Draw(true);
                 }
                     break;
 

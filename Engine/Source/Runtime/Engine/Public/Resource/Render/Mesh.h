@@ -110,10 +110,10 @@ namespace tomato
 
         static void Sphere(
                 std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
-                int sectorCnt = 8, int stackCnt = 6);
+                int sectorCnt = 20, int stackCnt = 10);
         static void Capsule(
                 std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
-                int sectorCnt = 8, int stackCnt = 7);
+                int sectorCnt = 20, int stackCnt = 10);
 
         static void Cylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int sectorCnt = 10);
         static void OpenCylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int sectorCnt = 10);
