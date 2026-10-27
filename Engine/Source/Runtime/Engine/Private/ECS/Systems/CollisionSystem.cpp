@@ -42,13 +42,13 @@ namespace tomato
         CPU_PROFILER_BLOCK_END(CollisionSystem::Update);
     }
 
-    void CollisionSystem::RunBroadPhase(SimContext& simCtx)
+    void CollisionSystem::RunBroadPhase(const SimContext& simCtx)
     {
         candidates_.clear();
         broad_.FindContactPairCandidates(simCtx.state->GetRegistry(), candidates_);
     }
 
-    void CollisionSystem::RunNarrowPhase(SimContext& simCtx)
+    void CollisionSystem::RunNarrowPhase(const SimContext& simCtx)
     {
         contacts_.clear();
 
@@ -151,9 +151,9 @@ namespace tomato
             ResolveContact(contact);
     }
 
-    void CollisionSystem::ResolveContact(ContactEvent& event)
+    void CollisionSystem::ResolveContact(const ContactEvent& event)
     {
-        COL_RESOLVE_LOG("===== SOLVE COLLISION " << (int)event.a << " " << (int)event.b);
+        COL_RESOLVE_LOG("===== SOLVE COLLISION " << entt::to_integral(event.a) << " " << entt::to_integral(event.b));
 
         auto& reg = *(event.reg);
         entt::entity rootA = GetRootEntity(reg, event.a);

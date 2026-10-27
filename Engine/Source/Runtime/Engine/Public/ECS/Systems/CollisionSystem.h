@@ -22,8 +22,8 @@ namespace tomato
     private:
         static constexpr int EXIT_CNT = 2;
 
-        void RunBroadPhase(SimContext& simCtx);
-        void RunNarrowPhase(SimContext& simCtx);
+        void RunBroadPhase(const SimContext& simCtx);
+        void RunNarrowPhase(const SimContext& simCtx);
         BroadPhase broad_;
         NarrowPhase narrow_;
 
@@ -31,7 +31,7 @@ namespace tomato
 
         void ResolveContacts();
         std::vector<ContactEvent> contacts_;
-        static void ResolveContact(ContactEvent& event);
+        static void ResolveContact(const ContactEvent& event);
 
         static void ResolveContinuousContact(
             TransformComponent& trf, VelocityComponent& vel,

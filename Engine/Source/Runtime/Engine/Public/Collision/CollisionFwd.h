@@ -10,7 +10,7 @@ namespace tomato
     using ContactPair = UnorderedPair<entt::entity>;
     inline std::ostream& operator<<(std::ostream& os, const ContactPair& pair)
     {
-        os << (int)pair.a << " " << (int)pair.b;
+        os << entt::to_integral(pair.a) << " " << entt::to_integral(pair.b);
         return os;
     }
 
