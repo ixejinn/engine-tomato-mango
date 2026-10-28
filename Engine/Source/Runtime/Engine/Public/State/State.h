@@ -26,8 +26,7 @@ namespace tomato
         virtual void Update() = 0;
         virtual void Exit() = 0;
 
-        void SetNextState(std::unique_ptr<State>&&);
-        std::unique_ptr<State> GetStateByID(AssetID);
+        static State* SetNextState(State* cur, AssetID newStateID);
 
         entt::registry& GetRegistry() { return registry_; }
         std::unordered_map<UUID, entt::entity>& GetEntityMap() { return entityMap_; }
@@ -40,13 +39,13 @@ namespace tomato
         void SetPlayerInput(uint32_t tick, IntentState input, int playerID);
 
     protected:
-        PassKey<State> key_;
-
         Engine& engine_;
-        entt::registry registry_;
-        std::unordered_map<UUID, entt::entity> entityMap_;
 
+        entt::registry registry_;
+        std::unordered_map<UUID, entt::entity> entityMap_;      ////
         PlayerInputTimelines playerInputs_;
+
+        PassKey<State> key_;
     };
 }
 

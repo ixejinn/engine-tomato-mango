@@ -13,6 +13,7 @@
 #include "GameNetwork/Rollback/RollbackManager.h"
 #include "Collision/Layer/CollisionLayerMatrix.h"
 #include "Simulation/Tick/TickFwd.h"
+#include "Utils/PassKey.h"
 #include "Editor.h"
 
 namespace tomato
@@ -24,12 +25,11 @@ namespace tomato
         ~Engine();
 
         void SetNextState(std::unique_ptr<State>&& newState);
-        void TryStartGame(std::unique_ptr<State>&& newState);
+        State* GetNextState(PassKey<State>) { return nextState_.get(); }
 
         void Run();
 
         Window& GetWindow() { return window_;}
-        IntentTranslator& GetInputRecorder() { return intentTranslator_; }
 
         template<typename Component>
         void SetRollbackComponent() {
@@ -43,6 +43,7 @@ namespace tomato
         }
 
         void RequestMatchToServer();
+        void TryStartGame(std::unique_ptr<State>&& newState);
 
         CollisionLayerMatrix collisionLayerMtx_;
 
@@ -57,6 +58,7 @@ namespace tomato
         void ChangeState(TickClock& tc);
         std::unique_ptr<State> currState_{nullptr};
         std::unique_ptr<State> nextState_{nullptr};
+        bool setObjs_{false};
 
         Editor editor_;
 
@@ -73,9 +75,7 @@ namespace tomato
         void FixedUpdate(TickClock& tc, SimContext& simCtx, RunMode mode);
         void Update(SimContext& simCtx, RunMode mode);
         void UpdateEditor(uint64_t tick, RunMode& mode);
-
         SystemManager systemManager_;
-
         bool isRunning_{true};
 
         void InitializeInputCallbacks();

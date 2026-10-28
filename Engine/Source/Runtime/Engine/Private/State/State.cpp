@@ -38,14 +38,6 @@ namespace tomato
         editCam = Prefab::CreateCamera(registry_, true, false, "Edit Camera");
         registry_.emplace<EditorHidden>(editCam);
 
-        // Create player camera
-        entt::entity& playerCam = renderCtx.playerCam;
-        playerCam = Prefab::CreateCamera(registry_, true, true,
-            "Camera",
-            glm::vec3(0.f, 4.f, 10.f),
-            glm::vec3(-30.f, 0.f, 0.f)
-        );
-
         // Skybox
         Prefab::CreateSkybox(registry_);
 
@@ -57,14 +49,10 @@ namespace tomato
         collisionCtx.layerMtx = &engine.collisionLayerMtx_;
     }
 
-    void State::SetNextState(std::unique_ptr<State>&& newState)
+    State* State::SetNextState(State* curr, AssetID newStateID)
     {
-        engine_.SetNextState(std::move(newState));
-    }
-
-    std::unique_ptr<State> State::GetStateByID(AssetID stateID)
-    {
-        return StateRegistry::GetInstance().GetStateFactory(stateID)(engine_);
+        curr->engine_.SetNextState(StateRegistry::GetInstance().GetStateFactory(newStateID)(curr->engine_));
+        return curr->engine_.GetNextState(curr->key_);
     }
 
     Window& State::GetWindow()

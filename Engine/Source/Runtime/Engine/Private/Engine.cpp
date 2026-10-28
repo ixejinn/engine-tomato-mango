@@ -182,18 +182,16 @@ namespace tomato {
 
     void Engine::UpdateEditor(uint64_t tick, RunMode& mode)
     {
-        RunMode before = mode;
-
         editor_.BeginFrame();
         editor_.Draw(tick, currState_.get(), mode);
         editor_.EndFrame();
 
         // GL 상태 값 초기화
-        if(currState_)
-            currState_.get()->GetRegistry().ctx().get<RenderContext>().glState.Invalidate();
+        auto& renderCtx = currState_->GetRegistry().ctx().get<RenderContext>();
+        if (currState_)
+            renderCtx.glState.Invalidate();
 
-        if (before != mode)
-            currState_.get()->GetRegistry().ctx().get<RenderContext>().runMode = mode;
+        renderCtx.runMode = mode;
     }
 
     void Engine::ChangeState(TickClock& tc)

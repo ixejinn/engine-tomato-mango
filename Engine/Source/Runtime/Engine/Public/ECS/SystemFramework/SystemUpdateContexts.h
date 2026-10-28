@@ -32,7 +32,6 @@ namespace tomato
     {
         entt::entity mainCam{entt::null};
         entt::entity editorCam{entt::null};
-        entt::entity playerCam{entt::null};
 
         GLStateCache glState;
 
