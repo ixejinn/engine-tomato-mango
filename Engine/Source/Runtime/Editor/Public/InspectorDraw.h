@@ -17,6 +17,7 @@ namespace tomato
 	bool DrawVelocityInspector(EditorContext&, entt::registry&, VelocityComponent&);
 	bool DrawColliderInspector(EditorContext&, entt::registry&, ColliderComponent&);
 	bool DrawRenderInspector(EditorContext&, entt::registry&, RenderComponent&);
+	bool DrawHierarchyInspector(EditorContext&, entt::registry&, HierarchyComponent&);
 	bool DrawUIInspector(EditorContext&, entt::registry&, UIComponent&);
 	bool DrawCanvasInspector(EditorContext&, entt::registry&, CanvasComponent&);
 	bool DrawRectTransformInspector(EditorContext&, entt::registry&, RectTransformComponent&);

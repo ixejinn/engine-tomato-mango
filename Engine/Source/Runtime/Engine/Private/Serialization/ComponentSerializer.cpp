@@ -23,6 +23,7 @@
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Components/Collision.h"
+#include "ECS/Components/PhysicsBody.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
@@ -322,6 +323,9 @@ namespace tomato::Serialization
 		json components = json::object();
 		for (auto& info : componentInfo)
 		{
+			if (!info.serializable)
+				continue;
+
 			if (!info.Has(reg, entity))
 				continue;
 
@@ -492,6 +496,15 @@ namespace tomato::Serialization
 		collider.trigger = data["trigger"];
 	}
 
+	void Save(json& data, entt::registry& registry, const PhysicsBodyComponent& physics)
+	{
+		data["inverse"] = physics.inverseMass;
+	}
+
+	void Load(const json& data, entt::registry& registry, PhysicsBodyComponent& physics)
+	{
+		physics.inverseMass = data["inverse"];
+	}
 	
 	void Save(json& data, entt::registry& registry, const UIComponent& ui)
 	{
@@ -663,6 +676,7 @@ namespace tomato::Serialization
 
 	void Save(json& data, entt::registry& registry, const HierarchyComponent& hierarchy)
 	{
+		data["root"] = GetUUID(registry, hierarchy.root);
 		data["parent"] = GetUUID(registry, hierarchy.parent);
 
 		data["children"] = nlohmann::json::array();
@@ -674,6 +688,7 @@ namespace tomato::Serialization
 	{
 		hierarchy.children.clear();
 
+		hierarchy.root = GetEntityByUUID(registry, data["root"]);
 		hierarchy.parent = GetEntityByUUID(registry, data["parent"]);
 
 		for (const auto& child : data["children"])

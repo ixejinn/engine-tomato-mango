@@ -71,6 +71,8 @@ namespace tomato::Serialization
 	};
 #undef TMT_COMPONENT_FLAGS_LIST
 
+	using SaveFunc = std::function<void(json&, entt::registry&, entt::entity)>;
+	using LoadFunc = std::function<void(const json&, entt::registry&, entt::entity)>;
 	struct ComponentSerializationInfo
 	{
 		void (*Save)(json&, entt::registry&, entt::entity);
@@ -88,6 +90,8 @@ namespace tomato::Serialization
 	struct ComponentInfo
 	{
 		std::string name;
+
+		bool serializable = false;
 
 		ComponentCategory category;
 		ComponentFlags flags;
