@@ -30,7 +30,6 @@ namespace tomato {
         editor_.InitImGui(window_.GetHandle(), input_);
 
         Serialization::ComponentRegistry::GetInstance().Init();
-        Serialization::ComponentRegistry::GetInstance().InitInspector();
     }
 
     Engine::~Engine()

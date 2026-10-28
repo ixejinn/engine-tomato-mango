@@ -26,6 +26,16 @@ namespace tomato::Serialization
 		if (initialized)
 			return;
 
+		RegisterBuiltInComponents();
+		RegisterBuiltInComponentsInspector();
+
+		initialized = true;
+	}
+
+	// Register built-in engine components explicitly during Engine initialization.
+	// Register custom components statically using a macro in each component's .cpp file.
+	void ComponentRegistry::RegisterBuiltInComponents()
+	{
 		RegisterComponent<VisibilityComponent>("Visibility", ComponentCategory::Common,
 			ComponentFlags::Hidden | ComponentFlags::ReadOnly | ComponentFlags::Essential);
 		RegisterComponent<CameraComponent>("Camera", ComponentCategory::Common);
@@ -54,14 +64,11 @@ namespace tomato::Serialization
 		RegisterComponent<CharacterTag>("TagCharacter", ComponentCategory::Tag, ComponentFlags::Hidden);
 		RegisterComponent<EditorHidden>("TagEditorHidden", ComponentCategory::Tag, ComponentFlags::Hidden);
 		RegisterComponent<NoInspector>("TagNoInspector", ComponentCategory::Tag, ComponentFlags::Hidden);
-		
-
-		initialized = true;
 	}
 
-	void ComponentRegistry::InitInspector()
+	void ComponentRegistry::RegisterBuiltInComponentsInspector()
 	{
-		//@Warning : Must initialize ComponentRegistry::Init() first.
+		//@Warning : Must initialize ComponentRegistry::RegisterBuiltInComponents() first.
 
 		RegisterInspector<CameraComponent>("Camera", DrawCameraInspcetor);
 		RegisterInspector<InputChannelComponent>("InputChannel", DrawInputChannelInspcetor);

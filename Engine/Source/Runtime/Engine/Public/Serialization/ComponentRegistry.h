@@ -30,7 +30,8 @@ namespace tomato::Serialization
 		}
 
 		void Init();
-		void InitInspector();
+		void RegisterBuiltInComponents();
+		void RegisterBuiltInComponentsInspector();
 
 		template<typename T>
 		void RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags = (ComponentFlags)0, bool serializable = true);

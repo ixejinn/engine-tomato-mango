@@ -16,7 +16,7 @@
 #include "Game/LobbyState.h"
 #endif
 
-#define TOMATO_GREENTEA
+//#define TOMATO_GREENTEA
 
 using namespace tomato;
 
@@ -33,7 +33,7 @@ int main() {
     engine.SetNextState(std::make_unique<ExampleState>(engine));
 
 #else //TOMATO_GREENTEA
-    engine.SetNextState(std::make_unique<GameState>(engine));
+    engine.SetNextState(std::make_unique<LobbyState>(engine));
 
 #endif //TOMATO_GREENTEA
     engine.Run();
