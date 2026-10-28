@@ -334,6 +334,24 @@ namespace tomato
 		return changed;
 	}
 
+	bool DrawHierarchyInspector(EditorContext& eCtx, entt::registry& reg, HierarchyComponent& hier)
+	{
+		ImGui::SeparatorText("root");
+		ImGui::Text(std::to_string(entt::to_integral(hier.root)).c_str());
+		
+		ImGui::SeparatorText("parent");
+		if(hier.parent == entt::null)
+			ImGui::Text("entt::null");
+		else
+			ImGui::Text(std::to_string(entt::to_integral(hier.parent)).c_str());
+
+		ImGui::SeparatorText("children");
+		for (auto child : hier.children)
+			ImGui::Text(std::to_string(entt::to_integral(child)).c_str());
+
+		return true;
+	}
+
 	bool DrawUIInspector(EditorContext& eCtx, entt::registry& reg, UIComponent& ui)
 	{
 		bool changed = false;

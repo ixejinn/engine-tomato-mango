@@ -4,7 +4,6 @@
 #include <string>
 
 #include "ComponentRegistry.h"
-
 namespace tomato::Serialization
 {
 	template<typename T>
@@ -13,9 +12,10 @@ namespace tomato::Serialization
 		ComponentRegistryEntry(
 			const std::string& name,
 			ComponentCategory category,
-			ComponentFlags flags)
+			ComponentFlags flags,
+			bool serializable)
 		{
-			ComponentRegistry::GetInstance().RegisterComponent<T>(name, category, flags);
+			ComponentRegistry::GetInstance().RegisterComponent<T>(name, category, flags, serializable);
 		}
 
 		ComponentRegistryEntry(
@@ -30,6 +30,15 @@ namespace tomato::Serialization
 		}
 	};
 }
+#define REGISTER_COMPONENT(TYPE, NAME, CATEGORY, FLAGS, SERIALIZABLE)\
+namespace { tomato::Serialization::ComponentRegistryEntry<TYPE> ComponentRegistryEntry{\
+			NAME, CATEGORY, FLAGS, SERIALIZABLE \
+		};\
+}
 
-//#define REGISTER_COMPONENT()
+#define REGISTER_SERIALIZABLE_COMPONENT(TYPE, NAME, CATEGORY, FLAGS, SAVE, LOAD)\
+namespace { tomato::Serialization::ComponentRegistryEntry<TYPE> ComponentRegistryEntry{\
+			NAME, CATEGORY, FLAGS, true, SAVE, LOAD \
+		};\
+}
 #endif // !MANGO_COMPONENTREGISTRYENTRY_H

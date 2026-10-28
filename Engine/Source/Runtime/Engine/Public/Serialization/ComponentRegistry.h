@@ -36,7 +36,7 @@ namespace tomato::Serialization
 		void RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags = (ComponentFlags)0, bool serializable = true);
 
 		template<typename T>
-		void RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags, bool serializable, SaveFunc save, LoadFunc load);
+		void RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags, SaveFunc save, LoadFunc load);
 
 		template<typename T>
 		void RegisterInspector(const std::string& name, bool (*draw)(EditorContext&, entt::registry&, T&));
@@ -132,7 +132,7 @@ namespace tomato::Serialization
 						T component;
 
 						Serialization::Load(j, reg, component);
-						reg.emplace<T>(e, std::move(component));
+						reg.emplace_or_replace<T>(e, std::move(component));
 					};
 			}
 		}
@@ -143,7 +143,7 @@ namespace tomato::Serialization
 	}
 
 	template<typename T>
-	void tomato::Serialization::ComponentRegistry::RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags, bool serializable, SaveFunc save, LoadFunc load)
+	void tomato::Serialization::ComponentRegistry::RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags, SaveFunc save, LoadFunc load)
 	{
 		const std::type_index type = typeid(T);
 		if (HasComponentType<T>())
@@ -163,7 +163,7 @@ namespace tomato::Serialization
 		info.name = name;
 		info.category = category;
 		info.flags = flags;
-		info.serializable = serializable;
+		info.serializable = true;
 
 		info.Has =
 			[](entt::registry& reg, entt::entity e)
@@ -183,12 +183,9 @@ namespace tomato::Serialization
 				if (reg.any_of<T>(e))
 					reg.remove<T>(e);
 			};
-
-		if (serializable)
-		{
-			info.serialization.Save = save;
-			info.serialization.Load = load;
-		}
+		
+		info.serialization.Save = save;
+		info.serialization.Load = load;
 
 		nameToIndex_[name] = componentInfo_.size();
 		typeToIndex_[type] = componentInfo_.size();

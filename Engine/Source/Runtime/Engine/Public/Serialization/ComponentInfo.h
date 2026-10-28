@@ -91,7 +91,7 @@ namespace tomato::Serialization
 	{
 		std::string name;
 
-		bool serializable = true;
+		bool serializable = false;
 
 		ComponentCategory category;
 		ComponentFlags flags;
