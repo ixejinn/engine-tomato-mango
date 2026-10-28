@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <typeindex>
 #include <unordered_map>
 #include <entt/entt.hpp>
 
@@ -32,7 +33,10 @@ namespace tomato::Serialization
 		void InitInspector();
 
 		template<typename T>
-		void RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags = (ComponentFlags)0);
+		void RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags = (ComponentFlags)0, bool serializable = true);
+
+		template<typename T>
+		void RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags, SaveFunc save, LoadFunc load);
 
 		template<typename T>
 		void RegisterInspector(const std::string& name, bool (*draw)(EditorContext&, entt::registry&, T&));
@@ -45,19 +49,40 @@ namespace tomato::Serialization
 		const ComponentInfo* FindComponentInfo(const std::string& name) const;
 
 	private:
+		bool HasComponentName(const std::string& name) const;
+
+		template<typename T>
+		bool HasComponentType() const;
+
+	private:
 		bool initialized = false;
 		std::vector<ComponentInfo> componentInfo_;
 		std::unordered_map<std::string, size_t> nameToIndex_;
+		std::unordered_map<std::type_index, size_t> typeToIndex_;
 	};
 
 	template<typename T>
-	void tomato::Serialization::ComponentRegistry::RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags)
+	void tomato::Serialization::ComponentRegistry::RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags, bool serializable)
 	{
+		const std::type_index type = typeid(T);
+		if (HasComponentType<T>())
+		{
+			TMT_ERR << "Component type: " << type.name() << " already registered.";
+			return;
+		}
+
+		if (HasComponentName(name))
+		{
+			TMT_ERR << "Component name: " << name << " already registered.";
+			return;
+		}
+
 		ComponentInfo info;
 
 		info.name = name;
 		info.category = category;
 		info.flags = flags;
+		info.serializable = serializable;
 
 		info.Has =
 			[](entt::registry& reg, entt::entity e)
@@ -78,38 +103,92 @@ namespace tomato::Serialization
 					reg.remove<T>(e);
 			};
 
-		if constexpr (std::is_empty_v<T>)
+		if (serializable)
 		{
-			info.serialization.Save =
-				[](json&, entt::registry&, entt::entity)
-				{
-				};
+			if constexpr (std::is_empty_v<T>)
+			{
+				info.serialization.Save =
+					[](json&, entt::registry&, entt::entity)
+					{
+					};
 
-			info.serialization.Load =
-				[](const json&, entt::registry& reg, entt::entity e)
-				{
-					reg.emplace_or_replace<T>(e);
-				};
-		}
-		else
-		{
-			info.serialization.Save =
-				[](json& j, entt::registry& reg, entt::entity e)
-				{
-					Serialization::Save(j, reg, reg.get<T>(e));
-				};
+				info.serialization.Load =
+					[](const json&, entt::registry& reg, entt::entity e)
+					{
+						reg.emplace_or_replace<T>(e);
+					};
+			}
+			else
+			{
+				info.serialization.Save =
+					[](json& j, entt::registry& reg, entt::entity e)
+					{
+						Serialization::Save(j, reg, reg.get<T>(e));
+					};
 
-			info.serialization.Load =
-				[](const json& j, entt::registry& reg, entt::entity e)
-				{
-					T component;
+				info.serialization.Load =
+					[](const json& j, entt::registry& reg, entt::entity e)
+					{
+						T component;
 
-					Serialization::Load(j, reg, component);
-					reg.emplace<T>(e, std::move(component));
-				};
+						Serialization::Load(j, reg, component);
+						reg.emplace_or_replace<T>(e, std::move(component));
+					};
+			}
 		}
 
 		nameToIndex_[name] = componentInfo_.size();
+		typeToIndex_[type] = componentInfo_.size();
+		componentInfo_.push_back(std::move(info));
+	}
+
+	template<typename T>
+	void tomato::Serialization::ComponentRegistry::RegisterComponent(const std::string& name, ComponentCategory category, ComponentFlags flags, SaveFunc save, LoadFunc load)
+	{
+		const std::type_index type = typeid(T);
+		if (HasComponentType<T>())
+		{
+			TMT_ERR << "Component type: " << type.name() << " already registered.";
+			return;
+		}
+
+		if (HasComponentName(name))
+		{
+			TMT_ERR << "Component name: " << name << " already registered.";
+			return;
+		}
+
+		ComponentInfo info;
+
+		info.name = name;
+		info.category = category;
+		info.flags = flags;
+		info.serializable = true;
+
+		info.Has =
+			[](entt::registry& reg, entt::entity e)
+			{
+				return reg.any_of<T>(e);
+			};
+
+		info.editor.Add =
+			[](entt::registry& reg, entt::entity e)
+			{
+				static_cast<void>(reg.get_or_emplace<T>(e));
+			};
+
+		info.editor.Remove =
+			[](entt::registry& reg, entt::entity e)
+			{
+				if (reg.any_of<T>(e))
+					reg.remove<T>(e);
+			};
+		
+		info.serialization.Save = save;
+		info.serialization.Load = load;
+
+		nameToIndex_[name] = componentInfo_.size();
+		typeToIndex_[type] = componentInfo_.size();
 		componentInfo_.push_back(std::move(info));
 	}
 
@@ -123,6 +202,12 @@ namespace tomato::Serialization
 			{
 				return draw(eCtx, reg, reg.get<T>(e));
 			};
+	}
+
+	template<typename T>
+	bool tomato::Serialization::ComponentRegistry::HasComponentType() const
+	{
+		return typeToIndex_.contains(std::type_index(typeid(T)));
 	}
 }
 

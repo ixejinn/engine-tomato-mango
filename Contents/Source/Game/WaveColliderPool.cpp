@@ -34,6 +34,7 @@ void WaveColliderPoolTraits::Assemble(entt::registry& registry_, entt::entity e)
         GetAssetID(Texture::PrimitiveName));
 
     registry_.emplace<EditorHidden>(e);
+    registry_.emplace<NoSave>(e);
 
     registry_.emplace<ColliderComponent>(e, true);
     registry_.emplace<WaveColliderComponent>(e);

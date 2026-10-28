@@ -7,6 +7,7 @@
 #include "ECS/Components/Movement.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Components/Collision.h"
+#include "ECS/Components/PhysicsBody.h"
 #include "ECS/Components/Render.h"
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
@@ -25,8 +26,6 @@ namespace tomato::Serialization
 		if (initialized)
 			return;
 
-		//RegisterComponent<NametagComponent>("Nametag", ComponentCategory::Common,
-		//	ComponentFlags::Hidden | ComponentFlags::ReadOnly | ComponentFlags::Essential);
 		RegisterComponent<VisibilityComponent>("Visibility", ComponentCategory::Common,
 			ComponentFlags::Hidden | ComponentFlags::ReadOnly | ComponentFlags::Essential);
 		RegisterComponent<CameraComponent>("Camera", ComponentCategory::Common);
@@ -35,6 +34,7 @@ namespace tomato::Serialization
 		RegisterComponent<MovementComponent>("Movement", ComponentCategory::Common);
 		RegisterComponent<VelocityComponent>("Velocity", ComponentCategory::Common);
 		RegisterComponent<ColliderComponent>("Collider", ComponentCategory::Common);
+		RegisterComponent<PhysicsBodyComponent>("PhysicsBody", ComponentCategory::Common);
 		RegisterComponent<RenderComponent>("Render", ComponentCategory::Common);
 		RegisterComponent<UIComponent>("UI", ComponentCategory::UI);
 		RegisterComponent<CanvasComponent>("Canvas", ComponentCategory::UI);
@@ -87,5 +87,10 @@ namespace tomato::Serialization
 			return nullptr;
 
 		return &componentInfo_[it->second];
+	}
+
+	bool ComponentRegistry::HasComponentName(const std::string& name) const
+	{
+		return nameToIndex_.contains(name);
 	}
 }

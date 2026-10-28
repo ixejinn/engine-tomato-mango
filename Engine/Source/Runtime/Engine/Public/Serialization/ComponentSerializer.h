@@ -58,6 +58,9 @@ namespace tomato::Serialization
 	void Save(json&, entt::registry&, const ColliderComponent&);
 	void Load(const json&, entt::registry&, ColliderComponent&);
 
+	void Save(json&, entt::registry&, const PhysicsBodyComponent&);
+	void Load(const json&, entt::registry&, PhysicsBodyComponent&);
+
 	void Save(json&, entt::registry&, const RenderComponent&);
 	void Load(const json&, entt::registry&, RenderComponent&);
 

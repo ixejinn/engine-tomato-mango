@@ -144,6 +144,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Core/Public/Serialization/UUID.h
         
         Source/Runtime/Engine/Public/Serialization/ComponentRegistry.h
+        Source/Runtime/Engine/Public/Serialization/ComponentRegistryEntry.h
         Source/Runtime/Engine/Public/Serialization/Json.h
         Source/Runtime/Editor/Public/Editor.h
         Source/Runtime/Editor/Public/EditorPanel.h
