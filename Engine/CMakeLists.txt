@@ -233,7 +233,12 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Collision/Detection/Narrow/ShapeView.h
 		Source/Runtime/Engine/Public/Collision/Detection/Broad/BroadPhaseProxy.h
 		Source/Runtime/Engine/Private/Collision/Detection/Narrow/Pairs/SphereSphere.h
-)
+        Source/Runtime/Engine/Public/Serialization/JsonIO.h
+        Source/Runtime/Engine/Public/Serialization/ParticleSerializer.h
+        Source/Runtime/Engine/Public/Serialization/StateSerializer.h
+        Source/Runtime/Engine/Public/Serialization/ResourceSerializer.h
+        Source/Runtime/Engine/Public/Serialization/SerializeManager.h
+        )
 
 set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Collision/Layer/CollisionLayerMatrix.cpp
@@ -293,7 +298,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/GameNetwork/Rollback/RollbackManager.cpp
         Source/Runtime/Engine/Private/Prefab/UIPrefab.cpp
         Source/Runtime/Engine/Private/ECS/Systems/UITransformSystem.cpp
-        Source/Runtime/Engine/Private/Serialization/ComponentSerializer.cpp
+        
 		Source/Runtime/Core/Private/Serialization/UUID.cpp
         Source/Runtime/Engine/Private/Serialization/ComponentRegistry.cpp
         Source/Runtime/Editor/Private/Editor.cpp
@@ -330,6 +335,14 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/ECS/Systems/FrictionSystem.cpp
 		Source/Runtime/Engine/Private/Collision/Detection/Narrow/NarrowPhase.cpp
 		Source/Runtime/Engine/Private/Collision/Detection/Narrow/Pairs/SphereSphere.cpp
+        Source/Runtime/Engine/Private/Serialization/JsonIO.cpp
+        Source/Runtime/Engine/Private/Serialization/ComponentSerializer_Core.cpp
+        Source/Runtime/Engine/Private/Serialization/ComponentSerializer_UI.cpp
+        Source/Runtime/Engine/Private/Serialization/ComponentSerializer_Paricle.cpp
+        Source/Runtime/Engine/Private/Serialization/ParticleSerializer.cpp
+        Source/Runtime/Engine/Private/Serialization/StateSerializer.cpp
+        Source/Runtime/Engine/Private/Serialization/ResourceSerializer.cpp
+        Source/Runtime/Engine/Private/Serialization/SerializeManager.cpp
 )
 
 add_library(engine STATIC

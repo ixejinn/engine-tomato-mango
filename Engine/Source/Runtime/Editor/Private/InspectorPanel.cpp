@@ -1,5 +1,7 @@
 ﻿#include "InspectorPanel.h"
 
+#include "Engine.h"
+
 #include "Resource/AssetRegistry.h"
 #include "Resource/PathManager.h"
 #include "Resource/Render/Texture.h"
@@ -224,7 +226,10 @@ namespace tomato
 			{
 				auto runtimePath = PathManager::ToRuntime(path.value());
 				
-				Serialization::SaveParticle(path.value(), editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
+				editorCtx.engine_->GetSerializer()
+					.GetParticleSerializer()
+					.SaveParticle(path.value(), editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
+				//Serialization::SaveParticle(path.value(), editorCtx.currentState->GetRegistry(), editorCtx.selectedEntity);
 				FileUtils::CopyAsset(path.value(), runtimePath, std::filesystem::copy_options::overwrite_existing);
 			}
 		}

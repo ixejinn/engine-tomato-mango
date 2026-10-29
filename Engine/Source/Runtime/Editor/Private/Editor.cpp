@@ -1,4 +1,5 @@
 ﻿#include "Editor.h"
+#include "Engine.h"
 
 #include <entt/entt.hpp>
 #include "Resource/PathManager.h"
@@ -22,7 +23,6 @@
 #include "Services/Input.h"
 #include "Services/Window.h"
 #include "State/State.h"
-
 #include "Input/KeyDeviceState.h"
 
 #include "EditorPanel.h"
@@ -33,7 +33,7 @@
 
 namespace tomato
 {
-	void Editor::InitImGui(GLFWwindow* wnd, Input& input)
+	void Editor::InitImGui(GLFWwindow* wnd, Input& input, Engine* engine)
 	{
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
@@ -65,11 +65,9 @@ namespace tomato
 			&config,
 			io.Fonts->GetGlyphRangesKorean());
 
-		LoadResources();
-
 		eCtx.selectedEntity = entt::null;
-		// panels.push_back(std::make_unique<HierarchyPanel>(400.f, 300.f, Window::GetWidth(), 320.f));
-		// panels.push_back(std::make_unique<InspectorPanel>(300.f, 600.f, Window::GetWidth(), 900.f));
+		eCtx.engine_ = engine;
+		LoadResources();
 		panels.push_back(std::make_unique<HierarchyPanel>(300.f, 300.f, Window::GetWidth(), 0.f));
 		panels.push_back(std::make_unique<InspectorPanel>(300.f, 600.f, Window::GetWidth(), 300.f));
 	}

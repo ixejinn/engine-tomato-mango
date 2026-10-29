@@ -27,7 +27,7 @@ namespace tomato {
         InitializeInputCallbacks();
         InitializeNetwork();
 
-        editor_.InitImGui(window_.GetHandle(), input_);
+        editor_.InitImGui(window_.GetHandle(), input_, this);
 
         Serialization::ComponentRegistry::GetInstance().Init();
     }

@@ -1,41 +1,13 @@
 ﻿#ifndef MANGO_COMPONENTSERIALIZER_H
 #define MANGO_COMPONENTSERIALIZER_H
 
-#include <unordered_map>
 #include <entt/fwd.hpp>
 #include "Serialization/Json.h"
 #include "Serialization/UUID.h"
-#include "State/StateFwd.h"
 #include "ECS/Forward/ComponentFwd.h"
-#include "Particle/ParticleEmitterPool.h"
-
-namespace tomato
-{
-	class Engine;
-}
 
 namespace tomato::Serialization
 {
-	void CreateJsonFile(const char*);
-	json LoadJsonData(const char*);
-
-	void SaveScene(State*, const char*);
-	void LoadStateScene(State*, const char*);
-	void NewStateScene(State*);
-
-	void SaveResourcesInfo(json&);
-	void SaveParticlesInfo(json&, entt::registry&);
-	void SaveEntity(json&, entt::registry&, entt::entity);
-
-	void SaveParticle(std::filesystem::path&, entt::registry&, entt::entity);
-
-	void LoadResources(const json&);
-	void CreateEntity(const json&, entt::registry&, std::unordered_map<UUID, entt::entity>&);
-	void LoadComponents(const json&, entt::registry&, std::unordered_map<UUID, entt::entity>&);
-	void LoadEntityComponents(const json&, entt::registry&, entt::entity);
-	void ResolveHierarchy(entt::registry&, std::unordered_map<UUID, entt::entity>&);
-	void AttachParticles(const json&, entt::registry&);
-
 	//Component Save & Load Func
 	void Save(json&, entt::registry&, const VisibilityComponent&);
 	void Load(const json&, entt::registry&, VisibilityComponent&);
@@ -97,22 +69,22 @@ namespace tomato::Serialization
 
 	// For Tag
 	void Save(json&, entt::registry&, const ActiveTag&);
-	void Load(const json&, ActiveTag&);
+	void Load(const json&, entt::registry&, ActiveTag&);
 
 	void Save(json&, entt::registry&, const RootEntityTag&);
-	void Load(const json&, RootEntityTag&);
+	void Load(const json&, entt::registry&, RootEntityTag&);
 
 	void Save(json&, entt::registry&, const MainCameraTag&);
-	void Load(const json&, MainCameraTag&);
+	void Load(const json&, entt::registry&, MainCameraTag&);
 
 	void Save(json&, entt::registry&, const CharacterTag&);
-	void Load(const json&, CharacterTag&);
+	void Load(const json&, entt::registry&, CharacterTag&);
 
 	void Save(json&, entt::registry&, const EditorHidden&);
-	void Load(const json&, EditorHidden&);
+	void Load(const json&, entt::registry&, EditorHidden&);
 
 	void Save(json&, entt::registry&, const NoInspector&);
-	void Load(const json&, NoInspector&);
+	void Load(const json&, entt::registry&, NoInspector&);
 }
 
 #endif // !MANGO_COMPONENTSERIALIZER_H

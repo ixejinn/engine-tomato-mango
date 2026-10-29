@@ -11,7 +11,7 @@
 #include "Serialization/ComponentSerializer.h"
 
 #include "InspectorDraw.h"
-
+#include "Utils/Logger.h"
 namespace tomato::Serialization
 {
 	struct ComponentRegistry

@@ -3,6 +3,8 @@
 #include <string>
 #include <entt/entt.hpp>
 
+#include "Engine.h"
+
 #include "GLFW/glfw3.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -144,7 +146,8 @@ namespace tomato
 
 		else
 		{
-			Serialization::NewStateScene(eCtx.currentState);
+			eCtx.engine_->GetSerializer().NewState(eCtx.currentState);
+			//Serialization::NewStateScene(eCtx.currentState);
 			eCtx.sceneDirty = false;
 			eCtx.currentScenePath = "";
 			eCtx.currentSceneRuntimePath = "";
@@ -169,10 +172,11 @@ namespace tomato
 			if (!runtimePath.empty())
 			{
 				FileUtils::CopyAsset(path.value(), runtimePath, std::filesystem::copy_options::overwrite_existing);
-				Serialization::LoadStateScene(
+				eCtx.engine_->GetSerializer().LoadState(eCtx.currentState, runtimePath.string().c_str());
+				/*Serialization::LoadStateScene(
 					eCtx.currentState,
 					runtimePath.string().c_str()
-				);
+				);*/
 
 				eCtx.currentScenePath = path.value();
 				eCtx.currentSceneRuntimePath = runtimePath;
@@ -191,8 +195,9 @@ namespace tomato
 
 		else
 		{
-			Serialization::SaveScene(eCtx.currentState,
-				eCtx.currentScenePath.string().c_str());
+			eCtx.engine_->GetSerializer().SaveState(eCtx.currentState, eCtx.currentScenePath.string().c_str());
+			/*Serialization::SaveScene(eCtx.currentState,
+				eCtx.currentScenePath.string().c_str());*/
 			FileUtils::CopyAsset(eCtx.currentScenePath, eCtx.currentSceneRuntimePath, std::filesystem::copy_options::overwrite_existing);
 		}
 
@@ -211,8 +216,9 @@ namespace tomato
 		{
 			auto runtimePath = PathManager::ToRuntime(path.value());
 
-			Serialization::SaveScene(eCtx.currentState,
-				path.value().string().c_str());
+			eCtx.engine_->GetSerializer().SaveState(eCtx.currentState, path.value().string().c_str());
+			/*Serialization::SaveScene(eCtx.currentState,
+				path.value().string().c_str());*/
 			FileUtils::CopyAsset(path.value(), runtimePath, std::filesystem::copy_options::overwrite_existing);
 
 			eCtx.currentScenePath = path.value();
@@ -226,10 +232,11 @@ namespace tomato
 		auto& path = eCtx.currentScenePath;
 		if (!path.empty())
 		{
-			Serialization::LoadStateScene(
+			eCtx.engine_->GetSerializer().LoadState(eCtx.currentState, path.string().c_str());
+			/*Serialization::LoadStateScene(
 				eCtx.currentState,
 				path.string().c_str()
-			);
+			);*/
 		}
 	}
 

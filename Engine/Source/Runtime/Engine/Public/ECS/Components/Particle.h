@@ -5,6 +5,7 @@
 #include <chrono>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <entt/entt.hpp>
 #include "Resource/ResourceFwd.h"
 #include "Particle/ParticleType.h"
 
