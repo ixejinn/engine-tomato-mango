@@ -25,8 +25,6 @@ namespace tomato
             entt::entity entity;
         };
         std::vector<DrawItem> drawList_;
-
-        void RenderDrawItem(PipelineState state, entt::registry& registry, const DrawItem& drawItem);
     };
 }
 

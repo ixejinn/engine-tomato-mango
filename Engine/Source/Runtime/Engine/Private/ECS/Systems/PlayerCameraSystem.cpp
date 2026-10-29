@@ -1,6 +1,7 @@
 #include "ECS/Systems/PlayerCameraSystem.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/Components/Camera.h"
+#include "Prefab/Prefab.h"
 
 namespace tomato
 {
@@ -12,11 +13,13 @@ namespace tomato
         // Set main camera to render context
         auto viewMainCam = registry.view<MainCameraTag>();
         auto mainCamCnt = viewMainCam.size();
+
         if (mainCamCnt > 1)
             TMT_WARN << "Invalid main camera count: Expected 1, found " << mainCamCnt;
-        else if (mainCamCnt < 1) {
-            TMT_WARN << "Invalid main camera count: Expected at least 1 camera";
-            renderCtx.mainCam = entt::null;
+        else if (mainCamCnt < 1)
+        {
+            TMT_WARN << "Create player camera";
+            renderCtx.mainCam = Prefab::CreateCamera(registry, true, true);
             return;
         }
 

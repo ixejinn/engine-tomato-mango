@@ -106,29 +106,29 @@ namespace tomato::Serialization
 
 		AssetID stateID = root["State"];
 
-		auto newState = state->GetStateByID(stateID);
-        auto& registry = newState->GetRegistry();
-
-		//Load Resources
-		LoadResources(root);
-
-		CreateEntity(root, registry, newState->GetEntityMap());
-
-		LoadComponents(root, registry, newState->GetEntityMap());
-
-		//ResolveHierarchy(registry, newState->GetEntityMap());
-
-		AttachParticles(root, registry);
-
-		state->SetNextState(std::move(newState));
-		registry.ctx().get<EntityNameGenerator>().Initialize(registry);
+		// auto newState = state->GetStateByID(stateID);
+  //       auto& registry = newState->GetRegistry();
+  //
+		// //Load Resources
+		// LoadResources(root);
+  //
+		// CreateEntity(root, registry, newState->GetEntityMap());
+  //
+		// LoadComponents(root, registry, newState->GetEntityMap());
+  //
+		// //ResolveHierarchy(registry, newState->GetEntityMap());
+  //
+		// AttachParticles(root, registry);
+  //
+		// state->SetNextState(std::move(newState));
+		// registry.ctx().get<EntityNameGenerator>().Initialize(registry);
 	}
 
 	void NewStateScene(State* state)
 	{
-		AssetID stateID = StateRegistry::GetInstance().GetStateID(typeid(*state));
-		auto newState = state->GetStateByID(stateID);
-		state->SetNextState(std::move(newState));
+		// AssetID stateID = StateRegistry::GetInstance().GetStateID(typeid(*state));
+		// auto newState = state->GetStateByID(stateID);
+		// state->SetNextState(std::move(newState));
 	}
 
 	void LoadResources(const json& root)

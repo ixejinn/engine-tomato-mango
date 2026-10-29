@@ -227,9 +227,4 @@ namespace tomato
         std::ranges::sort(drawList_, std::ranges::less{}, &DrawItem::sortKey);
         return true;
     }
-
-    void RenderSystem::RenderDrawItem(PipelineState state, entt::registry& registry, const DrawItem& drawItem)
-    {
-
-    }
 }
