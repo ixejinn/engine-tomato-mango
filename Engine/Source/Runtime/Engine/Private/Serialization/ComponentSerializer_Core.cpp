@@ -122,6 +122,20 @@ namespace tomato::Serialization
 		render.texture = data["texture"];
 	}
 
+	void Save(json& data, entt::registry& registry, const StencilComponent& stencil)
+	{
+		data["func"] = stencil.func;
+		data["writeRef"] = stencil.writeRef;
+		data["readRef"] = stencil.readRef;
+	}
+
+	void Load(const json& data, entt::registry& registry, StencilComponent& stencil)
+	{
+		stencil.func	 = data["func"];
+		stencil.writeRef = data["writeRef"];
+		stencil.readRef	 = data["readRef"] ;
+	}
+
 	void Save(json& data, entt::registry& registry, const VelocityComponent& velocity)
 	{
 		data["speed"] = velocity.horizontalSpeed;
@@ -161,6 +175,28 @@ namespace tomato::Serialization
 	void Load(const json& data, entt::registry& registry, PhysicsBodyComponent& physics)
 	{
 		physics.inverseMass = data["inverse"];
+	}
+
+	void Save(json& data, entt::registry& registry, const FrictionComponent& friction)
+	{
+		data["groundFriction"] = friction.groundFriction;
+		data["airDrag"] = friction.airDrag;
+	}
+
+	void Load(const json& data, entt::registry& registry, FrictionComponent& friction)
+	{
+		friction.groundFriction = data["groundFriction"];
+		friction.airDrag = data["airDrag"];
+	}
+
+	void Save(json& data, entt::registry& registry, const SurfaceComponent& surface)
+	{
+		data["friction"] = surface.friction;
+	}
+
+	void Load(const json& data, entt::registry& registry, SurfaceComponent& surface)
+	{
+		surface.friction = data["friction"];
 	}
 
 	void Save(json& data, entt::registry& registry, const TargetComponent& target)
@@ -212,6 +248,12 @@ namespace tomato::Serialization
 
 	void Save(json& data, entt::registry& registry, const CharacterTag& charTag) {}
 	void Load(const json& data, entt::registry& registry, CharacterTag& charTag) {}
+
+	void Save(json& data, entt::registry& registry, const GroundTriggerTag& gndTriggerTag) {}
+	void Load(const json& data, entt::registry& registry, GroundTriggerTag& gndTriggerTag) {}
+
+	void Save(json& data, entt::registry& registry, const RollbackEntityTag& rollbackTag) {}
+	void Load(const json& data, entt::registry& registry, RollbackEntityTag& rollbackTag) {}
 
 	void Save(json& data, entt::registry& registry, const EditorHidden& eHiddenTag) {}
 	void Load(const json& data, entt::registry& registry, EditorHidden&) {}

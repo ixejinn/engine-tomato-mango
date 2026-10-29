@@ -206,6 +206,17 @@ namespace tomato
 
 	void MainMenuBar::SaveAs(EditorContext& eCtx)
 	{
+		// 지정한 경로가 없으면 중간 디렉터리까지 생성하고, 이미 존재하면 아무 작업도 하지 않음
+		std::error_code ec;
+		const auto saveDir = PathManager::ProjectResource() / "Scenes";
+		std::filesystem::create_directories(saveDir, ec);
+
+		if (ec)
+		{
+			TMT_ERR << "Failed to create scene directory: " << ec.message();
+			return;
+		}
+
 		auto path = FileDialog::SaveFile(
 			"Save Scene",
 			"scene",

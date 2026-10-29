@@ -197,7 +197,14 @@ namespace tomato::Serialization
 	void tomato::Serialization::ComponentRegistry::RegisterInspector
 		(const std::string& name, bool (*draw)(EditorContext&, entt::registry&, T&))
 	{
-		auto& component = componentInfo_[nameToIndex_[name]];
+		auto it = nameToIndex_.find(name);
+		if (it == nameToIndex_.end())
+		{
+			TMT_ERR << "Invalid component name " << name;
+			return;
+		}
+
+		auto& component = componentInfo_[it->second];
 		component.editor.Draw =
 			[draw](EditorContext& eCtx, entt::registry& reg, entt::entity e)
 			{

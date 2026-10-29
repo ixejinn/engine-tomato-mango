@@ -17,6 +17,7 @@
 #include "ECS/Components/Character.h"
 #include "ECS/Components/Particle.h"
 #include "ECS/Components/EditorTag.h"
+#include "ECS/Components/Rollback.h"
 
 #include "Utils/Bitmask/BitmaskOperators.h"
 namespace tomato::Serialization
@@ -40,12 +41,15 @@ namespace tomato::Serialization
 			ComponentFlags::Hidden | ComponentFlags::ReadOnly | ComponentFlags::Essential);
 		RegisterComponent<CameraComponent>("Camera", ComponentCategory::Common);
 		RegisterComponent<InputChannelComponent>("InputChannel", ComponentCategory::Common);
-		RegisterComponent<TransformComponent>("Transform", ComponentCategory::Common , ComponentFlags::Essential);
+		RegisterComponent<TransformComponent>("Transform", ComponentCategory::Common, ComponentFlags::Essential);
 		RegisterComponent<MovementComponent>("Movement", ComponentCategory::Common);
 		RegisterComponent<VelocityComponent>("Velocity", ComponentCategory::Common);
 		RegisterComponent<ColliderComponent>("Collider", ComponentCategory::Common);
 		RegisterComponent<PhysicsBodyComponent>("PhysicsBody", ComponentCategory::Common);
+		RegisterComponent<FrictionComponent>("Friction", ComponentCategory::Common);
+		RegisterComponent<SurfaceComponent>("Surface", ComponentCategory::Common);
 		RegisterComponent<RenderComponent>("Render", ComponentCategory::Common);
+		RegisterComponent<StencilComponent>("Stencil", ComponentCategory::Common);
 		RegisterComponent<UIComponent>("UI", ComponentCategory::UI);
 		RegisterComponent<CanvasComponent>("Canvas", ComponentCategory::UI);
 		RegisterComponent<RectTransformComponent>("Rect Transform", ComponentCategory::UI, ComponentFlags::Essential);
@@ -62,6 +66,8 @@ namespace tomato::Serialization
 		RegisterComponent<RootEntityTag>("TagRoot", ComponentCategory::Tag, ComponentFlags::Hidden);
 		RegisterComponent<MainCameraTag>("TagMainCam", ComponentCategory::Tag);
 		RegisterComponent<CharacterTag>("TagCharacter", ComponentCategory::Tag, ComponentFlags::Hidden);
+		RegisterComponent<GroundTriggerTag>("TagGroundTrigger", ComponentCategory::Tag, ComponentFlags::Hidden);
+		RegisterComponent<RollbackEntityTag>("TagRollback", ComponentCategory::Tag);
 		RegisterComponent<EditorHidden>("TagEditorHidden", ComponentCategory::Tag, ComponentFlags::Hidden);
 		RegisterComponent<NoInspector>("TagNoInspector", ComponentCategory::Tag, ComponentFlags::Hidden);
 	}

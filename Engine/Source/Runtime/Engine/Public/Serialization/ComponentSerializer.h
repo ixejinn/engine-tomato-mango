@@ -33,8 +33,17 @@ namespace tomato::Serialization
 	void Save(json&, entt::registry&, const PhysicsBodyComponent&);
 	void Load(const json&, entt::registry&, PhysicsBodyComponent&);
 
+	void Save(json&, entt::registry&, const FrictionComponent&);
+	void Load(const json&, entt::registry&, FrictionComponent&);
+
+	void Save(json&, entt::registry&, const SurfaceComponent&);
+	void Load(const json&, entt::registry&, SurfaceComponent&);
+
 	void Save(json&, entt::registry&, const RenderComponent&);
 	void Load(const json&, entt::registry&, RenderComponent&);
+
+	void Save(json&, entt::registry&, const StencilComponent&);
+	void Load(const json&, entt::registry&, StencilComponent&);
 
 	void Save(json&, entt::registry&, const UIComponent&);
 	void Load(const json&, entt::registry&, UIComponent&);
@@ -79,6 +88,12 @@ namespace tomato::Serialization
 
 	void Save(json&, entt::registry&, const CharacterTag&);
 	void Load(const json&, entt::registry&, CharacterTag&);
+
+	void Save(json&, entt::registry&, const GroundTriggerTag&);
+	void Load(const json&, entt::registry&, GroundTriggerTag&);
+	
+	void Save(json&, entt::registry&, const RollbackEntityTag&);
+	void Load(const json&, entt::registry&, RollbackEntityTag&);
 
 	void Save(json&, entt::registry&, const EditorHidden&);
 	void Load(const json&, entt::registry&, EditorHidden&);

@@ -12,7 +12,11 @@ namespace tomato
 	struct VelocityComponent;
 	struct ColliderComponent;
 	struct PhysicsBodyComponent;
+	struct FrictionComponent;
+	struct SurfaceComponent;
+
 	struct RenderComponent;
+	struct StencilComponent;
 
 	struct UIComponent;
 	struct CanvasComponent;
@@ -31,6 +35,8 @@ namespace tomato
 	struct RootEntityTag;
 	struct MainCameraTag;
 	struct CharacterTag;
+	struct GroundTriggerTag;
+	struct RollbackEntityTag;
 
 	struct EditorHidden;
 	struct NoInspector;
