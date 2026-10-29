@@ -5,7 +5,7 @@
 #include "Utils/StringLiteral.h"
 #include "Profiler/Profiler.h"
 #include "Profiler/ExecutionTime.h"
-#include "EngineDebug.h"
+#include "Engine/EngineDebug.h"
 
 namespace tomato
 {

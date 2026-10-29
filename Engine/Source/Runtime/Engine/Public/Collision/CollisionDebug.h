@@ -2,7 +2,7 @@
 #define MANGO_COLLISIONDEBUG_H
 
 #include <iostream>
-#include "EngineDebug.h"
+#include "Engine/EngineDebug.h"
 
 #ifdef TOMATO_DEBUG
 // #define TOMATO_DEBUG_COLLISION

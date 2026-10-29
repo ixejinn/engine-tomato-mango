@@ -47,7 +47,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/ECS/Components/UIEvents.h
 		Source/Runtime/Engine/Public/ECS/Systems/CameraTransformSystem.h
         Source/Runtime/Engine/Public/ECS/Systems/System.h
-        Source/Runtime/Engine/Public/Engine.h
+		Source/Runtime/Engine/Public/Engine/Engine.h
 		Source/Runtime/Engine/Public/Simulation/SimulationConfig.h
         Source/Runtime/Engine/Public/Services/Window.h
         Source/Runtime/Engine/Public/Services/ServiceFwd.h
@@ -64,7 +64,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Simulation/Tick/TickClock.h
         Source/Runtime/Engine/Public/Simulation/Tick/TickFwd.h
         Source/Runtime/Engine/Public/State/DefaultState.h
-        Source/Runtime/Engine/Public/GameplayConfig.h
+		Source/Runtime/Engine/Public/Engine/GameplayConfig.h
         Source/Runtime/Engine/Public/State/StateFwd.h
 		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemUpdateContexts.h
         Source/Runtime/Engine/Public/ECS/Systems/CollisionSystem.h
@@ -89,7 +89,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Utils/RegistryEntry.h
         Source/Runtime/Engine/Public/Utils/Utf.h
         Source/Runtime/Engine/Public/Resource/Audio/Audio.h
-        Source/Runtime/Engine/Public/TomatoFwd.h
+		Source/Runtime/Engine/Public/Engine/TomatoFwd.h
         Source/Runtime/Core/Public/Containers/UnorderedPair.h
 
 		Source/Runtime/Engine/Private/Collision/Detection/Narrow/GJK/GJK.h
@@ -206,7 +206,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Core/Public/Profiler/CPUProfiler.h
         Source/Runtime/Engine/Public/Profiler/ExecutionTime.h
 		Source/Runtime/Engine/Public/Profiler/ProfilerConfig.h
-		Source/Runtime/Engine/Public/EngineConfig.h
+		Source/Runtime/Engine/Public/Engine/EngineConfig.h
 		Source/Runtime/Engine/Private/ECS/Components/TransformDirty.h
 		Source/Runtime/Engine/Private/ECS/Components/UIDirty.h
 		Source/Runtime/Engine/Public/ECS/Forward/TransformDirtyFwd.h
@@ -228,18 +228,19 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Private/ECS/Components/Gizmo.h
 		Source/Runtime/Engine/Public/ECS/Systems/FrictionSystem.h
 		Source/Runtime/Engine/Public/Collision/CollisionDebug.h
-		Source/Runtime/Engine/Public/EngineDebug.h
+		Source/Runtime/Engine/Public/Engine/EngineDebug.h
 		Source/Runtime/Engine/Public/ECS/Components/PhysicsBody.h
 		Source/Runtime/Engine/Public/Collision/Detection/Narrow/ShapeView.h
 		Source/Runtime/Engine/Public/Collision/Detection/Broad/BroadPhaseProxy.h
 		Source/Runtime/Engine/Private/Collision/Detection/Narrow/Pairs/SphereSphere.h
+		Source/Runtime/Engine/Public/State/StateEvent.h
 )
 
 set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Collision/Layer/CollisionLayerMatrix.cpp
         Source/Runtime/Core/Private/Collision/ColliderSupport.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/CameraTransformSystem.cpp
-        Source/Runtime/Engine/Private/Engine.cpp
+		Source/Runtime/Engine/Private/Engine/Engine.cpp
         Source/Runtime/Engine/Private/Services/Window.cpp
         Source/Runtime/Engine/Private/Input/IntentTranslator.cpp
         Source/Runtime/Engine/Private/Services/Input.cpp

@@ -10,7 +10,7 @@
 #include "Services/ServiceFwd.h"
 #include "Resource/ResourceFwd.h"
 #include "Serialization/UUID.h"
-#include "TomatoFwd.h"
+#include "Engine/TomatoFwd.h"
 #include "Collision/Layer/CollisionLayerMatrix.h"
 #include "Utils/PassKey.h"
 
@@ -26,7 +26,9 @@ namespace tomato
         virtual void Update() = 0;
         virtual void Exit() = 0;
 
-        static State* SetNextState(State* cur, AssetID newStateID);
+        virtual void CreateDefaultEntities() {}
+
+        // static State* SetNextState(State* cur, AssetID newStateID);
 
         entt::registry& GetRegistry() { return registry_; }
         std::unordered_map<UUID, entt::entity>& GetEntityMap() { return entityMap_; }

@@ -24,23 +24,13 @@ namespace tomato
         Engine(int width, int height, const char* title, NetMode netMode = NetMode::NM_Alone);
         ~Engine();
 
-        void SetNextState(std::unique_ptr<State>&& newState);
-        State* GetNextState(PassKey<State>) { return nextState_.get(); }
-
         void Run();
 
         Window& GetWindow() { return window_;}
 
+        void SetNextState(std::unique_ptr<State>&& newState);
         template<typename Component>
-        void SetRollbackComponent() {
-            if (netMode_ == NetMode::NM_Alone)
-                return;
-
-            if (!rollbackManager_)
-                rollbackManager_ = std::make_unique<RollbackManager>();
-
-            rollbackManager_->Register<Component>();
-        }
+        void SetRollbackComponent();
 
         void RequestMatchToServer();
         void TryStartGame(std::unique_ptr<State>&& newState);
@@ -55,20 +45,21 @@ namespace tomato
         IntentTranslator intentTranslator_;
         InputUI inputUI_;
 
+        void OnChangeStateRequest(const Event::ChangeStateRequest& event);
         void ChangeState(TickClock& tc);
         std::unique_ptr<State> currState_{nullptr};
         std::unique_ptr<State> nextState_{nullptr};
-        bool setObjs_{false};
+        bool loaded{true};
 
         Editor editor_;
 
         void ProcessQueuedPackets(TickClock& tc);
-        std::unique_ptr<ClientNetwork> network_{ nullptr };
-        std::unique_ptr<GamePlayNetSystem> gameNet_{ nullptr };
+        std::unique_ptr<ClientNetwork> network_{nullptr};
+        std::unique_ptr<GamePlayNetSystem> gameNet_{nullptr};
 
         void Rollback(SimContext& simCtx);
         void Resimulate(SimContext& simCtx, uint32_t currT);
-        std::unique_ptr<RollbackManager> rollbackManager_{ nullptr };
+        std::unique_ptr<RollbackManager> rollbackManager_{nullptr};
 
         NetMode netMode_;
 
@@ -78,9 +69,22 @@ namespace tomato
         SystemManager systemManager_;
         bool isRunning_{true};
 
-        void InitializeInputCallbacks();
+        void InitializeInput();
+        void InitializeSerialization(); ////
         void InitializeNetwork();
     };
+
+    template<typename Component>
+    void Engine::SetRollbackComponent()
+    {
+        if (netMode_ == NetMode::NM_Alone)
+            return;
+
+        if (!rollbackManager_)
+            rollbackManager_ = std::make_unique<RollbackManager>();
+
+        rollbackManager_->Register<Component>();
+    }
 }
 
 #endif //MANGO_ENGINE_H

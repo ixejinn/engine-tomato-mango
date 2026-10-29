@@ -1,4 +1,4 @@
-﻿#include "Engine.h"
+﻿#include "Engine/Engine.h"
 #include "State/State.h"
 #include "State/StateRegistry.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
@@ -47,12 +47,6 @@ namespace tomato
         //// Set collision context
         auto& collisionCtx = registry_.ctx().get<CollisionContext>();
         collisionCtx.layerMtx = &engine.collisionLayerMtx_;
-    }
-
-    State* State::SetNextState(State* curr, AssetID newStateID)
-    {
-        curr->engine_.SetNextState(StateRegistry::GetInstance().GetStateFactory(newStateID)(curr->engine_));
-        return curr->engine_.GetNextState(curr->key_);
     }
 
     Window& State::GetWindow()

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <entt/fwd.hpp>
-#include <GameplayConfig.h>
+#include "Engine/GameplayConfig.h"
 
 #include "Utils/PassKey.h"
 #include "State/StateFwd.h"

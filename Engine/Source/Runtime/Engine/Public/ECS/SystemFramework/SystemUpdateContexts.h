@@ -10,7 +10,7 @@
 #include "Collision/CollisionCache.h"
 #include "Render/GLStateCache.h"
 #include "ECS/SystemFramework/SystemConstants.h"
-#include "EngineConfig.h"
+#include "Engine/EngineConfig.h"
 
 namespace tomato
 {

@@ -1,10 +1,11 @@
-﻿#include "Engine.h"
-#include "EngineConfig.h"
-#include "EngineDebug.h"
+﻿#include "Engine/Engine.h"
+#include "Engine/EngineConfig.h"
+#include "Engine/EngineDebug.h"
 #include "Event/EventDispatcher.h"
 #include "Simulation/Tick/TickClock.h"
 #include "Render/GLStateCache.h"
 #include "State/DefaultState.h"
+#include "State/StateEvent.h"
 #include "ECS/Systems/GarbageEntityCollectionSystem.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/SystemFramework/SystemRegistry.h"
@@ -18,19 +19,19 @@
 #include "Profiler/CPUProfiler.h"
 #include "Input/KeyDeviceState.h"
 
-namespace tomato {
+namespace tomato
+{
     Engine::Engine(const int width, const int height, const char* title, NetMode netMode)
         : window_(width, height, title)
         , input_(window_)
         , netMode_(netMode)
     {
-        InitializeInputCallbacks();
+        InitializeInput();
+        InitializeSerialization();
         InitializeNetwork();
-
         editor_.InitImGui(window_.GetHandle(), input_);
 
-        Serialization::ComponentRegistry::GetInstance().Init();
-        Serialization::ComponentRegistry::GetInstance().InitInspector();
+        EventDispatcher::GetInstance().Connect<Event::ChangeStateRequest, &Engine::OnChangeStateRequest>(*this);
     }
 
     Engine::~Engine()
@@ -83,6 +84,7 @@ namespace tomato {
         auto& keyState = KeyDeviceState::GetInstance();
         auto& profiler = Profiler::GetInstance();
 
+        ChangeState(tickClock);
         while (!window_.ShouldClose() && isRunning_)
         {
             if (nextState_)
@@ -194,6 +196,14 @@ namespace tomato {
         renderCtx.runMode = mode;
     }
 
+    void Engine::OnChangeStateRequest(const Event::ChangeStateRequest& event)
+    {
+        loaded = true;
+
+        // 직렬화함수 호출하면서 Engine& 매개변수로 넘기기
+        // 직렬화함수에서 직렬화 + 레지스트리 세팅 후 engine.SetNextState로 등록
+    }
+
     void Engine::ChangeState(TickClock& tc)
     {
         if (!nextState_)
@@ -213,9 +223,11 @@ namespace tomato {
 
         currState_ = std::move(nextState_);
         currState_->Init();
+        // TMT_DEBUG << "Key for current State's factory function: " << std::type_index(typeid(*currState_)).name();
 
-        TMT_DEBUG << "Key for current State's factory function: " << std::type_index(typeid(*currState_)).name();
-
+        if (!loaded)
+            currState_->CreateDefaultEntities();
+        loaded = false;
         inputUI_.SetState(currState_.get());
 
         tc.ResetTick();
@@ -256,12 +268,18 @@ namespace tomato {
         }
     }
 
-    void Engine::InitializeInputCallbacks()
+    void Engine::InitializeInput()
     {
         input_.keySignal_.Connect<&IntentTranslator::OnKeyEvent>(intentTranslator_);
         input_.cursorSignal_.Connect<&InputUI::OnHover>(inputUI_);
         input_.mouseSignal_.Connect<&IntentTranslator::OnMouseButtonEvent>(intentTranslator_);
         input_.mouseSignal_.Connect<&InputUI::OnClick>(inputUI_);
+    }
+
+    void Engine::InitializeSerialization()
+    {
+        Serialization::ComponentRegistry::GetInstance().Init();
+        Serialization::ComponentRegistry::GetInstance().InitInspector();
     }
 
     void Engine::InitializeNetwork()
