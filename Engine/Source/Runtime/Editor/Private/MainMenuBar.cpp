@@ -3,6 +3,8 @@
 #include <string>
 #include <entt/entt.hpp>
 
+#include "Engine.h"
+
 #include "GLFW/glfw3.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -144,7 +146,8 @@ namespace tomato
 
 		else
 		{
-			Serialization::NewStateScene(eCtx.currentState);
+			eCtx.engine_->GetSerializer().NewState(eCtx.currentState);
+			//Serialization::NewStateScene(eCtx.currentState);
 			eCtx.sceneDirty = false;
 			eCtx.currentScenePath = "";
 			eCtx.currentSceneRuntimePath = "";
@@ -169,10 +172,11 @@ namespace tomato
 			if (!runtimePath.empty())
 			{
 				FileUtils::CopyAsset(path.value(), runtimePath, std::filesystem::copy_options::overwrite_existing);
-				Serialization::LoadStateScene(
+				eCtx.engine_->GetSerializer().LoadState(eCtx.currentState, runtimePath.string().c_str());
+				/*Serialization::LoadStateScene(
 					eCtx.currentState,
 					runtimePath.string().c_str()
-				);
+				);*/
 
 				eCtx.currentScenePath = path.value();
 				eCtx.currentSceneRuntimePath = runtimePath;
@@ -191,8 +195,9 @@ namespace tomato
 
 		else
 		{
-			Serialization::SaveScene(eCtx.currentState,
-				eCtx.currentScenePath.string().c_str());
+			eCtx.engine_->GetSerializer().SaveState(eCtx.currentState, eCtx.currentScenePath.string().c_str());
+			/*Serialization::SaveScene(eCtx.currentState,
+				eCtx.currentScenePath.string().c_str());*/
 			FileUtils::CopyAsset(eCtx.currentScenePath, eCtx.currentSceneRuntimePath, std::filesystem::copy_options::overwrite_existing);
 		}
 
@@ -201,6 +206,17 @@ namespace tomato
 
 	void MainMenuBar::SaveAs(EditorContext& eCtx)
 	{
+		// 지정한 경로가 없으면 중간 디렉터리까지 생성하고, 이미 존재하면 아무 작업도 하지 않음
+		std::error_code ec;
+		const auto saveDir = PathManager::ProjectResource() / "Scenes";
+		std::filesystem::create_directories(saveDir, ec);
+
+		if (ec)
+		{
+			TMT_ERR << "Failed to create scene directory: " << ec.message();
+			return;
+		}
+
 		auto path = FileDialog::SaveFile(
 			"Save Scene",
 			"scene",
@@ -211,8 +227,9 @@ namespace tomato
 		{
 			auto runtimePath = PathManager::ToRuntime(path.value());
 
-			Serialization::SaveScene(eCtx.currentState,
-				path.value().string().c_str());
+			eCtx.engine_->GetSerializer().SaveState(eCtx.currentState, path.value().string().c_str());
+			/*Serialization::SaveScene(eCtx.currentState,
+				path.value().string().c_str());*/
 			FileUtils::CopyAsset(path.value(), runtimePath, std::filesystem::copy_options::overwrite_existing);
 
 			eCtx.currentScenePath = path.value();
@@ -226,10 +243,11 @@ namespace tomato
 		auto& path = eCtx.currentScenePath;
 		if (!path.empty())
 		{
-			Serialization::LoadStateScene(
+			eCtx.engine_->GetSerializer().LoadState(eCtx.currentState, path.string().c_str());
+			/*Serialization::LoadStateScene(
 				eCtx.currentState,
 				path.string().c_str()
-			);
+			);*/
 		}
 	}
 

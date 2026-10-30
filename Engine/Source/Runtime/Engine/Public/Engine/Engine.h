@@ -2,19 +2,27 @@
 #define MANGO_ENGINE_H
 
 #include <memory>
+
 #include "Services/Window.h"
 #include "Services/Input.h"
+
 #include "Input/IntentTranslator.h"
 #include "Input/InputUI.h"
+
 #include "ECS/SystemFramework/SystemManager.h"
+#include "Collision/Layer/CollisionLayerMatrix.h"
+
 #include "State/StateFwd.h"
+#include "Simulation/Tick/TickFwd.h"
+
 #include "Network/ClientNetwork.h"
 #include "GameNetwork/GamePlayNetSystem.h"
 #include "GameNetwork/Rollback/RollbackManager.h"
-#include "Collision/Layer/CollisionLayerMatrix.h"
-#include "Simulation/Tick/TickFwd.h"
+
 #include "Utils/PassKey.h"
+
 #include "Editor.h"
+#include "Serialization/SerializeManager.h"
 
 namespace tomato
 {
@@ -27,6 +35,9 @@ namespace tomato
         void Run();
 
         Window& GetWindow() { return window_;}
+
+        IntentTranslator& GetInputRecorder() { return intentTranslator_; }
+        Serialization::SerializeManager& GetSerializer() { return serializer_; }
 
         void SetNextState(std::unique_ptr<State>&& newState);
         template<typename Component>
@@ -72,6 +83,9 @@ namespace tomato
         void InitializeInput();
         void InitializeSerialization(); ////
         void InitializeNetwork();
+
+        Serialization::SerializeManager serializer_;
+
     };
 
     template<typename Component>

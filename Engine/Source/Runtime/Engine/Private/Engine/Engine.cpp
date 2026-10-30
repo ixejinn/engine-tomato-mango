@@ -29,7 +29,8 @@ namespace tomato
         InitializeInput();
         InitializeSerialization();
         InitializeNetwork();
-        editor_.InitImGui(window_.GetHandle(), input_);
+
+        editor_.InitImGui(window_.GetHandle(), input_, this);
 
         EventDispatcher::GetInstance().Connect<Event::ChangeStateRequest, &Engine::OnChangeStateRequest>(*this);
     }
@@ -279,7 +280,6 @@ namespace tomato
     void Engine::InitializeSerialization()
     {
         Serialization::ComponentRegistry::GetInstance().Init();
-        Serialization::ComponentRegistry::GetInstance().InitInspector();
     }
 
     void Engine::InitializeNetwork()

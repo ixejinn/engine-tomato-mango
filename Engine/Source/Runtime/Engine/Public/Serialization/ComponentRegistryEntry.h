@@ -30,15 +30,16 @@ namespace tomato::Serialization
 		}
 	};
 }
+
+#define TMT_CONCAT_(a,b) a##b
+#define TMT_CONCAT(a,b) TMT_CONCAT_(a,b)
+
 #define REGISTER_COMPONENT(TYPE, NAME, CATEGORY, FLAGS, SERIALIZABLE)\
-namespace { tomato::Serialization::ComponentRegistryEntry<TYPE> ComponentRegistryEntry{\
-			NAME, CATEGORY, FLAGS, SERIALIZABLE \
-		};\
-}
+namespace { tomato::Serialization::ComponentRegistryEntry<TYPE> \
+	TMT_CONCAT(g_entry_, __COUNTER__){ NAME, CATEGORY, FLAGS, SERIALIZABLE }; }
 
 #define REGISTER_SERIALIZABLE_COMPONENT(TYPE, NAME, CATEGORY, FLAGS, SAVE, LOAD)\
-namespace { tomato::Serialization::ComponentRegistryEntry<TYPE> ComponentRegistryEntry{\
-			NAME, CATEGORY, FLAGS, true, SAVE, LOAD \
-		};\
-}
+namespace { tomato::Serialization::ComponentRegistryEntry<TYPE> \
+	TMT_CONCAT(g_entry_, __COUNTER__){ NAME, CATEGORY, FLAGS, true, SAVE, LOAD }; }
+
 #endif // !MANGO_COMPONENTREGISTRYENTRY_H

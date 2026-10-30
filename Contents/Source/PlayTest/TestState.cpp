@@ -29,19 +29,19 @@ using namespace tomato;
 using namespace std::chrono_literals;
 
 void TestState::Init() {
-    //// Load Assets
-    auto audioTest = Audio::Create(PathManager::ProjectSound("sfx_get_heart.mp3"), 8);
-    audioPtr_ = AssetRegistry<Audio>::GetInstance().Get(audioTest);
+    ////// Load Assets
+    //auto audioTest = Audio::Create(PathManager::ProjectSound("sfx_get_heart.mp3"), 8);
+    //audioPtr_ = AssetRegistry<Audio>::GetInstance().Get(audioTest);
 
-    Texture::Create(PathManager::ProjectImage("WATER_GAME_LOGO.png"));
-    Texture::Create(PathManager::ProjectImage("heart.png"));
-    Font::Create(PathManager::ProjectFont("D2Coding.ttf"));
-    Font::Create(PathManager::ProjectFont("Pretendard-SemiBold.ttf"));
-    Mesh::Create(Mesh::Primitive::Sphere, 20, 10);
+    //Texture::Create(PathManager::ProjectImage("WATER_GAME_LOGO.png"));
+    //Texture::Create(PathManager::ProjectImage("heart.png"));
+    //Font::Create(PathManager::ProjectFont("D2Coding.ttf"));
+    //Font::Create(PathManager::ProjectFont("Pretendard-SemiBold.ttf"));
+    //Mesh::Create(Mesh::Primitive::Sphere, 20, 10);
 
-    ParticleEffect::Create(PathManager::ProjectParticle("burst_test.tmt.ptc"));
-    ParticleEffect::Create(PathManager::ProjectParticle("ribbon_particle.tmt.ptc"));
-    ParticleEffect::Create(PathManager::ProjectParticle("jump.tmt.ptc"));
+    //ParticleEffect::Create(PathManager::ProjectParticle("burst_test.tmt.ptc"));
+    //ParticleEffect::Create(PathManager::ProjectParticle("ribbon_particle.tmt.ptc"));
+    //ParticleEffect::Create(PathManager::ProjectParticle("jump.tmt.ptc"));
 
     // EventDispatcher::GetInstance().Connect<LandingEvent, &TestState::CallbackJump>(*this);
 
@@ -51,7 +51,7 @@ void TestState::Init() {
 
     //// Create game object
 
-    PlayTest();
+    //PlayTest();
     // BottleneckTest();
 }
 

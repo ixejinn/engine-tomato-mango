@@ -16,7 +16,7 @@ namespace tomato
 	class Editor
 	{
 	public:
-		void InitImGui(GLFWwindow* wnd, Input& input);
+		void InitImGui(GLFWwindow* wnd, Input& input, Engine* engine);
 		void ShutdownImGui(Input& input);
 
 		void BeginFrame();

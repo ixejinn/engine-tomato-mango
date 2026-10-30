@@ -5,11 +5,12 @@
 #include <entt/fwd.hpp>
 #include <glm/glm.hpp>
 #include "State/StateFwd.h"
-
 namespace tomato
 {
+	class Engine;
 	struct EditorContext
 	{
+		Engine* engine_;
         uint64_t tick;
 
 		State* currentState;

@@ -4,6 +4,7 @@
 #include "Resource/Render/Texture.h"
 #include "Resource/AssetRegistry.h"
 #include "Serialization/ComponentSerializer.h"
+#include "Serialization/JsonIO.h"
 #include "ECS/Components/Particle.h"
 
 namespace tomato
