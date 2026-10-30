@@ -38,7 +38,7 @@ namespace tomato
 		if (editorCtx.selectedEntity == entt::null)
 			return;
 
-		if (editorCtx.currentState->GetRegistry().all_of<NoInspector>(editorCtx.selectedEntity))
+		if (editorCtx.currentState->GetRegistry().all_of<NoInspectorTag>(editorCtx.selectedEntity))
 			return;
 
 		// ImGui::SetNextWindowPos(ImVec2(posX_, posY_), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));

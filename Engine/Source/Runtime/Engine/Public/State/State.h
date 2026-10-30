@@ -4,7 +4,6 @@
 #include <array>
 #include <memory>
 #include <unordered_map>
-#include <typeindex>
 #include <entt/entity/registry.hpp>
 #include "State/StateFwd.h"
 #include "Services/ServiceFwd.h"
@@ -22,13 +21,11 @@ namespace tomato
         explicit State(Engine& engine);
         virtual ~State() = default;
 
-        virtual void Init() = 0;
-        virtual void Update() = 0;
-        virtual void Exit() = 0;
+        virtual void Init()   {};
+        virtual void Update() {};
+        virtual void Exit()   {};
 
         virtual void CreateDefaultEntities() {}
-
-        // static State* SetNextState(State* cur, AssetID newStateID);
 
         entt::registry& GetRegistry() { return registry_; }
         std::unordered_map<UUID, entt::entity>& GetEntityMap() { return entityMap_; }

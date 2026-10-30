@@ -13,7 +13,9 @@ public:
 
     void Init() override;
     void Update() override;
-    void Exit() override {};
+    void Exit() override;
+
+    void CreateDefaultEntities();
 
 private:
     void CallbackLand(const tomato::LandingEvent& event);

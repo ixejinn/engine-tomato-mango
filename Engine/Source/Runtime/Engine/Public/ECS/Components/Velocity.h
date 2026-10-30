@@ -7,24 +7,24 @@ namespace tomato
 {
     struct VelocityComponent
     {
-        glm::vec3 velocity;
-        glm::vec3 input;
+        glm::vec3 velocity{0};
+        glm::vec3 input{0};
 
-        float horizontalSpeed{3.0f};
-        float acceleration{20.0f};
+        float horizontalSpeed{3};
+        float acceleration{20};
 
         glm::vec3 Get() const { return velocity + input; }
     };
 
     struct FrictionComponent
     {
-        float groundFriction{5.0f};
-        float airDrag{0.5f};
+        float groundFriction{5};
+        float airDrag{0.5};
     };
 
     struct SurfaceComponent
     {
-        float friction{1.0f};
+        float friction{1};
     };
 }
 

@@ -22,9 +22,9 @@ namespace tomato
 
 		std::u32string codepoints{};
 
-		glm::vec4 color{0.0f, 0.0f, 0.0f, 1.0f};
+		glm::vec4 color{0, 0, 0, 1};
 		AssetID font{GetAssetID(Font::defaultFontPath)};
-        float fontSize{48.f};
+        float fontSize{48};
 
         bool dirty{true};
 	};

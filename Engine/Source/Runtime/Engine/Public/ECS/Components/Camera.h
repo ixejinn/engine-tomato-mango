@@ -14,18 +14,11 @@ namespace tomato
 
     struct CameraComponent
     {
-        CameraComponent(
-            const ProjectionMode m = ProjectionMode::Perspective,
-            const float degree = 45.f,
-            const float zNear = 0.1f,
-            const float zFar = 100.f)
-                : mode(m), degree(degree), zNear(zNear), zFar(zFar), viewProjMat(1.f) {}
+        ProjectionMode mode{Perspective};
 
-        ProjectionMode mode;
-
-        float degree;
-        float zNear;
-        float zFar;
+        float degree{45};
+        float zNear{0.1};
+        float zFar{100};
 
         glm::vec3 right;
         glm::vec3 up;

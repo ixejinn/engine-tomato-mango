@@ -3,14 +3,13 @@
 
 #include <glm/glm.hpp>
 #include <entt/entt.hpp>
-#include "Serialization/UUID.h"
 
 namespace tomato
 {
 	struct TargetComponent
 	{
-		entt::entity target{ entt::null };
-		glm::vec3 headOffset{ 0.f, 0.f, 0.f };
+		entt::entity target{entt::null};
+		glm::vec3 headOffset{0};
 	};
 }
 #endif // !MANGO_TARGETCOMPONENT_H

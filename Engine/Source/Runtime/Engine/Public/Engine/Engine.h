@@ -60,7 +60,7 @@ namespace tomato
         void ChangeState(TickClock& tc);
         std::unique_ptr<State> currState_{nullptr};
         std::unique_ptr<State> nextState_{nullptr};
-        bool loaded{true};
+        bool loaded{false};
 
         Editor editor_;
 

@@ -4,7 +4,7 @@
 #include "Event/EventDispatcher.h"
 #include "Simulation/Tick/TickClock.h"
 #include "Render/GLStateCache.h"
-#include "State/DefaultState.h"
+#include "State/State.h"
 #include "State/StateEvent.h"
 #include "ECS/Systems/GarbageEntityCollectionSystem.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
@@ -211,7 +211,7 @@ namespace tomato
         if (!nextState_)
         {
             if (!currState_)
-                nextState_ = std::make_unique<DefaultState>(*this);
+                nextState_ = std::make_unique<State>(*this);
             else
             {
                 TMT_WARN << "Next state is NULL.";

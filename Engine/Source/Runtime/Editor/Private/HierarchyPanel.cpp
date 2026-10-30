@@ -74,7 +74,7 @@ namespace tomato
 
 				for (auto [e, tag] : view.each())
 				{
-					if (editorCtx.currentState->GetRegistry().all_of<EditorHidden>(e))
+					if (editorCtx.currentState->GetRegistry().all_of<EditorHiddenTag>(e))
 						continue;
 					DrawEntity(editorCtx, e);
 				}

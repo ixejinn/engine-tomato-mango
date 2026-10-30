@@ -3,43 +3,78 @@
 
 namespace tomato
 {
-	struct VisibilityComponent;
+	// ActiveTag.h
+	struct ActiveTag;
 
+	// Camera.h
 	struct CameraComponent;
-	struct TransformComponent;
+	struct MainCameraTag;
+
+	// Character.h
+	struct CharacterTag;
+	struct GroundTriggerTag;
+
+	// Collision.h
+	struct ColliderComponent;
+
+	// EditorTag.h
+	struct EditorHiddenTag;
+	struct NoInspectorTag;
+	struct NoSaveTag;
+
+	// Hierarchy.h
+	struct RootEntityTag;
+	struct HierarchyComponent;
+
+	// Movement.h
 	struct InputChannelComponent;
 	struct MovementComponent;
-	struct VelocityComponent;
-	struct ColliderComponent;
-	struct PhysicsBodyComponent;
-	struct FrictionComponent;
-	struct SurfaceComponent;
 
+	// Nametag.h
+	struct NametagComponent;
+
+	// Particle.h	/////////////////////////////////
+	struct ParticleEmitterComponent;
+	struct ParticleRuntimeComponent;
+	struct ParticleBufferComponent;
+	struct ParticleRenderComponent;
+	struct ParticleAttachmentComponent;
+
+	// PhysicsBody.h
+	struct PhysicsBodyComponent;
+
+	// Render.h
 	struct RenderComponent;
 	struct StencilComponent;
 
-	struct UIComponent;
-	struct CanvasComponent;
-	struct RectTransformComponent;
-	struct TextComponent;
-	struct TargetComponent;
-	struct MouseEventComponent;
-	struct SelectableComponent;
-
-	struct HierarchyComponent;
-	
-	struct ParticleEmitterComponent;
-	struct ParticleRenderComponent;
-
-	struct ActiveTag;
-	struct RootEntityTag;
-	struct MainCameraTag;
-	struct CharacterTag;
-	struct GroundTriggerTag;
+	// Rollback.h
 	struct RollbackEntityTag;
 
-	struct EditorHidden;
-	struct NoInspector;
+	// Target.h
+	struct TargetComponent;
+
+	// Text.h
+	struct TextComponent;
+
+	// Transform.h
+	struct TransformComponent;
+
+	// UI.h
+	struct CanvasComponent;
+	struct UIComponent;
+	struct RectTransformComponent;
+	struct SelectableComponent;
+
+	// UIEvents.h
+	struct MouseEventComponent;
+
+	// Velocity.h
+	struct VelocityComponent;
+	struct FrictionComponent;
+	struct SurfaceComponent;
+
+	// Visibility.h
+	struct VisibilityComponent;
 }
 
 #endif // !MANGO_COMPONENTFWD_H

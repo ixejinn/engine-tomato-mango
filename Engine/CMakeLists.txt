@@ -56,14 +56,13 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Input/InputIntent.h
 		Source/Runtime/Engine/Public/Input/IntentState.h
         Source/Runtime/Engine/Public/Input/IntentTranslator.h
-        Source/Runtime/Engine/Public/Input/InputEvent.h
+        Source/Runtime/Engine/Public/Input/InputEvents.h
         Source/Runtime/Engine/Public/Input/InputUI.h
         Source/Runtime/Engine/Public/Input/KeyConstants.h
         Source/Runtime/Engine/Public/Input/InputEventFwd.h
         Source/Runtime/Engine/Public/Services/Input.h
         Source/Runtime/Engine/Public/Simulation/Tick/TickClock.h
         Source/Runtime/Engine/Public/Simulation/Tick/TickFwd.h
-        Source/Runtime/Engine/Public/State/DefaultState.h
 		Source/Runtime/Engine/Public/Engine/GameplayConfig.h
         Source/Runtime/Engine/Public/State/StateFwd.h
 		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemUpdateContexts.h
@@ -318,8 +317,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Editor/Private/MainMenuBar.cpp
         Source/Runtime/Engine/Private/Utils/FileDialog.cpp
 		Source/Runtime/Engine/Private/State/StateRegistry.cpp
-		Source/Runtime/Engine/Private/State/DefaultState.cpp
-        Source/Runtime/Engine/Private/ECS/Systems/ParticleEmissionSystem.cpp
+		Source/Runtime/Engine/Private/ECS/Systems/ParticleEmissionSystem.cpp
         Source/Runtime/Engine/Private/Math/Ray.cpp
         Source/Runtime/Engine/Private/Math/Geometry.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/EditorCameraSystem.cpp
@@ -335,8 +333,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Collision/Detection/Narrow/NarrowPhase.cpp
 		Source/Runtime/Engine/Private/Collision/Detection/Narrow/Pairs/SphereSphere.cpp
         Source/Runtime/Engine/Private/Serialization/JsonIO.cpp
-        Source/Runtime/Engine/Private/Serialization/ComponentSerializer_Core.cpp
-        Source/Runtime/Engine/Private/Serialization/ComponentSerializer_UI.cpp
+		Source/Runtime/Engine/Private/Serialization/ComponentSerializer.cpp
         Source/Runtime/Engine/Private/Serialization/ComponentSerializer_Paricle.cpp
         Source/Runtime/Engine/Private/Serialization/ParticleSerializer.cpp
         Source/Runtime/Engine/Private/Serialization/StateSerializer.cpp

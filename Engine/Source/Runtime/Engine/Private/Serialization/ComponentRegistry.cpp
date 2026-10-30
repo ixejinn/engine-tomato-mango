@@ -68,8 +68,8 @@ namespace tomato::Serialization
 		RegisterComponent<CharacterTag>("TagCharacter", ComponentCategory::Tag, ComponentFlags::Hidden);
 		RegisterComponent<GroundTriggerTag>("TagGroundTrigger", ComponentCategory::Tag, ComponentFlags::Hidden);
 		RegisterComponent<RollbackEntityTag>("TagRollback", ComponentCategory::Tag);
-		RegisterComponent<EditorHidden>("TagEditorHidden", ComponentCategory::Tag, ComponentFlags::Hidden);
-		RegisterComponent<NoInspector>("TagNoInspector", ComponentCategory::Tag, ComponentFlags::Hidden);
+		RegisterComponent<EditorHiddenTag>("TagEditorHidden", ComponentCategory::Tag, ComponentFlags::Hidden);
+		RegisterComponent<NoInspectorTag>("TagNoInspector", ComponentCategory::Tag, ComponentFlags::Hidden);
 	}
 
 	void ComponentRegistry::RegisterBuiltInComponentsInspector()

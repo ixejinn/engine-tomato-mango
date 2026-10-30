@@ -5,7 +5,7 @@ namespace tomato
 {
     struct PhysicsBodyComponent
     {
-        float inverseMass{1.0f};    // 0: 움직이지 않음
+        float inverseMass{1};    // 0: 움직이지 않음
     };
 }
 

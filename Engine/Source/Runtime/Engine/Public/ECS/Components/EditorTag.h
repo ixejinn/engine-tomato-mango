@@ -3,8 +3,8 @@
 
 namespace tomato
 {
-	struct EditorHidden{};
-	struct NoInspector {};
-	struct NoSave {};
+	struct EditorHiddenTag{};
+	struct NoInspectorTag {};
+	struct NoSaveTag {};
 }
 #endif // !MANGO_EDITORTAG_H

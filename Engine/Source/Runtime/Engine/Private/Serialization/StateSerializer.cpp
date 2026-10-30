@@ -24,7 +24,7 @@ namespace tomato::Serialization
 
 	void StateSerializer::SaveEntity(json& data, entt::registry& reg, entt::entity entity)
 	{
-		if (reg.all_of<NoSave>(entity))
+		if (reg.all_of<NoSaveTag>(entity))
 			return;
 
 		// particle

@@ -55,7 +55,7 @@ namespace tomato
 
 		int sortOrder{0};
 
-		entt::entity camera{ entt::null }; // optional
+		entt::entity camera{entt::null}; // optional
 	};
 
 #define TMT_UI_TYPE_LIST(X)	\
@@ -96,10 +96,10 @@ namespace tomato
 
 	struct UIComponent
 	{
-		entt::entity canvas{ entt::null };
-		int sortOrder{ 0 };
+		entt::entity canvas{entt::null};
+		int sortOrder{0};
 
-		UIType type{ UIType::Default };
+		UIType type{UIType::Default};
 	};
 
 	struct UIRect
@@ -150,12 +150,12 @@ namespace tomato
 
 	struct SelectableComponent
 	{
-		bool interactable{ true };
+		bool interactable{true};
 
 		//transition
-		glm::vec4 normalColor{ 0.2f, 0.75f, 0.4f, 1.0f };
-		glm::vec4 highlightedColor{ 0.f, 1.f, 0.5f, 1.f };
-		glm::vec4 pressedColor{ 1.f, 0.f, 1.f, 1.f };
+		glm::vec4 normalColor{0.2f, 0.75f, 0.4f, 1.0f};
+		glm::vec4 highlightedColor{0.f, 1.f, 0.5f, 1.f};
+		glm::vec4 pressedColor{1.f, 0.f, 1.f, 1.f};
 	};
 }
 

@@ -5,10 +5,10 @@ namespace tomato
 {
 	struct VisibilityComponent
 	{
-		bool visible{ true }; //self visible
+		bool visible{true}; //self visible
 
-		//Cache : Fanal parent's visible
-		bool inheritedVisible{ true }; 
+		// Cache : Latest parent's visible
+		bool inheritedVisible{true};
 	};
 }
 

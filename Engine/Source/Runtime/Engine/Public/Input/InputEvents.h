@@ -1,5 +1,5 @@
-﻿#ifndef MANGO_INPUTEVENT_H
-#define MANGO_INPUTEVENT_H
+﻿#ifndef MANGO_INPUTEVENTS_H
+#define MANGO_INPUTEVENTS_H
 
 #include <cstdint>
 #include "Input/KeyConstants.h"
@@ -43,4 +43,4 @@ namespace tomato {
     };
 }
 
-#endif //MANGO_INPUTEVENT_H
+#endif //MANGO_INPUTEVENTS_H
