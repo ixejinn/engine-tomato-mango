@@ -49,32 +49,32 @@ namespace tomato::Serialization
 
 		AssetID stateID = root["State"];
 
-		auto newState = state->GetStateByID(stateID);
-		if (!newState)
-		{
-			TMT_ERR << "Invalid State ID in " << path;
-			return;
-		}
-
-		auto& registry = newState->GetRegistry();
-
-		//Load Resources
-		resource_.LoadResources(root);
-		state_.CreateEntities(root, registry, newState->GetEntityMap());
-		state_.LoadComponents(root, registry, newState->GetEntityMap());
-
-		//ResolveHierarchy(registry, newState->GetEntityMap());
-
-		particle_.Attach(root, registry);
-
-		state->SetNextState(std::move(newState));
-		registry.ctx().get<EntityNameGenerator>().Initialize(registry);
+//		auto newState = state->GetStateByID(stateID);
+//		if (!newState)
+//		{
+//			TMT_ERR << "Invalid State ID in " << path;
+//			return;
+//		}
+//
+//		auto& registry = newState->GetRegistry();
+//
+//		//Load Resources
+//		resource_.LoadResources(root);
+//		state_.CreateEntities(root, registry, newState->GetEntityMap());
+//		state_.LoadComponents(root, registry, newState->GetEntityMap());
+//
+//		//ResolveHierarchy(registry, newState->GetEntityMap());
+//
+//		particle_.Attach(root, registry);
+//
+//		state->SetNextState(std::move(newState));
+//		registry.ctx().get<EntityNameGenerator>().Initialize(registry);
 	}
 
 	void SerializeManager::NewState(State* state)
 	{
-		AssetID stateID = StateRegistry::GetInstance().GetStateID(typeid(*state));
-		auto newState = state->GetStateByID(stateID);
-		state->SetNextState(std::move(newState));
+//		AssetID stateID = StateRegistry::GetInstance().GetStateID(typeid(*state));
+//		auto newState = state->GetStateByID(stateID);
+//		state->SetNextState(std::move(newState));
 	}
 }

@@ -3,7 +3,7 @@
 #include <string>
 #include <entt/entt.hpp>
 
-#include "Engine.h"
+#include "Engine/Engine.h"
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
@@ -15,6 +15,7 @@
 #include "EditorPanel.h"
 #include "State/State.h"
 #include "State/StateRegistry.h"
+#include "State/StateEvent.h"
 
 #include "Serialization/ComponentSerializer.h"
 
@@ -172,11 +173,7 @@ namespace tomato
 			if (!runtimePath.empty())
 			{
 				FileUtils::CopyAsset(path.value(), runtimePath, std::filesystem::copy_options::overwrite_existing);
-				eCtx.engine_->GetSerializer().LoadState(eCtx.currentState, runtimePath.string().c_str());
-				/*Serialization::LoadStateScene(
-					eCtx.currentState,
-					runtimePath.string().c_str()
-				);*/
+				EventDispatcher::GetInstance().Enqueue(Event::ChangeStateRequest{runtimePath.string().c_str()});
 
 				eCtx.currentScenePath = path.value();
 				eCtx.currentSceneRuntimePath = runtimePath;

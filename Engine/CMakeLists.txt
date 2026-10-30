@@ -163,8 +163,6 @@ set(ENGINE_HEADERS
         Source/Runtime/Editor/Public/MainMenuBar.h
 		Source/Runtime/Engine/Public/ECS/Components/Character.h
 		Source/Runtime/Core/Public/Clock/Timer.h
-        Source/PlayTest/TimerTestComponent.h    /////
-        Source/PlayTest/TimerTestSystem.h       /////
 		Source/Runtime/Core/Public/Clock/TickTimer.h
 		Source/Runtime/Core/Public/Clock/TimerState.h
 		Source/Runtime/Engine/Public/ECS/Components/Particle.h

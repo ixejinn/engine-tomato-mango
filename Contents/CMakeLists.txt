@@ -5,7 +5,14 @@
 		Source/PlayTest/UIController.h
         Source/Game/WaveManager.h
 		Source/jung/WaveManagerFwd.h
-
+		Source/PlayTest/TimerTestComponent.h
+		Source/PlayTest/TimerTestSystem.h
+		Source/Game/WavePool.h
+		Source/Game/WaveColliderPool.h
+		Source/Game/Wave/WaveEvent.h
+		Source/Game/Wave/WaveEventFwd.h
+		Source/PlayTest/ExampleState.h
+		Source/PlayTest/RenderTestState.h
 )
 
 set(CONTENTS_SOURCES
@@ -16,18 +23,13 @@ set(CONTENTS_SOURCES
 		Source/PlayTest/TimerTestSystem.cpp
 		Source/Game/GameState.cpp
         Source/Game/WaveSystem.cpp
-        Source/Game/WavePool.h
         Source/Game/WavePool.cpp
-        Source/Game/WaveColliderPool.h
         Source/Game/WaveColliderPool.cpp
         Source/Game/WaveManager.cpp
-		Source/Game/Wave/WaveEvent.h
-		Source/Game/Wave/WaveEventFwd.h
         Source/Game/LobbyState.cpp
 		Source/PlayTest/ExampleState.cpp
-		Source/PlayTest/ExampleState.h
-		Source/PlayTest/RenderTestState.h
 		Source/PlayTest/RenderTestState.cpp
+
 )
 
 add_executable(contents
