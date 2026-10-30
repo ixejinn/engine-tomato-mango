@@ -139,17 +139,26 @@ namespace tomato::Serialization
 	void Save(json& data, entt::registry& registry, const VelocityComponent& velocity)
 	{
 		data["speed"] = velocity.horizontalSpeed;
+		data["acceleration"] = velocity.acceleration;
 		data["velocity"] = { velocity.velocity.x, velocity.velocity.y, velocity.velocity.z };
+		data["input"] = { velocity.input.x, velocity.input.y, velocity.input.z };
 	}
 
 	void Load(const json& data, entt::registry& registry, VelocityComponent& velocity)
 	{
 		velocity.horizontalSpeed = data["speed"];
+		velocity.acceleration = data["acceleration"];
 		velocity.velocity =
 		{
 			data["velocity"][0],
 			data["velocity"][1],
 			data["velocity"][2],
+		};
+		velocity.input =
+		{
+			data["input"][0],
+			data["input"][1],
+			data["input"][2],
 		};
 	}
 

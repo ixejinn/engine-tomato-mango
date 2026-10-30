@@ -4,6 +4,7 @@
 #include "Serialization/SerializeManager.h"
 #include "Serialization/JsonIO.h"
 
+#include "Engine/Engine.h"
 #include "State/State.h"
 #include "State/StateRegistry.h"
 
@@ -41,40 +42,38 @@ namespace tomato::Serialization
 		ofs << root.dump(4);
 	}
 
-	void SerializeManager::LoadState(State* state, const char* path)
+	void SerializeManager::LoadState(Engine& engine_, const char* path)
 	{
 		json root = LoadJsonData(path);
 		if (root == nullptr)
 			return;
 
 		AssetID stateID = root["State"];
+		auto newState = StateRegistry::GetInstance().GetStateFactory(stateID)(engine_);
+		if (!newState)
+		{
+			TMT_ERR << "Invalid State ID in " << path;
+			return;
+		}
 
-//		auto newState = state->GetStateByID(stateID);
-//		if (!newState)
-//		{
-//			TMT_ERR << "Invalid State ID in " << path;
-//			return;
-//		}
-//
-//		auto& registry = newState->GetRegistry();
-//
-//		//Load Resources
-//		resource_.LoadResources(root);
-//		state_.CreateEntities(root, registry, newState->GetEntityMap());
-//		state_.LoadComponents(root, registry, newState->GetEntityMap());
-//
-//		//ResolveHierarchy(registry, newState->GetEntityMap());
-//
-//		particle_.Attach(root, registry);
-//
-//		state->SetNextState(std::move(newState));
-//		registry.ctx().get<EntityNameGenerator>().Initialize(registry);
+		auto& registry = newState->GetRegistry();
+
+		//Load Resources
+		resource_.LoadResources(root);
+		state_.CreateEntities(root, registry, newState->GetEntityMap());
+		state_.LoadComponents(root, registry, newState->GetEntityMap());
+
+		//ResolveHierarchy(registry, newState->GetEntityMap());
+
+		particle_.Attach(root, registry);
+		engine_.SetNextState(std::move(newState));
+		registry.ctx().get<EntityNameGenerator>().Initialize(registry);
 	}
 
-	void SerializeManager::NewState(State* state)
+	void SerializeManager::NewState(Engine& engine_, State* state)
 	{
-//		AssetID stateID = StateRegistry::GetInstance().GetStateID(typeid(*state));
-//		auto newState = state->GetStateByID(stateID);
-//		state->SetNextState(std::move(newState));
+		AssetID stateID = StateRegistry::GetInstance().GetStateID(typeid(*state));
+		auto newState = StateRegistry::GetInstance().GetStateFactory(stateID)(engine_);
+		engine_.SetNextState(std::move(newState));
 	}
 }

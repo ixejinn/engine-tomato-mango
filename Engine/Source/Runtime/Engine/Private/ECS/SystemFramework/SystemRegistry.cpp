@@ -11,12 +11,12 @@ namespace tomato
 {
     void SystemRegistry::RegisterSystems(SystemManager& manager)
     {
-        ////// Register tick phase systems
+        //// Register tick phase systems
         // Pre
         for (const auto& factory : tickFactories_[TickPhase::PreUpdate])
             manager.AddSystem(TickPhase::PreUpdate, factory.mode, factory.factory());
 
-        // Update
+        //// Update
         manager.AddSystem(TickPhase::Update, RunMode::Game | RunMode::Rollback,
             std::make_unique<FrictionSystem>());
         manager.AddSystem(TickPhase::Update, RunMode::Game | RunMode::Rollback,
@@ -30,7 +30,7 @@ namespace tomato
         manager.AddSystem(TickPhase::Update, RunMode::Game | RunMode::Rollback,
             std::make_unique<IntegrationSystem>());
 
-        // Post
+        //// Post
         manager.AddSystem(TickPhase::PostUpdate, RunMode::Game | RunMode::Editor | RunMode::Rollback,
             std::make_unique<CharacterScaleSystem>());
         for (const auto& factory : tickFactories_[TickPhase::PostUpdate])

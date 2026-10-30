@@ -147,7 +147,7 @@ namespace tomato
 
 		else
 		{
-			eCtx.engine_->GetSerializer().NewState(eCtx.currentState);
+			eCtx.engine_->GetSerializer().NewState(*eCtx.engine_, eCtx.currentState);
 			//Serialization::NewStateScene(eCtx.currentState);
 			eCtx.sceneDirty = false;
 			eCtx.currentScenePath = "";
@@ -173,7 +173,7 @@ namespace tomato
 			if (!runtimePath.empty())
 			{
 				FileUtils::CopyAsset(path.value(), runtimePath, std::filesystem::copy_options::overwrite_existing);
-				EventDispatcher::GetInstance().Enqueue(Event::ChangeStateRequest{runtimePath.string().c_str()});
+				EventDispatcher::GetInstance().Enqueue(Event::ChangeStateRequest{runtimePath});
 
 				eCtx.currentScenePath = path.value();
 				eCtx.currentSceneRuntimePath = runtimePath;
@@ -240,7 +240,7 @@ namespace tomato
 		auto& path = eCtx.currentScenePath;
 		if (!path.empty())
 		{
-			eCtx.engine_->GetSerializer().LoadState(eCtx.currentState, path.string().c_str());
+			eCtx.engine_->GetSerializer().LoadState(*eCtx.engine_, path.string().c_str());
 			/*Serialization::LoadStateScene(
 				eCtx.currentState,
 				path.string().c_str()

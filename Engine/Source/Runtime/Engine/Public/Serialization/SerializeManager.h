@@ -12,15 +12,19 @@
 
 #include "State/StateFwd.h"
 #include "ECS/Forward/ComponentFwd.h"
+namespace tomato
+{
+	class Engine;
+}
 
 namespace tomato::Serialization
 {
 	class SerializeManager
 	{
 	public:
-		void SaveState(State* state , const char* path);
-		void LoadState(State* state , const char* path);
-		void NewState(State* state);
+		void SaveState(State* state, const char* path);
+		void LoadState(Engine& engine_, const char* path);
+		void NewState(Engine& engine_, State* state);
 
 		ResourceSerializer& GetResourceSerializer() { return resource_; }
 		StateSerializer& GetStateSerializer() { return state_; }

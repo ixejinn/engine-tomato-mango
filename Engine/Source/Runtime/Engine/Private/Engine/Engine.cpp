@@ -203,6 +203,7 @@ namespace tomato
 
         // 직렬화함수 호출하면서 Engine& 매개변수로 넘기기
         // 직렬화함수에서 직렬화 + 레지스트리 세팅 후 engine.SetNextState로 등록
+        serializer_.LoadState(*this, event.filepath.string().c_str());
     }
 
     void Engine::ChangeState(TickClock& tc)

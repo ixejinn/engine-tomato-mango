@@ -1,11 +1,14 @@
 #ifndef MANGO_STATEEVENT_H
 #define MANGO_STATEEVENT_H
 
+#include <filesystem>
+
 namespace tomato::Event
 {
     struct ChangeStateRequest
     {
-        const char* filepath;
+        //const char* filepath;
+        std::filesystem::path filepath;
     };
 }
 
