@@ -33,9 +33,9 @@ namespace tomato::Serialization
 
 	void Load(const json& data, entt::registry&, ColliderComponent& collider)
 	{
-		collider.layer = data.value("layer", CollisionLayer::Default);
-		collider.type = data.value("type", ColliderType::Cube);
-		collider.trigger = data.value("trigger", false);
+		collider.layer = data.at("layer").get<CollisionLayer>();
+		collider.type = data.at("type").get<ColliderType>();
+		collider.trigger = data.at("trigger").get<bool>();
 
 		collider.aabbDirty = true;
 	}
@@ -53,11 +53,13 @@ namespace tomato::Serialization
 
 	void Load(const json& data, entt::registry& registry, HierarchyComponent& hierarchy)
 	{
-		hierarchy.root = GetEntityByUUID(registry, data["root"]);
-		hierarchy.parent = GetEntityByUUID(registry, data["parent"]);
+		hierarchy.root = GetEntityByUUID(registry, data.at("root").get<UUID>());
+		hierarchy.parent = GetEntityByUUID(registry, data.at("parent").get<UUID>());
 
+		const auto uuids = data.at("children").get<std::vector<UUID>>();
 		hierarchy.children.clear();
-		for (const auto& child : data["children"])
+		hierarchy.children.reserve(uuids.size());
+		for (const auto child : uuids)
 			hierarchy.children.push_back(GetEntityByUUID(registry, child));
 	}
 
@@ -70,7 +72,7 @@ namespace tomato::Serialization
 
 	void Load(const json& data, entt::registry&, InputChannelComponent& channel)
 	{
-		channel.channel = data.value("channel", 0);
+		channel.channel = data.at("channel").get<uint8_t>();
 		channel.useWASD = data.value("useWASD", true);
 	}
 
@@ -92,13 +94,13 @@ namespace tomato::Serialization
 
 	void Load(const json& data, entt::registry&, PhysicsBodyComponent& physics)
 	{
-		physics.inverseMass = data.value("inverseMass", 1.0f);
+		physics.inverseMass = data.at("inverseMass").get<float>();
 	}
 
 	// Render.h
 	void Save(json& data, entt::registry&, const RenderComponent& render)
 	{
-		data["color"] = {render.color.r, render.color.g, render.color.b, render.color.a};
+		data["color"] = render.color;
 		data["mesh"] = render.mesh;
 		data["shader"] = render.shader;
 		data["texture"] = render.texture;
@@ -108,17 +110,11 @@ namespace tomato::Serialization
 
 	void Load(const json& data, entt::registry&, RenderComponent& render)
 	{
-		render.color =
-		{
-			data["color"][0],
-			data["color"][1],
-			data["color"][2],
-			data["color"][3]
-		};
-		render.mesh = data["mesh"];
-		render.shader = data["shader"];
-		render.texture = data["texture"];
-		render.priority = data.value("priority", RenderPriority::Opaque);
+		render.color = data["color"];
+		render.mesh = data.at("mesh").get<AssetID>();
+		render.shader = data.at("shader").get<AssetID>();
+		render.texture = data.at("texture").get<AssetID>();
+		render.priority = data.at("priority").get<RenderPriority>();
 		render.doubleSided = data.value("doubleSided", false);
 	}
 
@@ -140,25 +136,20 @@ namespace tomato::Serialization
 	void Save(json& data, entt::registry& registry, const TargetComponent& target)
 	{
 		data["target"] = GetUUID(registry, target.target);
-		data["offset"] = {target.headOffset.x, target.headOffset.y, target.headOffset.z};
+		data["offset"] = target.headOffset;
 	}
 
 	void Load(const json& data, entt::registry& registry, TargetComponent& target)
 	{
 		target.target = GetEntityByUUID(registry, data["target"]);
-		target.headOffset =
-		{
-			data["offset"][0],
-			data["offset"][1],
-			data["offset"][2]
-		};
+		target.headOffset = data["offset"];
 	}
 
 	// Text.h
 	void Save(json& data, entt::registry&, const TextComponent& text)
 	{
 		data["text"] = text.text;
-		data["color"] = { text.color.x, text.color.y, text.color.z, text.color.w };
+		data["color"] = text.color;
 		data["font"] = text.font;
 		data["fontSize"] = text.fontSize;
 	}
@@ -166,12 +157,7 @@ namespace tomato::Serialization
 	void Load(const json& data, entt::registry&, TextComponent& text)
 	{
 		text.text = data["text"];
-		text.color = {
-			data["color"][0],
-			data["color"][1],
-			data["color"][2],
-			data["color"][3],
-		};
+		text.color = data["color"];
 		text.font = data["font"];
 		text.fontSize = data.value("fontSize", 48.0f);
 
@@ -181,37 +167,36 @@ namespace tomato::Serialization
 	// Transform.h
 	void Save(json& data, entt::registry&, const TransformComponent& transform)
 	{
-		auto position = transform.GetLocalPosition();
-		data["position"] = {position.x, position.y, position.z};
-
-		auto degree = transform.GetLocalRotationDegree();
-		data["degree"] = {degree.x, degree.y, degree.z};
-
-		auto scale = transform.GetLocalScale();
-		data["scale"] = {scale.x, scale.y, scale.z};
+		data["position"] = transform.GetLocalPosition();
+		data["rotation"] = transform.GetLocalRotationDegree();
+		data["scale"] = transform.GetLocalScale();
 	}
 
 	void Load(const json& data, entt::registry&, TransformComponent& transform)
 	{
-		transform.SetPosition(data["position"][0], data["position"][1], data["position"][2]);
-		transform.SetRotationDegree(data["degree"][0], data["degree"][1], data["degree"][2]);
-		transform.SetScale(data["scale"][0], data["scale"][1], data["scale"][2]);
+		const glm::vec3 position = data["position"];
+		const glm::vec3 rotation = data["rotation"];
+		const glm::vec3 scale = data["scale"];
+
+		transform.SetPosition(position);
+		transform.SetRotationDegree(rotation);
+		transform.SetScale(scale);
 	}
 
 	// UI.h
 	void Save(json& data, entt::registry&, const CanvasComponent& canvas)
 	{
 		data["mode"] = canvas.mode;
-		data["actSize"] = {canvas.actualSize.x, canvas.actualSize.y};
-		data["refSize"] = {canvas.referenceSize.x, canvas.referenceSize.y};
+		data["actSize"] = canvas.actualSize;
+		data["refSize"] = canvas.referenceSize;
 		data["sortOrder"] = canvas.sortOrder;
 	}
 
 	void Load(const json& data, entt::registry&, CanvasComponent& canvas)
 	{
 		canvas.mode = data.value("mode", RenderMode::ScreenOverlay);
-		canvas.actualSize = {data["actSize"][0], data["actSize"][1]};
-		canvas.referenceSize = {data["refSize"][0], data["refSize"][1]};
+		canvas.actualSize = data["actSize"];
+		canvas.referenceSize = data["refSize"];
 		canvas.sortOrder = data.value("sortOrder", 0);
 	}
 
@@ -231,24 +216,24 @@ namespace tomato::Serialization
 
 	void Save(json& data, entt::registry&, const RectTransformComponent& rectTransform)
 	{
-		data["anchorPos"] = { rectTransform.anchoredPosition.x, rectTransform.anchoredPosition.y };
-		data["offsetMin"] = { rectTransform.offsetMin.x, rectTransform.offsetMin.y };
-		data["offsetMax"] = { rectTransform.offsetMax.x, rectTransform.offsetMax.y };
-		data["sizeDelta"] = { rectTransform.sizeDelta.x, rectTransform.sizeDelta.y };
-		data["anchorMin"] = { rectTransform.anchorMin.x, rectTransform.anchorMin.y };
-		data["anchorMax"] = { rectTransform.anchorMax.x, rectTransform.anchorMax.y };
-		data["pivot"] = { rectTransform.pivot.x, rectTransform.pivot.y };
+		data["anchorPos"] = rectTransform.anchoredPosition;
+		data["offsetMin"] = rectTransform.offsetMin;
+		data["offsetMax"] = rectTransform.offsetMax;
+		data["sizeDelta"] = rectTransform.sizeDelta;
+		data["anchorMin"] = rectTransform.anchorMin;
+		data["anchorMax"] = rectTransform.anchorMax;
+		data["pivot"] = rectTransform.pivot;
 	}
 
 	void Load(const json& data, entt::registry&, RectTransformComponent& rectTransform)
 	{
-		rectTransform.anchoredPosition = {data["anchorPos"][0], data["anchorPos"][1]};
-		rectTransform.offsetMin = {data["offsetMin"][0], data["offsetMin"][1]};
-		rectTransform.offsetMax = {data["offsetMax"][0], data["offsetMax"][1]};
-		rectTransform.sizeDelta = {data["sizeDelta"][0], data["sizeDelta"][1]};
-		rectTransform.anchorMin = {data["anchorMin"][0], data["anchorMin"][1]};
-		rectTransform.anchorMax = {data["anchorMax"][0], data["anchorMax"][1]};
-		rectTransform.pivot = {data["pivot"][0], data["pivot"][1]};
+		rectTransform.anchoredPosition = data["anchorPos"];
+		rectTransform.offsetMin = data["offsetMin"];
+		rectTransform.offsetMax = data["offsetMax"];
+		rectTransform.sizeDelta = data["sizeDelta"];
+		rectTransform.anchorMin = data["anchorMin"];
+		rectTransform.anchorMax = data["anchorMax"];
+		rectTransform.pivot = data["pivot"];
 
 		rectTransform.dirty = UI::Dirty::All;
 	}
@@ -257,56 +242,31 @@ namespace tomato::Serialization
 	{
 		data["interactable"] = selectable.interactable;
 
-		data["normal"] = {selectable.normalColor.x, selectable.normalColor.y, selectable.normalColor.z, selectable.normalColor.w};
-		data["highlight"] = {selectable.highlightedColor.x, selectable.highlightedColor.y, selectable.highlightedColor.z, selectable.highlightedColor.w};
-		data["pressed"] = {selectable.pressedColor.x, selectable.pressedColor.y, selectable.pressedColor.z, selectable.pressedColor.w};
+		data["normal"] = selectable.normalColor;
+		data["highlight"] = selectable.highlightedColor;
+		data["pressed"] = selectable.pressedColor;
 	}
 
 	void Load(const json& data, entt::registry&, SelectableComponent& selectable)
 	{
 		selectable.interactable = data["interactable"];
 
-		selectable.normalColor =
-		{
-			data["normal"][0],
-			data["normal"][1],
-			data["normal"][2],
-			data["normal"][3]
-		};
-
-		selectable.highlightedColor =
-		{
-			data["highlight"][0],
-			data["highlight"][1],
-			data["highlight"][2],
-			data["highlight"][3]
-		};
-
-		selectable.pressedColor =
-		{
-			data["pressed"][0],
-			data["pressed"][1],
-			data["pressed"][2],
-			data["pressed"][3]
-		};
+		selectable.normalColor = data["normal"];
+		selectable.highlightedColor = data["highlight"];
+		selectable.pressedColor = data["pressed"];
 	}
 
 	// Velocity.h
 	void Save(json& data, entt::registry&, const VelocityComponent& velocity)
 	{
-		data["velocity"] = { velocity.velocity.x, velocity.velocity.y, velocity.velocity.z };
+		data["velocity"] = velocity.velocity;
 		data["speed"] = velocity.horizontalSpeed;
 		data["acceleration"] = velocity.acceleration;
 	}
 
 	void Load(const json& data, entt::registry&, VelocityComponent& velocity)
 	{
-		velocity.velocity =
-		{
-			data["velocity"][0],
-			data["velocity"][1],
-			data["velocity"][2],
-		};
+		velocity.velocity = data["velocity"];
 		velocity.horizontalSpeed = data.value("speed", 3.0f);
 		velocity.acceleration = data.value("acceleration", 20.0f);
 	}
