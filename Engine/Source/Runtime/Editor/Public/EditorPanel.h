@@ -40,9 +40,11 @@ namespace tomato
 		const glm::vec2 GetPos() { return glm::vec2{ posX_, posY_ }; }
 		const glm::vec2 GetPivot() { return pivot_; }
 
-		bool open{ false };
+		bool open_{ false };
 
 	protected:
+		bool wasOpen_{ false };
+
 		float width_{ 0 };
 		float height_{ 0 };
 

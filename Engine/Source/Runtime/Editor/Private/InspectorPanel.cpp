@@ -35,17 +35,19 @@ namespace tomato
 
 	void InspectorPanel::Draw(EditorContext& editorCtx)
 	{
+		if (!open_)
+			return;
+
 		if (editorCtx.selectedEntity == entt::null)
 			return;
 
 		if (editorCtx.currentState->GetRegistry().all_of<NoInspectorTag>(editorCtx.selectedEntity))
 			return;
 
-		// ImGui::SetNextWindowPos(ImVec2(posX_, posY_), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
 		ImGui::SetNextWindowPos(ImVec2(posX_, posY_ + ImGui::GetFrameHeight()), ImGuiCond_Once, ImVec2(1.f, 0.f));
 		ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_Once);
 		
-		if (ImGui::Begin("Inspector", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize))
+		if (ImGui::Begin("Inspector", &open_, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize))
 		{
 			SetPos({ ImGui::GetWindowPos().x, ImGui::GetWindowPos().y });
 
@@ -79,6 +81,12 @@ namespace tomato
 			}
 		}
 		ImGui::End();
+		if (open_ != wasOpen_)
+		{
+			if (!open_)	
+				editorCtx.selectedEntity = entt::null;
+		}
+		wasOpen_ = open_;
 	}
 
 	void InspectorPanel::LoadResources()
