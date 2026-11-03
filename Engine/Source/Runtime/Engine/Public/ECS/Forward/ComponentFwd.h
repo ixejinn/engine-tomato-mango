@@ -35,10 +35,7 @@ namespace tomato
 
 	// Particle.h	/////////////////////////////////
 	struct ParticleEmitterComponent;
-	struct ParticleRuntimeComponent;
-	struct ParticleBufferComponent;
-	struct ParticleRenderComponent;
-	struct ParticleAttachmentComponent;
+	struct ParticleSimulationComponent;
 
 	// PhysicsBody.h
 	struct PhysicsBodyComponent;

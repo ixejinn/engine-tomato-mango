@@ -53,12 +53,12 @@ namespace tomato::Serialization
 
 	// Nametag.h
 
-	// Particle.h	///////////////////////////////////////////////////////////////
+	// Particle.h
 	void Save(json&, entt::registry&, const ParticleEmitterComponent&);
 	void Load(const json&, entt::registry&, ParticleEmitterComponent&);
 
-	void Save(json&, entt::registry&, const ParticleRenderComponent&);
-	void Load(const json&, entt::registry&, ParticleRenderComponent&);
+	void Save(json&, entt::registry&, const ParticleSimulationComponent&);
+	void Load(const json&, entt::registry&, ParticleSimulationComponent&);
 
 	// PhysicsBody.h
 	void Save(json&, entt::registry&, const PhysicsBodyComponent&);

@@ -24,6 +24,8 @@
 #include "ECS/Entity/Hierarchy.h"
 #include "ECS/Entity/Entity.h"
 
+#include "Particle/ParticleConfig.h"
+
 #include "Utils/FileDialog.h"
 namespace tomato
 {
@@ -716,297 +718,271 @@ namespace tomato
 		return changed;
 	}
 
-	bool DrawParticleInspector(EditorContext& eCtx, entt::registry& reg, ParticleEmitterComponent& particle)
+	bool DrawParticleInspector(EditorContext& eCtx, entt::registry& reg, ParticleEmitterComponent& emitter)
 	{
-		// Not check dirty for particle
 		bool changed = false;
-		auto& particleRender = reg.get<ParticleRenderComponent>(eCtx.selectedEntity);
-		if (ImGui::BeginTable("ParticleInformation", 2))
-		{
-			ImGui::TableNextRow();
 
+		auto& sets = emitter.sets;
+		const char* preview;
+		if (ImGui::BeginTable("Main emitter", 2))
+		{
+			// Duration
+			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
 			ImGui::Text("Duration");
 
 			ImGui::TableSetColumnIndex(1);
-			float duration = std::chrono::duration<float>(particle.emitter.duration).count();
-			if (ImGui::InputFloat("##Duration", &duration, 0.f, 0.f, "%g"))
-			{
-				particle.emitter.duration =
-					std::chrono::duration_cast<std::chrono::milliseconds>(
-						std::chrono::duration<float>(duration)
-					);
-			}
+			if (ImGui::InputFloat("##Duration", &sets.duration))
+				changed = true;
 
+			// Looping
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
 			ImGui::Text("Looping");
 
 			ImGui::TableSetColumnIndex(1);
-			ImGui::Checkbox("##Looping", &particle.looping);
+			if (ImGui::Checkbox("##Looping", &sets.looping))
+				changed = true;
 
+			// Start delay
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
 			ImGui::Text("Start Delay");
 
 			ImGui::TableSetColumnIndex(1);
-			float startDelay = std::chrono::duration<float>(particle.startDelay).count();
-			if (ImGui::InputFloat("##StartDelay", &startDelay, 0.f, 0.f, "%g"))
-			{
-				particle.startDelay =
-					std::chrono::duration_cast<std::chrono::milliseconds>(
-						std::chrono::duration<float>(startDelay)
-					);
-			}
+			if (ImGui::InputFloat("##StartDelay", &sets.startDelay))
+				changed = true;
+
+			// Max particles
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("Start Lifetime");
+			ImGui::Text("Max Particles");
 
 			ImGui::TableSetColumnIndex(1);
-			float startLifetime = std::chrono::duration<float>(particle.particleLifetime).count();
-			if (ImGui::InputFloat("##StartLifetime", &startLifetime, 0.f, 0.f, "%g"))
+			int maxParticles = sets.maxParticles;
+			if (ImGui::InputInt("##MaxParticles", &maxParticles))
 			{
-				particle.particleLifetime =
-					std::chrono::duration_cast<std::chrono::milliseconds>(
-						std::chrono::duration<float>(startLifetime)
-					);
+				sets.maxParticles = std::clamp(maxParticles,
+					0, static_cast<int>(reg.ctx().get<ParticleConfig>().maxParticlesPerEmitter));
+				changed = true;
 			}
 
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("Start Speed");
-
-			ImGui::TableSetColumnIndex(1);
-			ImGui::InputFloat("##StartSpeed", &particle.startSpeed, 0.f, 0.f, "%g");
-
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("Start Size");
-
-			ImGui::TableSetColumnIndex(1);
-			ImGui::InputFloat("##StartSize", &particleRender.size, 0.f, 0.f, "%g");
-
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("Start Color");
-
-			ImGui::TableSetColumnIndex(1);
-			ImVec4 pColor = { particleRender.color.x, particleRender.color.y, particleRender.color.z, particleRender.color.w };
-			if (ImGui::ColorButton("##start Color", pColor))
-				ImGui::OpenPopup("picker");
-
-			if (ImGui::BeginPopup("picker"))
-			{
-				ImGui::ColorPicker4("##colorEdit4", glm::value_ptr(particleRender.color));
-				ImGui::EndPopup();
-			}
-
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("Max Paritcles");
-
-			ImGui::TableSetColumnIndex(1);
-			ImGui::DragInt("##MaxParticles", &particle.maxParticles);
-			
+			// Simulation space
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
 			ImGui::Text("Simulation Space");
 
 			ImGui::TableSetColumnIndex(1);
-			const char* spacePreview = particleSimulationSpaceMetas[(uint8_t)particle.space].name;
-			if (ImGui::BeginCombo("##Space", spacePreview))
+			preview = "World";
+			for (const auto& info : particleSimulationSpaceMetas)
 			{
-				for (const auto& space : particleSimulationSpaceMetas)
+				if (sets.simSpace == info.type)
 				{
-					if(ImGui::Selectable(space.name, particle.space == space.type))
+					preview = info.name;
+					break;
+				}
+			}
+
+			if (ImGui::BeginCombo("##SimulationSpace", preview))
+			{
+				for (const auto& info : particleSimulationSpaceMetas)
+				{
+					if (ImGui::Selectable(info.name, sets.simSpace == info.type))
 					{
-						particle.space = space.type;
+						sets.simSpace = info.type;
+						changed = true;
 					}
 				}
+
 				ImGui::EndCombo();
 			}
+		}
+		ImGui::EndTable();
+		ImGui::Separator();
 
-			/*auto& runtimeParticle = reg.get<ParticleRuntimeComponent>(eCtx.selectedEntity);
-			auto& targetParticle = reg.get<TargetComponent>(eCtx.selectedEntity);*/
-			/*ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("Custom");
-
-			ImGui::TableSetColumnIndex(1);
-			static bool bTarget = true;
-			if (ImGui::Checkbox("##check", &bTarget))
-				targetParticle.target = bTarget ? targetParticle.target : 0;
-
+		if (ImGui::BeginTable("Main particles", 2))
+		{
+			// Lifetime
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("Target");
+			ImGui::Text("Lifetime");
 
 			ImGui::TableSetColumnIndex(1);
-			
-			ImGui::BeginDisabled(!bTarget);
-			entt::entity targetEntity = GetEntityByUUID(reg, targetParticle.target);
-			const char* namePreview = targetEntity == entt::null ?
-				"None" : reg.try_get<NametagComponent>(targetEntity)->name.c_str();
-			
-			if (ImGui::BeginCombo("##entityCombo", namePreview))
-			{
-				auto view = reg.view<NametagComponent, TransformComponent>();
-				for (auto [e, tag, transform] : view.each())
-				{
-					if (ImGui::Selectable(tag.name.c_str(), targetParticle.target == tag.id))
-						targetParticle.target = tag.id;
-				}
-				ImGui::EndCombo();
-			}
-			ImGui::EndDisabled();*/
+			if (ImGui::InputFloat("##Lifetime", &sets.lifetime))
+				changed = true;
 
-			ImGui::EndTable();
+			// Speed
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Text("Speed");
+
+			ImGui::TableSetColumnIndex(1);
+			if (ImGui::InputFloat("##Speed", &sets.speed))
+				changed = true;
+
+			// Size
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Text("Size");
+
+			ImGui::TableSetColumnIndex(1);
+			if (ImGui::InputFloat("##Size", &sets.size))
+				changed = true;
+
+			// Color
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Text("Color");
+
+			ImGui::TableSetColumnIndex(1);
+			if (ImGui::ColorEdit4("##Color", glm::value_ptr(sets.color)))
+				changed = true;
 		}
-		
+		ImGui::EndTable();
 		ImGui::Separator();
+
 		if (ImGui::BeginTable("Shape", 2))
 		{
+			// Emitter shape
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("Shape");
+			ImGui::Text("Emitter Shape");
 
 			ImGui::TableSetColumnIndex(1);
-			const char* shapePreview = shapeMetas[(uint8_t)particle.shape].name;
-			if (ImGui::BeginCombo("##Shape", shapePreview))
+			preview = "Cone";
+			for (const auto& info : particleEmitterShapeMetas)
 			{
-				for (const auto& shape : shapeMetas)
+				if (sets.shape == info.shape)
 				{
-					if (ImGui::Selectable(shape.name, particle.shape == shape.shape))
+					preview = info.name;
+					break;
+				}
+			}
+
+			if (ImGui::BeginCombo("##EmitterShape", preview))
+			{
+				for (const auto& info : particleEmitterShapeMetas)
+				{
+					if (ImGui::Selectable(info.name, sets.shape == info.shape))
 					{
-						particle.shape = shape.shape;
+						sets.shape = info.shape;
+						changed = true;
 					}
 				}
+
 				ImGui::EndCombo();
 			}
 
-			if (particle.shape == ParticleEffectShape::Cone)
-			{
-				ImGui::TableNextRow();
-				ImGui::TableSetColumnIndex(0);
-				ImGui::Text("Angle");
+			// Cone angle
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Text("Cone Angle");
 
-				ImGui::TableSetColumnIndex(1);
-				ImGui::InputFloat("##coneAngle", &particle.angle, 0.f, 0.f, "%g");
-			}
+			ImGui::TableSetColumnIndex(1);
+			if (ImGui::InputFloat("##ConeAngle", &sets.coneAngle))
+				changed = true;
+		}
+		ImGui::EndTable();
+		ImGui::Separator();
 
+		if (ImGui::BeginTable("Render", 2))
+		{
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
 			ImGui::Text("Texture");
 
 			ImGui::TableSetColumnIndex(1);
-			std::filesystem::path curTex = AssetRegistry<Texture>::GetInstance().GetName(particleRender.texture);
+			std::filesystem::path curTex;
+			if (sets.texture != 0)
+				curTex = AssetRegistry<Texture>::GetInstance().GetName(sets.texture);
+			else
+				curTex = AssetRegistry<Texture>::GetInstance().GetName(GetAssetID(Texture::PrimitiveName));
 			if (ImGui::BeginCombo("##texture", curTex.filename().string().c_str()))
 			{
 				auto it = AssetRegistry<Texture>::GetInstance().GetNameMapBegin();
 				auto endIt = AssetRegistry<Texture>::GetInstance().GetNameMapEnd();
-				for (it; it != endIt; it++)
+				for (it; it != endIt; ++it)
 				{
 					curTex = it->second;
-					if (ImGui::Selectable(curTex.filename().string().c_str(), particleRender.texture == it->first))
+					if (ImGui::Selectable(curTex.filename().string().c_str(), sets.texture == it->first))
 					{
-						particleRender.texture = it->first;
+						sets.texture = it->first;
 						changed = true;
 					}
 				}
 				ImGui::EndCombo();
 			}
-
-			auto loadSrc = DrawLoadResourceButton("Open File", "All Images \0*.png;*.jpg;*.jpeg\0\0", PathManager::ProjectResource() / "Img");
-			if (!loadSrc.empty())
-				particleRender.texture = GetAssetID(loadSrc);
-
-			ImGui::EndTable();
 		}
-
+		ImGui::EndTable();
 		ImGui::Separator();
+
 		if (ImGui::BeginTable("Emission", 2))
 		{
+			// Rate over time
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("Rate over Time");
+			ImGui::Text("Rate Over Time");
 
 			ImGui::TableSetColumnIndex(1);
-			float rateOverTime = particle.emitPeriod == std::chrono::milliseconds::zero() ?
-				0.f : 1.f / std::chrono::duration<float>(particle.emitPeriod).count();
-			
-			if (ImGui::InputFloat("##RateOverTime", &rateOverTime, 0.f, 0.f, "%g"))
-			{
-				particle.emitPeriod = rateOverTime == 0.f ?
-					std::chrono::milliseconds::zero() :
-					std::chrono::duration_cast<std::chrono::milliseconds>(
-						std::chrono::duration<float>(1.f / rateOverTime)
-					);
-			}
-			ImGui::EndTable();
+			if (ImGui::InputFloat("##RateOverTime", &sets.rateOverTime))
+				changed = true;
 		}
+		ImGui::EndTable();
 
+		// Bursts
 		ImGui::Text("Bursts");
 		ImGui::SameLine();
-		if(ImGui::Button("+", ImVec2(15.f, 15.f)))
+		if (ImGui::Button("+", ImVec2(15.0f, 15.0f)))
 		{
-			if (!particle.burst.has_value())
-				particle.burst.emplace(
-					std::chrono::milliseconds::zero(),
-					std::chrono::milliseconds::zero(),
-					std::chrono::steady_clock::now(), 1, 0, 5);
+			sets.bursts.emplace_back();
 		}
 
 		ImGui::SameLine();
-		if (ImGui::Button("-", ImVec2(15.f, 15.f)))
+		if (ImGui::Button("-", ImVec2(15.0f, 15.0f)))
 		{
-			if (particle.burst.has_value())
-				particle.burst.reset();
+			sets.bursts.pop_back();
 		}
 
-		if (ImGui::BeginTable("Burst", 3, ImGuiTableFlags_SizingStretchSame))
+		if (ImGui::BeginTable("Bursts", 4, ImGuiTableFlags_SizingStretchSame))
 		{
-				ImGui::TableSetupColumn("Period", ImGuiTableColumnFlags_WidthStretch);
-				ImGui::TableSetupColumn("Count", ImGuiTableColumnFlags_WidthStretch);
-				ImGui::TableSetupColumn("Cycles", ImGuiTableColumnFlags_WidthStretch);
-				ImGui::TableHeadersRow();
+			ImGui::TableSetupColumn("Time", ImGuiTableColumnFlags_WidthStretch);
+			ImGui::TableSetupColumn("Count", ImGuiTableColumnFlags_WidthStretch);
+			ImGui::TableSetupColumn("Cycles", ImGuiTableColumnFlags_WidthStretch);
+			ImGui::TableSetupColumn("Interval", ImGuiTableColumnFlags_WidthStretch);
+			ImGui::TableHeadersRow();
 
-			if(particle.burst.has_value())
+			for (auto& burst : sets.bursts)
 			{
 				ImGui::TableNextRow();
-				ImGui::TableSetColumnIndex(0);
-				float burstPeriod = particle.burst.value().period == std::chrono::milliseconds::zero() ?
-					0.f : 1.f / std::chrono::duration<float>(particle.burst.value().period).count();
 
-				if (ImGui::InputFloat("##burstPeriod", &burstPeriod, 0.f, 0.f, "%g"))
-				{
-					particle.burst.value().period =
-						std::chrono::duration_cast<std::chrono::milliseconds>(
-							std::chrono::duration<float>(burstPeriod)
-						);
-				}
+				ImGui::TableSetColumnIndex(0);
+				if (ImGui::InputFloat("##Time", &burst.time))
+					changed = true;
 
 				ImGui::TableSetColumnIndex(1);
-				int burstCount = (int)particle.burst.value().count;
-				if (ImGui::DragInt("##count", &burstCount, 1.f, 0, MAX_PARTICLE_NUM, "%d", ImGuiSliderFlags_AlwaysClamp))
+				int cnt = burst.count;
+				if (ImGui::InputInt("##Count", &cnt))
 				{
-					particle.burst.value().count = burstCount;
-					if (particle.maxParticles < burstCount)
-					{
-						int newSize = std::min(MAX_PARTICLE_NUM, burstCount);
-						auto& buffer = reg.get<ParticleBufferComponent>(eCtx.selectedEntity);
-						buffer.positions.resize(newSize + 1);
-						buffer.velocities.resize(newSize + 1);
-						buffer.lifetimes.resize(newSize + 1);
-					}
+					burst.count = std::max(0, cnt);
+					changed = true;
 				}
+
 				ImGui::TableSetColumnIndex(2);
-				ImGui::DragInt("##cycles", &particle.burst.value().cycles);
+				int cycles = burst.cycles;
+				if (ImGui::InputInt("##Cycles", &cnt))
+				{
+					burst.cycles = std::max(0, cycles);
+					changed = true;
+				}
+
+				ImGui::TableSetColumnIndex(3);
+				if (ImGui::InputFloat("##Interval", &burst.interval))
+					changed = true;
 			}
-				ImGui::EndTable();
 		}
+		ImGui::EndTable();
 
 		ImGui::NewLine();
-
 		return changed;
 	}
 

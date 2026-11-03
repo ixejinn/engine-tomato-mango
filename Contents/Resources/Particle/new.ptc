@@ -1,0 +1,21 @@
+{
+    "duration": 5.0,
+    "looping": true,
+    "startDelay": 0.0,
+    "maxParticles": 100,
+    "simulationSpace": "World",
+    "lifetime": 1.0,
+    "speed": 1.0,
+    "size": 0.10000000149011612,
+    "color": [
+        0.6551326513290405,
+        1.0,
+        0.5490195751190186,
+        1.0
+    ],
+    "rateOverTime": 2.0,
+    "bursts": [],
+    "shape": "Cone",
+    "coneAngle": 30.0,
+    "texture": 0
+}

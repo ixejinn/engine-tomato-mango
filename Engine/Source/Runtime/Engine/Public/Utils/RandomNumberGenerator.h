@@ -10,7 +10,9 @@ namespace tomato
     public:
         RandomNumberGenerator() = delete;
 
-        /// [min, max]
+        /**
+         * @return [min, max] 구간의 랜덤 정수
+         */
         template<std::integral T = int>
         static T GetUniformIntDistribution(T min, T max)
         {
@@ -18,7 +20,9 @@ namespace tomato
             return dis(gen_);
         }
 
-        /// [min, max)
+        /**
+         * @return [min, max) 구간의 랜덤 실수
+         */
         template<std::floating_point T = float>
         static T GetUniformRealDistribution(T min, T max)
         {

@@ -37,7 +37,6 @@ namespace tomato
                 UpdateFrom(registry, e, ROOT_QUAT, ROOT_SCL, ROOT_MAT, false);
         }
 
-        UpdateParticleTransform(registry);
         CPU_PROFILER_BLOCK_END(TransformSystem::Update);
     }
 
@@ -95,27 +94,6 @@ namespace tomato
 
                 UpdateFrom(reg, child, trf.wRotation, trf.wScale, trf.transformMatrix, bUpdated);
             }
-        }
-    }
-    void TransformSystem::UpdateParticleTransform(entt::registry& reg)
-    {
-        auto rootView = reg.view<TransformComponent, ParticleRuntimeComponent, TargetComponent>();
-
-        for (auto [e, trf, runtime, target] : rootView.each())
-        {
-            if (target.target == entt::null) continue;
-            if (!reg.valid(target.target))
-                continue;
-
-            auto& targetTrf = reg.get<TransformComponent>(target.target);
-
-            auto T = glm::translate(glm::mat4(1.f), trf.position);
-            auto R = glm::toMat4(trf.rotation);
-            auto S = glm::scale(glm::mat4(1.f), trf.scale);
-
-            trf.wRotation = targetTrf.wRotation * trf.rotation;
-            trf.wScale = targetTrf.wScale * trf.scale;
-            trf.transformMatrix = targetTrf.transformMatrix * (T * R * S);
         }
     }
 }

@@ -8,10 +8,10 @@ namespace tomato {
 
     struct Audio;
 
-    struct Mesh;
-    struct Shader;
-    struct Texture;
-    struct ParticleEffect;
+    class Mesh;
+    class Shader;
+    class Texture;
+    class ParticleEffect;
 }
 
 #endif //MANGO_RESOURCEFWD_H

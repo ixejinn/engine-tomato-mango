@@ -3,7 +3,10 @@
 #include "Serialization/ParticleSerializer.h"
 #include "Serialization/ComponentRegistry.h"
 
+#include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Particle.h"
+#include "ECS/Components/Target.h"
+#include "ECS/Components/Transform.h"
 #include "ECS/Entity/Entity.h"
 #include "Particle/ParticleEmitterPool.h"
 
@@ -13,12 +16,20 @@ namespace tomato::Serialization
 	{
 		data["Particle"] = json::array();
 
-		auto view = reg.view<ParticleAttachmentComponent>();
-		for (auto [e, attach] : view.each())
+		auto view = reg.view<ActiveTag, TransformComponent, ParticleEmitterComponent, TargetComponent>();
+		for (auto [e, trf, emitter, target] : view.each())
 		{
+			if (!emitter.sets.looping)
+				continue;
+
 			json particle;
-			particle["particle"] = attach.particle;
-			particle["target"] = GetUUID(reg, attach.target);
+			particle["origin"] = emitter.origin;
+			particle["sets"] = emitter.sets;
+
+			particle["position"] = trf.GetLocalPosition();
+			particle["rotation"] = trf.GetLocalRotationDegree();
+
+			particle["target"] = GetUUID(reg, target.target);
 
 			data["Particle"].push_back(particle);
 		}
@@ -28,26 +39,23 @@ namespace tomato::Serialization
 	{
 		for (auto& particle : root["Particle"])
 		{
-			AssetID asset = particle["particle"];
+			AssetID asset = particle["origin"];
 			entt::entity target = GetEntityByUUID(reg, particle["target"]);
 
-			reg.ctx().get<ParticleEmitterPool>().Acquire(reg, asset, target);
+			entt::entity ptc = reg.ctx().get<ParticleEmitterPool>().Acquire(reg, target, asset);
+
+			auto& trf = reg.get<TransformComponent>(ptc);
+			trf.SetPosition(particle["position"]);
+			trf.SetRotationDegree(particle["rotation"]);
+
+			auto& sets = reg.get<ParticleEmitterComponent>(ptc).sets;
+			sets = particle["sets"];
 		}
 	}
 
 	void ParticleSerializer::SaveParticle(const std::filesystem::path& path, entt::registry& reg, entt::entity entity)
 	{
-		json root;
-
-		auto& componentInfo = ComponentRegistry::GetInstance().GetComponentInfo();
-		for (auto& info : componentInfo)
-		{
-			if (info.category == Serialization::ComponentCategory::Particle)
-				info.serialization.Save(root, reg, entity);
-
-			/*if (info.name == "Target")
-				info.serialization.Save(root, reg, entity);*/
-		}
+		json root = reg.get<ParticleEmitterComponent>(entity).sets;
 
 		std::ofstream ofs(path);
 		ofs << root.dump(4);

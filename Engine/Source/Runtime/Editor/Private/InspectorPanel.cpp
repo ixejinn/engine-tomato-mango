@@ -5,6 +5,7 @@
 #include "Resource/AssetRegistry.h"
 #include "Resource/PathManager.h"
 #include "Resource/Render/Texture.h"
+#include "Resource/Render/ParticleEffect.h"
 
 #include "GLFW/glfw3.h"
 #include "imgui.h"
@@ -22,12 +23,36 @@
 #include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Camera.h"
 #include "ECS/Components/EditorTag.h"
+#include "ECS/Components/Particle.h"
 
 #include "Utils/FileDialog.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 
 namespace tomato
 {
+	namespace
+	{
+		void LoadParticleButton(EditorContext& editorCtx, const Serialization::ComponentInfo& info)
+		{
+			if (ImGui::MenuItem("Load"))
+			{
+				auto path = FileDialog::OpenFile(
+					"Load Particle",
+					"Particle Files (*.ptc)\0*.ptc\0\0",
+					PathManager::ProjectResource() / "Particle");
+
+				if (path)
+				{
+					auto runtimePath = PathManager::ToRuntime(path.value());
+
+					ParticleEffect::Create(path.value());
+					auto* ptc = AssetRegistry<ParticleEffect>::GetInstance().Get(GetAssetID(path.value()));
+					editorCtx.currentState->GetRegistry().get<ParticleEmitterComponent>(editorCtx.selectedEntity).sets = ptc->GetSettings();
+				}
+			}
+		}
+	}
+
 	InspectorPanel::InspectorPanel(float width, float height, float x, float y) : EditorPanel(width, height, x, y)
 	{
 		LoadResources();
@@ -205,7 +230,10 @@ namespace tomato
 			}
 
 			if (comp.category == Serialization::ComponentCategory::Particle)
+			{
+				LoadParticleButton(editorCtx, comp);
 				SaveParticleButton(editorCtx, comp);
+			}
 
 			ImGui::EndPopup();
 		}

@@ -1,96 +1,82 @@
-﻿#include <entt/entt.hpp>
-#include "Particle/ParticleEmitterPool.h"
-#include "ECS/Components/Nametag.h"
+﻿#include "Particle/ParticleEmitterPool.h"
+#include "Particle/ParticleConfig.h"
+#include "Resource/AssetRegistry.h"
+#include "Resource/Render/ParticleEffect.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Target.h"
-#include "ECS/Components/Hierarchy.h"
 #include "ECS/Components/Particle.h"
-#include "ECS/Components/Visibility.h"
-#include "ECS/Entity/Hierarchy.h"
-#include "Resource/AssetRegistry.h"
-#include "Resource/Render/Texture.h"
-#include "Resource/Render/ParticleEffect.h"
 
 namespace tomato
 {
-    void ParticlePoolTraits::Assemble(entt::registry& registry_, entt::entity e)
+    namespace
     {
-        // auto& nameTag = registry_.get<NametagComponent>(e);
-        // nameTag.name = registry_.ctx().get<EntityNameGenerator>().Generate("ParticleEffect");
+        void ResetEmitter(entt::registry& registry, entt::entity e, AssetID effectID)
+        {
+            auto& emitter = registry.get<ParticleEmitterComponent>(e);
+            auto& sim = registry.get<ParticleSimulationComponent>(e);
 
-        registry_.emplace<ParticleEmitterComponent>(e);
-        registry_.emplace<ParticleRuntimeComponent>(e);
-        registry_.emplace<ParticleRenderComponent>(e);
-        registry_.emplace<TargetComponent>(e);
+            emitter.origin = effectID;
 
-        auto& particleBuf = registry_.emplace<ParticleBufferComponent>(e);
-        particleBuf.positions.reserve(MAX_PARTICLE_NUM);
-        particleBuf.velocities.reserve(MAX_PARTICLE_NUM);
-        particleBuf.lifetimes.reserve(MAX_PARTICLE_NUM);
+            if (effectID != 0)
+            {
+                if (const auto* ptc = AssetRegistry<ParticleEffect>::GetInstance().Get(effectID))
+                    emitter.sets = ptc->GetSettings();
+                else
+                {
+                    TMT_ERR << "Invalid particle effect asset: " << effectID;
+                    emitter.sets = ParticleEmitterSettings{ .duration = 0.0f, .looping = false };    // 다음 틱에 반납
+                }
+            }
+            else
+                emitter.sets = ParticleEmitterSettings{};
+
+            emitter.sets.maxParticles = std::min(emitter.sets.maxParticles, static_cast<uint32_t>(sim.positions.size()));
+            sim.time = -emitter.sets.startDelay;
+            sim.accumulator = 0.0f;
+            sim.activeCnt = 0;
+        }
     }
 
-    void ParticlePoolTraits::Reset(entt::registry& registry_, entt::entity e,
-        AssetID ptcID, glm::vec3 pos)
+    void ParticleEmitterPoolTraits::Assemble(entt::registry& registry, entt::entity e)
     {
-        ParticleEffect* ptcEffect = AssetRegistry<ParticleEffect>::GetInstance().Get(ptcID);
+        const auto* config = registry.ctx().find<ParticleConfig>();
+        const uint32_t capacity = config ? config->maxParticlesPerEmitter : ParticleConfig{}.maxParticlesPerEmitter;
 
-        auto& transform = registry_.get<TransformComponent>(e);
-        transform.SetPosition(pos);
-
-        auto& pRuntime = registry_.get<ParticleRuntimeComponent>(e);
-        pRuntime.active = true;
-
-        auto& attach = registry_.emplace<ParticleAttachmentComponent>(e);
-        attach.particle = ptcID;
-
-        ParticleData pData{
-            .emitter = registry_.get<ParticleEmitterComponent>(e),
-            .runtime = pRuntime,
-            .buffer = registry_.get<ParticleBufferComponent>(e),
-            .render = registry_.get<ParticleRenderComponent>(e)
-        };
-
-        ptcEffect->InitializeParticleComponent(pData);
+        registry.emplace<ParticleEmitterComponent>(e);
+        registry.emplace<TargetComponent>(e);
+        auto& sim = registry.emplace<ParticleSimulationComponent>(e);
+        sim.positions.resize(capacity);
+        sim.velocities.resize(capacity);
+        sim.remainingLifetimes.resize(capacity);
     }
 
-    void ParticlePoolTraits::Reset(entt::registry& registry_, entt::entity e,
-        AssetID ptcID, entt::entity target, glm::vec3 offset)
+    void ParticleEmitterPoolTraits::Reset(entt::registry& registry, entt::entity e,
+        glm::vec3 pos, AssetID effectID)
     {
-        ParticleEffect* ptcEffect = AssetRegistry<ParticleEffect>::GetInstance().Get(ptcID);
-
-        auto& pRuntime = registry_.get<ParticleRuntimeComponent>(e);
-        pRuntime.active = true;
-
-        auto& pTarget = registry_.get<TargetComponent>(e);
-        pTarget.target = target;
-        pTarget.headOffset = offset;
-
-        auto& attach = registry_.emplace<ParticleAttachmentComponent>(e);
-        attach.particle = ptcID;
-        attach.target = target;
-
-        ParticleData pData{
-            .emitter = registry_.get<ParticleEmitterComponent>(e),
-            .runtime = pRuntime,
-            .buffer = registry_.get<ParticleBufferComponent>(e),
-            .render = registry_.get<ParticleRenderComponent>(e)
-        };
-
-        ptcEffect->InitializeParticleComponent(pData);
+        registry.get<TransformComponent>(e).SetPosition(pos);
+        ResetEmitter(registry, e, effectID);
     }
 
-    bool ParticlePoolTraits::Deactivate(entt::registry& registry_, entt::entity e)
+    void ParticleEmitterPoolTraits::Reset(entt::registry& registry, entt::entity e,
+        entt::entity target, AssetID effectID, glm::vec3 offset)
     {
-        auto* particle = registry_.try_get<ParticleRuntimeComponent>(e);
-        if (!particle)
+        auto& targetComp = registry.get<TargetComponent>(e);
+        targetComp.target = target;
+        targetComp.headOffset = offset;
+
+        ResetEmitter(registry, e, effectID);
+    }
+
+    bool ParticleEmitterPoolTraits::Deactivate(entt::registry& registry, entt::entity e)
+    {
+        auto* emitter = registry.try_get<ParticleEmitterComponent>(e);
+        auto* sim = registry.try_get<ParticleSimulationComponent>(e);
+        auto* target = registry.try_get<TargetComponent>(e);
+        if (!emitter || !sim || !target)
             return false;
 
-        registry_.remove<ParticleAttachmentComponent>(e);
-
-        particle->active = false;
-
-        auto& pTarget = registry_.get<TargetComponent>(e);
-        pTarget.target = entt::null;
+        sim->activeCnt = 0;
+        target->target = entt::null;
 
         return true;
     }

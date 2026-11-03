@@ -83,11 +83,11 @@ namespace tomato {
             idToName_[id] = name;
             data_.emplace_back(std::move(asset));
 
-            //TMT_INFO << name << " : " << id << '\n';
+            TMT_INFO << name << " : " << id << '\n';
         }
         else
         {
-            //TMT_WARN << "Failed to register " << name << ", " << id << " already exists. Please try a different ID";
+            TMT_WARN << "Failed to register " << name << ", " << id << " already exists. Please try a different ID";
             //data_[it->second] = std::move(asset);
         }
     }
@@ -97,7 +97,10 @@ namespace tomato {
     {
         auto it = idToIdx_.find(id);
         if (it == idToIdx_.end())
+        {
             TMT_ERR << "Invalid asset ID: " << id;
+            return nullptr;
+        }
 
         return data_[it->second].get();
     }

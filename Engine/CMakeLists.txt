@@ -184,8 +184,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Private/Collision/Detection/Narrow/GJK/GJKResult.h
 		Source/Runtime/Engine/Public/Collision/CollisionTolerance.h
 		Source/Runtime/Engine/Public/ECS/Forward/CharacterCompFwd.h
-        Source/Runtime/Engine/Public/ECS/Systems/ParticleEmissionSystem.h
-        Source/Runtime/Engine/Public/Math/Geometry.h
+		Source/Runtime/Engine/Public/Math/Geometry.h
         Source/Runtime/Engine/Public/Math/AABB.h
         Source/Runtime/Engine/Public/Math/Ray.h
 		
@@ -236,7 +235,11 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Serialization/StateSerializer.h
         Source/Runtime/Engine/Public/Serialization/ResourceSerializer.h
         Source/Runtime/Engine/Public/Serialization/SerializeManager.h
-        )
+		Source/Runtime/Engine/Public/Particle/ParticleConfig.h
+		Source/Runtime/Engine/Public/Particle/ParticleEmitterSettings.h
+		Source/Runtime/Engine/Public/ECS/Systems/ParticleSimulationSystem.h
+		Source/Runtime/Engine/Public/Particle/ParticleFwd.h
+)
 
 set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Collision/Layer/CollisionLayerMatrix.cpp
@@ -313,12 +316,10 @@ set(ENGINE_SOURCES
 		Source/Runtime/Core/Private/Clock/TickTimer.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/ParticleRenderSystem.cpp
 		Source/Runtime/Engine/Private/Particle/ParticleEmitterPool.cpp
-		Source/Runtime/Engine/Private/Resource/Render/ParticleEffect.cpp
         Source/Runtime/Editor/Private/MainMenuBar.cpp
         Source/Runtime/Engine/Private/Utils/FileDialog.cpp
 		Source/Runtime/Engine/Private/State/StateRegistry.cpp
-		Source/Runtime/Engine/Private/ECS/Systems/ParticleEmissionSystem.cpp
-        Source/Runtime/Engine/Private/Math/Ray.cpp
+		Source/Runtime/Engine/Private/Math/Ray.cpp
         Source/Runtime/Engine/Private/Math/Geometry.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/EditorCameraSystem.cpp
 		Source/Runtime/Engine/Private/Input/KeyDeviceState.cpp
@@ -334,11 +335,13 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Collision/Detection/Narrow/Pairs/SphereSphere.cpp
         Source/Runtime/Engine/Private/Serialization/JsonIO.cpp
 		Source/Runtime/Engine/Private/Serialization/ComponentSerializer.cpp
-        Source/Runtime/Engine/Private/Serialization/ComponentSerializer_Paricle.cpp
-        Source/Runtime/Engine/Private/Serialization/ParticleSerializer.cpp
+		Source/Runtime/Engine/Private/Serialization/ParticleSerializer.cpp
         Source/Runtime/Engine/Private/Serialization/StateSerializer.cpp
         Source/Runtime/Engine/Private/Serialization/ResourceSerializer.cpp
         Source/Runtime/Engine/Private/Serialization/SerializeManager.cpp
+		Source/Runtime/Engine/Private/Particle/ParticleEmitterSettings.cpp
+		Source/Runtime/Engine/Private/ECS/Systems/ParticleSimulationSystem.cpp
+        Source/Runtime/Engine/Private/Resource/Render/ParticleEffect.cpp
 )
 
 add_library(engine STATIC

@@ -37,6 +37,8 @@ namespace tomato
             manager.AddSystem(TickPhase::PostUpdate, factory.mode, factory.factory());
         manager.AddSystem(TickPhase::PostUpdate, RunMode::Game | RunMode::Editor | RunMode::Rollback,
             std::make_unique<TransformSystem>());
+        manager.AddSystem(TickPhase::PostUpdate, RunMode::Game | RunMode::Editor,
+            std::make_unique<ParticleSimulationSystem>());
 
         ////// Register frame phase systems
         // Pre
@@ -46,8 +48,6 @@ namespace tomato
             std::make_unique<CameraTransformSystem>());
         for (const auto& factory : frameFactories_[FramePhase::PreRender])
             manager.AddSystem(FramePhase::PreRender, factory.mode, factory.factory());
-        manager.AddSystem(FramePhase::PreRender, RunMode::Game | RunMode::Editor,
-            std::make_unique<ParticleEmissionSystem>());
 
         manager.AddSystem(FramePhase::Render, RunMode::Game | RunMode::Editor,
             std::make_unique<RenderSystem>());
