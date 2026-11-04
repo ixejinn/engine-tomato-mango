@@ -90,8 +90,8 @@ namespace tomato
 	{
 		auto& r = editorCtx.currentState->GetRegistry();
 
-		if (auto* runtime = r.try_get<ParticleRuntimeComponent>(e);
-			runtime != nullptr && !runtime->active) return;
+		// if (auto* runtime = r.try_get<ParticleRuntimeComponent>(e);
+		// 	runtime != nullptr && !runtime->active) return;
 
 		auto* hierarchy = r.try_get<HierarchyComponent>(e);
 
@@ -263,7 +263,7 @@ namespace tomato
 		{
 			//@TODO : Change default particle asset
 			auto& particlePool = editorCtx.currentState->GetRegistry().ctx().get<ParticleEmitterPool>();
-			auto newParticle = particlePool.Acquire(reg, GetAssetID(PathManager::ProjectParticle("burst_test.tmt.ptc")), glm::vec3(0));
+			auto newParticle = particlePool.Acquire(reg, glm::vec3(0));
 			if (newParticle != entt::null)
 				selected = newParticle;
 		}

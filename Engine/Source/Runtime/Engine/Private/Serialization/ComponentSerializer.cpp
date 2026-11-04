@@ -86,6 +86,22 @@ namespace tomato::Serialization
 		movement.control = data.value("control", Direct);
 	}
 
+	// Particle.h
+	void Save(json& data, entt::registry&, const ParticleEmitterComponent& emitter)
+	{
+		data["origin"] = emitter.origin;
+		data["sets"] = emitter.sets;
+	}
+
+	void Load(const json& data, entt::registry&, ParticleEmitterComponent& emitter)
+	{
+		emitter.origin = data.at("origin").get<AssetID>();
+		emitter.sets = data.at("sets").get<ParticleEmitterSettings>();
+	}
+
+	void Save(json&, entt::registry&, const ParticleSimulationComponent&) {}
+	void Load(const json&, entt::registry&, ParticleSimulationComponent&) {}
+
 	// PhysicsBody.h
 	void Save(json& data, entt::registry&, const PhysicsBodyComponent& physics)
 	{

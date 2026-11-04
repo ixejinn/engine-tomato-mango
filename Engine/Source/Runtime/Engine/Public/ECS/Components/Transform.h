@@ -46,6 +46,8 @@ namespace tomato
 
         const glm::mat4& GetTransformMatrix() const { return transformMatrix; }
 
+        bool IsDirty() const;
+
     private:
         // Local
         glm::vec3 position;

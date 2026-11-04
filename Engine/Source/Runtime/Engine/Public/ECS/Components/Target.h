@@ -10,6 +10,8 @@ namespace tomato
 	{
 		entt::entity target{entt::null};
 		glm::vec3 headOffset{0};
+		float delay{0};
+		float speed{5};
 	};
 }
 #endif // !MANGO_TARGETCOMPONENT_H

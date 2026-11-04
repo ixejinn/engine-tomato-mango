@@ -4,11 +4,7 @@
 namespace tomato
 {
     struct ParticleEmitterComponent;
-    struct ParticleRuntimeComponent;
-    struct ParticleBufferComponent;
-    struct ParticleRenderComponent;
-
-    struct ParticleData;
+    struct ParticleSimulationComponent;
 }
 
 #endif //MANGO_PARTICLECOMPFWD_H

@@ -18,11 +18,11 @@ void ExampleState::Init()
     auto sfx = Audio::Create(PathManager::ProjectSound("water-drip.mp3"), 8);
     sfxPtr = AssetRegistry<Audio>::GetInstance().Get(sfx);
 
-    ParticleEffect::Create(PathManager::ProjectParticle("burst_test.tmt.ptc"));
-    ParticleEffect::Create(PathManager::ProjectParticle("ribbon_particle.tmt.ptc"));
-    ParticleEffect::Create(PathManager::ProjectParticle("jump.tmt.ptc"));
-
-    jumpPtcl = GetAssetID("Resources\\Contents\\Particle\\jump.tmt.ptc");
+    // ParticleEffect::Create(PathManager::ProjectParticle("burst_test.tmt.ptc"));
+    // ParticleEffect::Create(PathManager::ProjectParticle("ribbon_particle.tmt.ptc"));
+    // ParticleEffect::Create(PathManager::ProjectParticle("jump.tmt.ptc"));
+    //
+    // jumpPtcl = GetAssetID("Resources\\Contents\\Particle\\jump.tmt.ptc");
 
     ////////
 
@@ -134,7 +134,7 @@ void ExampleState::CallbackLand(const LandingEvent& event)
 {
     if (event.remainingJumpCount == 0)
     {
-        event.reg->ctx().get<ParticleEmitterPool>().Acquire(registry_, jumpPtcl, event.position);
+        // event.reg->ctx().get<ParticleEmitterPool>().Acquire(registry_, jumpPtcl, event.position);
         sfxPtr->Start();
         // std::cout << "test\n";
     }

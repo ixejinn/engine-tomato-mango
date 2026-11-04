@@ -59,7 +59,7 @@ namespace tomato::Serialization
 		RegisterComponent<MouseEventComponent>("Mouse Event", ComponentCategory::UI);
 		RegisterComponent<HierarchyComponent>("Hierarchy", ComponentCategory::Common, ComponentFlags::Hidden);
 		RegisterComponent<ParticleEmitterComponent>("Particle Effect", ComponentCategory::Particle);
-		RegisterComponent<ParticleRenderComponent>("Particle Render", ComponentCategory::Particle, ComponentFlags::Hidden);
+		RegisterComponent<ParticleSimulationComponent>("Particle Render", ComponentCategory::Particle, ComponentFlags::Hidden);
 		
 		//Tag
 		RegisterComponent<ActiveTag>("TagActive", ComponentCategory::Tag, ComponentFlags::Hidden);

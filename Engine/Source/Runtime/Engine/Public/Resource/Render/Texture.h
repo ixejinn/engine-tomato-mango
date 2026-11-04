@@ -52,6 +52,7 @@ namespace tomato
         GLuint GetHandle() const { return textureID_; }
         int GetWidth() const { return width_; }
         int GetHeight() const { return height_; }
+
     private:
         struct GLFormat
         {

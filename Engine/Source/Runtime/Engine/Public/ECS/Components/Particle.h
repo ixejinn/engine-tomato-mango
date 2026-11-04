@@ -1,96 +1,28 @@
 ﻿#ifndef MANGO_PARTICLE_H
 #define MANGO_PARTICLE_H
 
-#include <vector>
-#include <chrono>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-#include <entt/entt.hpp>
 #include "Resource/ResourceFwd.h"
-#include "Particle/ParticleType.h"
+#include "Particle/ParticleEmitterSettings.h"
 
 namespace tomato
 {
-    inline static int MAX_PARTICLE_NUM = 256;
-
-    struct Lifetime
+    struct ParticleEmitterComponent
     {
-        std::chrono::milliseconds duration;
-        std::chrono::steady_clock::time_point start;
+        AssetID origin{0};              // 원본 에셋
+        ParticleEmitterSettings sets;   // 원본 에셋 복사본
     };
 
-    struct Burst
+    struct ParticleSimulationComponent
     {
-        std::chrono::milliseconds period;
-        std::chrono::milliseconds adder;
-        std::chrono::steady_clock::time_point latest;
+        // Emitter
+        float time{0};  // 현재 사이클 기준 이미터 시간(초)
+        float accumulator{0};
 
-        int cycles;
-        int finishedCycles;
-
-        uint8_t count;
-    };
-
-    struct ParticleEmitterComponent // user can change value in editor
-    {
-        bool looping;
-
-        Lifetime emitter;
-
-        ParticleEffectShape shape;
-        float angle{ 0.f }; // cone shape
-        ParticleSimulationSpace space;
-
-        std::chrono::milliseconds emitPeriod;
-        std::optional<Burst> burst;
-
-        std::chrono::milliseconds startDelay;
-        float startSpeed;
-
-        // each particle
-        std::chrono::milliseconds particleLifetime;
-
-        int maxParticles;
-    };
-
-    struct ParticleRuntimeComponent // Values that change during play 
-    {
-        bool active{ false };
-
-        std::chrono::milliseconds adder;
-        std::chrono::steady_clock::time_point latestTP;
-
-        int activeCnt = 0;
-
-        //UUID target = 0;
-    };
-
-    struct ParticleBufferComponent // Actual Particles data for simulation
-    {
+        // Particle data
+        uint32_t activeCnt{0};  // 활동 중인 파티클 개수
         std::vector<glm::vec3> positions;
         std::vector<glm::vec3> velocities;
-        std::vector<Lifetime> lifetimes;
-    };
-
-    struct ParticleRenderComponent
-    {
-        AssetID texture;
-        float size;
-        glm::vec4 color;
-    };
-
-    struct ParticleData
-    {
-        ParticleEmitterComponent& emitter;
-        ParticleRuntimeComponent& runtime;
-        ParticleBufferComponent& buffer;
-        ParticleRenderComponent& render;
-    };
-
-    struct ParticleAttachmentComponent
-    {
-        entt::entity target{ entt::null };
-        AssetID particle;
+        std::vector<float> remainingLifetimes;  // 남은 수명(초), 0 이하가 되면 소멸
     };
 }
 

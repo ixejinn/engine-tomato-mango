@@ -9,6 +9,7 @@
 #include "ECS/Components/PendingDestroy.h"
 #include "ECS/Components/UI.h"
 #include "Particle/ParticleEmitterPool.h"
+#include "Particle/ParticleConfig.h"
 #include "Prefab/Prefab.h"
 #include "Utils/PassKey.h"
 #include "Render/GLStateCache.h"
@@ -28,6 +29,7 @@ namespace tomato
         registry_.ctx().emplace<UIContext>();
         registry_.ctx().emplace<EntityNameGenerator>();
 
+        registry_.ctx().emplace<ParticleConfig>();
         ParticleEmitterPool::EmplaceInContext(registry_);
 
         //// Set render context

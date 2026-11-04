@@ -2,7 +2,6 @@
 #define MANGO_PARTICLERENDERSYSTEM_H
 
 #include "ECS/Systems/System.h"
-#include "ECS/Forward/ParticleCompFwd.h"
 #include "Resource/ResourceFwd.h"
 
 namespace tomato
@@ -15,10 +14,10 @@ namespace tomato
         void Update(SimContext& simCtx) override;
 
     private:
-        Mesh* mesh2D_;
-        Shader* shader_;
+        Mesh*   plain_{nullptr};
+        Shader* shader_{nullptr};
 
-        AssetID curTexture_;
+        Texture* const texture_;
     };
 }
 

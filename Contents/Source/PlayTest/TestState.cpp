@@ -145,8 +145,7 @@ void TestState::TEST_TriggerExit(const TriggerExitEvent& event) {
 void TestState::CallbackJump(const tomato::LandingEvent& event)
 {
     auto e = event.reg->ctx().get<ParticleEmitterPool>().Acquire(
-        registry_, GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")),
-        event.position);
+        registry_, event.position, GetAssetID(PathManager::ProjectParticle("jump.tmt.ptc")));
      // std::cout << "Jump particle " << (int)e.value() << "\n";
 }
 
@@ -168,8 +167,8 @@ void TestState::PlayTest()
     registry_.emplace<CollisionTestComponent>(player0);
 
     auto& particlePool = registry_.ctx().get<ParticleEmitterPool>();
-    particlePool.Acquire(registry_, GetAssetID("Resources\\Contents\\Particle\\burst_test.tmt.ptc"), player0);
-    particlePool.Acquire(registry_, GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"), player0);
+    particlePool.Acquire(registry_, player0, GetAssetID("Resources\\Contents\\Particle\\burst_test.tmt.ptc"));
+    particlePool.Acquire(registry_, player0, GetAssetID("Resources\\Contents\\Particle\\ribbon_particle.tmt.ptc"));
 
     // Player1 character
     // entt::entity player1 = Prefab::CreateCharacter(registry_, true, "Player 1");
