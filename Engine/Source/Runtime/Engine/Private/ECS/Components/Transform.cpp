@@ -94,4 +94,9 @@ namespace tomato
     {
         SetScale({s, s, s});
     }
+
+    bool TransformComponent::IsDirty() const
+    {
+        return HasFlag(dirty, Transform::Dirty::Local | Transform::Dirty::Hierarchy);
+    }
 }

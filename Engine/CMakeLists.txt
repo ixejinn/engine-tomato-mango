@@ -239,6 +239,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Particle/ParticleEmitterSettings.h
 		Source/Runtime/Engine/Public/ECS/Systems/ParticleSimulationSystem.h
 		Source/Runtime/Engine/Public/Particle/ParticleFwd.h
+		Source/Runtime/Engine/Public/ECS/Systems/TargetSystem.h
 )
 
 set(ENGINE_SOURCES
@@ -342,6 +343,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Particle/ParticleEmitterSettings.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/ParticleSimulationSystem.cpp
         Source/Runtime/Engine/Private/Resource/Render/ParticleEffect.cpp
+		Source/Runtime/Engine/Private/ECS/Systems/TargetSystem.cpp
 )
 
 add_library(engine STATIC
