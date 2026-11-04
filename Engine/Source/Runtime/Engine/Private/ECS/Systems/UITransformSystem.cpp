@@ -101,7 +101,7 @@ namespace tomato
             //Target-based World UI
             if (auto* target = registry.try_get<TargetComponent>(e))
             {
-                auto targetEntity = target->target;
+                auto targetEntity = target->targetEntity;
                 auto* targetTransform = registry.try_get<TransformComponent>(targetEntity);
                 if (!targetTransform)
                     continue;

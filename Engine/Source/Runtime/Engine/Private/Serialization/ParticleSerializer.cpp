@@ -29,7 +29,7 @@ namespace tomato::Serialization
 			particle["position"] = trf.GetLocalPosition();
 			particle["rotation"] = trf.GetLocalRotationDegree();
 
-			particle["target"] = GetUUID(reg, target.target);
+			particle["target"] = GetUUID(reg, target.targetEntity);
 
 			data["Particle"].push_back(particle);
 		}

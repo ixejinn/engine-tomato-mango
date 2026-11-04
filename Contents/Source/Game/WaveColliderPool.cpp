@@ -44,7 +44,7 @@ void WaveColliderPoolTraits::Assemble(entt::registry& registry_, entt::entity e)
 void WaveColliderPoolTraits::Reset(entt::registry& registry_, entt::entity e, entt::entity wave, entt::entity target)
 {
     auto& targetComp = registry_.get<TargetComponent>(e);
-    targetComp.target = target;
+    targetComp.targetEntity = target;
 
     auto& waveCollider = registry_.get<WaveColliderComponent>(e).wave = wave;
     auto& transformComp = registry_.get<TransformComponent>(e);

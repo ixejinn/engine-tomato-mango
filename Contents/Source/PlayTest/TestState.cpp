@@ -256,7 +256,9 @@ void TestState::PlayTest()
     auto worldCanvas = UIPrefab::CreateCanvas(registry_, RenderMode::World);
 
     auto targetLabel = UIPrefab::CreateText(registry_, worldCanvas, { 0.f, 0.f }, "player0", { 1.0f, 1.0f, 0.f, 1.f }, 0.5f);
-    registry_.emplace<TargetComponent>(targetLabel, player0, glm::vec3{ 0.f, 1.f, 0.f });
+    auto& targetP0 = registry_.emplace<TargetComponent>(targetLabel);
+    targetP0.targetEntity = player0;
+    targetP0.offset = glm::vec3{ 0.f, 1.f, 0.f };
     SetHierarchy(registry_, worldCanvas, targetLabel);
     auto& uiCmp = registry_.get<UIComponent>(targetLabel);
     uiCmp.sortOrder = 1;

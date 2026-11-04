@@ -247,7 +247,7 @@ namespace tomato
 					auto* target = registry.try_get<TargetComponent>(entity);
 					if (!target) continue;
 
-					auto* targetTransform = registry.try_get<TransformComponent>(target->target);
+					auto* targetTransform = registry.try_get<TransformComponent>(target->targetEntity);
 					if (!targetTransform)
 						continue;
 
@@ -266,7 +266,7 @@ namespace tomato
 							targetTransform->GetWorldPosition(),
 							viewProjMat == nullptr ? glm::mat4(1.f) : viewProjMat->viewProjMat,
 							Window::GetWidth(), Window::GetHeight());
-					rect.position = screenPos + target->headOffset;
+					rect.position = screenPos + target->offset;
 
 					rect.computedSize = rect.sizeDelta;
 
@@ -322,10 +322,10 @@ namespace tomato
 			// Target-based World UI
 			if (auto* target = registry.try_get<TargetComponent>(entity))
 			{
-				auto* targetTransform = registry.try_get<TransformComponent>(target->target);
+				auto* targetTransform = registry.try_get<TransformComponent>(target->targetEntity);
 				if (!targetTransform) continue;
 
-				rect.position = targetTransform->GetWorldPosition() + target->headOffset;
+				rect.position = targetTransform->GetWorldPosition() + target->offset;
 
 				rect.computedSize = rect.sizeDelta;
 				continue;

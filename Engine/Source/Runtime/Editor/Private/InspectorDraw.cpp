@@ -661,31 +661,79 @@ namespace tomato
 	{
 		bool changed = false;
 
-		ImGui::SeparatorText("Target");
-		
-		entt::entity targetEntity = target.target;
-		const char* namePreview = targetEntity == entt::null ? "None" : reg.try_get<NametagComponent>(targetEntity)->name.c_str();
-		if (ImGui::BeginCombo("##entityCombo", namePreview))
+		ImGui::SeparatorText("Target Type");
+		if (ImGui::BeginCombo("##targetTypeCombo", targetTypeMetas[static_cast<int>(target.type)].name))
 		{
-			auto view = reg.view<NametagComponent, TransformComponent>();
-			for (auto [e, tag, transform] : view.each())
+			for (const auto& meta : targetTypeMetas)
 			{
-				if (ImGui::Selectable(tag.name.c_str(), target.target == e))
+				if (ImGui::Selectable(meta.name, target.type == meta.type))
 				{
-					target.target = e;
+					target.type = meta.type;
 					changed = true;
 				}
 			}
-			if (ImGui::Selectable("None", target.target == entt::null))
+			ImGui::EndCombo();
+		}
+
+		ImGui::SeparatorText("Target Motion");
+		if (ImGui::BeginCombo("##targetMotionCombo", targetMotionMetas[static_cast<int>(target.motion)].name))
+		{
+			for (const auto& meta : targetMotionMetas)
 			{
-				target.target = entt::null;
+				if (ImGui::Selectable(meta.name, target.motion == meta.motion))
+				{
+					target.motion = meta.motion;
+					changed = true;
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::SeparatorText("Target Object");
+		const char* objPreview = target.targetEntity == entt::null ? "None" : reg.try_get<NametagComponent>(target.targetEntity)->name.c_str();
+		if (ImGui::BeginCombo("##objectCombo", objPreview))
+		{
+			auto view = reg.view<ActiveTag, NametagComponent, TransformComponent>();
+			for (auto [e, tag, trf] : view.each())
+			{
+				if (ImGui::Selectable(tag.name.c_str(), target.targetEntity == e))
+				{
+					target.targetEntity = e;
+					changed = true;
+				}
+			}
+			if (ImGui::Selectable("None", target.targetEntity == entt::null))
+			{
+				target.targetEntity = entt::null;
 				changed = true;
 			}
 			ImGui::EndCombo();
 		}
 
-		if(DrawVec3Control("Offset", glm::value_ptr(target.headOffset)))
+		if(DrawVec3Control("Target Position", glm::value_ptr(target.targetPosition)))
 			changed = true;
+
+		if(DrawVec3Control("Offset", glm::value_ptr(target.offset)))
+			changed = true;
+
+		if (ImGui::InputFloat("Stop Distance", &target.stopDistance))
+			changed = true;
+
+		if (ImGui::InputFloat("Margin", &target.margin))
+			changed = true;
+
+		if (ImGui::InputFloat("Delay", &target.delay))
+			changed = true;
+
+		if (ImGui::InputFloat("Speed", &target.speed))
+			changed = true;
+
+		if (ImGui::InputFloat("Acceleration", &target.acceleration))
+			changed = true;
+
+		ImGui::SeparatorText("State");
+		std::string statePreview = targetStateMetas[static_cast<int>(target.state)].name;
+		ImGui::InputText("##targetState", &statePreview, ImGuiInputTextFlags_ReadOnly);
 
 		ImGui::NewLine();
 

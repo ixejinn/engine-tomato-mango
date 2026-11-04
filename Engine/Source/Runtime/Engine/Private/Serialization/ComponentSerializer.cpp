@@ -151,14 +151,14 @@ namespace tomato::Serialization
 	// Target.h
 	void Save(json& data, entt::registry& registry, const TargetComponent& target)
 	{
-		data["target"] = GetUUID(registry, target.target);
-		data["offset"] = target.headOffset;
+		data["target"] = GetUUID(registry, target.targetEntity);
+		data["offset"] = target.offset;
 	}
 
 	void Load(const json& data, entt::registry& registry, TargetComponent& target)
 	{
-		target.target = GetEntityByUUID(registry, data["target"]);
-		target.headOffset = data["offset"];
+		target.targetEntity = GetEntityByUUID(registry, data["target"]);
+		target.offset = data["offset"];
 	}
 
 	// Text.h

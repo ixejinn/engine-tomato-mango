@@ -6,11 +6,10 @@
 
 namespace tomato
 {
-    // *---------- Collision type
 #define TMT_COLLISION_TYPE_LIST(X)  \
-X(Cube, "Cube")                 \
-X(Sphere, "Sphere")             \
-//X(Capsule, "Capsule")
+    X(Cube,   "Cube")               \
+    X(Sphere, "Sphere")             \
+    // X(Capsule, "Capsule")
 
     enum class ColliderType : uint8_t
     {
@@ -26,7 +25,7 @@ X(Sphere, "Sphere")             \
         const char* name;
     };
 
-    static constexpr ColliderTypeMeta ColliderTypeMetas[] =
+    inline constexpr ColliderTypeMeta ColliderTypeMetas[] =
     {
 #define X(Enum, Display) { ColliderType::Enum, Display },
         TMT_COLLISION_TYPE_LIST(X)
@@ -40,7 +39,7 @@ X(Sphere, "Sphere")             \
         {
             { ColliderType::Cube, "Cube" },
             { ColliderType::Sphere, "Sphere" },
-//            { ColliderType::Capsule, "Capsule"}
+            // { ColliderType::Capsule, "Capsule"}
         }
     )
 }

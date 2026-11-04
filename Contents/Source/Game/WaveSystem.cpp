@@ -44,7 +44,7 @@ void WaveSystem::Update(SimContext& simCtx)
 			auto* target = reg.try_get<TargetComponent>(col);
 			if (!target) continue;
 
-			auto tEntity = GetEntityByUUID(reg, target->target);
+			auto tEntity = GetEntityByUUID(reg, target->targetEntity);
 			auto& targetTransform = reg.get<TransformComponent>(tEntity);
 
 			if (wave.active == false || transform.GetLocalScale().x >= wave.radius * 2.f)
@@ -80,7 +80,7 @@ void WaveSystem::Update(SimContext& simCtx)
 			auto* target = reg.try_get<TargetComponent>(col);
 			if (!target) continue;
 
-			auto tEntity = GetEntityByUUID(reg, target->target);
+			auto tEntity = GetEntityByUUID(reg, target->targetEntity);
 			auto& targetTransform = reg.get<TransformComponent>(tEntity);
 			auto& colTransform = reg.get<TransformComponent>(col);
 			if (wave.active == false || transform.GetLocalScale().x >= wave.radius * 2.f)
@@ -116,9 +116,9 @@ void WaveSystem::Update(SimContext& simCtx)
 	auto waveColliderView = reg.view<ActiveTag, TransformComponent, TargetComponent, WaveColliderComponent>();
 	for (auto [e, transform, target, waveCol] : waveColliderView.each())
 	{
-		if (target.target == entt::null) continue;
+		if (target.targetEntity == entt::null) continue;
 		if (waveCol.wave == entt::null || !reg.valid(waveCol.wave)) continue;
-		auto tEntity = target.target;
+		auto tEntity = target.targetEntity;
 		auto& targetTransform = reg.get<TransformComponent>(tEntity);
 		auto& waveTransform = reg.get<TransformComponent>(waveCol.wave);
 		auto& wave = reg.get<WaveComponent>(waveCol.wave);

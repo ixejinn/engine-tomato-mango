@@ -61,8 +61,8 @@ namespace tomato
         entt::entity target, AssetID effectID, glm::vec3 offset)
     {
         auto& targetComp = registry.get<TargetComponent>(e);
-        targetComp.target = target;
-        targetComp.headOffset = offset;
+        targetComp.targetEntity = target;
+        targetComp.offset = offset;
 
         ResetEmitter(registry, e, effectID);
     }
@@ -76,7 +76,7 @@ namespace tomato
             return false;
 
         sim->activeCnt = 0;
-        target->target = entt::null;
+        target->targetEntity = entt::null;
 
         return true;
     }
