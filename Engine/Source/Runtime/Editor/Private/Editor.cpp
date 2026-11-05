@@ -104,6 +104,9 @@ namespace tomato
 			ResetEditorContext(state);
 		}
 
+		if (eCtx.selectedEntity != entt::null)
+			panels[1]->open_ = true;
+
 		mainMenu_.Draw(eCtx, mode);
 		for (auto& panel : panels)
 			panel->Draw(eCtx);
@@ -145,7 +148,7 @@ namespace tomato
 		Ray ray = ScreenPointToRay(reg, mousePos);
 
 		float nearest = FLT_MAX;
-		entt::entity selected = entt::null;
+		entt::entity selected = eCtx.selectedEntity;
 
 		auto view = reg.view<VisibilityComponent, TransformComponent, RenderComponent, RootEntityTag>();
 		for (auto [e, visib, transform, render] : view.each())
@@ -162,6 +165,7 @@ namespace tomato
 				{
 					nearest = distance;
 					selected = e;
+					panels[1]->open_ = true; // idx 1: inspector Panel
 				}
 			}
 		}

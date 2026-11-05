@@ -34,6 +34,7 @@ namespace tomato
 {
 	HierarchyPanel::HierarchyPanel(float width, float height, float x, float y) : EditorPanel(width, height, x, y)
 	{
+		open_ = true;
 		LoadResources();
 	}
 
@@ -50,7 +51,8 @@ namespace tomato
 
 	void HierarchyPanel::Draw(EditorContext& editorCtx)
 	{
-		// ImGui::SetNextWindowPos(ImVec2(posX_, posY_), ImGuiCond_FirstUseEver, ImVec2(1.f, 1.f));
+		//if (!open_) return;
+		
 		ImGui::SetNextWindowPos(ImVec2(posX_, ImGui::GetFrameHeight()), ImGuiCond_Once, ImVec2(1.f, 0.f));
 		ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_Once);
 
@@ -68,8 +70,6 @@ namespace tomato
 
 			if (ImGui::CollapsingHeader(sceneName.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				int node_n = 0;
-
 				auto view = editorCtx.currentState->GetRegistry().view<ActiveTag, RootEntityTag, NametagComponent>();
 
 				for (auto [e, tag] : view.each())

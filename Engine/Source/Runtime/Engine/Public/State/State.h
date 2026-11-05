@@ -28,7 +28,6 @@ namespace tomato
         virtual void CreateDefaultEntities() {}
 
         entt::registry& GetRegistry() { return registry_; }
-        std::unordered_map<UUID, entt::entity>& GetEntityMap() { return entityMap_; }
 
         Window& GetWindow();
 
@@ -41,7 +40,6 @@ namespace tomato
         Engine& engine_;
 
         entt::registry registry_;
-        std::unordered_map<UUID, entt::entity> entityMap_;      ////
         PlayerInputTimelines playerInputs_;
 
         PassKey<State> key_;

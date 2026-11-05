@@ -1,4 +1,5 @@
 #include <fstream>
+#include <unordered_map>
 #include <entt/entt.hpp>
 
 #include "Serialization/SerializeManager.h"
@@ -57,15 +58,15 @@ namespace tomato::Serialization
 		}
 
 		auto& registry = newState->GetRegistry();
+		std::unordered_map<UUID, entt::entity> entityMap;
 
 		//Load Resources
 		resource_.LoadResources(root);
-		state_.CreateEntities(root, registry, newState->GetEntityMap());
-		state_.LoadComponents(root, registry, newState->GetEntityMap());
-
-		//ResolveHierarchy(registry, newState->GetEntityMap());
+		state_.CreateEntities(root, registry, entityMap);
+		state_.LoadComponents(root, registry, entityMap);
 
 		particle_.Attach(root, registry);
+
 		engine_.SetNextState(std::move(newState));
 		registry.ctx().get<EntityNameGenerator>().Initialize(registry);
 	}
