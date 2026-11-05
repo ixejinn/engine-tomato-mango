@@ -29,8 +29,6 @@ namespace tomato
 
 		void EndFrame();
 
-		void SetInputCallbacks(Input& input);
-
 		void PickObject(entt::registry& reg, glm::vec2 mousePos);
 
     private:

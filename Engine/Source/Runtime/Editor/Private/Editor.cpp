@@ -20,7 +20,6 @@
 #include <implot/implot.h>
 
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
-#include "Services/Input.h"
 #include "Services/Window.h"
 #include "State/State.h"
 #include "Input/KeyDeviceState.h"
@@ -30,8 +29,6 @@
 #include "InspectorPanel.h"
 
 #include "Math/Geometry.h"
-
-#include "Input/InputEvents.h"
 
 namespace tomato
 {
@@ -51,16 +48,14 @@ namespace tomato
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // 키보드 입력으로 ImGui의 포커스 이동을 막기 위해 주석 처리
 
 		// Setup ImPlot context
 		ImPlot::CreateContext();
 		
 		// Setup Platform/Renderer backends
-		ImGui_ImplGlfw_InitForOpenGL(wnd, false);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+		ImGui_ImplGlfw_InitForOpenGL(wnd, true);
 		ImGui_ImplOpenGL3_Init();
-		
-		SetInputCallbacks(input);
 
 		ImFontConfig config;
 
@@ -86,12 +81,6 @@ namespace tomato
 
 	void Editor::ShutdownImGui(Input& input)
 	{
-        input.GetMouseButtonSink().disconnect<ImGui_ImplGlfw_MouseButtonCallback>();
-        input.GetCursorPosSink().disconnect<ImGui_ImplGlfw_CursorPosCallback>();
-        input.GetScrollSink().disconnect<ImGui_ImplGlfw_ScrollCallback>();
-        input.GetKeySink().disconnect<ImGui_ImplGlfw_KeyCallback>();
-        input.GetCharSink().disconnect<ImGui_ImplGlfw_CharCallback>();
-
 		ImPlot::DestroyContext();
 
 		ImGui_ImplOpenGL3_Shutdown();
@@ -135,15 +124,6 @@ namespace tomato
 	{
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	}
-
-	void Editor::SetInputCallbacks(Input& input)
-	{
-		input.GetMouseButtonSink().connect<ImGui_ImplGlfw_MouseButtonCallback>();
-		input.GetCursorPosSink().connect<ImGui_ImplGlfw_CursorPosCallback>();
-		input.GetScrollSink().connect<ImGui_ImplGlfw_ScrollCallback>();
-		input.GetKeySink().connect<ImGui_ImplGlfw_KeyCallback>();
-		input.GetCharSink().connect<ImGui_ImplGlfw_CharCallback>();
 	}
 
 	void Editor::PickObject(entt::registry& reg, glm::vec2 mousePos)
