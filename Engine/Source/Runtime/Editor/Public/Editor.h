@@ -35,7 +35,6 @@ namespace tomato
 		void LoadResources();
 		void ResetEditorContext(State*);
 
-		bool IsMouseOverPanel(glm::vec2 mousePos);
 		bool TrySelectUI(entt::registry& reg, glm::vec2 mousePos);
 
 	private:

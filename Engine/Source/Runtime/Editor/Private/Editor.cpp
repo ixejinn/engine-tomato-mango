@@ -115,8 +115,10 @@ namespace tomato
 		if (KeyDeviceState::GetInstance().IsKeyPressed(Key::LeftMouseButton))
 		{
 			auto& keyDeviceState = KeyDeviceState::GetInstance();
-			PickObject(eCtx.currentState->GetRegistry(),
-				{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)});
+
+			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::GetIO().WantCaptureMouse)
+				PickObject(eCtx.currentState->GetRegistry(),
+					{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)});
 		}
 	}
 
@@ -128,12 +130,7 @@ namespace tomato
 
 	void Editor::PickObject(entt::registry& reg, glm::vec2 mousePos)
 	{
-		// 1. Check the first click position and exclude ImGui window areas
-		// Note: Calculated using a top-left coordinate system and assuming the pivot is (1, 1)
-		if (IsMouseOverPanel(mousePos))
-			return;
-
-		// 2-0 Check UI
+		// Check UI
 		if (TrySelectUI(reg, glm::vec2(mousePos.x, Window::GetHeight() - mousePos.y)))
 			return;
 
@@ -178,22 +175,6 @@ namespace tomato
 		eCtx.currentState = newState;
 		eCtx.sceneDirty = false;
 		eCtx.selectedEntity = entt::null;
-	}
-
-	bool Editor::IsMouseOverPanel(glm::vec2 mousePos)
-	{
-		for (auto& panel : panels)
-		{
-			glm::vec2 panelTopLeft = panel.get()->GetPos();
-			glm::vec2 panelBotRight = panelTopLeft + panel.get()->GetSize();
-
-			if (mousePos.x < panelTopLeft.x || mousePos.x > panelBotRight.x ||
-				mousePos.y < panelTopLeft.y || mousePos.y > panelBotRight.y)
-				continue;
-
-			return true;
-		}
-		return false;
 	}
 
 	bool Editor::TrySelectUI(entt::registry& reg, glm::vec2 mousePos)
