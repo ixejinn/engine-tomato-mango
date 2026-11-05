@@ -33,7 +33,7 @@ int main() {
     engine.SetNextState(std::make_unique<ExampleState>(engine));
 
 #else //TOMATO_GREENTEA
-    engine.SetNextState(std::make_unique<TestState>(engine));
+    engine.SetNextState(std::make_unique<LobbyState>(engine));
 
 #endif //TOMATO_GREENTEA
     engine.Run();

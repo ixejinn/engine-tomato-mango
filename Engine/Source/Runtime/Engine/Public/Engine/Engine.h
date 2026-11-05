@@ -15,6 +15,7 @@
 #include "State/StateFwd.h"
 #include "Simulation/Tick/TickFwd.h"
 
+#include "Network/NetworkRuntime.h"
 #include "Network/ClientNetwork.h"
 #include "GameNetwork/GamePlayNetSystem.h"
 #include "GameNetwork/Rollback/RollbackManager.h"
@@ -64,13 +65,14 @@ namespace tomato
 
         Editor editor_;
 
+        NetworkRuntime networkRuntime_;
         void ProcessQueuedPackets(TickClock& tc);
-        std::unique_ptr<ClientNetwork> network_{nullptr};
-        std::unique_ptr<GamePlayNetSystem> gameNet_{nullptr};
+        //std::unique_ptr<ClientNetwork> network_{nullptr};
+        //std::unique_ptr<GamePlayNetSystem> gameNet_{nullptr};
 
         void Rollback(SimContext& simCtx);
         void Resimulate(SimContext& simCtx, uint32_t currT);
-        std::unique_ptr<RollbackManager> rollbackManager_{nullptr};
+        //std::unique_ptr<RollbackManager> rollbackManager_{nullptr};
 
         NetMode netMode_;
 
@@ -94,10 +96,9 @@ namespace tomato
         if (netMode_ == NetMode::NM_Alone)
             return;
 
-        if (!rollbackManager_)
-            rollbackManager_ = std::make_unique<RollbackManager>();
-
-        rollbackManager_->Register<Component>();
+        /*if (!networkRuntime_.Client().Rollback)
+            rollbackManager_ = std::make_unique<RollbackManager>();*/
+        networkRuntime_.Client().Rollback().Register<Component>();
     }
 }
 

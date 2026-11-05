@@ -113,6 +113,8 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Network/ClientNetwork.h
         Source/Runtime/Engine/Public/Network/WinsockInitializer.h
         Source/Runtime/Engine/Public/Network/NetTypes.h
+        Source/Runtime/Engine/Public/Network/NetworkRuntime.h
+        Source/Runtime/Engine/Public/Network/ClientRole.h
         Source/Runtime/Engine/Public/GameNetwork/Message/InputMessage.h
         Source/Runtime/Engine/Public/GameNetwork/Message/NetMessage.h
         Source/Runtime/Engine/Public/GameNetwork/GamePlayNetSystem.h
@@ -285,6 +287,8 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Network/TCPNetDriver.cpp
         Source/Runtime/Engine/Private/Network/UDPNetDriver.cpp
         Source/Runtime/Engine/Private/Network/CilentNetwork.cpp
+        Source/Runtime/Engine/Private/Network/ClientRole.cpp
+        Source/Runtime/Engine/Private/Network/NetworkRuntime.cpp
         Source/Runtime/Engine/Private/GameNetwork/Message/InputMessage.cpp
         Source/Runtime/Engine/Private/GameNetwork/GamePlayNetSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/IntegrationSystem.cpp

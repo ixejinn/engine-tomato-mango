@@ -47,9 +47,10 @@ namespace tomato
 
     void Engine::TryStartGame(std::unique_ptr<State>&& newState)
     {
-        if (network_->GetNetState() == ClientNetworkState::NSS_Starting)
+        auto& network_ = networkRuntime_.Client().Network();
+        if (network_.GetNetState() == ClientNetworkState::NSS_Starting)
         {
-            ServerTimeMs startTime = network_->GetLocalStartTime();
+            ServerTimeMs startTime = network_.GetLocalStartTime();
             if (startTime == 0) return;
             auto now = static_cast<ServerTimeMs>(
                 duration_cast<std::chrono::milliseconds>(
@@ -57,7 +58,7 @@ namespace tomato
 
             if (static_cast<int32_t>(now - startTime) >= 0)
             {
-                network_->SetNetState(ClientNetworkState::NSS_Playing);
+                network_.SetNetState(ClientNetworkState::NSS_Playing);
                 SetNextState(std::move(newState));
                 std::cout << now << "\n##### Game Start #####\n\n";
             }
@@ -80,7 +81,7 @@ namespace tomato
         window_.SetWindowUserPointer(input_, tickClock);
         GarbageEntityCollectionSystem garbageCollectionSystem;
 
-        network_->ThreadStart();
+        networkRuntime_.Start();
 
         auto& keyState = KeyDeviceState::GetInstance();
         auto& profiler = Profiler::GetInstance();
@@ -93,17 +94,15 @@ namespace tomato
 
             CPU_PROFILER_TOTAL_BEGIN()
 
-            // std::cout << "       *========== " << tickClock.GetTick() << " ==========*\n";
-            ProcessQueuedPackets(tickClock);
+                // std::cout << "       *========== " << tickClock.GetTick() << " ==========*\n";
+            networkRuntime_.PollIncoming(tickClock);
 
             // *---------- Rollback and resimulate
             auto currT = tickClock.GetTick();
-            auto lateT = gameNet_->GetConfirmedTick();
-            if (currT > lateT &&
-                currT - lateT <= ROLLBACK_WINDOW)
+            int64_t lateT;
+            if (networkRuntime_.ShoudRollback(currT, lateT))
             {
                 // std::cout << "       Rollback " << lateT << "~" << currT << "\n";
-
                 SimContext rbSimCtx{ currState_.get(), lateT };
                 Rollback(rbSimCtx);
                 Resimulate(rbSimCtx, currT);
@@ -130,7 +129,7 @@ namespace tomato
             intentTranslator_.UpdateIntentState(tickClock.GetTick());
         }
 
-        network_->ThreadStop();
+        networkRuntime_.Stop();
 
         if (profiler.IsActive())
         {
@@ -141,8 +140,8 @@ namespace tomato
 
     void Engine::RequestMatchToServer()
     {
-        network_->ConnectToServer();
-        network_->RequestMatch();
+        networkRuntime_.Client().Network().ConnectToServer();
+        networkRuntime_.Client().Network().RequestMatch();
     }
 
     void Engine::ProcessInputEvents(const uint32_t tick)
@@ -152,7 +151,7 @@ namespace tomato
 
         currState_->SetPlayerInput(
             tick, intentTranslator_.GetCurrInputState(),
-            network_->GetMyPlayerID());
+            networkRuntime_.Client().Network().GetMyPlayerID());
     }
 
     void Engine::FixedUpdate(TickClock& tc, SimContext& simCtx, RunMode mode)
@@ -168,13 +167,13 @@ namespace tomato
             EventDispatcher::GetInstance().Update();
             currState_->Update();   // !!!!!! temporary !!!!!!
 
-            if (network_->GetNetState() == ClientNetworkState::NSS_Playing)
-                gameNet_->ProcessOutgoingMessages(simCtx.tick);
+            if (networkRuntime_.Client().Network().GetNetState() == ClientNetworkState::NSS_Playing)
+                networkRuntime_.Client().GameNet().ProcessOutgoingMessages(simCtx.tick);
 
             ++simCtx.tick;
             tc.AddTick();
 
-            rollbackManager_->Capture(simCtx);
+            networkRuntime_.Client().Rollback().Capture(simCtx);
         }
     }
 
@@ -238,22 +237,22 @@ namespace tomato
 
         if (netMode_ == NetMode::NM_Client)
         {
-            gameNet_->SetState(currState_.get());
-            rollbackManager_->Capture(simCtx);
+            networkRuntime_.Client().GameNet().SetState(currState_.get());
+            networkRuntime_.Client().Rollback().Capture(simCtx);
         }
     }
 
     void Engine::ProcessQueuedPackets(TickClock& tc)
     {
-        gameNet_->InitializeConfirmedTick(tc.GetTick()); // for rollback
+        networkRuntime_.Client().GameNet().InitializeConfirmedTick(tc.GetTick()); // for rollback
 
-        network_->ProcessQueuedUDPPacket();
-        network_->ProcessQueuedTCPPacket();
+        networkRuntime_.Client().Network().ProcessQueuedUDPPacket();
+        networkRuntime_.Client().Network().ProcessQueuedTCPPacket();
     }
 
     void Engine::Rollback(SimContext& simCtx)
     {
-        rollbackManager_->Rollback(simCtx);
+        networkRuntime_.Client().Rollback().Rollback(simCtx);
         systemManager_.Update(TickPhase::PostUpdate, simCtx, RunMode::Rollback);
     }
 
@@ -266,7 +265,7 @@ namespace tomato
             currState_->Update();   // !!!!!! temporary !!!!!!
 
             ++simCtx.tick;
-            rollbackManager_->Capture(simCtx);
+            networkRuntime_.Client().Rollback().Capture(simCtx);
         }
     }
 
@@ -285,12 +284,14 @@ namespace tomato
 
     void Engine::InitializeNetwork()
     {
-        network_ = std::make_unique<ClientNetwork>();
+       /* network_ = std::make_unique<ClientNetwork>();
         gameNet_ = std::make_unique<GamePlayNetSystem>(currState_.get());
         network_->SetGameplaySystem(gameNet_.get());
         gameNet_->SetNetwork(network_.get());
 
         if (!rollbackManager_)
-            rollbackManager_ = std::make_unique<RollbackManager>();
+            rollbackManager_ = std::make_unique<RollbackManager>();*/
+
+        networkRuntime_.EnableClient();
     }
 }
