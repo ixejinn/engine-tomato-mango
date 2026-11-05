@@ -31,8 +31,20 @@
 
 #include "Math/Geometry.h"
 
+#include "Input/InputEvents.h"
+
 namespace tomato
 {
+    bool Editor::OnKeyEvent(const KeyEvent&)
+    {
+        return !ImGui::GetIO().WantCaptureKeyboard;
+    }
+
+    bool Editor::OnMouseButtonEvent(const MouseButtonEvent&)
+    {
+        return !ImGui::GetIO().WantCaptureMouse;
+    }
+
 	void Editor::InitImGui(GLFWwindow* wnd, Input& input, Engine* engine)
 	{
 		// Setup Dear ImGui context

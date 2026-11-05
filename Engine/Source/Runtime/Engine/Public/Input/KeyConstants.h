@@ -93,6 +93,7 @@ namespace tomato
     {
         Release,
         Press,
+        Repeat,
         Error
     };
 }

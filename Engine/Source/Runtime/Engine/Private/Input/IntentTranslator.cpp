@@ -11,6 +11,9 @@ namespace tomato
 
     bool IntentTranslator::OnKeyEvent(const KeyEvent& event)
     {
+        if (event.action == KeyAction::Repeat)
+            return true;
+
         if (keyIntents_[event.key] != InputIntent::None)
         {
             if (event.action == KeyAction::Release)

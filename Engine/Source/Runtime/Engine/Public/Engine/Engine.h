@@ -51,18 +51,19 @@ namespace tomato
     private:
         Window window_;
 
+        void ConnectInputChain();
         void ProcessInputEvents(uint32_t tick);
         Input input_;
         IntentTranslator intentTranslator_;
         InputUI inputUI_;
 
+        Editor editor_;
+        
         void OnChangeStateRequest(const Event::ChangeStateRequest& event);
         void ChangeState(TickClock& tc);
         std::unique_ptr<State> currState_{nullptr};
         std::unique_ptr<State> nextState_{nullptr};
         bool loaded{false};
-
-        Editor editor_;
 
         void ProcessQueuedPackets(TickClock& tc);
         std::unique_ptr<ClientNetwork> network_{nullptr};
@@ -80,7 +81,6 @@ namespace tomato
         SystemManager systemManager_;
         bool isRunning_{true};
 
-        void InitializeInput();
         void InitializeSerialization(); ////
         void InitializeNetwork();
 

@@ -1,12 +1,9 @@
-﻿#include "Services/Input.h"
+﻿#include <GLFW/glfw3.h>
+#include "Services/Input.h"
 #include "Services/Window.h"
-#include "Input/IntentTranslator.h"
-#include "Input/InputUI.h"
 #include "Input/KeyDeviceState.h"
-#include "ECS/Systems/EditorCameraSystem.h"
 #include "Simulation/Tick/TickClock.h"
 #include "Utils/Logger.h"
-#include <GLFW/glfw3.h>
 
 namespace tomato
 {
@@ -22,12 +19,6 @@ namespace tomato
 
     void Input::OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
     {
-        // if (externalCallbacks_.key)
-        // {
-        //     externalCallbacks_.key(window, key, scancode, action, mods);
-        //     //return; @TODO : if editor mode
-        // }
-
         Key k = ConvertKeyGLFW(key);
         KeyAction a = ConvertActionGLFW(action);
         if (a == KeyAction::Error)
@@ -40,11 +31,16 @@ namespace tomato
         auto* input = winData->input;
         auto* tickClock = winData->tickClock;
 
-        input->keySigh_.publish(window, key, scancode, action, mods);
-        input->keySignal_.Collect(input->collector_,
-            KeyEvent{k, a, a == KeyAction::Release ? 0.f : 1.f, tickClock->GetTick()});
+        const float v = (a == KeyAction::Release) ? 0.0f : 1.0f;
+        KeyDeviceState::GetInstance().UpdateInputAxis(k, v);
 
-        KeyDeviceState::GetInstance().UpdateInputAxis(k, a == KeyAction::Release ? 0.f : 1.f);
+        input->keySigh_.publish(window, key, scancode, action, mods);   // ImGui에서 입력 소비 여부 결정
+
+        const KeyEvent event{k, a, v, tickClock->GetTick()};
+        if (a == KeyAction::Release)
+            input->keySignal_.Publish(event);                           // Release 이벤트는 모두에게 보냄
+        else
+            input->keySignal_.Collect(input->collector_, event);    // 에디터-UI-게임 순으로 입력 우선 소비
     }
 
     void Input::OnMouseButtonEvent(GLFWwindow* window, int button, int action, int mods)
@@ -65,16 +61,17 @@ namespace tomato
         double xPos(0), yPos(0);
         glfwGetCursorPos(window, &xPos, &yPos);
 
+        const float v = (a == KeyAction::Release) ? 0.0f : 1.0f;
+        KeyDeviceState::GetInstance().UpdateInputAxis(k, v);
+
         input->mouseButtonSigh_.publish(window, button, action, mods);
-        input->mouseSignal_.Collect(input->collector_,
-            MouseButtonEvent{
-                k, a, a == KeyAction::Release ? 0.f : 1.f, tickClock->GetTick(),
-                static_cast<float>(xPos), static_cast<float>(yPos)});
 
-        // if (externalCallbacks_.mouseButton)
-        //     externalCallbacks_.mouseButton(window, button, action, mods);
+        const MouseButtonEvent event{k, a, v, tickClock->GetTick(), static_cast<float>(xPos), static_cast<float>(yPos)};
+        if (a == KeyAction::Release)
+            input->mouseSignal_.Publish(event);
+        else
+            input->mouseSignal_.Collect(input->collector_, event);
 
-        KeyDeviceState::GetInstance().UpdateInputAxis(k, a == KeyAction::Release ? 0.f : 1.f);
     }
 
     void Input::OnCursorPosEvent(GLFWwindow* window, double xpos, double ypos)
@@ -236,8 +233,9 @@ namespace tomato
         case GLFW_RELEASE:
             return KeyAction::Release;
         case GLFW_PRESS:
-        case GLFW_REPEAT:
             return KeyAction::Press;
+        case GLFW_REPEAT:
+            return KeyAction::Repeat;
         default:
             return KeyAction::Error;
         }

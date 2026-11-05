@@ -26,7 +26,8 @@ namespace tomato
         , input_(window_)
         , netMode_(netMode)
     {
-        InitializeInput();
+        ConnectInputChain();
+
         InitializeSerialization();
         InitializeNetwork();
 
@@ -143,6 +144,18 @@ namespace tomato
     {
         network_->ConnectToServer();
         network_->RequestMatch();
+    }
+
+    void Engine::ConnectInputChain()
+    {
+        input_.keySignal_.Connect<&IntentTranslator::OnKeyEvent>(intentTranslator_);
+        input_.keySignal_.Connect<&Editor::OnKeyEvent>();
+
+        input_.cursorSignal_.Connect<&InputUI::OnHover>(inputUI_);
+
+        input_.mouseSignal_.Connect<&IntentTranslator::OnMouseButtonEvent>(intentTranslator_);
+        input_.mouseSignal_.Connect<&InputUI::OnClick>(inputUI_);
+        input_.mouseSignal_.Connect<&Editor::OnMouseButtonEvent>();
     }
 
     void Engine::ProcessInputEvents(const uint32_t tick)
@@ -268,14 +281,6 @@ namespace tomato
             ++simCtx.tick;
             rollbackManager_->Capture(simCtx);
         }
-    }
-
-    void Engine::InitializeInput()
-    {
-        input_.keySignal_.Connect<&IntentTranslator::OnKeyEvent>(intentTranslator_);
-        input_.cursorSignal_.Connect<&InputUI::OnHover>(inputUI_);
-        input_.mouseSignal_.Connect<&IntentTranslator::OnMouseButtonEvent>(intentTranslator_);
-        input_.mouseSignal_.Connect<&InputUI::OnClick>(inputUI_);
     }
 
     void Engine::InitializeSerialization()
