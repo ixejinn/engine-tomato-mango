@@ -157,7 +157,7 @@ namespace tomato
 
     void Engine::FixedUpdate(TickClock& tc, SimContext& simCtx, RunMode mode)
     {
-        int cnt = tc.GetSimulateNum();
+        int cnt = tc.GetSimulateNum(TickPolicy::Discard);
         while (cnt--)
         {
             simCtx.tick = tc.GetTick();

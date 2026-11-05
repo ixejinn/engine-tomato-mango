@@ -2,15 +2,22 @@
 #define MANGO_TICKCLOCK_H
 
 #include <chrono>
-#include <ratio>
 #include "Simulation/Tick/TickFwd.h"
 
-namespace tomato {
-    class TickClock {
+namespace tomato
+{
+    enum class TickPolicy
+    {
+        Keep,
+        Discard
+    };
+
+    class TickClock
+    {
     public:
         [[nodiscard]] int64_t GetTick() const { return tick_.count(); }
 
-        int GetSimulateNum();
+        int GetSimulateNum(TickPolicy policy);
 
         void AddTick() { ++tick_; }
         void ResetTick();
