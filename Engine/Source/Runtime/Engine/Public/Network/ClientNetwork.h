@@ -81,7 +81,7 @@ namespace tomato
         TCPNetDriver server_;
 
         std::thread TCPRecvThread, UDPRecvThread;
-        bool TCPRecvThreadRunning_{ false }, UDPRecvThreadRunning_{ false };
+        std::atomic<bool> TCPRecvThreadRunning_{ false }, UDPRecvThreadRunning_{ false };
 
         std::vector<uint8_t> recvBuffer;
         SPSCQueue<std::unique_ptr<TCPPacket>, 256> pendingTCPPackets_;

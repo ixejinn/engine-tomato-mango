@@ -100,6 +100,12 @@ namespace tomato
 		return bytesReceivedCount;
 	}
 
+	void TCPSocket::Shutdown()
+	{
+		if (socket_ != INVALID_SOCKET)
+			shutdown(socket_, SD_BOTH); // recv가 0 또는 에러로 즉시 반환
+	}
+
 	int TCPSocket::GetSocketAddress(SocketAddress& inFromAddress, int inLen)
 	{
 		int error = getpeername(socket_, &inFromAddress.sockAddr_, &inLen);

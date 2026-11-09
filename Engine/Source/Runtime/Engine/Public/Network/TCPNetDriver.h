@@ -18,6 +18,7 @@ namespace tomato
 
 		int SendPacket(uint8_t* buffer, int size);
 		int RecvPacket(uint8_t* buffer, int size);
+		void Shutdown();
 
 		const TCPSocketPtr GetSocket() const { return socket_; }
 

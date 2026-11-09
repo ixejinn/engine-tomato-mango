@@ -21,6 +21,7 @@ namespace tomato
 		TCPSocketPtr Accept(SocketAddress& inFromAddress);
 		int Send(const void* inData, int inLen);
 		int Receive(void* inBuffer, int inLen);
+		void Shutdown();
 
 		int GetSocketAddress(SocketAddress& inFromAddress, int inLen);
 		int SetNonBlockingMode(bool nonBlocking);

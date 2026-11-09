@@ -71,4 +71,9 @@ namespace tomato
 		return socket_->Receive(buffer, size);
 	}
 
+	void TCPNetDriver::Shutdown()
+	{
+		socket_->Shutdown();
+	}
+
 }

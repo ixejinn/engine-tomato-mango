@@ -214,6 +214,10 @@ namespace tomato
 
                 pendingTCPPackets_.Emplace(std::move(packet));
             }
+            else
+            {
+                if (!TCPRecvThreadRunning_) break; // 종료 요청에 의한 것
+            }
         }
     }
 
@@ -440,12 +444,13 @@ namespace tomato
     void ClientNetwork::ThreadStop()
     {
         UDPRecvThreadRunning_ = false;
-        UDPRecvThread.join();
-
+        if(UDPRecvThread.joinable()) UDPRecvThread.join();
+        
         if (server_.IsConnectedToServer())
         {
             TCPRecvThreadRunning_ = false;
-            TCPRecvThread.join();
+            //server_.Shutdown(); // 블로킹 recv 깨움
+            if(TCPRecvThread.joinable()) TCPRecvThread.join();
         }
     }
 }
