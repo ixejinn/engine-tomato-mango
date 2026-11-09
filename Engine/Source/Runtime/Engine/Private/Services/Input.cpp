@@ -17,8 +17,8 @@ namespace tomato
 
     void Input::OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
     {
-        Key k = ConvertKeyGLFW(key);
-        KeyAction a = ConvertActionGLFW(action);
+        Key k = ToEngineKey(key);
+        KeyAction a = ToEngineKeyAction(action);
         if (a == KeyAction::Error)
         {
             TMT_WARN << "KeyAction of " << static_cast<int>(k) << " is invalid";
@@ -41,8 +41,8 @@ namespace tomato
 
     void Input::OnMouseButtonEvent(GLFWwindow* window, int button, int action, int mods)
     {
-        Key k = ConvertKeyGLFW(button);
-        KeyAction a = ConvertActionGLFW(action);
+        Key k = ToEngineKey(button);
+        KeyAction a = ToEngineKeyAction(action);
 
         if (a == KeyAction::Error)
         {
@@ -81,7 +81,7 @@ namespace tomato
         KeyDeviceState::GetInstance().UpdateInputAxis(Key::MouseY, ypos);
     }
 
-    Key Input::ConvertKeyGLFW(int glfwKey)
+    Key Input::ToEngineKey(const int glfwKey)
     {
         switch (glfwKey)
         {
@@ -206,7 +206,7 @@ namespace tomato
         }
     }
 
-    KeyAction Input::ConvertActionGLFW(int glfwAction)
+    KeyAction Input::ToEngineKeyAction(const int glfwAction)
     {
         switch (glfwAction)
         {

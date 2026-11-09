@@ -161,7 +161,7 @@ namespace tomato
     void Engine::ProcessInputEvents(const uint32_t tick)
     {
         window_.TMP_CheckEscapeKey();
-        Window::PollEvents();
+        window_.PollEvents();
 
         currState_->SetPlayerInput(
             tick, intentTranslator_.GetCurrInputState(),
