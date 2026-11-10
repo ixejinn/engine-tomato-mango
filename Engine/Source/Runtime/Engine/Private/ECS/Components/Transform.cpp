@@ -99,4 +99,9 @@ namespace tomato
     {
         return HasFlag(dirty, Transform::Dirty::Local | Transform::Dirty::Hierarchy);
     }
+
+    void TransformComponent::MarkDirty()
+    {
+        dirty |= Transform::Dirty::Local;
+    }
 }

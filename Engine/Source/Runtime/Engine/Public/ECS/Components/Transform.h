@@ -47,6 +47,7 @@ namespace tomato
         const glm::mat4& GetTransformMatrix() const { return transformMatrix; }
 
         bool IsDirty() const;
+        void MarkDirty();
 
     private:
         // Local

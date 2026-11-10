@@ -281,6 +281,7 @@ namespace tomato
         {
             // std::cout << "        --------- " << rbSimCtx.tick << " ---------\n";
             systemManager_.FixedUpdate(simCtx, RunMode::Rollback);
+            EventDispatcher::GetInstance().Update();
             currState_->Update();   // !!!!!! temporary !!!!!!
 
             ++simCtx.tick;
