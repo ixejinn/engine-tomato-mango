@@ -7,8 +7,8 @@
 #include "Resource/Render/Texture.h"
 #include "Resource/Render/ParticleEffect.h"
 #include "Resource/PathManager.h"
-#include "Input/IntentTranslator.h"
-#include "Input/InputIntent.h"
+#include "Input/PlayerInput.h"
+#include "Input/InputAction.h"
 #include "Input/KeyConstants.h"
 #include "Utils/Logger.h"
 #include "ECS/Components/Components.h"
@@ -56,7 +56,7 @@ void TestState::Init() {
 }
 
 void TestState::Update() {
-    // if (engine_.GetInputRecorder().IsPress(InputIntent::Test_1))
+    // if (engine_.GetInputRecorder().WasJustPressed(InputAction::Test_1))
     //     audioPtr_->Start();
 }
 

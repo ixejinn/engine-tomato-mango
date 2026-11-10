@@ -14,7 +14,7 @@ namespace tomato
 
     private:
         static Key ToEngineKey(int glfwKey);
-        static KeyAction ToEngineKeyAction(int glfwAction);
+        static KeyEventType ToEngineKeyAction(int glfwAction);
 
         static void OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void OnMouseButtonEvent(GLFWwindow* window, int button, int action, int mods);

@@ -3,14 +3,14 @@
 
 #include <array>
 #include "Containers/Timeline.h"
-#include "Input/IntentState.h"
+#include "Input/ActionSnapshot.h"
 #include "Engine/GameplayConfig.h"
 
 namespace tomato
 {
     class State;
 
-    using PlayerInputTimelines = std::array<Timeline<IntentState>, MAX_PLAYER_NUM>;
+    using PlayerInputTimelines = std::array<Timeline<ActionSnapshot>, MAX_PLAYER_NUM>;
 
     namespace Event
     {

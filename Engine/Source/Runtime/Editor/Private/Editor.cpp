@@ -22,7 +22,7 @@
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Services/Window.h"
 #include "State/State.h"
-#include "Input/KeyDeviceState.h"
+#include "Input/InputState.h"
 
 #include "EditorPanel.h"
 #include "HierarchyPanel.h"
@@ -112,13 +112,13 @@ namespace tomato
 		for (auto& panel : panels)
 			panel->Draw(eCtx);
 		
-		if (KeyDeviceState::GetInstance().IsKeyPressed(Key::LeftMouseButton))
+		if (InputState::GetInstance().IsKeyPressed(Key::LeftMouseButton))
 		{
-			auto& keyDeviceState = KeyDeviceState::GetInstance();
+			auto& keyDeviceState = InputState::GetInstance();
 
 			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::GetIO().WantCaptureMouse)
 				PickObject(eCtx.currentState->GetRegistry(),
-					{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)});
+					{keyDeviceState.GetKeyValue(Key::MouseX), keyDeviceState.GetKeyValue(Key::MouseY)});
 		}
 	}
 

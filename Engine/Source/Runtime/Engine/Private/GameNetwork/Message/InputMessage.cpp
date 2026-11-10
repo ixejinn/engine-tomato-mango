@@ -13,24 +13,24 @@ namespace tomato
 {
     void InputCommand::Read(NetBitReader& reader)
     {
-        reader.ReadInt(inputRecord.tick, std::numeric_limits<uint32_t>::max());
+        reader.ReadInt(snapshot.tick, std::numeric_limits<uint32_t>::max());
 
         uint32_t value = 0;
-        reader.ReadInt(value, uint32_t(InputIntent::COUNT));
-        inputRecord.down = static_cast<InputIntent>(value);
-        reader.ReadInt(value, uint32_t(InputIntent::COUNT));
-        inputRecord.held = static_cast<InputIntent>(value);
+        reader.ReadInt(value, uint32_t(InputAction::COUNT));
+        snapshot.pressed = static_cast<InputAction>(value);
+        reader.ReadInt(value, uint32_t(InputAction::COUNT));
+        snapshot.held = static_cast<InputAction>(value);
 
-        //std::cout << "[ READ ] " << inputRecord.tick << " " << (int)inputRecord.down << " " << (int)inputRecord.held << '\n';
+        //std::cout << "[ READ ] " << snapshot.tick << " " << (int)snapshot.down << " " << (int)snapshot.held << '\n';
     }
 
     void InputCommand::Write(NetBitWriter& writer)
     {
-        writer.WriteInt(inputRecord.tick, std::numeric_limits<uint32_t>::max());
-        writer.WriteInt(static_cast<uint32_t>(inputRecord.down), static_cast<uint32_t>(InputIntent::COUNT));
-        writer.WriteInt(static_cast<uint32_t>(inputRecord.held), static_cast<uint32_t>(InputIntent::COUNT));
+        writer.WriteInt(snapshot.tick, std::numeric_limits<uint32_t>::max());
+        writer.WriteInt(static_cast<uint32_t>(snapshot.pressed), static_cast<uint32_t>(InputAction::COUNT));
+        writer.WriteInt(static_cast<uint32_t>(snapshot.held), static_cast<uint32_t>(InputAction::COUNT));
         
         //std::cout << "Write : " << tick << '\n';
-        //std::cout << "[ WRITE ] " << inputRecord.tick << " " << (int)inputRecord.down << " " << (int)inputRecord.held << '\n';
+        //std::cout << "[ WRITE ] " << snapshot.tick << " " << (int)snapshot.down << " " << (int)snapshot.held << '\n';
     }
 }

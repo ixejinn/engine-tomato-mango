@@ -88,14 +88,6 @@ namespace tomato
     };
 
     inline bool IsButton(Key key) { return key < Key::AXIS_BEGIN; }
-
-    enum class KeyAction
-    {
-        Release,
-        Press,
-        Repeat,
-        Error
-    };
 }
 
 #endif //MANGO_KEYCONSTANTS_H

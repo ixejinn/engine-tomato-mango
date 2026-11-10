@@ -9,7 +9,7 @@
 #include "Resource/AssetHash.h"
 #include "Prefab/Prefab.h"
 #include "Render/GLStateCache.h"
-#include "Input/KeyDeviceState.h"
+#include "Input/InputState.h"
 #include "Utils/RandomNumberGenerator.h"
 #include "Utils/RegistryEntry.h"
 REGISTER_STATE(RenderTestState)
@@ -76,7 +76,7 @@ void RenderTestState::Init()
 
 void RenderTestState::Update()
 {
-    // if (KeyDeviceState::GetInstance().IsKeyPressed(Key::P))
+    // if (InputState::GetInstance().IsKeyPressed(Key::P))
     //     GLStateCache::PrintLastBindCallCounts();
 }
 

@@ -4,18 +4,26 @@
 #include <cstdint>
 #include "Input/KeyConstants.h"
 
-namespace tomato {
+namespace tomato
+{
+    enum class KeyEventType
+    {
+        Release,
+        Press,
+        Repeat,
+        Error
+    };
 
     /**
      * @brief Input event for a single key.
      */
     struct KeyEvent
     {
-        KeyEvent(Key k, KeyAction a, float v, int64_t t)
-        : key(k), action(a), value(v), tick(t) {}
+        KeyEvent(Key k, KeyEventType a, float v, int64_t t)
+        : key(k), type(a), value(v), tick(t) {}
 
         Key key;
-        KeyAction action;
+        KeyEventType type;
 
         float value;
 
@@ -27,7 +35,7 @@ namespace tomato {
      */
     struct MouseButtonEvent : public KeyEvent
     {
-        MouseButtonEvent(Key k, KeyAction a, float v, int64_t t, float x, float y)
+        MouseButtonEvent(Key k, KeyEventType a, float v, int64_t t, float x, float y)
         : KeyEvent(k, a, v, t), xPos(x), yPos(y) {}
 
         float xPos, yPos;

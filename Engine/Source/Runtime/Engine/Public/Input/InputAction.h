@@ -1,5 +1,5 @@
-#ifndef MANGO_INPUTINTENT_H
-#define MANGO_INPUTINTENT_H
+#ifndef MANGO_INPUTACTION_H
+#define MANGO_INPUTACTION_H
 
 #include <cstdint>
 
@@ -10,7 +10,7 @@ namespace tomato {
      * 각 비트는 물리 키가 아니라 Jump와 같은 의미가 있는 액션을 나타내며,
      * IntentTranslator의 바인딩 테이블에서 실제 물리 키와 연결할 수 있다.
      */
-    enum class InputIntent : uint32_t
+    enum class InputAction : uint32_t
     {
         None    = 0,
 
@@ -46,4 +46,4 @@ namespace tomato {
     };
 }
 
-#endif //MANGO_INPUTINTENT_H
+#endif //MANGO_INPUTACTION_H

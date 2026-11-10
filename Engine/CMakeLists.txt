@@ -53,9 +53,9 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Services/ServiceFwd.h
         Source/Runtime/Engine/Public/Event/EventDispatcher.h
         Source/Runtime/Engine/Public/Event/EventSignal.h
-        Source/Runtime/Engine/Public/Input/InputIntent.h
-		Source/Runtime/Engine/Public/Input/IntentState.h
-        Source/Runtime/Engine/Public/Input/IntentTranslator.h
+        Source/Runtime/Engine/Public/Input/InputAction.h
+        Source/Runtime/Engine/Public/Input/ActionSnapshot.h
+        Source/Runtime/Engine/Public/Input/PlayerInput.h
         Source/Runtime/Engine/Public/Input/InputEvents.h
         Source/Runtime/Engine/Public/Input/InputUI.h
         Source/Runtime/Engine/Public/Input/KeyConstants.h
@@ -178,7 +178,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/State/StateRegistry.h
 		Source/Runtime/Engine/Public/ECS/Forward/SystemFrameworkFwd.h
 		Source/Runtime/Engine/Public/Collision/CollisionTypesFwd.h
-		Source/Runtime/Engine/Public/Input/InputIntentFwd.h
+		Source/Runtime/Engine/Public/Input/InputActionFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/Systems.h
 		Source/Runtime/Engine/Public/Collision/CollisionCache.h
 		Source/Runtime/Engine/Private/Collision/Detection/Narrow/GJK/GJKResult.h
@@ -190,7 +190,7 @@ set(ENGINE_HEADERS
 		
 		Source/Runtime/Engine/Public/ECS/Systems/EditorCameraSystem.h
 		Source/Runtime/Engine/Public/ECS/Systems/PlayerCameraSystem.h
-		Source/Runtime/Engine/Public/Input/KeyDeviceState.h
+		Source/Runtime/Engine/Public/Input/InputState.h
 		Source/Runtime/Engine/Public/ECS/SystemFramework/ChangeRunModeEvent.h
 		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemFrameworkEventFwd.h
 		Source/Runtime/Engine/Public/Services/ChangeFramebufferSizeEvent.h
@@ -248,7 +248,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/ECS/Systems/CameraTransformSystem.cpp
 		Source/Runtime/Engine/Private/Engine/Engine.cpp
         Source/Runtime/Engine/Private/Services/Window.cpp
-        Source/Runtime/Engine/Private/Input/IntentTranslator.cpp
+        Source/Runtime/Engine/Private/Input/PlayerInput.cpp
         Source/Runtime/Engine/Private/Services/Input.cpp
 		Source/Runtime/Engine/Private/Simulation/Tick/TickClock.cpp
         Source/Runtime/Engine/Private/ECS/Systems/CollisionSystem.cpp

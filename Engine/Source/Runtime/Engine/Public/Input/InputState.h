@@ -1,5 +1,5 @@
-#ifndef MANGO_KEYDEVICESTATE_H
-#define MANGO_KEYDEVICESTATE_H
+#ifndef MANGO_INPUTSTATE_H
+#define MANGO_INPUTSTATE_H
 
 #include "Containers/EnumArray.h"
 #include "Input/KeyConstants.h"
@@ -17,19 +17,19 @@ namespace tomato
      * 모든 Key에 대해 최신 InputAxis 값을 보관하는 싱글톤 클래스.
      * 게임 모드(게임플레이/에디터)와 무관하게 항상 각 키의 InputAxis는 최신 상태로 유지된다.
      */
-    class KeyDeviceState
+    class InputState
     {
-        KeyDeviceState() = default;
+        InputState() = default;
 
     public:
-        ~KeyDeviceState() = default;
+        ~InputState() = default;
 
-        KeyDeviceState(const KeyDeviceState&) = delete;
-        KeyDeviceState& operator=(const KeyDeviceState&) = delete;
+        InputState(const InputState&) = delete;
+        InputState& operator=(const InputState&) = delete;
 
-        static KeyDeviceState& GetInstance()
+        static InputState& GetInstance()
         {
-            static KeyDeviceState instance;
+            static InputState instance;
             return instance;
         }
 
@@ -37,7 +37,7 @@ namespace tomato
         bool OnMouseButtonEvent(const MouseButtonEvent& event);
         bool OnCursorPosEvent(const CursorPosEvent& event);
 
-        InputAxis GetKeyState(Key key) { return latestValues_[key]; }
+        InputAxis GetKeyValue(Key key) { return latestValues_[key]; }
 
         bool IsKeyPressed(Key key) const;
         bool IsKeyReleased(Key key) const;
@@ -49,4 +49,4 @@ namespace tomato
     };
 }
 
-#endif //MANGO_KEYDEVICESTATE_H
+#endif //MANGO_INPUTSTATE_H

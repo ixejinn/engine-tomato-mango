@@ -17,7 +17,7 @@
 #include "Utils/Logger.h"
 #include "Profiler/Profiler.h"
 #include "Profiler/CPUProfiler.h"
-#include "Input/KeyDeviceState.h"
+#include "Input/InputState.h"
 
 namespace tomato
 {
@@ -145,20 +145,20 @@ namespace tomato
 
     void Engine::ConnectInputChain()
     {
-        auto& keyDeviceState = KeyDeviceState::GetInstance();
+        auto& inputState = InputState::GetInstance();
 
         // EnTT::sigh는 뒤에 연결한 리스너부터 호출
-        // Editor - KeyDeviceState - UI - Game
-        input_.keySignal_.Connect<&IntentTranslator::OnKeyEvent>(intentTranslator_);
-        input_.keySignal_.Connect<&KeyDeviceState::OnKeyEvent>(keyDeviceState);
+        // Editor - InputState - UI - Game
+        input_.keySignal_.Connect<&PlayerInput::OnKeyEvent>(playerInput_);
+        input_.keySignal_.Connect<&InputState::OnKeyEvent>(inputState);
         input_.keySignal_.Connect<&Editor::OnKeyEvent>();
 
         input_.cursorSignal_.Connect<&InputUI::OnHover>(inputUI_);
-        input_.cursorSignal_.Connect<&KeyDeviceState::OnCursorPosEvent>(keyDeviceState);
+        input_.cursorSignal_.Connect<&InputState::OnCursorPosEvent>(inputState);
 
-        input_.mouseSignal_.Connect<&IntentTranslator::OnMouseButtonEvent>(intentTranslator_);
+        input_.mouseSignal_.Connect<&PlayerInput::OnMouseButtonEvent>(playerInput_);
         input_.mouseSignal_.Connect<&InputUI::OnClick>(inputUI_);
-        input_.mouseSignal_.Connect<&KeyDeviceState::OnMouseButtonEvent>(keyDeviceState);
+        input_.mouseSignal_.Connect<&InputState::OnMouseButtonEvent>(inputState);
         input_.mouseSignal_.Connect<&Editor::OnMouseButtonEvent>();
     }
 
@@ -176,9 +176,9 @@ namespace tomato
             simCtx.tick = tc.GetTick();
             TICK_LOG("\n *--------- " << simCtx.tick << " ---------*\n");
 
-            intentTranslator_.UpdateInputState(simCtx.tick);
+            playerInput_.UpdateSnapshot(simCtx.tick);
             currState_->SetPlayerInput(
-                    simCtx.tick, intentTranslator_.GetCurrInputState(),
+                    simCtx.tick, playerInput_.GetSnapshot(),
                     network_->GetMyPlayerID());
 
             systemManager_.FixedUpdate(simCtx, mode);

@@ -12,8 +12,8 @@
 #include "Resource/Render/ParticleEffect.h"
 #include "Resource/PathManager.h"
 
-#include "Input/IntentTranslator.h"
-#include "Input/InputIntent.h"
+#include "Input/PlayerInput.h"
+#include "Input/InputAction.h"
 #include "Input/KeyConstants.h"
 
 #include "Utils/Logger.h"
