@@ -33,6 +33,7 @@ namespace tomato
         editor_.InitImGui(window_.GetHandle(), input_, this);
 
         EventDispatcher::GetInstance().Connect<Event::ChangeStateRequest, &Engine::OnChangeStateRequest>(*this);
+        EventDispatcher::GetInstance().Connect<Event::NetworkModeRequest, &Engine::OnNetworkModeRequest>(*this);
     }
 
     Engine::~Engine()
@@ -93,15 +94,7 @@ namespace tomato
             // std::cout << "       *========== " << tickClock.GetTick() << " ==========*\n";
             CPU_PROFILER_TOTAL_BEGIN()
 
-            // 임시 테스트 코드
-            static bool prevF9 = false;
-            bool f9 = glfwGetKey(window_.GetHandle(), GLFW_KEY_F9) == GLFW_PRESS;
-            if (f9 && !prevF9)
-                networkRuntime_.RequestClient(!networkRuntime_.HasClient());   // HasClient() 추가 필요
-            prevF9 = f9;
-
             networkRuntime_.ApplyPending(currState_.get()); // 네트워크 모드 지연 적용
-            if(networkRuntime_.HasClient()) RequestMatchToServer();
             networkRuntime_.PollIncoming(tickClock); // 패킷 처리
 
             // *---------- Rollback and resimulate
@@ -147,7 +140,11 @@ namespace tomato
 
     void Engine::RequestMatchToServer()
     {
-        networkRuntime_.Client().Network().ConnectToServer();
+        if (!networkRuntime_.Client().Network().ConnectToServer())
+        {
+            std::cout << "Can not Connect Server. Please check if the server is active and try again.\n";
+            return;
+        }
         networkRuntime_.Client().Network().RequestMatch();
     }
 
@@ -211,6 +208,12 @@ namespace tomato
         serializer_.LoadState(*this, event.filepath.string().c_str());
     }
 
+    void Engine::OnNetworkModeRequest(const Event::NetworkModeRequest& event)
+    {
+        networkRuntime_.RequestClient(event.client);
+        //networkRuntime_.RequestServer(event.server);
+    }
+
     void Engine::ChangeState(TickClock& tc)
     {
         if (!nextState_)
@@ -242,14 +245,6 @@ namespace tomato
         systemManager_.Update(TickPhase::PostUpdate, simCtx, RunMode::Game | RunMode::Editor);
 
         networkRuntime_.OnStateChanged(currState_.get(), simCtx);
-    }
-
-    void Engine::ProcessQueuedPackets(TickClock& tc)
-    {
-        networkRuntime_.Client().GameNet().InitializeConfirmedTick(tc.GetTick()); // for rollback
-
-        networkRuntime_.Client().Network().ProcessQueuedUDPPacket();
-        networkRuntime_.Client().Network().ProcessQueuedTCPPacket();
     }
 
     void Engine::Rollback(SimContext& simCtx)

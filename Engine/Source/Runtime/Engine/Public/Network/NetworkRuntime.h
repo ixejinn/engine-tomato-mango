@@ -5,8 +5,9 @@
 #include <optional>
 
 #include "Simulation/Tick/TickFwd.h"
-#include "NetTypes.h"
-#include "ClientRole.h"
+#include "Network/WinsockInitializer.h"
+#include "Network/NetTypes.h"
+#include "Network/ClientRole.h"
 
 namespace tomato
 {
@@ -39,6 +40,8 @@ namespace tomato
 		bool HasClient() { return client_ ? true : false; }
 		ClientRole& Client() { return *client_; }
 	private:
+		WinsockInitializer winsockInit_;
+
 		NetMode netMode_;
 		std::optional<bool> pendingClient_;
 		//std::optional<bool> pendingServer_;

@@ -17,15 +17,16 @@ namespace tomato
 
     ClientNetwork::~ClientNetwork() {}
 
-    void ClientNetwork::ConnectToServer()
+    bool ClientNetwork::ConnectToServer()
     {
-        if (server_.IsConnectedToServer())
-            return;
+        if(!server_.IsConnectedToServer() && server_.InitClientMode())
+        {
+            TCPRecvThread = std::thread(&ClientNetwork::TCPNetRecvThreadLoop, this);
+            TCPRecvThreadRunning_ = true;
 
-        server_.InitClientMode();
-
-        TCPRecvThread = std::thread(&ClientNetwork::TCPNetRecvThreadLoop, this);
-        TCPRecvThreadRunning_ = true;
+            return true;
+        }
+        return false;
     }
 
     void ClientNetwork::RequestMatch()

@@ -7,6 +7,13 @@ namespace tomato
 		client_ = std::make_unique<ClientRole>();
 		client_->GameNet().SetState(currentState);
 		client_->Start();
+
+		if (!client_->Network().ConnectToServer())
+		{
+			std::cout << "Can not Connect Server. Please check if the server is active and try again.\n";
+			return;
+		}
+		//client_->Network().RequestMatch();
 	}
 
 	void NetworkRuntime::ApplyPending(State* currentState)

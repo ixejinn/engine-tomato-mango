@@ -240,7 +240,8 @@ namespace tomato
 		auto& path = eCtx.currentScenePath;
 		if (!path.empty())
 		{
-			eCtx.engine_->GetSerializer().LoadState(*eCtx.engine_, path.string().c_str());
+			EventDispatcher::GetInstance().Enqueue(Event::ChangeStateRequest{ path });
+			//eCtx.engine_->GetSerializer().LoadState(*eCtx.engine_, path.string().c_str());
 			/*Serialization::LoadStateScene(
 				eCtx.currentState,
 				path.string().c_str()

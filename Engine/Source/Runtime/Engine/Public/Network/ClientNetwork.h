@@ -14,7 +14,7 @@
 #include "ECS/Forward/SystemFwd.h"
 #include "Network/NetTypes.h"
 #include "Network/NetworkFwd.h"
-#include "Network/WinsockInitializer.h"
+
 #include "Network/UDPNetDriver.h"
 #include "Network/TCPNetDriver.h"
 #include "Network/NetConnection.h"
@@ -40,7 +40,7 @@ namespace tomato
         explicit ClientNetwork();
         ~ClientNetwork();
 
-        void ConnectToServer();
+        bool ConnectToServer();
         void RequestMatch();
 
         void SetNetState(ClientNetworkState state) { netState_ = state; }
@@ -76,7 +76,6 @@ namespace tomato
         void SetGameplaySystem(GamePlayNetSystem* gameNetSys) { gameNetSystem_ = gameNetSys; }
 
     private:
-        WinsockInitializer winsockInit_;
         UDPNetDriver driver_;
         TCPNetDriver server_;
 

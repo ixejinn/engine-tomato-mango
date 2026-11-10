@@ -28,6 +28,7 @@
 #include "EditorPanel.h"
 #include "HierarchyPanel.h"
 #include "InspectorPanel.h"
+#include "NetworkPanel.h"
 
 #include "Math/Geometry.h"
 
@@ -70,6 +71,7 @@ namespace tomato
 		LoadResources();
 		panels.push_back(std::make_unique<HierarchyPanel>(300.f, 300.f, Window::GetWidth(), 0.f));
 		panels.push_back(std::make_unique<InspectorPanel>(300.f, 600.f, Window::GetWidth(), 300.f));
+		panels.push_back(std::make_unique<NetworkPanel>(300.f, 400.f, 0.f, 0.f));
 	}
 
 	void Editor::ShutdownImGui(Input& input)
@@ -96,7 +98,7 @@ namespace tomato
 
 	void Editor::Draw(uint64_t tick, State* state, RunMode& mode)
 	{
-		// ImGui::ShowDemoWindow();
+		 ImGui::ShowDemoWindow();
         eCtx.tick = tick;
 		if (eCtx.currentState != state)
 		{

@@ -115,6 +115,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Network/NetTypes.h
         Source/Runtime/Engine/Public/Network/NetworkRuntime.h
         Source/Runtime/Engine/Public/Network/ClientRole.h
+        Source/Runtime/Engine/Public/Network/NetworkEvents.h
         Source/Runtime/Engine/Public/GameNetwork/Message/InputMessage.h
         Source/Runtime/Engine/Public/GameNetwork/Message/NetMessage.h
         Source/Runtime/Engine/Public/GameNetwork/GamePlayNetSystem.h
@@ -150,6 +151,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Editor/Public/Editor.h
         Source/Runtime/Editor/Public/EditorPanel.h
         Source/Runtime/Editor/Public/HierarchyPanel.h
+        Source/Runtime/Editor/Public/NetworkPanel.h
         Source/Runtime/Editor/Public/EditorFwd.h
 		Source/Runtime/Engine/Public/GameObject/Character/MovementMode.h
         Source/Runtime/Engine/Public/Server/MatchServerNetwork.h
@@ -309,6 +311,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Serialization/ComponentRegistry.cpp
         Source/Runtime/Editor/Private/Editor.cpp
         Source/Runtime/Editor/Private/HierarchyPanel.cpp
+        Source/Runtime/Editor/Private/NetworkPanel.cpp
         Source/Runtime/Engine/Private/Server/MatchServerNetwork.cpp
         Source/Runtime/Engine/Private/Server/Session.cpp
         Source/Runtime/Engine/Private/Server/SessionManager.cpp
