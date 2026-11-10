@@ -30,7 +30,6 @@ namespace tomato
         auto* tickClock = winData->tickClock;
 
         const float v = (a == KeyAction::Release) ? 0.0f : 1.0f;
-        KeyDeviceState::GetInstance().UpdateInputAxis(k, v);
 
         const KeyEvent event{k, a, v, tickClock->GetTick()};
         if (a == KeyAction::Release)
@@ -58,7 +57,6 @@ namespace tomato
         glfwGetCursorPos(window, &xPos, &yPos);
 
         const float v = (a == KeyAction::Release) ? 0.0f : 1.0f;
-        KeyDeviceState::GetInstance().UpdateInputAxis(k, v);
 
         const MouseButtonEvent event{k, a, v, tickClock->GetTick(), static_cast<float>(xPos), static_cast<float>(yPos)};
         if (a == KeyAction::Release)
@@ -76,9 +74,6 @@ namespace tomato
 
         input->cursorSignal_.Publish(
             CursorPosEvent{tickClock->GetTick(), static_cast<float>(xpos), static_cast<float>(ypos)});
-
-        KeyDeviceState::GetInstance().UpdateInputAxis(Key::MouseX, xpos);
-        KeyDeviceState::GetInstance().UpdateInputAxis(Key::MouseY, ypos);
     }
 
     Key Input::ToEngineKey(const int glfwKey)

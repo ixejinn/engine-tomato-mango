@@ -3,11 +3,12 @@
 
 #include "Containers/EnumArray.h"
 #include "Input/KeyConstants.h"
+#include "Input/InputEventFwd.h"
 
 namespace tomato
 {
     /// Generic scalar value for a Key, covering both digital and analog input.
-    /// 버튼의 경우, released 0.f/pressed 1.f를, 축 키는 연속값을 저장한다.
+    /// 버튼의 경우, released 0.f / pressed 1.f를, 축 키는 연속값을 저장한다.
     using InputAxis = float;
 
     /**
@@ -32,17 +33,19 @@ namespace tomato
             return instance;
         }
 
+        bool OnKeyEvent(const KeyEvent& event);
+        bool OnMouseButtonEvent(const MouseButtonEvent& event);
+        bool OnCursorPosEvent(const CursorPosEvent& event);
+
         InputAxis GetKeyState(Key key) { return latestValues_[key]; }
 
-        bool IsKeyPressed(Key key);
-        bool IsKeyReleased(Key key);
+        bool IsKeyPressed(Key key) const;
+        bool IsKeyReleased(Key key) const;
 
     private:
         void UpdateInputAxis(Key key, InputAxis value);
 
         EnumArray<Key, InputAxis> latestValues_;
-
-        friend class Input;
     };
 }
 

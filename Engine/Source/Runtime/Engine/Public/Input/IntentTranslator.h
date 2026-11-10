@@ -24,7 +24,8 @@ namespace tomato
         void BindInputIntent(Key key, InputIntent intent) { keyIntents_[key] = intent; }
         InputIntent GetBoundInputIntent(Key key) { return keyIntents_[key]; }
 
-        void UpdateIntentState(uint32_t tick);
+        void UpdateInputState(int64_t tick);
+
         const IntentState& GetCurrInputState() const { return curr_; }
 
         bool IsPress(InputIntent intent) const;
@@ -33,9 +34,16 @@ namespace tomato
     private:
         void BindInitialInputIntent();
 
+        InputIntent ComputeHeld() const;
+
         EnumArray<Key, InputIntent> keyIntents_;
 
-        IntentState prev_;
+        /// Sample 호출 마다 press 입력 이벤트를 모아 Sample에서 curr_.down를 덮어씀
+        InputIntent pendingDown_{InputIntent::None};
+
+        /// 틱마다 호출되는 Sample에서 갱신
+        /// held: 틱마다 KeyDeviceState에서 현재 눌려있는 키를 조회
+        /// down: pendingDown_으로 덮어씀
         IntentState curr_;
     };
 }

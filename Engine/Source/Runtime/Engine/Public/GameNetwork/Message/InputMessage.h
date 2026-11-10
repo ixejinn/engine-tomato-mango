@@ -1,5 +1,5 @@
 ﻿#ifndef MANGO_INPUT_MESSAGE_H
-#define MAGNO_INPUT_MESSAGE_H
+#define MANGO_INPUT_MESSAGE_H
 
 #include "Network/NetworkFwd.h"
 #include "Network/NetTypes.h"

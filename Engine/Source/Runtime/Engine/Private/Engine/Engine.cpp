@@ -83,7 +83,6 @@ namespace tomato
 
         network_->ThreadStart();
 
-        auto& keyState = KeyDeviceState::GetInstance();
         auto& profiler = Profiler::GetInstance();
 
         ChangeState(tickClock);
@@ -112,7 +111,7 @@ namespace tomato
             }
             // ----------* Rollback and resimulate
 
-            ProcessInputEvents(tickClock.GetTick());
+            ProcessInputEvents();
 
             // *---------- Simulate and render
             SimContext simCtx{ currState_.get(), tickClock.GetTick() };
@@ -127,8 +126,6 @@ namespace tomato
 
             window_.SwapBuffers();
             // ----------* Simulate and render
-
-            intentTranslator_.UpdateIntentState(tickClock.GetTick());
         }
 
         network_->ThreadStop();
@@ -148,24 +145,27 @@ namespace tomato
 
     void Engine::ConnectInputChain()
     {
+        auto& keyDeviceState = KeyDeviceState::GetInstance();
+
+        // EnTT::sigh는 뒤에 연결한 리스너부터 호출
+        // Editor - KeyDeviceState - UI - Game
         input_.keySignal_.Connect<&IntentTranslator::OnKeyEvent>(intentTranslator_);
+        input_.keySignal_.Connect<&KeyDeviceState::OnKeyEvent>(keyDeviceState);
         input_.keySignal_.Connect<&Editor::OnKeyEvent>();
 
         input_.cursorSignal_.Connect<&InputUI::OnHover>(inputUI_);
+        input_.cursorSignal_.Connect<&KeyDeviceState::OnCursorPosEvent>(keyDeviceState);
 
         input_.mouseSignal_.Connect<&IntentTranslator::OnMouseButtonEvent>(intentTranslator_);
         input_.mouseSignal_.Connect<&InputUI::OnClick>(inputUI_);
+        input_.mouseSignal_.Connect<&KeyDeviceState::OnMouseButtonEvent>(keyDeviceState);
         input_.mouseSignal_.Connect<&Editor::OnMouseButtonEvent>();
     }
 
-    void Engine::ProcessInputEvents(const uint32_t tick)
+    void Engine::ProcessInputEvents()
     {
         window_.TMP_CheckEscapeKey();
         window_.PollEvents();
-
-        currState_->SetPlayerInput(
-            tick, intentTranslator_.GetCurrInputState(),
-            network_->GetMyPlayerID());
     }
 
     void Engine::FixedUpdate(TickClock& tc, SimContext& simCtx, RunMode mode)
@@ -175,6 +175,11 @@ namespace tomato
         {
             simCtx.tick = tc.GetTick();
             TICK_LOG("\n *--------- " << simCtx.tick << " ---------*\n");
+
+            intentTranslator_.UpdateInputState(simCtx.tick);
+            currState_->SetPlayerInput(
+                    simCtx.tick, intentTranslator_.GetCurrInputState(),
+                    network_->GetMyPlayerID());
 
             systemManager_.FixedUpdate(simCtx, mode);
 

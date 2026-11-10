@@ -52,7 +52,7 @@ namespace tomato
         Window window_;
 
         void ConnectInputChain();
-        void ProcessInputEvents(uint32_t tick);
+        void ProcessInputEvents();
         Input input_;
         IntentTranslator intentTranslator_;
         InputUI inputUI_;
