@@ -36,8 +36,8 @@ namespace tomato
 		void SetMode(NetMode mode) { netMode_ = mode; }
 		NetMode GetMode() const { return netMode_; }
 
-		ClientRole& Client() { return *client_; }
 		bool HasClient() { return client_ ? true : false; }
+		ClientRole& Client() { return *client_; }
 	private:
 		NetMode netMode_;
 		std::optional<bool> pendingClient_;

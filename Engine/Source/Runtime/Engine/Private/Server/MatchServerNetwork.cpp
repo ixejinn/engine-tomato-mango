@@ -41,7 +41,8 @@ namespace tomato
 			NetBitReader reader(nextPacket->buffer.data(), nextPacket->size());
 			reader.ReadInt(type, static_cast<uint16_t>(TCPPacketType::COUNT));
 
-			ProcessPacket(static_cast<TCPPacketType>(type), reader, nextPacket->sessionId);
+			if(sessionMgr_.ValidateSession(nextPacket->sessionId))
+				ProcessPacket(static_cast<TCPPacketType>(type), reader, nextPacket->sessionId);
 		}
 	}
 

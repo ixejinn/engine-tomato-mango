@@ -29,7 +29,6 @@ namespace tomato
     {
         InitializeInput();
         InitializeSerialization();
-        InitializeNetwork();
 
         editor_.InitImGui(window_.GetHandle(), input_, this);
 
@@ -82,8 +81,6 @@ namespace tomato
         window_.SetWindowUserPointer(input_, tickClock);
         GarbageEntityCollectionSystem garbageCollectionSystem;
         
-        //networkRuntime_.Start();
-
         auto& keyState = KeyDeviceState::GetInstance();
         auto& profiler = Profiler::GetInstance();
 
@@ -97,14 +94,14 @@ namespace tomato
             CPU_PROFILER_TOTAL_BEGIN()
 
             // 임시 테스트 코드
-            //static bool prevF9 = false;
-            //bool f9 = glfwGetKey(window_.GetHandle(), GLFW_KEY_F9) == GLFW_PRESS;
-            //if (f9 && !prevF9)
-            //    networkRuntime_.RequestClient(!networkRuntime_.HasClient());   // HasClient() 추가 필요
-            //prevF9 = f9;
+            static bool prevF9 = false;
+            bool f9 = glfwGetKey(window_.GetHandle(), GLFW_KEY_F9) == GLFW_PRESS;
+            if (f9 && !prevF9)
+                networkRuntime_.RequestClient(!networkRuntime_.HasClient());   // HasClient() 추가 필요
+            prevF9 = f9;
 
             networkRuntime_.ApplyPending(currState_.get()); // 네트워크 모드 지연 적용
-            //if(networkRuntime_.HasClient()) RequestMatchToServer();
+            if(networkRuntime_.HasClient()) RequestMatchToServer();
             networkRuntime_.PollIncoming(tickClock); // 패킷 처리
 
             // *---------- Rollback and resimulate
@@ -285,18 +282,5 @@ namespace tomato
     void Engine::InitializeSerialization()
     {
         Serialization::ComponentRegistry::GetInstance().Init();
-    }
-
-    void Engine::InitializeNetwork()
-    {
-       /* network_ = std::make_unique<ClientNetwork>();
-        gameNet_ = std::make_unique<GamePlayNetSystem>(currState_.get());
-        network_->SetGameplaySystem(gameNet_.get());
-        gameNet_->SetNetwork(network_.get());
-
-        if (!rollbackManager_)
-            rollbackManager_ = std::make_unique<RollbackManager>();*/
-
-        //networkRuntime_.EnableClient();
     }
 }

@@ -444,13 +444,16 @@ namespace tomato
     void ClientNetwork::ThreadStop()
     {
         UDPRecvThreadRunning_ = false;
-        if(UDPRecvThread.joinable()) UDPRecvThread.join();
+        if(UDPRecvThread.joinable())
+            UDPRecvThread.join();
         
         if (server_.IsConnectedToServer())
         {
             TCPRecvThreadRunning_ = false;
-            //server_.Shutdown(); // 블로킹 recv 깨움
-            if(TCPRecvThread.joinable()) TCPRecvThread.join();
+            server_.Shutdown(); // 블로킹 recv 깨움
+
+            if(TCPRecvThread.joinable())
+                TCPRecvThread.join();
         }
     }
 }

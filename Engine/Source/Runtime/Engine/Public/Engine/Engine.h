@@ -84,7 +84,6 @@ namespace tomato
 
         void InitializeInput();
         void InitializeSerialization(); ////
-        void InitializeNetwork();
 
         Serialization::SerializeManager serializer_;
 
@@ -98,7 +97,8 @@ namespace tomato
 
         /*if (!networkRuntime_.Client().Rollback)
             rollbackManager_ = std::make_unique<RollbackManager>();*/
-        networkRuntime_.Client().Rollback().Register<Component>();
+        if(networkRuntime_.HasClient())
+            networkRuntime_.Client().Rollback().Register<Component>();
     }
 }
 
