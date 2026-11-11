@@ -1,6 +1,8 @@
 #ifndef MANGO_SNAPSHOTTIMELINE_H
 #define MANGO_SNAPSHOTTIMELINE_H
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 #include <entt/entt.hpp>
 #include <vector>
 #include <array>
@@ -69,6 +71,27 @@ namespace tomato
 
         Timeline<TimelineSlice> data_;
     };
+
+    template<>
+    inline void SnapshotTimeline<TransformComponent>::Rollback(entt::registry& reg, int64_t tick)
+    {
+        const int64_t storedTick = data_[tick].tick;
+        if (storedTick != tick)
+        {
+            TMT_WARN << "Rollback tick mismatch (requested: " << tick << ", stored: " << storedTick << ")";
+            return;
+        }
+
+        for (auto& [e, component] : data_[tick].data)
+        {
+            if (reg.all_of<TransformComponent>(e))
+                reg.get<TransformComponent>(e) = component;
+            else
+                reg.emplace<TransformComponent>(e, component);
+
+            std::cout << "rollback: " << (int)e << " " << glm::to_string(component.GetWorldPosition()) << "\n";
+        }
+    }
 
     template<>
     inline void SnapshotTimeline<TransformComponent>::Capture(entt::registry& reg, int64_t tick)

@@ -68,6 +68,7 @@ namespace tomato
             // Update AABB
             if (col.aabbDirty)
             {
+                std::cout << "update aabb " << (int)e << "\n";
                 col.aabbDirty = false;
 
                 // Sweep AABB center

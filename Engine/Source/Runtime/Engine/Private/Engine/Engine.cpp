@@ -102,12 +102,12 @@ namespace tomato
             if (currT > lateT &&
                 currT - lateT <= ROLLBACK_WINDOW)
             {
-                // std::cout << "       Rollback " << lateT << "~" << currT << "\n";
+                 std::cout << "       Rollback " << lateT << "~" << currT << "\n";
 
                 SimContext rbSimCtx{ currState_.get(), lateT };
                 Rollback(rbSimCtx);
                 Resimulate(rbSimCtx, currT);
-                // std::cout << "       Rollback finish\n";
+                 std::cout << "       Rollback finish\n";
             }
             // ----------* Rollback and resimulate
 
@@ -279,7 +279,7 @@ namespace tomato
     {
         while (simCtx.tick < currT)
         {
-            // std::cout << "        --------- " << rbSimCtx.tick << " ---------\n";
+             std::cout << "        ----re----- " << simCtx.tick << " ---------\n";
             systemManager_.FixedUpdate(simCtx, RunMode::Rollback);
             EventDispatcher::GetInstance().Update();
             currState_->Update();   // !!!!!! temporary !!!!!!

@@ -9,7 +9,7 @@
 #include "ECS/Entity/Hierarchy.h"
 #include "Simulation/SimulationConfig.h"
 #include "Math/AABB.h"
-
+#include <iostream>
 namespace tomato
 {
     void SAP::FindOverlappingPairs(std::vector<BroadPhaseProxy>& proxies, std::vector<OverlapEntryPair>& out)
@@ -56,7 +56,10 @@ namespace tomato
 
                 // Test AABB (for axis y and z)
                 if (TestAABBAABB(aabbAct, aabb))
+                {
+                    std::cout << "test aabb\n";
                     out.emplace_back(proxies[act].entryIndex, proxies[i].entryIndex);
+                }
             }
             active_.resize(write);
             active_.emplace_back(i);

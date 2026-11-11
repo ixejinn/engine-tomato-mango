@@ -5,7 +5,7 @@
 #include "Engine/EngineDebug.h"
 
 #ifdef TOMATO_DEBUG
-// #define TOMATO_DEBUG_COLLISION
+ #define TOMATO_DEBUG_COLLISION
 #endif
 
 #ifdef TOMATO_DEBUG_COLLISION

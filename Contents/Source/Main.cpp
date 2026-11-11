@@ -16,7 +16,7 @@
 #include "Game/LobbyState.h"
 #endif
 
-#define TOMATO_GREENTEA
+//#define TOMATO_GREENTEA
 
 using namespace tomato;
 
@@ -27,13 +27,13 @@ int main() {
 
 #else //TOMATO_SERVER
     PathManager::SetProjectRoot(TMT_PROJECT_ROOT);
-    Engine engine(1920, 1080, "TOMATO", NetMode::NM_Alone);
+    Engine engine(1920, 1080, "TOMATO", NetMode::NM_Client);
 
 #if defined(TOMATO_GREENTEA)
     engine.SetNextState(std::make_unique<ExampleState>(engine));
 
 #else //TOMATO_GREENTEA
-    engine.SetNextState(std::make_unique<TestState>(engine));
+    engine.SetNextState(std::make_unique<LobbyState>(engine));
 
 #endif //TOMATO_GREENTEA
     engine.Run();

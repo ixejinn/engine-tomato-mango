@@ -1,4 +1,6 @@
-﻿#include "ECS/Systems/IntegrationSystem.h"
+﻿#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+#include "ECS/Systems/IntegrationSystem.h"
 #include "ECS/Components/ActiveTag.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
@@ -17,9 +19,9 @@ namespace tomato
             auto velocity = vel.Get();
             if (glm::length2(velocity) > VELOCITY_SQ_EPSILON)
             {
-//                std::cout << glm::length(velocity) << "\n";
                 trf.AddPosition(velocity * FIXED_DELTA_TIME);
             }
+                std::cout << "integration: " << glm::to_string(velocity) << " " << glm::to_string(trf.GetWorldPosition()) << "\n";
         }
     }
 }

@@ -6,7 +6,7 @@
 #endif
 
 #ifdef TOMATO_DEBUG
-// #define TOMATO_DEBUG_TICK
+ #define TOMATO_DEBUG_TICK
 #endif
 
 #ifdef TOMATO_DEBUG_TICK

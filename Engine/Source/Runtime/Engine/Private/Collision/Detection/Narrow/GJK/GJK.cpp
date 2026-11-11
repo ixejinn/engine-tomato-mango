@@ -30,7 +30,7 @@ namespace tomato
 
     bool GJK::Overlap(const ShapeView& a, const ShapeView& b)
     {
-        COL_DETECT_VERBOSE_LOG("===== GJK overlap " << pair);
+        COL_DETECT_VERBOSE_LOG("===== GJK overlap ");
 
         const auto& colA = a.col;
         const auto& colB = b.col;
@@ -93,7 +93,7 @@ namespace tomato
 
     std::optional<DistanceResult> GJK::Distance(const ShapeView& a, const ShapeView& b)
     {
-        COL_DETECT_VERBOSE_LOG("===== GJK distance " << pair);
+        COL_DETECT_VERBOSE_LOG("===== GJK distance ");
 
         const auto& colA = a.col;
         const auto& colB = b.col;
@@ -166,7 +166,7 @@ namespace tomato
 
     std::optional<ContactData> GJK::Raycast(const ShapeView& a, const ShapeView& b, const glm::vec3& ray, bool reversed)
     {
-        COL_DETECT_VERBOSE_LOG("===== GJK raycast " << pair);
+        COL_DETECT_VERBOSE_LOG("===== GJK raycast ");
 
         const auto& colA = a.col;
         const auto& colB = b.col;

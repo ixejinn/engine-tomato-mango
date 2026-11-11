@@ -173,6 +173,7 @@ namespace tomato
 			{
 				//SendPacket for game start
 				//then, Remove from matches
+				//@TODO: 실제 게임이 끝날 때까지 방(매치) 데이터 보존
 				std::cout << "[MatchState::ALLREADY] Match ReadyToStart\n";
 				ServerTimeMs serverSteadyTime = static_cast<ServerTimeMs>(
 					duration_cast<std::chrono::milliseconds>(
