@@ -1,4 +1,5 @@
 ﻿#include <memory>
+#include <cstdio>
 #include "Engine/Engine.h"
 #include "Engine/EngineConfig.h"
 
@@ -16,11 +17,15 @@
 #include "Game/LobbyState.h"
 #endif
 
-//#define TOMATO_GREENTEA
+// #define TOMATO_GREENTEA
 
 using namespace tomato;
 
-int main() {
+int main()
+{
+    FILE* fp = nullptr;
+    freopen_s(&fp, "log.txt", "w", stdout);
+
 #if defined(TOMATO_SERVER)
     auto server = std::make_unique<MatchServer>();
     server->Run();
@@ -28,6 +33,7 @@ int main() {
 #else //TOMATO_SERVER
     PathManager::SetProjectRoot(TMT_PROJECT_ROOT);
     Engine engine(1920, 1080, "TOMATO", NetMode::NM_Client);
+    // Engine engine(1920, 1080, "TOMATO", NetMode::NM_Alone);
 
 #if defined(TOMATO_GREENTEA)
     engine.SetNextState(std::make_unique<ExampleState>(engine));
