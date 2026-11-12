@@ -64,15 +64,16 @@ namespace tomato
         for (auto [e, col, trf] : view.each())
         {
             const entt::entity root = GetRootEntity(reg, e);
+            const auto* vel = reg.try_get<VelocityComponent>(root);
 
             // Update AABB
-            if (col.aabbDirty)
+            if (col.aabbDirty || vel)
             {
                 col.aabbDirty = false;
 
                 // Sweep AABB center
                 glm::vec3 wPos = trf.GetWorldPosition();
-                if (const auto* vel = reg.try_get<VelocityComponent>(root))
+                if (vel)
                     wPos += vel->Get() * FIXED_DELTA_TIME;
 
                 UpdateAABB(col.aabb, wPos, trf.GetWorldScale() * 0.50f,

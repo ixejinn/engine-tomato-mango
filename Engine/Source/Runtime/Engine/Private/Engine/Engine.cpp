@@ -72,6 +72,8 @@ namespace tomato
         systemRegistry.RegisterEventCallbacks();
 
         TickClock tickClock;
+        TickPolicy tickPolicy{netMode_ == NetMode::NM_Alone ? TickPolicy::Discard : TickPolicy::Keep};
+
 #ifdef TOMATO_ENGINE
         RunMode runMode{RunMode::Editor};
 #else
@@ -117,7 +119,7 @@ namespace tomato
             SimContext simCtx{ currState_.get(), tickClock.GetTick() };
             garbageCollectionSystem.Update(simCtx);
 
-            FixedUpdate(tickClock, simCtx, runMode);
+            FixedUpdate(tickClock, tickPolicy, simCtx, runMode);
 
             Update(simCtx, runMode);
             UpdateEditor(tickClock.GetTick(), runMode);
@@ -168,9 +170,9 @@ namespace tomato
         window_.PollEvents();
     }
 
-    void Engine::FixedUpdate(TickClock& tc, SimContext& simCtx, RunMode mode)
+    void Engine::FixedUpdate(TickClock& tc, const TickPolicy policy, SimContext& simCtx, RunMode mode)
     {
-        int cnt = tc.GetSimulateNum(TickPolicy::Discard);
+        int cnt = tc.GetSimulateNum(policy);
         while (cnt--)
         {
             simCtx.tick = tc.GetTick();

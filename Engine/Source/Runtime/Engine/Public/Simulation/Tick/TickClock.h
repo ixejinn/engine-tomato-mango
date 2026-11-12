@@ -6,7 +6,7 @@
 
 namespace tomato
 {
-    enum class TickPolicy
+    enum class TickPolicy : uint8_t
     {
         Keep,
         Discard

@@ -75,7 +75,7 @@ namespace tomato
 
         NetMode netMode_;
 
-        void FixedUpdate(TickClock& tc, SimContext& simCtx, RunMode mode);
+        void FixedUpdate(TickClock& tc, TickPolicy policy, SimContext& simCtx, RunMode mode);
         void Update(SimContext& simCtx, RunMode mode);
         void UpdateEditor(uint64_t tick, RunMode& mode);
         SystemManager systemManager_;
