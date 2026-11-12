@@ -15,6 +15,7 @@
 #include "Editor.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 #include "Utils/Logger.h"
+#include "Utils/PassKey.h"
 #include "Profiler/Profiler.h"
 #include "Profiler/CPUProfiler.h"
 #include "Input/InputState.h"
@@ -122,7 +123,7 @@ namespace tomato
             FixedUpdate(tickClock, tickPolicy, simCtx, runMode);
 
             Update(simCtx, runMode);
-            UpdateEditor(tickClock.GetTick(), runMode);
+            UpdateEditor(tickClock, runMode);
 
             CPU_PROFILER_TOTAL_END()
 
@@ -203,10 +204,12 @@ namespace tomato
         systemManager_.Update(simCtx, mode);
     }
 
-    void Engine::UpdateEditor(uint64_t tick, RunMode& mode)
+    void Engine::UpdateEditor(TickClock& tc, RunMode& mode)
     {
+        RunMode before{mode};
+
         editor_.BeginFrame();
-        editor_.Draw(tick, currState_.get(), mode);
+        editor_.Draw(tc.GetTick(), currState_.get(), mode);
         editor_.EndFrame();
 
         // GL 상태 값 초기화
@@ -214,7 +217,11 @@ namespace tomato
         if (currState_)
             renderCtx.glState.Invalidate();
 
-        renderCtx.runMode = mode;
+        if (before != mode)
+        {
+            renderCtx.runMode = mode;
+            tc.ResetTick(PassKey<Engine>());
+        }
     }
 
     void Engine::OnChangeStateRequest(const Event::ChangeStateRequest& event)
@@ -252,7 +259,7 @@ namespace tomato
         loaded = false;
         inputUI_.SetState(currState_.get());
 
-        tc.ResetTick();
+        tc.ResetTick(PassKey<Engine>());
         SimContext simCtx{ currState_.get(), tc.GetTick() };
         systemManager_.Update(TickPhase::PostUpdate, simCtx, RunMode::Game | RunMode::Editor);
 

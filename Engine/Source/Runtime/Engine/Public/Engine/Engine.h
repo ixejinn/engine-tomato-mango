@@ -77,7 +77,7 @@ namespace tomato
 
         void FixedUpdate(TickClock& tc, TickPolicy policy, SimContext& simCtx, RunMode mode);
         void Update(SimContext& simCtx, RunMode mode);
-        void UpdateEditor(uint64_t tick, RunMode& mode);
+        void UpdateEditor(TickClock& tc, RunMode& mode);
         SystemManager systemManager_;
         bool isRunning_{true};
 

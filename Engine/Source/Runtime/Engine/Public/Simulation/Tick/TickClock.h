@@ -3,6 +3,8 @@
 
 #include <chrono>
 #include "Simulation/Tick/TickFwd.h"
+#include "Engine/TomatoFwd.h"
+#include "Utils/PassKey.h"
 
 namespace tomato
 {
@@ -20,7 +22,7 @@ namespace tomato
         int GetSimulateNum(TickPolicy policy);
 
         void AddTick() { ++tick_; }
-        void ResetTick();
+        void ResetTick(PassKey<Engine>);
 
     private:
         static constexpr Tick DT_{1};
