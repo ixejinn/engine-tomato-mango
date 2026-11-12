@@ -25,6 +25,14 @@ namespace tomato
 		void HandleCancel(const SessionId& client);
 		void HandleIntroResult(const SessionId&, MatchId& matchId, const int& set);
 
+		void HandleGameEnd(const SessionId& client, const MatchId& matchId);
+		void HandleLeave(const SessionId& client, const MatchId& matchId);
+		void HandleDisconnect(const SessionId& client);
+		void MarkPlayer(const SessionId& client, const MatchId& matchId, MatchPlayerState state);
+
+		//void SenPeerStatus(SessionId to, MatchId, uint8_t targetPlayerId, PeerState)
+		//void FinishIfDone(MatchId)
+
 		bool CheckPopulation();
 		bool CheckMatchTime(float dt);
 		bool GetMatchRequestFromPQ(MatchRequest& req);
@@ -53,6 +61,9 @@ namespace tomato
 		std::unordered_map<SessionId, MatchRequest> requests;
 		std::priority_queue<MatchRequest, std::vector<MatchRequest>, Compare> pq;
 		std::unordered_map<MatchId, Match> matches;
+
+		std::unordered_map<SessionId, ClientMatchInfo> clientInfo_; /* 매치 Cancel 판단을 위한 맵 */
+		std::unordered_map<MatchId, ActiveMatch> activeMatches_;	/* 게임 중 피어 연결 관리를 위한 맵 */
 
 		float waitTime{ 0.f };
 		uint8_t matchPlayerNum;

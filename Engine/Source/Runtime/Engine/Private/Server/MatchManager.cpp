@@ -58,6 +58,7 @@ namespace tomato
 		};
 
 		requests.try_emplace(client, mRequest);
+		clientInfo_[client] = { ClientMatchState::Queued, 0 };
 		pq.emplace(mRequest);
 
 		waitTime = 0.f;
@@ -73,7 +74,10 @@ namespace tomato
 
 		auto it = requests.find(client);
 		if (it != requests.end())
+		{
 			requests.erase(it);
+			clientInfo_.erase(client);
+		}
 	}
 
 	void MatchManager::HandleIntroResult(const SessionId& client, MatchId& matchId, const int& set)
@@ -141,12 +145,15 @@ namespace tomato
 		ctx.state = MatchState::Init;
 		ctx.playerNum = matchPlayerNum;
 
+		/* 매치 대기열에서 우선 순위가 높은 플레이어부터 새 매치 넣기 */
 		MatchRequest out;
 		for (int i = 0; i < matchPlayerNum; i++)
 		{
 			if (GetMatchRequestFromPQ(out))
 			{
 				ctx.players.push_back(out);
+				clientInfo_[out.sessionId] = { ClientMatchState::Matching, ctx.matchId };
+
 				requests.erase(out.sessionId);
 			}
 		}
@@ -199,7 +206,20 @@ namespace tomato
 					NetSendRequestQueue.Emplace(std::move(sendCmd));
 				}
 
+				// 활성 게임 관리를 위해 activeMatches_ 매치 데이터를 보관하고,
+				// Match와 Client 상태를 InGame으로 갱신
+				ActiveMatch am;
+				am.matchId = it->first;
+				for (int i = 0; i < it->second.GetMatchPlayerNum(); i++)
+				{
+					am.players.push_back(req[i].sessionId);
+					am.playerStates.push_back(MatchPlayerState::InGame);
+					clientInfo_[req[i].sessionId].state = ClientMatchState::InGame;
+				}
+				activeMatches_.emplace(am.matchId, std::move(am));
+
 				it = matches.erase(it);
+
 				break;
 			}
 
@@ -226,9 +246,14 @@ namespace tomato
 			uint8_t playerNum = it->second.GetMatchPlayerNum();
 			for (int i = 0; i < playerNum; i++)
 			{
+				/* 연결이 끊긴 세션은 큐에 다시 넣지 않음 */
+				if (!clientInfo_.contains(request[i].sessionId))
+					continue;
+
 				MatchRequest reRequest
 				{
 					.sessionId		= request[i].sessionId,
+					.address		= request[i].address,
 					.name			= request[i].name,
 					.requestId		= request[i].requestId,
 					.enqueueTime	= static_cast<ServerTimeMs>(
@@ -242,6 +267,8 @@ namespace tomato
 					continue;
 
 				requests.try_emplace(reRequest.sessionId, reRequest);
+				clientInfo_[reRequest.sessionId].state = ClientMatchState::Queued;
+
 				pq.emplace(reRequest);
 			}
 		}

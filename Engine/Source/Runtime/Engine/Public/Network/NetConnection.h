@@ -21,6 +21,17 @@ namespace tomato
 	*/
 	class NetBitWriter;
 	class NetBitReader;
+
+	/* 상대 peer의 연결 상태 */
+	enum class PeerState : uint8_t
+	{
+		Connected,
+		Finished,
+		Left,
+		Disconnected,
+		COUNT
+	};
+
 	struct NetConnection
 	{
 		uint32_t sessionId{ 0 };

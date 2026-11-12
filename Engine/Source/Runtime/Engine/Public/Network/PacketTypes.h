@@ -61,6 +61,7 @@ namespace tomato
 
 	enum class TCPPacketType : uint16_t
 	{
+		/* 게임 전: 매치 과정 중 필요한 패킷 */
 		MATCH_REQUEST,
 		MATCH_CANCEL,
 		MATCH_INTRO,
@@ -69,6 +70,14 @@ namespace tomato
 		MATCH_INTRO_SUCCESS,
 		MATCH_INTRO_FAILED,
 		MATCH_START,
+
+		/* 게임 중: 매치 관리에 필요한 패킷 */
+		GAME_END,
+		MATCH_LEAVE,
+		MATCH_PEER_STATUS,
+
+		/* recv 스레드 -> 메인 스레드용 이벤트 (네트워크로 오가지 않음) */
+		SESSION_DISCONNECTED,
 
 		COUNT
 	};

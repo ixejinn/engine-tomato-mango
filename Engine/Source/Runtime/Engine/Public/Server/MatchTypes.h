@@ -25,6 +25,10 @@ namespace tomato
 		Success,
 		Failed,
 
+		GameEnd,
+		Leave,
+		DisConnect,
+
 		COUNT
 	};
 
@@ -75,6 +79,18 @@ namespace tomato
 		Failed,
 
 		COUNT
+	};
+
+	enum class ClientMatchState : uint8_t { Idle, Queued, Matching, InGame, COUNT };
+	enum class MatchPlayerState : uint8_t { InGame, Finished, Left, Disconnected, COUNT };
+
+	struct ClientMatchInfo { ClientMatchState state; MatchId matchId; };
+
+	struct ActiveMatch
+	{
+		MatchId matchId;
+		std::vector<SessionId> players; // 인덱스 = playerId
+		std::vector<MatchPlayerState> playerStates;
 	};
 }
 
