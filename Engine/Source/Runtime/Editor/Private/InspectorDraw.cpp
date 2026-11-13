@@ -29,7 +29,7 @@
 #include "Utils/FileDialog.h"
 namespace tomato
 {
-	bool DrawCameraInspcetor(EditorContext& eCtx, entt::registry& reg, CameraComponent& camera)
+	bool DrawCameraInspector(EditorContext& eCtx, entt::registry& reg, CameraComponent& camera)
 	{
 		bool changed = false;
 
@@ -81,7 +81,7 @@ namespace tomato
 		return changed;
 	}
 
-	bool DrawInputChannelInspcetor(EditorContext& eCtx, entt::registry& reg, InputChannelComponent& inputCh)
+	bool DrawInputChannelInspector(EditorContext& eCtx, entt::registry& reg, InputChannelComponent& inputCh)
 	{
 		bool changed = false;
 
@@ -267,8 +267,19 @@ namespace tomato
 	{
 		bool changed = false;
 
+		ImGui::SeparatorText("Options");
+		ImGui::Text("Cull Face"); ImGui::SameLine();
+
+		bool cullFace = !render.doubleSided;
+		if (ImGui::Checkbox("##CullFace", &cullFace))
+		{
+			render.doubleSided = !cullFace;
+			changed = true;
+		}
+
 		ImGui::SeparatorText("Color");
-		ImGui::ColorEdit4("##color", glm::value_ptr(render.color));
+		if (ImGui::ColorEdit4("##color", glm::value_ptr(render.color)))
+			changed = true;
 
 		ImGui::SeparatorText("Mesh");
 
@@ -690,7 +701,9 @@ namespace tomato
 		}
 
 		ImGui::SeparatorText("Target Object");
-		const char* objPreview = target.targetEntity == entt::null ? "None" : reg.try_get<NametagComponent>(target.targetEntity)->name.c_str();
+		const char* objPreview =
+			target.targetEntity == entt::null ?
+			"None" : reg.try_get<NametagComponent>(target.targetEntity)->name.c_str();
 		if (ImGui::BeginCombo("##objectCombo", objPreview))
 		{
 			auto view = reg.view<ActiveTag, NametagComponent, TransformComponent>();

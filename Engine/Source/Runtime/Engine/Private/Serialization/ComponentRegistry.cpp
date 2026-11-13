@@ -76,8 +76,8 @@ namespace tomato::Serialization
 	{
 		//@Warning : Must initialize ComponentRegistry::RegisterBuiltInComponents() first.
 
-		RegisterInspector<CameraComponent>("Camera", DrawCameraInspcetor);
-		RegisterInspector<InputChannelComponent>("InputChannel", DrawInputChannelInspcetor);
+		RegisterInspector<CameraComponent>("Camera", DrawCameraInspector);
+		RegisterInspector<InputChannelComponent>("InputChannel", DrawInputChannelInspector);
 		RegisterInspector<TransformComponent>("Transform", DrawTransformInspector);
 		RegisterInspector<MovementComponent>("Movement", DrawMovementInspector);
 		RegisterInspector<VelocityComponent>("Velocity", DrawVelocityInspector);
