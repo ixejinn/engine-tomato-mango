@@ -33,8 +33,8 @@ namespace tomato::Serialization
 	inline void Save(json&, entt::registry&, const EditorHiddenTag&) {}
 	inline void Load(const json&, entt::registry&, EditorHiddenTag&) {}
 
-	inline void Save(json&, entt::registry&, const NoInspectorTag&) {}
-	inline void Load(const json&, entt::registry&, NoInspectorTag&) {}
+	inline void Save(json&, entt::registry&, const NonSelectableTag&) {}
+	inline void Load(const json&, entt::registry&, NonSelectableTag&) {}
 
 	// Hierarchy.h
 	//  엔티티 ID 대신 UUID를 저장

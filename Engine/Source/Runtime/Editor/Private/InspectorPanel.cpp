@@ -66,8 +66,8 @@ namespace tomato
 		if (editorCtx.selectedEntity == entt::null)
 			return;
 
-		if (editorCtx.currentState->GetRegistry().all_of<NoInspectorTag>(editorCtx.selectedEntity))
-			return;
+		/*if (editorCtx.currentState->GetRegistry().all_of<NonSelectableTag>(editorCtx.selectedEntity))
+			return;*/
 
 		ImGui::SetNextWindowPos(ImVec2(posX_, posY_ + ImGui::GetFrameHeight()), ImGuiCond_Once, ImVec2(1.f, 0.f));
 		ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_Once);

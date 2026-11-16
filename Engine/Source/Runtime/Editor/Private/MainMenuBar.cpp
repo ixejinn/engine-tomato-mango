@@ -39,6 +39,7 @@ namespace tomato
 		{
 			MenuFile(eCtx);
 			MenuTools(eCtx);
+			MenuProject(eCtx);
 
 			EditModeButton(eCtx, mode);
 
@@ -51,6 +52,13 @@ namespace tomato
 			openNotSavedPopup = false;
 		}
 		OpenPopupModal(eCtx);
+
+		if (openProjectSettings)
+		{
+			ImGui::OpenPopup("Project Settings");
+			openProjectSettings = false;
+		}
+		OpenProjectSettings(eCtx);
 
 		if (showCPUProfiler)
 			ShowCPUProfilerWindow(eCtx);
@@ -92,6 +100,17 @@ namespace tomato
 				else
 					profiler.End();
 			}
+
+			ImGui::EndMenu();
+		}
+	}
+
+	void MainMenuBar::MenuProject(EditorContext& eCtx)
+	{
+		if (ImGui::BeginMenu("Project"))
+		{
+			if (ImGui::MenuItem("Project Settings"))
+				openProjectSettings = true;
 
 			ImGui::EndMenu();
 		}
@@ -245,6 +264,74 @@ namespace tomato
 				eCtx.currentState,
 				path.string().c_str()
 			);*/
+		}
+	}
+
+	void MainMenuBar::OpenProjectSettings(EditorContext& eCtx)
+	{
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		ImGui::SetNextWindowSize(ImVec2(500, 500));
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+		if (ImGui::BeginPopupModal("Project Settings", NULL, ImGuiWindowFlags_NoResize))
+		{
+			if (ImGui::TreeNodeEx("Collision Layer Matrix", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				DrawLayerMatrix(eCtx);
+				ImGui::TreePop();
+			}
+
+			ImGui::SetCursorPos(ImVec2(ImGui::GetWindowSize().x - 50.f, ImGui::GetWindowSize().y - 30.f));
+			if (ImGui::Button("Close"))
+				ImGui::CloseCurrentPopup();
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void MainMenuBar::DrawLayerMatrix(EditorContext& eCtx)
+	{
+		//Layer Matrix
+		auto& matrix = eCtx.currentState->GetCollisionLayerMatrix();
+
+		const int layerSize = static_cast<int>(CollisionLayer::COUNT);
+		ImGuiTableColumnFlags column_flags = ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
+		if (ImGui::BeginTable("Layer Collision Matrix", layerSize + 1))
+		{
+			ImGui::TableSetupColumn("CollisionLayer", ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_WidthFixed);
+
+			for (int i = 0; i < layerSize; ++i)
+				ImGui::TableSetupColumn(CollisionLayerMetas[i].name, column_flags | ImGuiTableColumnFlags_NoHeaderWidth);
+
+			ImGui::TableAngledHeadersRow();
+
+			for (int i = 0; i < layerSize; ++i)
+			{
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+
+				ImGui::AlignTextToFramePadding();
+				ImGui::Text(CollisionLayerMetas[i].name);
+
+				for (int j = layerSize - 1; j >= i; --j)
+				{
+					ImGui::TableSetColumnIndex(j + 1);
+
+					const auto layerA = CollisionLayerMetas[i].layer;
+					const auto layerB = CollisionLayerMetas[j].layer;
+
+					bool canCollide = matrix.CanCollide(layerA, layerB);
+
+					ImGui::PushID(i * layerSize + j);
+
+					if (ImGui::Checkbox("##Collsion", &canCollide))
+						matrix.SetCollisionLayer(layerA, layerB, canCollide);
+
+					ImGui::PopID();
+				}
+				ImGui::NewLine();
+			}
+			ImGui::EndTable();
 		}
 	}
 

@@ -19,7 +19,7 @@ namespace tomato
 
 	// EditorTag.h
 	struct EditorHiddenTag;
-	struct NoInspectorTag;
+	struct NonSelectableTag;
 	struct NoSaveTag;
 
 	// Hierarchy.h

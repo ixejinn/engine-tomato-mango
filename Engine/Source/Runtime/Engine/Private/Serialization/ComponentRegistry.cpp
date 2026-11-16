@@ -69,7 +69,7 @@ namespace tomato::Serialization
 		RegisterComponent<GroundTriggerTag>("TagGroundTrigger", ComponentCategory::Tag, ComponentFlags::Hidden);
 		RegisterComponent<RollbackEntityTag>("TagRollback", ComponentCategory::Tag);
 		RegisterComponent<EditorHiddenTag>("TagEditorHidden", ComponentCategory::Tag, ComponentFlags::Hidden);
-		RegisterComponent<NoInspectorTag>("TagNoInspector", ComponentCategory::Tag, ComponentFlags::Hidden);
+		RegisterComponent<NonSelectableTag>("NonSelectableTag", ComponentCategory::Tag, ComponentFlags::Hidden);
 	}
 
 	void ComponentRegistry::RegisterBuiltInComponentsInspector()
@@ -82,6 +82,8 @@ namespace tomato::Serialization
 		RegisterInspector<MovementComponent>("Movement", DrawMovementInspector);
 		RegisterInspector<VelocityComponent>("Velocity", DrawVelocityInspector);
 		RegisterInspector<ColliderComponent>("Collider", DrawColliderInspector);
+		RegisterInspector<FrictionComponent>("Friction", DrawFrictionInspector);
+		RegisterInspector<SurfaceComponent>("Surface", DrawSurfaceInspector);
 		RegisterInspector<RenderComponent>("Render", DrawRenderInspector);
 		RegisterInspector<UIComponent>("UI", DrawUIInspector);
 		RegisterInspector<CanvasComponent>("Canvas", DrawCanvasInspector);

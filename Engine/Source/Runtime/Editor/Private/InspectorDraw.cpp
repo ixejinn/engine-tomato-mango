@@ -142,6 +142,22 @@ namespace tomato
 	{
 		bool changed = false;
 
+		ImGui::SeparatorText("Input Control");
+
+		if (ImGui::RadioButton("Direct", movement.control == InputControl::Direct))
+		{
+			movement.control = InputControl::Direct;
+			changed = true;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::RadioButton("Accelerate", movement.control == InputControl::Accelerate))
+		{
+			movement.control = InputControl::Accelerate;
+			changed = true;
+		}
+
 		ImGui::NewLine();
 
 		return changed;
@@ -156,10 +172,35 @@ namespace tomato
 			changed = true;
 
 		ImGuiSliderFlags flags = ImGuiSliderFlags_NoInput;
-		if (DrawVec3Control("Velocity", glm::value_ptr(vel.velocity), flags))
+		DrawVec3Control("Velocity", glm::value_ptr(vel.velocity), flags);
+		
+		ImGui::NewLine();
+
+		return changed;
+	}
+
+	bool DrawFrictionInspector(EditorContext& eCtx, entt::registry& reg, FrictionComponent& friction)
+	{
+		bool changed = false;
+
+		ImGui::SeparatorText("Ground Friction");
+		if (ImGui::DragFloat("##gFriction", &friction.groundFriction, 1.f, 0.f, 0.f, "%g"))
 			changed = true;
 
-		ImGui::NewLine();
+		ImGui::SeparatorText("Air Drag");
+		if (ImGui::DragFloat("##airDrag", &friction.airDrag, 1.f, 0.f, 0.f, "%g"))
+			changed = true;
+
+		return changed;
+	}
+
+	bool DrawSurfaceInspector(EditorContext& eCtx, entt::registry& reg, SurfaceComponent& surface)
+	{
+		bool changed = false;
+
+		ImGui::SeparatorText("Friction");
+		if (ImGui::DragFloat("##friction", &surface.friction, 1.f, 0.f, 0.f, "%g"))
+			changed = true;
 
 		return changed;
 	}
@@ -212,50 +253,6 @@ namespace tomato
 			}
 
 			ImGui::EndCombo();
-		}
-		ImGui::NewLine();
-
-		//Layer Matrix
-		auto& matrix = eCtx.currentState->GetCollisionLayerMatrix();
-
-		const int layerSize = static_cast<int>(CollisionLayer::COUNT);
-		ImGuiTableColumnFlags column_flags = ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
-		if (ImGui::BeginTable("Layer Collision Matrix", layerSize + 1))
-		{
-			ImGui::TableSetupColumn("CollisionLayer", ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_WidthFixed);
-			
-			for (int i = 0; i < layerSize; ++i) 
-				ImGui::TableSetupColumn(CollisionLayerMetas[i].name, column_flags | ImGuiTableColumnFlags_NoHeaderWidth);
-
-			ImGui::TableAngledHeadersRow();
-
-			for (int i = 0; i < layerSize; ++i)
-			{
-				ImGui::TableNextRow();
-				ImGui::TableSetColumnIndex(0);
-
-				ImGui::AlignTextToFramePadding();
-				ImGui::Text(CollisionLayerMetas[i].name);
-
-				for (int j = layerSize - 1; j >= i; --j)
-				{
-					ImGui::TableSetColumnIndex(j+1);
-
-					const auto layerA = CollisionLayerMetas[i].layer;
-					const auto layerB = CollisionLayerMetas[j].layer;
-
-					bool canCollide = matrix.CanCollide(layerA, layerB);
-
-					ImGui::PushID(i * layerSize + j);
-
-					if (ImGui::Checkbox("##Collsion", &canCollide))
-						matrix.SetCollisionLayer(layerA, layerB, canCollide);
-					
-					ImGui::PopID();
-				}
-				ImGui::NewLine();
-			}
-			ImGui::EndTable();
 		}
 		
 		ImGui::NewLine();
@@ -706,7 +703,7 @@ namespace tomato
 			"None" : reg.try_get<NametagComponent>(target.targetEntity)->name.c_str();
 		if (ImGui::BeginCombo("##objectCombo", objPreview))
 		{
-			auto view = reg.view<ActiveTag, NametagComponent, TransformComponent>();
+			auto view = reg.view<ActiveTag, NametagComponent, TransformComponent>(entt::exclude<NonSelectableTag, ColliderComponent, CameraComponent>);
 			for (auto [e, tag, trf] : view.each())
 			{
 				if (ImGui::Selectable(tag.name.c_str(), target.targetEntity == e))
