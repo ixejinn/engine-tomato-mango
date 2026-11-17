@@ -1,7 +1,7 @@
 #include <ranges>
 #include "Input/PlayerInput.h"
 #include "Input/InputEvents.h"
-#include "Input/InputState.h"
+#include "Input/KeyStateMap.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 
 namespace tomato
@@ -13,14 +13,14 @@ namespace tomato
 
     bool PlayerInput::OnKeyEvent(const KeyEvent& event)
     {
-        if (event.type == KeyEventType::Press)
+        if (event.event == InputEvent::Pressed)
             pendingPressed_ |= keyBindings_[event.key];
         return true;
     }
 
     bool PlayerInput::OnMouseButtonEvent(const MouseButtonEvent& event)
     {
-        if (event.type == KeyEventType::Press)
+        if (event.event == InputEvent::Pressed)
             pendingPressed_ |= keyBindings_[event.key];
         return true;
     }
@@ -28,20 +28,20 @@ namespace tomato
     void PlayerInput::UpdateSnapshot(int64_t tick)
     {
         curr_.tick = tick;
-        curr_.held = ComputeHeld();
+        curr_.down = ComputeDown();
         curr_.pressed = pendingPressed_;
 
         pendingPressed_ = InputAction::None;
     }
 
-    bool PlayerInput::WasJustPressed(InputAction intent) const
+    bool PlayerInput::WasJustPressed(const InputAction action) const
     {
-        return HasFlag(curr_.pressed, intent);
+        return HasFlag(curr_.pressed, action);
     }
 
-    bool PlayerInput::IsDown(InputAction intent) const
+    bool PlayerInput::IsDown(const InputAction action) const
     {
-        return HasFlag(curr_.held, intent);
+        return HasFlag(curr_.down, action);
     }
 
     void PlayerInput::BindDefaultActions() {
@@ -63,21 +63,21 @@ namespace tomato
         keyBindings_[Key::KP_0] = InputAction::Jump2;
     }
 
-    InputAction PlayerInput::ComputeHeld() const
+    InputAction PlayerInput::ComputeDown() const
     {
-        const auto& keyState = InputState::GetInstance();
+        const auto& keyStateMap = KeyStateMap::GetInstance();
 
-        InputAction held{InputAction::None};
+        InputAction down{InputAction::None};
 
         auto keyRange =
                 std::views::iota(0, static_cast<int>(Key::AXIS_BEGIN)) |
                 std::views::transform([](int i) { return static_cast<Key>(i); });
         for (Key key : keyRange)
         {
-            if (keyBindings_[key] != InputAction::None && keyState.IsKeyPressed(key))
-                held |= keyBindings_[key];
+            if (keyBindings_[key] != InputAction::None && keyStateMap.IsKeyDown(key))
+                down |= keyBindings_[key];
         }
 
-        return held;
+        return down;
     }
 }

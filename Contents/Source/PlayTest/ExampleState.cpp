@@ -7,7 +7,7 @@
 #include "Event/EventDispatcher.h"
 #include "Prefab/Prefab.h"
 #include "Particle/ParticleEmitterPool.h"
-#include "Input/InputState.h"
+#include "Input/KeyStateMap.h"
 #include "Utils/RegistryEntry.h"
 REGISTER_STATE(ExampleState)
 
@@ -34,7 +34,7 @@ void ExampleState::Update()
 {
     static int cnt = 0;
 
-    if (InputState::GetInstance().IsKeyPressed(Key::O) && cnt == 0)
+    if (KeyStateMap::GetInstance().IsKeyDown(Key::O) && cnt == 0)
     {
         ++cnt;
 
@@ -68,7 +68,7 @@ void ExampleState::CreateDefaultEntities()
     registry_.get<TransformComponent>(playerCube).SetPosition(1, 2, -2);
     registry_.get<RenderComponent>(playerCube).color = glm::vec4(196/255.f, 27/225.f, 232/225.f, 1);
     ChangeMesh(playerCube, cubeID, true);
-    registry_.get<InputChannelComponent>(playerCube).useWASD = false;
+    registry_.get<PlayerControlledComponent>(playerCube).useWASD = false;
 
     entt::entity playerSphere = Prefab::CreateCharacter(registry_, true, "playerSphere");
     registry_.get<TransformComponent>(playerSphere).SetPosition(-1, 3, -2);

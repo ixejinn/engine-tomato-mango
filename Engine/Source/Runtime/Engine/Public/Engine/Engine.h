@@ -36,7 +36,7 @@ namespace tomato
 
         Window& GetWindow() { return window_;}
 
-        PlayerInput& GetInputRecorder() { return playerInput_; }
+        PlayerInput& GetPlayerInput() { return playerInput_; }
         Serialization::SerializeManager& GetSerializer() { return serializer_; }
 
         void SetNextState(std::unique_ptr<State>&& newState);

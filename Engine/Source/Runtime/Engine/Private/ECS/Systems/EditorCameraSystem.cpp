@@ -9,7 +9,7 @@
 #include "ECS/SystemFramework/ChangeRunModeEvent.h"
 #include "Simulation/SimulationConfig.h"
 #include "State/State.h"
-#include "Input/InputState.h"
+#include "Input/KeyStateMap.h"
 #include "Services/Window.h"
 #include "Event/EventDispatcher.h"
 
@@ -26,7 +26,7 @@ namespace tomato
         auto& renderCtx = registry.ctx().get<RenderContext>();
         renderCtx.mainCam = renderCtx.editorCam;
 
-        auto& keyDeviceState = InputState::GetInstance();
+        auto& keyDeviceState = KeyStateMap::GetInstance();
 
         if (mode_ == None)
         {
@@ -44,11 +44,11 @@ namespace tomato
             }
 
             // Start free look
-            if (keyDeviceState.IsKeyPressed(Key::RightMouseButton))
+            if (keyDeviceState.IsKeyDown(Key::RightMouseButton))
                 mode_ = FreeLook;
 
             // Start pan
-            if (keyDeviceState.IsKeyPressed(Key::MiddleMouseButton))
+            if (keyDeviceState.IsKeyDown(Key::MiddleMouseButton))
                 mode_ = Pan;
 
             if (mode_ != None)
@@ -83,10 +83,10 @@ namespace tomato
         auto& registry = simCtx.state->GetRegistry();
         auto& renderCtx = registry.ctx().get<RenderContext>();
 
-        auto& keyDeviceState = InputState::GetInstance();
+        auto& keyDeviceState = KeyStateMap::GetInstance();
 
         //// Finish free looking
-        if (keyDeviceState.IsKeyReleased(Key::RightMouseButton))
+        if (keyDeviceState.IsKeyUp(Key::RightMouseButton))
         {
             mode_ = None;
 
@@ -115,13 +115,13 @@ namespace tomato
 
         // Move camera
         int back = 0, right = 0;
-        if (keyDeviceState.IsKeyPressed(Key::W))
+        if (keyDeviceState.IsKeyDown(Key::W))
             --back;
-        if (keyDeviceState.IsKeyPressed(Key::S))
+        if (keyDeviceState.IsKeyDown(Key::S))
             ++back;
-        if (keyDeviceState.IsKeyPressed(Key::A))
+        if (keyDeviceState.IsKeyDown(Key::A))
             --right;
-        if (keyDeviceState.IsKeyPressed(Key::D))
+        if (keyDeviceState.IsKeyDown(Key::D))
             ++right;
 
         glm::vec3 dir{right, 0, back};
@@ -143,10 +143,10 @@ namespace tomato
         auto& registry = simCtx.state->GetRegistry();
         auto& renderCtx = registry.ctx().get<RenderContext>();
 
-        auto& keyDeviceState = InputState::GetInstance();
+        auto& keyDeviceState = KeyStateMap::GetInstance();
 
         //// Finish pan
-        if (keyDeviceState.IsKeyReleased(Key::MiddleMouseButton))
+        if (keyDeviceState.IsKeyUp(Key::MiddleMouseButton))
         {
             mode_ = None;
 
@@ -169,13 +169,13 @@ namespace tomato
 
         // Move along camera's front(-back) and right vectors
         glm::vec3 keyBoardDir{0};
-        if (keyDeviceState.IsKeyPressed(Key::W))
+        if (keyDeviceState.IsKeyDown(Key::W))
             --keyBoardDir.z;
-        if (keyDeviceState.IsKeyPressed(Key::S))
+        if (keyDeviceState.IsKeyDown(Key::S))
             ++keyBoardDir.z;
-        if (keyDeviceState.IsKeyPressed(Key::A))
+        if (keyDeviceState.IsKeyDown(Key::A))
             --keyBoardDir.x;
-        if (keyDeviceState.IsKeyPressed(Key::D))
+        if (keyDeviceState.IsKeyDown(Key::D))
             ++keyBoardDir.x;
         const float keyBoardDirLen = glm::length(keyBoardDir);
         if (keyBoardDirLen > 1)

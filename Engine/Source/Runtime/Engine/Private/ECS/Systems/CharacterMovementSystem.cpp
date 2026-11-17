@@ -18,24 +18,24 @@ namespace tomato {
     {
         auto& registry = simCtx.state->GetRegistry();
 
-        auto view = registry.view<ActiveTag, VelocityComponent, InputChannelComponent, MovementComponent>();
-        for (auto [e, velocity, ch, move] : view.each())
+        auto view = registry.view<ActiveTag, VelocityComponent, PlayerControlledComponent, MovementComponent>();
+        for (auto [e, velocity, controlled, move] : view.each())
         {
-            const auto& inputRec = simCtx.state->GetPlayerInputTimelines()[ch.channel][simCtx.tick];
-            if (inputRec.tick != simCtx.tick)
+            const auto& snapshot = simCtx.state->GetPlayerInputTimelines()[controlled.playerIdx][simCtx.tick];
+            if (snapshot.tick != simCtx.tick)
                 continue;
-            InputAction keypress{inputRec.held};
-            InputAction keydown{inputRec.pressed};
+            const InputAction down{snapshot.down};
+            const InputAction pressed{snapshot.pressed};
 
             // Move
             int x = 0, y = 0;
-            if (HasFlag(keypress, ch.useWASD ? InputAction::Up : InputAction::Up2))
+            if (HasFlag(down, controlled.useWASD ? InputAction::Up : InputAction::Up2))
                 ++y;
-            if (HasFlag(keypress, ch.useWASD ? InputAction::Down : InputAction::Down2))
+            if (HasFlag(down, controlled.useWASD ? InputAction::Down : InputAction::Down2))
                 --y;
-            if (HasFlag(keypress, ch.useWASD ? InputAction::Left : InputAction::Left2))
+            if (HasFlag(down, controlled.useWASD ? InputAction::Left : InputAction::Left2))
                 --x;
-            if (HasFlag(keypress, ch.useWASD ? InputAction::Right : InputAction::Right2))
+            if (HasFlag(down, controlled.useWASD ? InputAction::Right : InputAction::Right2))
                 ++x;
 
             glm::vec2 input{x, -y};
@@ -78,21 +78,9 @@ namespace tomato {
                 }
             }
 
-            // Rotation (!!!!TEST!!!!)
-//            x = 0; y = 0;
-//            if (HasFlag(keypress, InputAction::TurnLeft))
-//                y += 5;
-//            if (HasFlag(keypress, InputAction::TurnRight))
-//                y -= 5;
-////            if (HasFlag(keypress, InputAction::TurnUp))
-////                x += 5;
-////            if (HasFlag(keypress, InputAction::TurnDown))
-////                x -= 5;
-//            glm::vec3 newDegree = trf.GetLocalRotationDegree() + glm::vec3{x, y, 0.f};
-//            trf.SetRotationDegree(newDegree);
-
             // Jump
-            if (HasFlag(keydown, ch.useWASD ? InputAction::Jump : InputAction::Jump2) && move.jumpCnt < JUMP_COUNT_MAX)
+            if (HasFlag(pressed, controlled.useWASD ? InputAction::Jump : InputAction::Jump2)
+                && move.jumpCnt < JUMP_COUNT_MAX)
                 CharacterMovement::Jump(registry, e, move, velocity, JUMP_SPEED);
         }
     }

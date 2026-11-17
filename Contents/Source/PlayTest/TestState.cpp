@@ -161,8 +161,8 @@ void TestState::PlayTest()
     renderP0.mesh = GetAssetID("Primitive::Sphere_20_10");
     renderP0.color = {155.f / 255, 20.f / 255, 90.f / 255, 1.f};
 
-    auto& channelP0 = registry_.get<InputChannelComponent>(player0);
-    channelP0.channel = 0;
+    auto& channelP0 = registry_.get<PlayerControlledComponent>(player0);
+    channelP0.playerIdx = 0;
 
     registry_.emplace<CollisionTestComponent>(player0);
 

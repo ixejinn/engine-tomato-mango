@@ -6,10 +6,12 @@
 
 namespace tomato
 {
-    /// Identifies which player's input timeline this entity uses.
-    struct InputChannelComponent
+    /**
+     * @brief Marks an entity as controlled by a player.
+     */
+    struct PlayerControlledComponent
     {
-        uint8_t channel{0};
+        uint8_t playerIdx{0};
         bool useWASD{true};
     };
 

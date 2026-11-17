@@ -1,6 +1,6 @@
 ﻿#include "Input/InputUI.h"
 #include "Input/InputEvents.h"
-#include "Input/InputState.h"
+#include "Input/KeyStateMap.h"
 
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/SystemFramework/ChangeRunModeEvent.h"
@@ -8,7 +8,6 @@
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
 #include "ECS/Components/ActiveTag.h"
-#include "Services/Input.h"
 #include "Services/Window.h"
 #include "Event/EventDispatcher.h"
 #include "State/State.h"
@@ -40,13 +39,13 @@ namespace tomato
         if (runMode_ != RunMode::Game)
             return false;
 
-		if (mouseEvent.type == KeyEventType::Press)
+		if (mouseEvent.event == InputEvent::Pressed)
 		{
 			pressed = currentHovered;
 			render.color = selectable.pressedColor;
 		}
 
-		if (mouseEvent.type == KeyEventType::Release)
+		if (mouseEvent.event == InputEvent::Released)
 		{
 			render.color = selectable.normalColor;
 
@@ -69,7 +68,7 @@ namespace tomato
 		if (currentHovered == entt::null)
 			return true;
 
-		if (previousHovered == currentHovered && InputState::GetInstance().IsKeyPressed(Key::LeftMouseButton))
+		if (previousHovered == currentHovered && KeyStateMap::GetInstance().IsKeyDown(Key::LeftMouseButton))
 			return false;
 
 		auto& rect = r.get<RectTransformComponent>(currentHovered);

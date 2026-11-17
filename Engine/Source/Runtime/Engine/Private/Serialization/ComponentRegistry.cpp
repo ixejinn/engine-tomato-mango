@@ -40,7 +40,7 @@ namespace tomato::Serialization
 		RegisterComponent<VisibilityComponent>("Visibility", ComponentCategory::Common,
 			ComponentFlags::Hidden | ComponentFlags::ReadOnly | ComponentFlags::Essential);
 		RegisterComponent<CameraComponent>("Camera", ComponentCategory::Common);
-		RegisterComponent<InputChannelComponent>("InputChannel", ComponentCategory::Common);
+		RegisterComponent<PlayerControlledComponent>("PlayerControlled", ComponentCategory::Common);
 		RegisterComponent<TransformComponent>("Transform", ComponentCategory::Common, ComponentFlags::Essential);
 		RegisterComponent<MovementComponent>("Movement", ComponentCategory::Common);
 		RegisterComponent<VelocityComponent>("Velocity", ComponentCategory::Common);
@@ -77,7 +77,7 @@ namespace tomato::Serialization
 		//@Warning : Must initialize ComponentRegistry::RegisterBuiltInComponents() first.
 
 		RegisterInspector<CameraComponent>("Camera", DrawCameraInspcetor);
-		RegisterInspector<InputChannelComponent>("InputChannel", DrawInputChannelInspcetor);
+		RegisterInspector<PlayerControlledComponent>("PlayerControlled", DrawInputChannelInspcetor);
 		RegisterInspector<TransformComponent>("Transform", DrawTransformInspector);
 		RegisterInspector<MovementComponent>("Movement", DrawMovementInspector);
 		RegisterInspector<VelocityComponent>("Velocity", DrawVelocityInspector);

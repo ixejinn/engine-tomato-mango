@@ -27,7 +27,7 @@ namespace tomato
 	struct HierarchyComponent;
 
 	// Movement.h
-	struct InputChannelComponent;
+	struct PlayerControlledComponent;
 	struct MovementComponent;
 
 	// Nametag.h

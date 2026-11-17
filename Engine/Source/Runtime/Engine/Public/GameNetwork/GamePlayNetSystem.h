@@ -28,8 +28,8 @@ namespace tomato
         int64_t GetConfirmedTick() const { return confirmedTick; }
 
 	private:
-		State* currentStatePtr_{ nullptr };
-		ClientNetwork* network_;
+		State* currentStatePtr_{nullptr};
+		ClientNetwork* network_{nullptr};
 
         int64_t confirmedTick{0};
 	};

@@ -81,7 +81,7 @@ namespace tomato
 		return changed;
 	}
 
-	bool DrawInputChannelInspcetor(EditorContext& eCtx, entt::registry& reg, InputChannelComponent& inputCh)
+	bool DrawInputChannelInspcetor(EditorContext& eCtx, entt::registry& reg, PlayerControlledComponent& inputCh)
 	{
 		bool changed = false;
 

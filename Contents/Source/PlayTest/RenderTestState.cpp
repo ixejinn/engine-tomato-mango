@@ -9,7 +9,7 @@
 #include "Resource/AssetHash.h"
 #include "Prefab/Prefab.h"
 #include "Render/GLStateCache.h"
-#include "Input/InputState.h"
+#include "Input/KeyStateMap.h"
 #include "Utils/RandomNumberGenerator.h"
 #include "Utils/RegistryEntry.h"
 REGISTER_STATE(RenderTestState)

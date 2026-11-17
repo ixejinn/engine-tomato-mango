@@ -8,7 +8,7 @@ namespace tomato {
      * @brief User-extensible bitmask of logical player actions for a single simulation tick.
      *
      * 각 비트는 물리 키가 아니라 Jump와 같은 의미가 있는 액션을 나타내며,
-     * IntentTranslator의 바인딩 테이블에서 실제 물리 키와 연결할 수 있다.
+     * PlayerInput에서 실제 물리 키와 연결할 수 있다.
      */
     enum class InputAction : uint32_t
     {

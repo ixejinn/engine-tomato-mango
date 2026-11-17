@@ -10,8 +10,9 @@
 namespace tomato
 {
     /**
-     * @brief Translates raw key input into per-tick InputAction snapshots for the simulation.
-     * InputAction 상태를 조회할 수 있는 유일한 창구.
+     * @brief Translates key input into per-tick ActionSnapshots.
+     *
+     * 키를 InputAction으로 바꾼다.
      */
     class PlayerInput
     {
@@ -21,28 +22,30 @@ namespace tomato
         bool OnKeyEvent(const KeyEvent& event);
         bool OnMouseButtonEvent(const MouseButtonEvent& event);
 
-        void BindAction(Key key, InputAction intent) { keyBindings_[key] = intent; }
+        void BindAction(Key key, InputAction action) { keyBindings_[key] = action; }
         InputAction GetBoundAction(Key key) { return keyBindings_[key]; }
 
+        /// 틱마다 한 번 호출해 ActionSnapshot을 갱신한다.
         void UpdateSnapshot(int64_t tick);
         const ActionSnapshot& GetSnapshot() const { return curr_; }
 
-        bool WasJustPressed(InputAction intent) const;
-        bool IsDown(InputAction intent) const;
+        bool WasJustPressed(InputAction action) const;
+        bool IsDown(InputAction action) const;
 
     private:
         void BindDefaultActions();
 
-        InputAction ComputeHeld() const;
+        /// 바인딩된 키 중 KeyStateMap에서 눌려 있는 키의 InputAction을 구한다.
+        InputAction ComputeDown() const;
 
         EnumArray<Key, InputAction> keyBindings_;
 
-        /// Sample 호출 마다 press 입력 이벤트를 모아 Sample에서 curr_.down를 덮어씀
+        /// 마지막 UpdateSnapshot 이후 들어온 press 이벤트의 InputAction.
+        /// 입력 이벤트는 프레임, 스냅샷은 틱마다 만들어지므로 여기에 모아 두었다가 다음 틱의 UpdateSnapshot에서 pressed로 사용한다.
+        /// press 이벤트 하나가 한 틱에서만 유효하도록 한다.
         InputAction pendingPressed_{InputAction::None};
 
-        /// 틱마다 호출되는 Sample에서 갱신
-        /// held: 틱마다 KeyDeviceState에서 현재 눌려있는 키를 조회
-        /// down: pendingDown_으로 덮어씀
+        /// UpdateSnapshot에서 갱신하는 현재의 ActionSnapshot
         ActionSnapshot curr_;
     };
 }

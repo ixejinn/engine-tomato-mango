@@ -64,15 +64,15 @@ namespace tomato::Serialization
 	}
 
 	// Movement.h
-	void Save(json& data, entt::registry&, const InputChannelComponent& channel)
+	void Save(json& data, entt::registry&, const PlayerControlledComponent& channel)
 	{
-		data["channel"] = channel.channel;
+		data["channel"] = channel.playerIdx;
 		data["useWASD"] = channel.useWASD;
 	}
 
-	void Load(const json& data, entt::registry&, InputChannelComponent& channel)
+	void Load(const json& data, entt::registry&, PlayerControlledComponent& channel)
 	{
-		channel.channel = data.at("channel").get<uint8_t>();
+		channel.playerIdx = data.at("channel").get<uint8_t>();
 		channel.useWASD = data.value("useWASD", true);
 	}
 

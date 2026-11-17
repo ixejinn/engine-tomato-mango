@@ -18,7 +18,7 @@
 #include "Utils/PassKey.h"
 #include "Profiler/Profiler.h"
 #include "Profiler/CPUProfiler.h"
-#include "Input/InputState.h"
+#include "Input/KeyStateMap.h"
 
 namespace tomato
 {
@@ -148,20 +148,20 @@ namespace tomato
 
     void Engine::ConnectInputChain()
     {
-        auto& inputState = InputState::GetInstance();
+        auto& keyStateMap = KeyStateMap::GetInstance();
 
         // EnTT::sigh는 뒤에 연결한 리스너부터 호출
-        // Editor - InputState - UI - Game
+        // Editor - KeyStateMap - UI - Game
         input_.keySignal_.Connect<&PlayerInput::OnKeyEvent>(playerInput_);
-        input_.keySignal_.Connect<&InputState::OnKeyEvent>(inputState);
+        input_.keySignal_.Connect<&KeyStateMap::OnKeyEvent>(keyStateMap);
         input_.keySignal_.Connect<&Editor::OnKeyEvent>();
 
         input_.cursorSignal_.Connect<&InputUI::OnHover>(inputUI_);
-        input_.cursorSignal_.Connect<&InputState::OnCursorPosEvent>(inputState);
+        input_.cursorSignal_.Connect<&KeyStateMap::OnCursorPosEvent>(keyStateMap);
 
         input_.mouseSignal_.Connect<&PlayerInput::OnMouseButtonEvent>(playerInput_);
         input_.mouseSignal_.Connect<&InputUI::OnClick>(inputUI_);
-        input_.mouseSignal_.Connect<&InputState::OnMouseButtonEvent>(inputState);
+        input_.mouseSignal_.Connect<&KeyStateMap::OnMouseButtonEvent>(keyStateMap);
         input_.mouseSignal_.Connect<&Editor::OnMouseButtonEvent>();
     }
 

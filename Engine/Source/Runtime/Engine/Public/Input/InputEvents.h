@@ -6,12 +6,11 @@
 
 namespace tomato
 {
-    enum class KeyEventType
+    enum class InputEvent
     {
-        Release,
-        Press,
-        Repeat,
-        Error
+        Released,
+        Pressed,
+        Repeat
     };
 
     /**
@@ -19,11 +18,11 @@ namespace tomato
      */
     struct KeyEvent
     {
-        KeyEvent(Key k, KeyEventType a, float v, int64_t t)
-        : key(k), type(a), value(v), tick(t) {}
+        KeyEvent(Key k, InputEvent a, float v, int64_t t)
+        : key(k), event(a), value(v), tick(t) {}
 
         Key key;
-        KeyEventType type;
+        InputEvent event;
 
         float value;
 
@@ -31,12 +30,12 @@ namespace tomato
     };
 
     /**
-     * @brief Input event for a mouse.
+     * @brief Input event for a mouse button.
      */
     struct MouseButtonEvent : public KeyEvent
     {
-        MouseButtonEvent(Key k, KeyEventType a, float v, int64_t t, float x, float y)
-        : KeyEvent(k, a, v, t), xPos(x), yPos(y) {}
+        MouseButtonEvent(Key k, InputEvent e, float v, int64_t t, float x, float y)
+        : KeyEvent(k, e, v, t), xPos(x), yPos(y) {}
 
         float xPos, yPos;
     };

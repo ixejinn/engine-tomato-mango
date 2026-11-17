@@ -11,7 +11,7 @@ namespace tomato
 	struct EditorContext;
 
 	bool DrawCameraInspcetor(EditorContext&, entt::registry&, CameraComponent&);
-	bool DrawInputChannelInspcetor(EditorContext&, entt::registry&, InputChannelComponent&);
+	bool DrawInputChannelInspcetor(EditorContext&, entt::registry&, PlayerControlledComponent&);
 	bool DrawTransformInspector(EditorContext&, entt::registry&, TransformComponent&);
 	bool DrawMovementInspector(EditorContext&, entt::registry&, MovementComponent&);
 	bool DrawVelocityInspector(EditorContext&, entt::registry&, VelocityComponent&);

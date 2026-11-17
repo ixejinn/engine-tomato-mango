@@ -49,8 +49,8 @@ void GameState::Init()
     auto& renderp0 = registry_.get<RenderComponent>(player);
     renderp0.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
     renderp0.color = { 0.f, 1.f, 1.f, 1.f };
-    auto& channelp = registry_.get<InputChannelComponent>(player);
-    channelp.channel = 0;
+    auto& channelp = registry_.get<PlayerControlledComponent>(player);
+    channelp.playerIdx = 0;
     registry_.emplace<WaveCollisionComponent>(player);
     entt::entity colObj = registry_.get<HierarchyComponent>(player).children[0];
     auto& colp = registry_.get<ColliderComponent>(colObj);
@@ -65,8 +65,8 @@ void GameState::Init()
     auto& renderp1 = registry_.get<RenderComponent>(player1);
     renderp1.mesh = GetAssetID(Mesh::GetPrimitiveName(Mesh::Primitive::Sphere));
     renderp1.color = { 0.f, 0.5f, 0.2f, 1.f };
-    auto& channelp1 = registry_.get<InputChannelComponent>(player1);
-    channelp1.channel = 0;
+    auto& channelp1 = registry_.get<PlayerControlledComponent>(player1);
+    channelp1.playerIdx = 0;
     channelp1.useWASD = false;
     registry_.emplace<WaveCollisionComponent>(player1);
     entt::entity colObj1 = registry_.get<HierarchyComponent>(player1).children[0];

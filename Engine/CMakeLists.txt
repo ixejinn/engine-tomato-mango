@@ -190,7 +190,7 @@ set(ENGINE_HEADERS
 		
 		Source/Runtime/Engine/Public/ECS/Systems/EditorCameraSystem.h
 		Source/Runtime/Engine/Public/ECS/Systems/PlayerCameraSystem.h
-		Source/Runtime/Engine/Public/Input/InputState.h
+        Source/Runtime/Engine/Public/Input/KeyStateMap.h
 		Source/Runtime/Engine/Public/ECS/SystemFramework/ChangeRunModeEvent.h
 		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemFrameworkEventFwd.h
 		Source/Runtime/Engine/Public/Services/ChangeFramebufferSizeEvent.h
@@ -323,7 +323,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Math/Ray.cpp
         Source/Runtime/Engine/Private/Math/Geometry.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/EditorCameraSystem.cpp
-		Source/Runtime/Engine/Private/Input/KeyDeviceState.cpp
+        Source/Runtime/Engine/Private/Input/KeyStateMap.cpp
         Source/Runtime/Engine/Private/ECS/Systems/PlayerCameraSystem.cpp
         Source/Runtime/Engine/Private/Profiler/Profiler.cpp
         Source/Runtime/Engine/Private/Math/AABB.cpp
