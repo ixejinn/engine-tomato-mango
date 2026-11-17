@@ -21,17 +21,17 @@ namespace tomato
 		void Update(float dt);
 
 		void ProcessMatchRequest();
-		void HandleEnqueue(const SessionId& client, const SocketAddress& inAddress, const std::string& name);
-		void HandleCancel(const SessionId& client);
-		void HandleIntroResult(const SessionId&, MatchId& matchId, const int& set);
+		void HandleEnqueue(SessionId client, const SocketAddress& inAddress, const std::string& name);
+		void HandleCancel(SessionId client);
+		void HandleIntroResult(SessionId client, MatchId matchId, int set);
 
-		void HandleGameEnd(const SessionId& client, const MatchId& matchId);
-		void HandleLeave(const SessionId& client, const MatchId& matchId);
-		void HandleDisconnect(const SessionId& client);
-		void MarkPlayer(const SessionId& client, const MatchId& matchId, MatchPlayerState state);
+		void HandleGameEnd(SessionId client, MatchId matchId);
+		void HandleLeave(SessionId client, MatchId matchId);
+		void HandleDisconnect(SessionId client);
+		bool MarkPlayer(SessionId client, MatchId matchId, MatchPlayerState state); // activeMatches의 client state를 갱신
 
-		//void SenPeerStatus(SessionId to, MatchId, uint8_t targetPlayerId, PeerState)
-		//void FinishIfDone(MatchId)
+		void SendPeerStatus(SessionId to, MatchId matchId, uint8_t targetPlayerId, PeerState peerState);
+		void FinishIfDone(MatchId matchId); // 끝난 게임 정리
 
 		bool CheckPopulation();
 		bool CheckMatchTime(float dt);

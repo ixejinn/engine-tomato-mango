@@ -15,7 +15,12 @@ namespace tomato
         //addToId.try_emplace({ "192.168.31.231", 9000 }, 1);
     }
 
-    ClientNetwork::~ClientNetwork() {}
+    ClientNetwork::~ClientNetwork()
+    {
+        // @TODO: 게임 종료 시 GAME_END, 의도적 나가기 시 MATCH_LEAVE 서버로 보내는 동작 수정하기
+        if (netState_ == ClientNetworkState::NSS_Playing && server_.IsConnectedToServer())
+            SendTCPPacket(TCPPacketType::MATCH_LEAVE);
+    }
 
     void ClientNetwork::ConnectToServer()
     {
@@ -258,6 +263,11 @@ namespace tomato
             std::cout << "Receive MATCH_START\n";
             HandleMatchStartPacket(reader);
             break;
+
+        case TCPPacketType::MATCH_PEER_STATUS:
+            std::cout << "Receive MATCH_PEER_STATUS\n";
+            HandleMatchPeerStatePacket(reader);
+            break;
         }
     }
 
@@ -303,6 +313,11 @@ namespace tomato
                 duration_cast<std::chrono::milliseconds>(
                     std::chrono::steady_clock::now().time_since_epoch()).count());
             break;
+
+        case TCPPacketType::GAME_END:
+        case TCPPacketType::MATCH_LEAVE:
+            writer.WriteInt(matchID_, std::numeric_limits<MatchId>::max());
+            break;
         }
 
         int16_t byteSize = writer.GetByteSize();
@@ -343,7 +358,7 @@ namespace tomato
 
             tomato::SocketAddress readAddr(addr, readPort);
 
-            conn.try_emplace(readPlayerId, 0, readMatchId, readPlayerId, readName, readAddr);
+            conn.try_emplace(readPlayerId, PeerState::Connected, 0, readMatchId, readPlayerId, readName, readAddr);
             addToId.try_emplace(readAddr, readPlayerId);
 
             std::cout << "[Add Connection]\nmatch id\tplayer id\tname\taddr\n" <<
@@ -414,6 +429,26 @@ namespace tomato
             std::cout << "[Now] " << localSteadyTimeNow << "\n[Start Time] " << localStartTime << '\n';
             netState_ = ClientNetworkState::NSS_Starting;
         }
+    }
+
+    void ClientNetwork::HandleMatchPeerStatePacket(NetBitReader& reader)
+    {
+        if (netState_ != ClientNetworkState::NSS_Playing) return;
+
+        uint8_t readTargetPlayerId{ 0 }, readPeerState{ 0 };
+        uint16_t readMatchId{ 0 };
+
+        reader.ReadInt(readMatchId, std::numeric_limits<uint16_t>::max());
+        reader.ReadInt(readTargetPlayerId, std::numeric_limits<uint8_t>::max());
+        reader.ReadInt(readPeerState, std::numeric_limits<uint8_t>::max());
+
+        // find taget player's connection
+        auto it = conn.find(readTargetPlayerId);
+        if (it != conn.end())
+            conn[readTargetPlayerId].state = static_cast<PeerState>(readPeerState);
+
+        //@Someting todo? ex.peerConnected...
+
     }
 
     PlayerId ClientNetwork::GetPeerPlayerID(const SocketAddress& addr)

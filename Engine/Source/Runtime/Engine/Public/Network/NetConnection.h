@@ -34,6 +34,7 @@ namespace tomato
 
 	struct NetConnection
 	{
+		PeerState state{ PeerState::Connected };
 		uint32_t sessionId{ 0 };
 
 		uint16_t matchId;

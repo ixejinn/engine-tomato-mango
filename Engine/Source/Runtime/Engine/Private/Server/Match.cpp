@@ -70,6 +70,7 @@ namespace tomato
 		for (int i = 0; i < ctx_.playerNum; i++)
 		{
 			conn.push_back(NetConnection{
+				.state = PeerState::Connected,
 				.sessionId = matchRequest[i].sessionId,
 				.matchId = ctx_.matchId,
 				.playerId = (uint8_t)i,

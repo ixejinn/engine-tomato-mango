@@ -41,15 +41,24 @@ namespace tomato
 			NetBitReader reader(nextPacket->buffer.data(), nextPacket->size());
 			reader.ReadInt(type, static_cast<uint16_t>(TCPPacketType::COUNT));
 
-			ProcessPacket(static_cast<TCPPacketType>(type), reader, nextPacket->sessionId);
+			if (type == static_cast<uint16_t>(TCPPacketType::SESSION_DISCONNECTED))
+				HandlePacketDisconnect(nextPacket->sessionId);
+			else
+				ProcessPacket(static_cast<TCPPacketType>(type), reader, nextPacket->sessionId);
 		}
 	}
 
-	void MatchServerNetwork::ProcessPacket(const TCPPacketType& header, NetBitReader& reader, SessionId& client)
+	void MatchServerNetwork::ProcessPacket(TCPPacketType header, NetBitReader& reader, SessionId client)
 	{
 		std::cout << __FUNCTION__;
 		switch (header)
 		{
+		case TCPPacketType::GAME_END:
+			break;
+
+		case TCPPacketType::MATCH_LEAVE:
+			break;
+
 		case TCPPacketType::MATCH_REQUEST:
 		case TCPPacketType::MATCH_CANCEL:
 		case TCPPacketType::MATCH_INTRO_SUCCESS:
@@ -64,8 +73,16 @@ namespace tomato
 			break;
 		}
 	}
+
+	void MatchServerNetwork::HandlePacketDisconnect(SessionId client)
+	{
+		// 매칭/게임에 포함된 client 처리를 위해 emplace
+		MatchRequestQueue.Emplace(client, SocketAddress{}, "", 0, MatchRequestAction::Disconnect);
+
+		sessionMgr_.RemoveSession(client);
+	}
 	
-	void MatchServerNetwork::HandlePacketRequest(const TCPPacketType& header, NetBitReader& reader, SessionId& client)
+	void MatchServerNetwork::HandlePacketRequest(TCPPacketType header, NetBitReader& reader, SessionId client)
 	{
 		uint16_t nameSize{}, port{};
 		std::string name{};
@@ -76,6 +93,21 @@ namespace tomato
 
 		switch (header)
 		{
+		case TCPPacketType::GAME_END:
+		{
+			// match Id
+			reader.ReadInt(matchId, std::numeric_limits<uint16_t>::max());
+			MatchRequestQueue.Emplace(client, sessionMgr_.GetAddress(client), name, matchId, MatchRequestAction::GameEnd);
+			break;
+		}
+
+		case TCPPacketType::MATCH_LEAVE:
+		{
+			reader.ReadInt(matchId, std::numeric_limits<uint16_t>::max());
+			MatchRequestQueue.Emplace(client, sessionMgr_.GetAddress(client), name, matchId, MatchRequestAction::Leave);
+			break;
+		}
+
 		case TCPPacketType::MATCH_REQUEST:
 		{
 			// name size + name + udp port number
@@ -99,17 +131,23 @@ namespace tomato
 			MatchRequestQueue.Emplace(client, addr, name, matchId, MatchRequestAction::Success);
 			break;
 		}
+
 		case TCPPacketType::MATCH_CANCEL:
+		{
+			MatchRequestQueue.Emplace(client, addr, name, matchId, MatchRequestAction::Cancel);
+			break;
+		}
+
 		case TCPPacketType::MATCH_INTRO_FAILED:
 		{
 			reader.ReadInt(matchId, std::numeric_limits<MatchId>::max());
-			MatchRequestQueue.Emplace(client, addr, name, matchId, MatchRequestAction::Cancel);
+			MatchRequestQueue.Emplace(client, addr, name, matchId, MatchRequestAction::Failed);
 			break;
 		}
 		}
 	}
 
-	void MatchServerNetwork::HandlePacketTimeSync(const TCPPacketType& header, NetBitReader& reader, SessionId& client)
+	void MatchServerNetwork::HandlePacketTimeSync(TCPPacketType header, NetBitReader& reader, SessionId client)
 	{
 		switch (header)
 		{
@@ -171,8 +209,8 @@ namespace tomato
 				continue;
 
 			Session* session = sessionMgr_.GetSession(socket);
-			if (session->sendBuffer.empty())
-				continue;
+			if (!session) continue;
+			if (session->sendBuffer.empty()) continue;
 
 			int sent = socket->Send(session->sendBuffer.data(), session->sendBuffer.size());
 			if (sent > 0)
@@ -192,7 +230,7 @@ namespace tomato
 		}
 	}
 
-	void MatchServerNetwork::ProcessDataFromClient(const SessionId& sessionId, const uint8_t* data, const int len)
+	void MatchServerNetwork::ProcessDataFromClient(SessionId sessionId, const uint8_t* data, const int len)
 	{
 		//socket에 따라 세션에 지정된 vector에 데이터스트림 추가
 		if (!sessionMgr_.ValidateSession(sessionId))
@@ -222,7 +260,7 @@ namespace tomato
 
 			for (const TCPSocketPtr& socket : readableSockets)
 			{
-				if (socket == listenSocket)
+				if (socket == listenSocket) // 새로운 연결 처리
 				{
 					SocketAddress newClientAddress;
 					auto newSocket = listenSocket->Accept(newClientAddress);
@@ -235,7 +273,7 @@ namespace tomato
 							" | session num." << sessionMgr_.GetSessionId(newSocket) << '\n';
 					}
 				}
-				else
+				else // 기존 연결에서 수신한 데이터 처리
 				{
 					SessionId id = sessionMgr_.GetSessionId(socket);
 					int dataReceived = socket->Receive(segment, MAX_PACKET_SIZE);
@@ -245,18 +283,27 @@ namespace tomato
 						std::cout << "GetMessage from " << id << '\n';
 						ProcessDataFromClient(id, segment, dataReceived);
 					}
-					else if (dataReceived <= 0)
+					else // 연결 끊김 처리
 					{
 						std::cout << "[Disconnected] " << sessionMgr_.GetAddress(id).ToString() << " | session num." << id << '\n';
 
 						readBlockSockets.erase(
 							std::remove(readBlockSockets.begin(), readBlockSockets.end(), socket),
 							readBlockSockets.end());
-						matchMgr_.RemoveRequest(id);
-						sessionMgr_.RemoveSession(socket);
+
+						// 메인 스레드로 세션 끊김 이벤트 전달: 세션 삭제 요청
+						RawBuffer rawBuffer{};
+						NetBitWriter writer{ &rawBuffer };
+						writer.WriteInt(static_cast<uint16_t>(TCPPacketType::SESSION_DISCONNECTED), static_cast<uint16_t>(TCPPacketType::COUNT));
+
+						const uint16_t byteSize = writer.GetByteSize();
+						TCPPacketPtr packet = std::make_unique<TCPPacket>(byteSize, id);
+						std::memcpy(packet->buffer.data(), rawBuffer.data(), byteSize);
+						
+						TCPRecvQueue.Emplace(std::move(packet));
 					}
 				}
-				readableSockets = readBlockSockets;
+				//readableSockets = readBlockSockets;
 			}
 		}
 	}

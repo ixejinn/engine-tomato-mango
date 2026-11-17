@@ -63,6 +63,7 @@ namespace tomato
         void HandleMatchIntroPacket(NetBitReader& reader);
         void HandleServerTimeSyncPacket(NetBitReader& reader);
         void HandleMatchStartPacket(NetBitReader& reader);
+        void HandleMatchPeerStatePacket(NetBitReader& reader);
 
         void ThreadStart();
         void ThreadStop();

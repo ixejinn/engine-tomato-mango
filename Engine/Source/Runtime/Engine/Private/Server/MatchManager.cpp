@@ -42,10 +42,19 @@ namespace tomato
 
 			if (reqCommand.action == MatchRequestAction::Failed)
 				HandleIntroResult(reqCommand.sessionId, reqCommand.matchId, 0);
+
+			if (reqCommand.action == MatchRequestAction::GameEnd)
+				HandleGameEnd(reqCommand.sessionId, reqCommand.matchId);
+
+			if (reqCommand.action == MatchRequestAction::Leave)
+				HandleLeave(reqCommand.sessionId, reqCommand.matchId);
+
+			if (reqCommand.action == MatchRequestAction::Disconnect)
+				HandleDisconnect(reqCommand.sessionId);
 		}
 	}
 
-	void MatchManager::HandleEnqueue(const SessionId& client, const SocketAddress& inAddress, const std::string& name)
+	void MatchManager::HandleEnqueue(SessionId client, const SocketAddress& inAddress, const std::string& name)
 	{
 		MatchRequest mRequest{
 			.sessionId = client,
@@ -64,7 +73,7 @@ namespace tomato
 		waitTime = 0.f;
 	}
 
-	void MatchManager::HandleCancel(const SessionId& client)
+	void MatchManager::HandleCancel(SessionId client)
 	{
 		/* @TODO:
 		* Match cancellation during active matching is not fully handled.
@@ -80,7 +89,7 @@ namespace tomato
 		}
 	}
 
-	void MatchManager::HandleIntroResult(const SessionId& client, MatchId& matchId, const int& set)
+	void MatchManager::HandleIntroResult(SessionId client, MatchId matchId, int set)
 	{
 
 		std::cout << __FUNCTION__ << '\n';
@@ -88,10 +97,158 @@ namespace tomato
 		if (it != matches.end())
 		{
 			int idx = it->second.GetPlayerId(client);
-			if (idx < 0) return;
+			if (idx < 0)
+				return;
+
 			std::cout << __FUNCTION__ << '\n';
 			it->second.SetPeerAck(idx, set);
 		}
+	}
+
+	void MatchManager::HandleGameEnd(SessionId client, MatchId matchId)
+	{
+		MarkPlayer(client, matchId, MatchPlayerState::Finished);
+		clientInfo_.erase(client);
+
+		auto it = activeMatches_.find(matchId);
+		if (it == activeMatches_.end())
+			return;
+
+		FinishIfDone(matchId);
+	}
+
+	void MatchManager::HandleLeave(SessionId client, MatchId matchId)
+	{
+		// matchId에 참여한 client의 state를 갱신
+		MarkPlayer(client, matchId, MatchPlayerState::Left);
+		clientInfo_.erase(client); // 게임 종료된 client의 상태를 Idle로 갱신
+
+		auto it = activeMatches_.find(matchId);
+		if (it == activeMatches_.end())
+			return;
+
+		for (size_t i = 0; i < it->second.players.size(); ++i)
+		{
+			if (it->second.playerStates[i] == MatchPlayerState::InGame)
+				SendPeerStatus(it->second.players[i], matchId, client, PeerState::Left);
+		}
+
+		FinishIfDone(matchId);
+	}
+
+	void MatchManager::HandleDisconnect(SessionId client)
+	{
+		auto it = clientInfo_.find(client);
+		if (it == clientInfo_.end())
+			return;
+
+		const ClientMatchState state = it->second.state;
+		MatchId localMatchId = it->second.matchId;
+
+		switch (state)
+		{
+		case ClientMatchState::Queued:
+			requests.erase(client);
+			break;
+
+		case ClientMatchState::Matching:
+			HandleIntroResult(client, it->second.matchId, 0);
+			break;
+
+		case ClientMatchState::InGame:
+		{
+			auto mit = activeMatches_.find(localMatchId);
+			if (mit == activeMatches_.end())
+				break;
+
+			auto& players = mit->second.players;
+			auto& states = mit->second.playerStates;
+
+			// 끊긴 플레이어 index
+			size_t leftIdx = players.size();
+			for (size_t i = 0; i < players.size(); ++i)
+			{
+				if (players[i] == client)
+				{
+					leftIdx = i;
+					break;
+				}
+			}
+			if (leftIdx == players.size())
+				break;
+
+			// 게임 중 연결이 끊긴 플레이어의 state 갱신
+			states[leftIdx] = MatchPlayerState::Disconnected;
+
+			// 남은 InGame 플레이어에게 알림
+			for (size_t i = 0; i < players.size(); ++i)
+			{
+				if (states[i] == MatchPlayerState::InGame)
+					SendPeerStatus(players[i], localMatchId, static_cast<uint8_t>(leftIdx), PeerState::Disconnected);
+			}
+
+			FinishIfDone(localMatchId);
+			break;
+		}
+
+		default:
+			break;
+		}
+		
+		clientInfo_.erase(client);
+	}
+
+	bool MatchManager::MarkPlayer(SessionId client, MatchId matchId, MatchPlayerState state)
+	{
+		auto it = activeMatches_.find(matchId);
+		if (it == activeMatches_.end())
+			return false;
+
+		auto& players = it->second.players;
+		for (size_t i = 0; i < players.size(); ++i)
+		{
+			if (players[i] == client)
+			{
+				it->second.playerStates[i] = state;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void MatchManager::SendPeerStatus(SessionId to, MatchId matchId, uint8_t targetPlayerId, PeerState peerState)
+	{
+		RawBuffer buf{};
+		tomato::NetBitWriter writer{ &buf };
+		writer.WriteInt(static_cast<uint16_t>(0), std::numeric_limits<uint16_t>::max()); // packet size 자리 확보
+		writer.WriteInt(static_cast<uint16_t>(TCPPacketType::MATCH_PEER_STATUS), static_cast<uint16_t>(TCPPacketType::COUNT)); // packet header (type)
+		writer.WriteInt(static_cast<uint16_t>(matchId), std::numeric_limits<uint16_t>::max()); // Match Id
+		writer.WriteInt(static_cast<uint8_t>(targetPlayerId), std::numeric_limits<uint8_t>::max());
+		writer.WriteInt(static_cast<uint8_t>(peerState), static_cast<uint8_t>(PeerState::COUNT));
+
+		// write packet size
+		uint16_t size = writer.GetByteSize();
+		memcpy(buf.data(), &size, sizeof(uint16_t));
+
+		auto sendCmd = std::make_unique<SendRequestCommand>(to, size);
+		std::memcpy(sendCmd.get()->data.data(), buf.data(), size);
+
+		NetSendRequestQueue.Emplace(std::move(sendCmd));
+	}
+
+	void MatchManager::FinishIfDone(MatchId matchId)
+	{
+		auto it = activeMatches_.find(matchId);
+		if (it == activeMatches_.end())
+			return;
+
+		for (auto s : it->second.playerStates)
+		{
+			if (s == MatchPlayerState::InGame)
+				return; // 아직 게임 중인 사람이 있음
+
+		}
+		activeMatches_.erase(it);
 	}
 
 	bool MatchManager::CheckPopulation()
