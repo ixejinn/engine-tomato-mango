@@ -11,8 +11,8 @@ namespace tomato
      */
     struct PlayerControlledComponent
     {
+        /// State의 PlayerInputTimelines에 접근할 때 사용하는 인덱스 (NM_Client일 때는 무시됨)
         uint8_t playerIdx{0};
-        bool useWASD{true};
     };
 
     struct MovementComponent

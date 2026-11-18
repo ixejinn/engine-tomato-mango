@@ -16,6 +16,8 @@
 #include "PlayTest/ExampleState.h"
 #include "Game/GameState.h"
 #include "Game/LobbyState.h"
+
+#include "Input/GameInput.h"
 #endif
 
 #define TOMATO_GREENTEA
@@ -35,6 +37,7 @@ int main() {
 
     PathManager::SetProjectRoot(TMT_PROJECT_ROOT);
     Engine engine(1920, 1080, "TOMATO", NetMode::NM_Alone);
+    SetDefaultGameInput(engine, true);
 
 #if defined(TOMATO_GREENTEA)
     engine.SetNextState(std::make_unique<ExampleState>(engine));

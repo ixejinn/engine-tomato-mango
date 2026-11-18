@@ -11,12 +11,15 @@
 #include "Utils/Bitmask/BitmaskOperators.h"
 #include "GameObject/Character/CharacterMovement.h"
 #include "GameObject/Character/CharacterMovementConfig.h"
+#include "GameObject/Character/CharacterInputActions.h"
 #include "Simulation/SimulationConfig.h"
 
-namespace tomato {
+namespace tomato
+{
     void CharacterMovementSystem::Update(SimContext &simCtx)
     {
         auto& registry = simCtx.state->GetRegistry();
+        const auto& actions = simCtx.state->GetCharacterInputActions();
 
         auto view = registry.view<ActiveTag, VelocityComponent, PlayerControlledComponent, MovementComponent>();
         for (auto [e, velocity, controlled, move] : view.each())
@@ -29,13 +32,13 @@ namespace tomato {
 
             // Move
             int x = 0, y = 0;
-            if (HasFlag(down, controlled.useWASD ? InputAction::Up : InputAction::Up2))
+            if (HasFlag(down, actions.moveUp))
                 ++y;
-            if (HasFlag(down, controlled.useWASD ? InputAction::Down : InputAction::Down2))
+            if (HasFlag(down, actions.moveDown))
                 --y;
-            if (HasFlag(down, controlled.useWASD ? InputAction::Left : InputAction::Left2))
+            if (HasFlag(down, actions.moveLeft))
                 --x;
-            if (HasFlag(down, controlled.useWASD ? InputAction::Right : InputAction::Right2))
+            if (HasFlag(down, actions.moveRight))
                 ++x;
 
             glm::vec2 input{x, -y};
@@ -79,8 +82,7 @@ namespace tomato {
             }
 
             // Jump
-            if (HasFlag(pressed, controlled.useWASD ? InputAction::Jump : InputAction::Jump2)
-                && move.jumpCnt < JUMP_COUNT_MAX)
+            if (HasFlag(pressed, actions.jump) && move.jumpCnt < JUMP_COUNT_MAX)
                 CharacterMovement::Jump(registry, e, move, velocity, JUMP_SPEED);
         }
     }

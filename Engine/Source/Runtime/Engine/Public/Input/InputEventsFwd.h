@@ -1,5 +1,5 @@
-#ifndef MANGO_INPUTEVENTFWD_H
-#define MANGO_INPUTEVENTFWD_H
+#ifndef MANGO_INPUTEVENTSFWD_H
+#define MANGO_INPUTEVENTSFWD_H
 
 namespace tomato
 {
@@ -8,4 +8,4 @@ namespace tomato
     struct CursorPosEvent;
 }
 
-#endif //MANGO_INPUTEVENTFWD_H
+#endif //MANGO_INPUTEVENTSFWD_H

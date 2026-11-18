@@ -67,7 +67,6 @@ void GameState::Init()
     renderp1.color = { 0.f, 0.5f, 0.2f, 1.f };
     auto& channelp1 = registry_.get<PlayerControlledComponent>(player1);
     channelp1.playerIdx = 0;
-    channelp1.useWASD = false;
     registry_.emplace<WaveCollisionComponent>(player1);
     entt::entity colObj1 = registry_.get<HierarchyComponent>(player1).children[0];
     auto& colp1 = registry_.get<ColliderComponent>(colObj1);

@@ -3,7 +3,7 @@
 
 #include "Containers/EnumArray.h"
 #include "Input/KeyConstants.h"
-#include "Input/InputEventFwd.h"
+#include "Input/InputEventsFwd.h"
 
 namespace tomato
 {

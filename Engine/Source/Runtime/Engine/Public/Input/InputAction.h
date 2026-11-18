@@ -5,44 +5,19 @@
 
 namespace tomato {
     /**
-     * @brief User-extensible bitmask of logical player actions for a single simulation tick.
+     * @brief A logical player action.
      *
-     * 각 비트는 물리 키가 아니라 Jump와 같은 의미가 있는 액션을 나타내며,
-     * PlayerInput에서 실제 물리 키와 연결할 수 있다.
+     * 각 액션은 비트 하나이며, Contents에서 상수로 정의하여 사용한다.
+     * @code
+     * inline constexpr InputAction Jump{1 << 4};
+     * @endcode
+     *
+     * 여러 액션을 비트 마스크로 합쳐서 ActionSnapshot에 저장한다.
+     * InputMappingContext에서 물리 키와 연결한다.
      */
     enum class InputAction : uint32_t
     {
-        None    = 0,
-
-        Up      = 1 << 0,
-        Down    = 1 << 1,
-        Left    = 1 << 2,
-        Right   = 1 << 3,
-
-        Jump    = 1 << 4,
-
-        //--------------------
-
-        TurnLeft    = 1 << 5,
-        TurnRight   = 1 << 6,
-        TurnUp      = 1 << 7,
-        TurnDown    = 1 << 8,
-
-        // 2P
-        Up2         = 1 << 9,
-        Down2       = 1 << 10,
-        Left2       = 1 << 11,
-        Right2      = 1 << 12,
-
-        Jump2       = 1 << 13,
-
-        // Debug
-        Test_1  = 1U << 28,
-        Test_2  = 1U << 29,
-        Test_3  = 1U << 30,
-        Test_4  = 1U << 31,
-
-        COUNT
+        None    = 0
     };
 }
 

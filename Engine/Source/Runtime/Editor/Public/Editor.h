@@ -11,7 +11,7 @@
 
 #include "Services/ServiceFwd.h"
 #include "State/StateFwd.h"
-#include "Input/InputEventFwd.h"
+#include "Input/InputEventsFwd.h"
 
 namespace tomato
 {

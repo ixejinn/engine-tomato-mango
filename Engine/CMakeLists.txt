@@ -59,7 +59,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Input/InputEvents.h
         Source/Runtime/Engine/Public/Input/InputUI.h
         Source/Runtime/Engine/Public/Input/KeyConstants.h
-        Source/Runtime/Engine/Public/Input/InputEventFwd.h
+		Source/Runtime/Engine/Public/Input/InputEventsFwd.h
         Source/Runtime/Engine/Public/Services/Input.h
         Source/Runtime/Engine/Public/Simulation/Tick/TickClock.h
         Source/Runtime/Engine/Public/Simulation/Tick/TickFwd.h
@@ -178,7 +178,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/State/StateRegistry.h
 		Source/Runtime/Engine/Public/ECS/Forward/SystemFrameworkFwd.h
 		Source/Runtime/Engine/Public/Collision/CollisionTypesFwd.h
-		Source/Runtime/Engine/Public/Input/InputActionFwd.h
+		Source/Runtime/Engine/Public/Input/InputFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/Systems.h
 		Source/Runtime/Engine/Public/Collision/CollisionCache.h
 		Source/Runtime/Engine/Private/Collision/Detection/Narrow/GJK/GJKResult.h
@@ -209,7 +209,6 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Systems/CharacterScaleSystem.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterConfig.h
 		Source/Runtime/Engine/Public/ECS/Components/ActiveTag.h
-		Source/Runtime/Engine/Public/GameObject/Character/LandingEvent.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterMovementConfig.h
 		Source/Runtime/Engine/Public/Math/Angle.h
 		Source/Runtime/Engine/Public/Collision/Layer/CollisionLayerTypes.h
@@ -240,6 +239,10 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Systems/ParticleSimulationSystem.h
 		Source/Runtime/Engine/Public/Particle/ParticleFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/TargetSystem.h
+		Source/Runtime/Engine/Public/GameObject/Character/CharacterInputActions.h
+		Source/Runtime/Engine/Public/Input/LocalPlayer.h
+		Source/Runtime/Engine/Public/Input/InputMappingContext.h
+		Source/Runtime/Engine/Public/GameObject/Character/CharacterFwd.h
 )
 
 set(ENGINE_SOURCES

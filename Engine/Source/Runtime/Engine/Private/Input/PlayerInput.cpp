@@ -2,15 +2,11 @@
 #include "Input/PlayerInput.h"
 #include "Input/InputEvents.h"
 #include "Input/KeyStateMap.h"
+#include "Input/InputMappingContext.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 
 namespace tomato
 {
-    PlayerInput::PlayerInput()
-    {
-        BindDefaultActions();
-    }
-
     bool PlayerInput::OnKeyEvent(const KeyEvent& event)
     {
         if (event.event == InputEvent::Pressed)
@@ -23,6 +19,21 @@ namespace tomato
         if (event.event == InputEvent::Pressed)
             pendingPressed_ |= keyBindings_[event.key];
         return true;
+    }
+
+    void PlayerInput::SetMappings(const InputMappingContext& imc)
+    {
+        ClearMappings();
+        for (const auto& [action, key] : imc.mappings)
+            keyBindings_[key] |= action;
+    }
+
+    void PlayerInput::ClearMappings()
+    {
+        for (auto& action : keyBindings_)
+            action = InputAction::None;
+
+        pendingPressed_ = InputAction::None;
     }
 
     void PlayerInput::UpdateSnapshot(int64_t tick)
@@ -42,25 +53,6 @@ namespace tomato
     bool PlayerInput::IsDown(const InputAction action) const
     {
         return HasFlag(curr_.down, action);
-    }
-
-    void PlayerInput::BindDefaultActions() {
-        keyBindings_[Key::W] = InputAction::Up;
-        keyBindings_[Key::S] = InputAction::Down;
-        keyBindings_[Key::A] = InputAction::Left;
-        keyBindings_[Key::D] = InputAction::Right;
-        keyBindings_[Key::SpaceBar] = InputAction::Jump;
-
-        keyBindings_[Key::Left]  = InputAction::TurnLeft;
-        keyBindings_[Key::Right] = InputAction::TurnRight;
-        keyBindings_[Key::Up]    = InputAction::TurnUp;
-        keyBindings_[Key::Down]  = InputAction::TurnDown;
-
-        keyBindings_[Key::KP_8] = InputAction::Up2;
-        keyBindings_[Key::KP_5] = InputAction::Down2;
-        keyBindings_[Key::KP_4] = InputAction::Left2;
-        keyBindings_[Key::KP_6] = InputAction::Right2;
-        keyBindings_[Key::KP_0] = InputAction::Jump2;
     }
 
     InputAction PlayerInput::ComputeDown() const

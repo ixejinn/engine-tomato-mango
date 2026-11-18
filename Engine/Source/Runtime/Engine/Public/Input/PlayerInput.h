@@ -5,25 +5,25 @@
 #include "Input/KeyConstants.h"
 #include "Input/InputAction.h"
 #include "Input/ActionSnapshot.h"
-#include "Input/InputEventFwd.h"
+#include "Input/InputEventsFwd.h"
+#include "Input/InputFwd.h"
 
 namespace tomato
 {
     /**
      * @brief Translates key input into per-tick ActionSnapshots.
      *
-     * 키를 InputAction으로 바꾼다.
+     * 로컬 플레이어마다 하나씩 가지며, 지정된 InputMappingContext를 읽고 물리 키와 액션을 매핑한다.
      */
     class PlayerInput
     {
     public:
-        PlayerInput();
-
         bool OnKeyEvent(const KeyEvent& event);
         bool OnMouseButtonEvent(const MouseButtonEvent& event);
 
-        void BindAction(Key key, InputAction action) { keyBindings_[key] = action; }
-        InputAction GetBoundAction(Key key) { return keyBindings_[key]; }
+        /// 매핑 초기화 후 교체된다.
+        void SetMappings(const InputMappingContext& imc);
+        void ClearMappings();
 
         /// 틱마다 한 번 호출해 ActionSnapshot을 갱신한다.
         void UpdateSnapshot(int64_t tick);
@@ -33,8 +33,6 @@ namespace tomato
         bool IsDown(InputAction action) const;
 
     private:
-        void BindDefaultActions();
-
         /// 바인딩된 키 중 KeyStateMap에서 눌려 있는 키의 InputAction을 구한다.
         InputAction ComputeDown() const;
 
