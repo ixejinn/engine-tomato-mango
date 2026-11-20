@@ -126,13 +126,32 @@ namespace tomato
 		if (it == activeMatches_.end())
 			return;
 
-		for (size_t i = 0; i < it->second.players.size(); ++i)
+		auto& players = it->second.players;
+		auto& states = it->second.playerStates;
+
+		// 끊긴 플레이어 index
+		size_t leftIdx = players.size();
+		for (size_t i = 0; i < players.size(); ++i)
 		{
-			if (it->second.playerStates[i] == MatchPlayerState::InGame)
-				SendPeerStatus(it->second.players[i], matchId, client, PeerState::Left);
+			if (players[i] == client)
+			{
+				leftIdx = i;
+				break;
+			}
+		}
+		if (leftIdx == players.size())
+			return;
+
+		states[leftIdx] = MatchPlayerState::Left;
+
+		for (size_t i = 0; i < players.size(); ++i)
+		{
+			if (states[i] == MatchPlayerState::InGame)
+				SendPeerStatus(players[i], matchId, static_cast<uint8_t>(leftIdx), PeerState::Left);
 		}
 
 		FinishIfDone(matchId);
+		clientInfo_.erase(client);
 	}
 
 	void MatchManager::HandleDisconnect(SessionId client)

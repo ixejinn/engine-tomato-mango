@@ -445,7 +445,8 @@ namespace tomato
 
         reader.ReadInt(readMatchId, std::numeric_limits<uint16_t>::max());
         reader.ReadInt(readTargetPlayerId, std::numeric_limits<uint8_t>::max());
-        reader.ReadInt(readPeerState, std::numeric_limits<uint8_t>::max());
+        reader.ReadInt(readPeerState, static_cast<uint8_t>(TCPPacketType::COUNT));
+        std::cout << "Player" << (int)readTargetPlayerId << " is disconnected.(" << (int)readPeerState << ") [match: " << readMatchId << "]\n";
 
         // find taget player's connection
         auto it = conn.find(readTargetPlayerId);
