@@ -143,6 +143,11 @@ namespace tomato
         network_->RequestMatch();
     }
 
+    void Engine::SendTCPPacketToServer(TCPPacketType type)
+    {
+        network_->SendTCPPacket(type);
+    }
+
     void Engine::ConnectInputChain()
     {
         auto& inputState = InputState::GetInstance();

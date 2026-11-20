@@ -137,6 +137,9 @@ namespace tomato
             if (netState_ == ClientNetworkState::NSS_Playing && it->second.playerId == playerID_)
                 continue;
 
+            if (it->second.state == PeerState::Left || it->second.state == PeerState::Disconnected)
+                continue;
+
             int byteSentCount{};
             driver_.SendPacket(buffer, byteSentCount, it->second.addr);
         }
@@ -316,7 +319,9 @@ namespace tomato
 
         case TCPPacketType::GAME_END:
         case TCPPacketType::MATCH_LEAVE:
+            std::cout << "GAME_END / MATCH_LEAVE\n";
             writer.WriteInt(matchID_, std::numeric_limits<MatchId>::max());
+            netState_ = ClientNetworkState::NSS_Uninitialized;
             break;
         }
 

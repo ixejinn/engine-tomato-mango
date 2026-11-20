@@ -44,6 +44,7 @@ namespace tomato
         void SetRollbackComponent();
 
         void RequestMatchToServer();
+        void SendTCPPacketToServer(TCPPacketType type);
         void TryStartGame(std::unique_ptr<State>&& newState);
 
         CollisionLayerMatrix collisionLayerMtx_;

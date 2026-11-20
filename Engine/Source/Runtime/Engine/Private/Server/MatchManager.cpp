@@ -91,7 +91,6 @@ namespace tomato
 
 	void MatchManager::HandleIntroResult(SessionId client, MatchId matchId, int set)
 	{
-
 		std::cout << __FUNCTION__ << '\n';
 		auto it = matches.find(matchId);
 		if (it != matches.end())
