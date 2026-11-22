@@ -54,9 +54,13 @@ namespace tomato
 		switch (header)
 		{
 		case TCPPacketType::GAME_END:
+			std::cout << "::GAME_END\n";
+			HandlePacketRequest(header, reader, client);
 			break;
 
 		case TCPPacketType::MATCH_LEAVE:
+			std::cout << "::MATCH_LEAVE\n";
+			HandlePacketRequest(header, reader, client);
 			break;
 
 		case TCPPacketType::MATCH_REQUEST:

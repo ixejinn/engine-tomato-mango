@@ -145,7 +145,19 @@ namespace tomato
 
     void Engine::SendTCPPacketToServer(TCPPacketType type)
     {
-        network_->SendTCPPacket(type);
+        switch (type)
+        {
+        case TCPPacketType::MATCH_LEAVE:
+            network_->LeaveMatch();
+            break;
+
+        case TCPPacketType::GAME_END:
+            network_->EndGame();
+            break;
+
+        default:
+            network_->SendTCPPacket(type);
+        }
     }
 
     void Engine::ConnectInputChain()
@@ -269,9 +281,7 @@ namespace tomato
     void Engine::ProcessQueuedPackets(TickClock& tc)
     {
         gameNet_->InitializeConfirmedTick(tc.GetTick()); // for rollback
-
-        network_->ProcessQueuedUDPPacket();
-        network_->ProcessQueuedTCPPacket();
+        network_->Update();
     }
 
     void Engine::Rollback(SimContext& simCtx)

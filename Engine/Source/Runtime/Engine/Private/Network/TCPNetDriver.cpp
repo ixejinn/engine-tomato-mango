@@ -47,8 +47,7 @@ namespace tomato
 		if (err == NO_ERROR)
 		{
 			std::cout << "Connect to Server\n";
-			connectedToServer = true;
-
+			
 			return true;
 		}
 

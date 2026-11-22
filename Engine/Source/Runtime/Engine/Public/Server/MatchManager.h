@@ -24,12 +24,14 @@ namespace tomato
 		void HandleEnqueue(SessionId client, const SocketAddress& inAddress, const std::string& name);
 		void HandleCancel(SessionId client);
 		void HandleIntroResult(SessionId client, MatchId matchId, int set);
+		void HandleMatchingCancel(SessionId client, MatchId matchId);
 
 		void HandleGameEnd(SessionId client, MatchId matchId);
 		void HandleLeave(SessionId client, MatchId matchId);
 		void HandleDisconnect(SessionId client);
 		bool MarkPlayer(SessionId client, MatchId matchId, MatchPlayerState state); // activeMatches의 client state를 갱신
 
+		void SendCancelResult(SessionId to, bool result);
 		void SendPeerStatus(SessionId to, MatchId matchId, uint8_t targetPlayerId, PeerState peerState);
 		void FinishIfDone(MatchId matchId); // 끝난 게임 정리
 
@@ -43,6 +45,8 @@ namespace tomato
 		void RemoveRequest(const SessionId& client);
 
 	private:
+		void PrintActiveMatches(); // debug
+
 		struct Compare {
 			bool operator()(const MatchRequest& a, const MatchRequest& b) const {
 				if (a.retryCount != b.retryCount)
@@ -51,7 +55,7 @@ namespace tomato
 				return a.enqueueTime > b.enqueueTime;
 			}
 		};
-
+	
 	private:
 		MatchId nextMatchID_ = 1;
 

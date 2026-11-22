@@ -81,11 +81,44 @@ namespace tomato
 		* Proper cancellation logic is needed when a match is already being created.
 		*/
 
-		auto it = requests.find(client);
+		/*auto it = requests.find(client);
 		if (it != requests.end())
 		{
 			requests.erase(it);
 			clientInfo_.erase(client);
+		}*/
+
+		auto it = clientInfo_.find(client);
+		if (it == clientInfo_.end())
+		{
+			SendCancelResult(client, false); // Idle
+			return;
+		}
+
+		ClientMatchInfo clientInfo = it->second;
+		switch (clientInfo.state)
+		{
+		case ClientMatchState::Idle: // 사실상 도달하지 않음 (Idle은 맵에 없음)
+			break;
+
+		case ClientMatchState::Queued:
+			requests.erase(client);
+			clientInfo_.erase(client); // 취소한 사람은 Idle로 변경 (재큐잉 대상에서 제외)
+			SendCancelResult(client, true);
+			break;
+
+		case ClientMatchState::Matching:
+			HandleMatchingCancel(client, clientInfo.matchId); // client failed 처리
+			clientInfo_.erase(client); 
+			SendCancelResult(client, true);
+			break;
+
+		case ClientMatchState::InGame: // 게임 중 취소 불가
+			SendCancelResult(client, false); // 실패 응답 전송
+			break;
+
+		default:
+			break;
 		}
 	}
 
@@ -102,6 +135,11 @@ namespace tomato
 			std::cout << __FUNCTION__ << '\n';
 			it->second.SetPeerAck(idx, set);
 		}
+	}
+
+	void MatchManager::HandleMatchingCancel(SessionId client, MatchId matchId)
+	{
+		HandleIntroResult(client, matchId, 0);
 	}
 
 	void MatchManager::HandleGameEnd(SessionId client, MatchId matchId)
@@ -170,7 +208,7 @@ namespace tomato
 			break;
 
 		case ClientMatchState::Matching:
-			HandleIntroResult(client, it->second.matchId, 0);
+			HandleMatchingCancel(client, it->second.matchId); // client failed 처리
 			break;
 
 		case ClientMatchState::InGame:
@@ -232,6 +270,25 @@ namespace tomato
 			}
 		}
 		return false;
+	}
+
+	void MatchManager::SendCancelResult(SessionId to, bool result)
+	{
+		TCPPacketType resultType = result == true ? TCPPacketType::MATCH_CANCEL_SUCCESS : TCPPacketType::MATCH_CANCEL_FAILED;
+
+		RawBuffer buf{};
+		tomato::NetBitWriter writer{ &buf };
+		writer.WriteInt(static_cast<uint16_t>(0), std::numeric_limits<uint16_t>::max()); // packet size 자리 확보
+		writer.WriteInt(static_cast<uint16_t>(resultType), static_cast<uint16_t>(TCPPacketType::COUNT)); // packet header (type)
+
+		// write packet size
+		uint16_t size = writer.GetByteSize();
+		memcpy(buf.data(), &size, sizeof(uint16_t));
+
+		auto sendCmd = std::make_unique<SendRequestCommand>(to, size);
+		std::memcpy(sendCmd.get()->data.data(), buf.data(), size);
+
+		NetSendRequestQueue.Emplace(std::move(sendCmd));
 	}
 
 	void MatchManager::SendPeerStatus(SessionId to, MatchId matchId, uint8_t targetPlayerId, PeerState peerState)
@@ -458,5 +515,25 @@ namespace tomato
 			else
 				++it;
 		}
+	}
+	void MatchManager::PrintActiveMatches()
+	{
+		std::cout << "\n========== Matches ==========\n";
+
+		for (const auto& [matchId, match] : matches)
+		{
+			std::cout << "Match ID: " << matchId << '\n';
+		}
+
+		std::cout << "=============================\n";
+
+		std::cout << "\n========== Active Matches ==========\n";
+
+		for (const auto& [matchId, match] : activeMatches_)
+		{
+			std::cout << "Match ID: " << matchId << '\n';
+		}
+
+		std::cout << "====================================\n";
 	}
 }

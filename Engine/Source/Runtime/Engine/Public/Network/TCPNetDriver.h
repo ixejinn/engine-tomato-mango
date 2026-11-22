@@ -21,12 +21,12 @@ namespace tomato
 
 		const TCPSocketPtr GetSocket() const { return socket_; }
 
-		bool IsConnectedToServer() const { return connectedToServer; }
+		//bool IsConnectedToServer() const { return connectedToServer; }
 
 	private:
 		TCPSocketPtr socket_;
 
-		bool connectedToServer = false;
+		//bool connectedToServer = false;
 	};
 
 }

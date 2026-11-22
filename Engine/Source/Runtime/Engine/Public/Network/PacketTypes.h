@@ -64,6 +64,8 @@ namespace tomato
 		/* 게임 전: 매치 과정 중 필요한 패킷 */
 		MATCH_REQUEST,
 		MATCH_CANCEL,
+		MATCH_CANCEL_SUCCESS,
+		MATCH_CANCEL_FAILED,
 		MATCH_INTRO,
 		TIME_SYNC_REQ,
 		TIME_SYNC_RES,
