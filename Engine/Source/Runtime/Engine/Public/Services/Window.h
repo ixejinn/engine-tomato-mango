@@ -28,12 +28,12 @@ namespace tomato
         Window(int width, int height, const char* title);
         ~Window();
 
+        static void SetVSync(bool set);
+
         /**
          * @brief Polls window and input events from the OS.
          */
-        static void PollEvents();
-
-        static void SetVSync(bool set);
+        void PollEvents();
 
         GLFWwindow* GetHandle() { return handle_; }
 
@@ -64,6 +64,8 @@ namespace tomato
 
         static int width_;
         static int height_;
+
+        void RecoverLostKeyRelease() const;
 
         GLFWwindow* handle_{nullptr};
 

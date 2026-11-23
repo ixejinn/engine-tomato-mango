@@ -2,7 +2,7 @@
 #define MANGO_BITMASKFWD_H
 
 #include <type_traits>
-#include "Input/InputIntentFwd.h"
+#include "Input/InputActionFwd.h"
 #include "Collision/CollisionTypesFwd.h"
 #include "ECS/Forward/SystemFrameworkFwd.h"
 #include "ECS/Forward/TransformDirtyFwd.h"
@@ -14,7 +14,7 @@ namespace tomato {
     template<typename T>
     struct is_bitmask : std::false_type {};
 
-    template<> struct is_bitmask<InputIntent>       : std::true_type {};
+    template<> struct is_bitmask<InputAction>       : std::true_type {};
 
     // template<> struct is_bitmask<CollisionLayer>    : std::true_type {};
     template<> struct is_bitmask<CollisionLayerFlag>: std::true_type {};

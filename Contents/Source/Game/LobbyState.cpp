@@ -12,8 +12,8 @@
 #include "Resource/Render/ParticleEffect.h"
 #include "Resource/PathManager.h"
 
-#include "Input/IntentTranslator.h"
-#include "Input/InputIntent.h"
+#include "Input/PlayerInput.h"
+#include "Input/InputAction.h"
 #include "Input/KeyConstants.h"
 
 #include "Utils/Logger.h"
@@ -46,6 +46,14 @@ void LobbyState::Init()
 		{
 			uiController_.onMatchRequest(e);
 			engine_.RequestMatchToServer();
+		};
+
+	auto cancelBtn = UIPrefab::CreateButton(registry_, "Match Cancel", { 150.f, 80.f }, {0.f, 100.f});
+	auto& mouseCancelEvt = registry_.get<MouseEventComponent>(cancelBtn);
+	mouseCancelEvt.onClick =
+		[this](const MouseClickEvent& e)
+		{
+			engine_.SendTCPPacketToServer(TCPPacketType::MATCH_CANCEL);
 		};
 }
 

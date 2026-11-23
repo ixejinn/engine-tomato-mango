@@ -5,7 +5,7 @@
 
 namespace tomato
 {
-    enum class InputIntent : uint32_t;
+    enum class InputAction : uint32_t;
 }
 
 #endif //MANGO_INPUTCONSTANTSFWD_H

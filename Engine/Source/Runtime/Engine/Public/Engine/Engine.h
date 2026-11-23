@@ -6,7 +6,7 @@
 #include "Services/Window.h"
 #include "Services/Input.h"
 
-#include "Input/IntentTranslator.h"
+#include "Input/PlayerInput.h"
 #include "Input/InputUI.h"
 
 #include "ECS/SystemFramework/SystemManager.h"
@@ -38,7 +38,7 @@ namespace tomato
 
         Window& GetWindow() { return window_;}
 
-        IntentTranslator& GetInputRecorder() { return intentTranslator_; }
+        PlayerInput& GetInputRecorder() { return playerInput_; }
         Serialization::SerializeManager& GetSerializer() { return serializer_; }
 
         void SetNextState(std::unique_ptr<State>&& newState);
@@ -46,6 +46,7 @@ namespace tomato
         void SetRollbackComponent();
 
         void RequestMatchToServer();
+        void SendTCPPacketToServer(TCPPacketType type);
         void TryStartGame(std::unique_ptr<State>&& newState);
 
         CollisionLayerMatrix collisionLayerMtx_;
@@ -53,9 +54,10 @@ namespace tomato
     private:
         Window window_;
 
-        void ProcessInputEvents(uint32_t tick);
+        void ConnectInputChain();
+        void ProcessInputEvents();
         Input input_;
-        IntentTranslator intentTranslator_;
+        PlayerInput playerInput_;
         InputUI inputUI_;
 
         void OnChangeStateRequest(const Event::ChangeStateRequest& event);
@@ -80,7 +82,6 @@ namespace tomato
         SystemManager systemManager_;
         bool isRunning_{true};
 
-        void InitializeInput();
         void InitializeSerialization(); ////
 
         Serialization::SerializeManager serializer_;

@@ -9,7 +9,7 @@
 #include "ECS/SystemFramework/ChangeRunModeEvent.h"
 #include "Simulation/SimulationConfig.h"
 #include "State/State.h"
-#include "Input/KeyDeviceState.h"
+#include "Input/InputState.h"
 #include "Services/Window.h"
 #include "Event/EventDispatcher.h"
 
@@ -26,7 +26,7 @@ namespace tomato
         auto& renderCtx = registry.ctx().get<RenderContext>();
         renderCtx.mainCam = renderCtx.editorCam;
 
-        auto& keyDeviceState = KeyDeviceState::GetInstance();
+        auto& keyDeviceState = InputState::GetInstance();
 
         if (mode_ == None)
         {
@@ -53,8 +53,8 @@ namespace tomato
 
             if (mode_ != None)
             {
-                preCursorPos.x = keyDeviceState.GetKeyState(Key::MouseX);
-                preCursorPos.y = keyDeviceState.GetKeyState(Key::MouseY);
+                preCursorPos.x = keyDeviceState.GetKeyValue(Key::MouseX);
+                preCursorPos.y = keyDeviceState.GetKeyValue(Key::MouseY);
 
                 simCtx.state->GetWindow().SetCursorDisable(true);
             }
@@ -83,7 +83,7 @@ namespace tomato
         auto& registry = simCtx.state->GetRegistry();
         auto& renderCtx = registry.ctx().get<RenderContext>();
 
-        auto& keyDeviceState = KeyDeviceState::GetInstance();
+        auto& keyDeviceState = InputState::GetInstance();
 
         //// Finish free looking
         if (keyDeviceState.IsKeyReleased(Key::RightMouseButton))
@@ -98,7 +98,7 @@ namespace tomato
         auto& trf = registry.get<TransformComponent>(renderCtx.editorCam);
 
         // Rotate camera
-        glm::vec2 currCursorPos{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)};
+        glm::vec2 currCursorPos{keyDeviceState.GetKeyValue(Key::MouseX), keyDeviceState.GetKeyValue(Key::MouseY)};
         glm::vec2 deltaCursorPos = currCursorPos - preCursorPos;
         preCursorPos = currCursorPos;
 
@@ -143,7 +143,7 @@ namespace tomato
         auto& registry = simCtx.state->GetRegistry();
         auto& renderCtx = registry.ctx().get<RenderContext>();
 
-        auto& keyDeviceState = KeyDeviceState::GetInstance();
+        auto& keyDeviceState = InputState::GetInstance();
 
         //// Finish pan
         if (keyDeviceState.IsKeyReleased(Key::MiddleMouseButton))
@@ -158,7 +158,7 @@ namespace tomato
         auto& trf = registry.get<TransformComponent>(renderCtx.editorCam);
 
         // Move along camera's up and right vectors
-        glm::vec2 currCursorPos{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)};
+        glm::vec2 currCursorPos{keyDeviceState.GetKeyValue(Key::MouseX), keyDeviceState.GetKeyValue(Key::MouseY)};
         glm::vec2 deltaCursorPos = currCursorPos - preCursorPos;
         preCursorPos = currCursorPos;
 

@@ -1,0 +1,52 @@
+#ifndef MANGO_INPUTSTATE_H
+#define MANGO_INPUTSTATE_H
+
+#include "Containers/EnumArray.h"
+#include "Input/KeyConstants.h"
+#include "Input/InputEventFwd.h"
+
+namespace tomato
+{
+    /// Generic scalar value for a Key, covering both digital and analog input.
+    /// 버튼의 경우, released 0.f / pressed 1.f를, 축 키는 연속값을 저장한다.
+    using InputAxis = float;
+
+    /**
+     * @brief Raw per-key input cache.
+     *
+     * 모든 Key에 대해 최신 InputAxis 값을 보관하는 싱글톤 클래스.
+     * 게임 모드(게임플레이/에디터)와 무관하게 항상 각 키의 InputAxis는 최신 상태로 유지된다.
+     */
+    class InputState
+    {
+        InputState() = default;
+
+    public:
+        ~InputState() = default;
+
+        InputState(const InputState&) = delete;
+        InputState& operator=(const InputState&) = delete;
+
+        static InputState& GetInstance()
+        {
+            static InputState instance;
+            return instance;
+        }
+
+        bool OnKeyEvent(const KeyEvent& event);
+        bool OnMouseButtonEvent(const MouseButtonEvent& event);
+        bool OnCursorPosEvent(const CursorPosEvent& event);
+
+        InputAxis GetKeyValue(Key key) { return latestValues_[key]; }
+
+        bool IsKeyPressed(Key key) const;
+        bool IsKeyReleased(Key key) const;
+
+    private:
+        void UpdateInputAxis(Key key, InputAxis value);
+
+        EnumArray<Key, InputAxis> latestValues_;
+    };
+}
+
+#endif //MANGO_INPUTSTATE_H

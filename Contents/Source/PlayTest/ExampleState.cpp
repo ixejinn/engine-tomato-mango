@@ -7,7 +7,7 @@
 #include "Event/EventDispatcher.h"
 #include "Prefab/Prefab.h"
 #include "Particle/ParticleEmitterPool.h"
-#include "Input/KeyDeviceState.h"
+#include "Input/InputState.h"
 #include "Utils/RegistryEntry.h"
 REGISTER_STATE(ExampleState)
 
@@ -34,7 +34,7 @@ void ExampleState::Update()
 {
     static int cnt = 0;
 
-    if (KeyDeviceState::GetInstance().IsKeyPressed(Key::O) && cnt == 0)
+    if (InputState::GetInstance().IsKeyPressed(Key::O) && cnt == 0)
     {
         ++cnt;
 

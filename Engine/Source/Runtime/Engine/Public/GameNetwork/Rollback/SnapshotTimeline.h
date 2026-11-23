@@ -9,7 +9,7 @@
 #include "GameNetwork/Rollback/RollbackConfig.h"
 #include "ECS/Components/Rollback.h"
 #include "ECS/Components/Transform.h"
-#include "ECS/Components/Velocity.h"
+#include "ECS/Components/Collision.h"
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Utils/Logger.h"
 
@@ -20,17 +20,17 @@ namespace tomato
     public:
         virtual ~SnapshotTimelineBase() = default;
 
-        virtual void Rollback(entt::registry&, uint32_t tick) = 0;
-        virtual void Capture(entt::registry&, uint32_t tick) = 0;
+        virtual void Rollback(entt::registry&, int64_t tick) = 0;
+        virtual void Capture(entt::registry&, int64_t tick) = 0;
     };
 
     template<typename Component>
     class SnapshotTimeline : public SnapshotTimelineBase
     {
     public:
-        void Rollback(entt::registry& reg, uint32_t tick) override
+        void Rollback(entt::registry& reg, int64_t tick) override
         {
-            const uint32_t storedTick = data_[tick].tick;
+            const int64_t storedTick = data_[tick].tick;
             if (storedTick != tick)
             {
                 TMT_WARN << "Rollback tick mismatch (requested: " << tick << ", stored: " << storedTick << ")";
@@ -46,7 +46,7 @@ namespace tomato
             }
         }
 
-        void Capture(entt::registry& reg, uint32_t tick) override
+        void Capture(entt::registry& reg, int64_t tick) override
         {
             auto& slice = data_[tick];
 
@@ -71,7 +71,7 @@ namespace tomato
     };
 
     template<>
-    inline void SnapshotTimeline<TransformComponent>::Capture(entt::registry& reg, uint32_t tick)
+    inline void SnapshotTimeline<TransformComponent>::Capture(entt::registry& reg, int64_t tick)
     {
         auto& slice = data_[tick];
 
@@ -83,8 +83,26 @@ namespace tomato
 
         for (const auto& [e, component] : view.each())
         {
-            // component.OnLocalDirtyBit();
             slice.data.emplace_back(e, component);
+            slice.data.back().second.MarkDirty();
+        }
+    }
+
+    template<>
+    inline void SnapshotTimeline<ColliderComponent>::Capture(entt::registry& reg, int64_t tick)
+    {
+        auto& slice = data_[tick];
+
+        slice.tick = tick;
+
+        auto view = reg.view<ColliderComponent, RollbackEntityTag>();
+        slice.data.clear();
+        slice.data.reserve(view.size_hint());
+
+        for (const auto& [e, component] : view.each())
+        {
+            slice.data.emplace_back(e, component);
+            slice.data.back().second.aabbDirty = true;
         }
     }
 
@@ -92,9 +110,9 @@ namespace tomato
     class SnapshotTimeline<CollisionContext> : public SnapshotTimelineBase
     {
     public:
-        void Rollback(entt::registry& reg, uint32_t tick) override
+        void Rollback(entt::registry& reg, int64_t tick) override
         {
-            const uint32_t storedTick = data_[tick].tick;
+            const int64_t storedTick = data_[tick].tick;
             if (storedTick != tick)
             {
                 TMT_WARN << "Rollback tick mismatch (requested: " << tick << ", stored: " << storedTick << ")";
@@ -109,7 +127,7 @@ namespace tomato
                 contactPairs[pb.first] = pb.second;
         }
 
-        void Capture(entt::registry& reg, uint32_t tick) override
+        void Capture(entt::registry& reg, int64_t tick) override
         {
             auto& slice = data_[tick];
 
@@ -137,9 +155,9 @@ namespace tomato
     class SnapshotTimeline<EntityPool<Traits>> : public SnapshotTimelineBase
     {
     public:
-        void Rollback(entt::registry& reg, uint32_t tick) override
+        void Rollback(entt::registry& reg, int64_t tick) override
         {
-            const uint32_t storedTick = data_[tick].tick;
+            const int64_t storedTick = data_[tick].tick;
             if (storedTick != tick)
             {
                 TMT_WARN << "Rollback tick mismatch (requested: " << tick << ", stored: " << storedTick << ")";
@@ -159,7 +177,7 @@ namespace tomato
             pool->freeEntityCount_ = slice.freeEntityCount;
         }
 
-        void Capture(entt::registry& reg, uint32_t tick) override
+        void Capture(entt::registry& reg, int64_t tick) override
         {
             auto* pool = reg.ctx().find<EntityPool<Traits>>();
             if (!pool)
@@ -178,7 +196,7 @@ namespace tomato
     private:
         struct TimelineSlice
         {
-            uint32_t tick;
+            int64_t tick;
             std::array<_entityPoolDetail::Entry, Traits::N> entries;
             std::array<uint32_t, Traits::N> freeIndices;
             uint32_t freeEntityCount;

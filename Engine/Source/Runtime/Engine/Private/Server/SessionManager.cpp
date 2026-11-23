@@ -4,6 +4,8 @@ namespace tomato
 {
 	void SessionManager::GenerateSession(const TCPSocketPtr& client, const SocketAddress& inAddr)
 	{
+		std::lock_guard<std::mutex> lock(mtx_);
+
 		if (socketToId.find(client) == socketToId.end())
 		{
 			socketToId.try_emplace(client, nextId_);
@@ -14,29 +16,50 @@ namespace tomato
 
 	bool SessionManager::ValidateSession(const SessionId& id)
 	{
+		std::lock_guard<std::mutex> lock(mtx_);
 		return tcpSessions.find(id) != tcpSessions.end();
 	}
 
 	bool SessionManager::ValidateSession(const TCPSocketPtr& client)
 	{
+		std::lock_guard<std::mutex> lock(mtx_);
 		return socketToId.find(client) != socketToId.end();
 	}
 
-	bool SessionManager::RemoveSession(const TCPSocketPtr& client)
+	bool SessionManager::RemoveSession(const TCPSocketPtr& socket)
 	{
-		auto it = socketToId.find(client);
+		std::lock_guard<std::mutex> lock(mtx_);
 
+		auto it = socketToId.find(socket);
 		if (it == socketToId.end())
 			return false;
 
-		tcpSessions.erase(it->second);
-		socketToId.erase(client);
+		return RemoveSessionLocked(it->second);
+	}
+
+	bool SessionManager::RemoveSession(SessionId id)
+	{
+		std::lock_guard<std::mutex> lock(mtx_);
+
+		return RemoveSessionLocked(id);
+	}
+
+	bool SessionManager::RemoveSessionLocked(SessionId id)
+	{
+		auto it = tcpSessions.find(id);
+		if (it == tcpSessions.end())
+			return false;
+
+		socketToId.erase(it->second.GetSocket());
+		tcpSessions.erase(it);
 
 		return true;
 	}
 
 	std::unique_ptr<TCPPacket> SessionManager::AppendRecvBuffer(const SessionId& client, const uint8_t* inData, const int& len)
 	{
+		std::lock_guard<std::mutex> lock(mtx_);
+
 		auto it = tcpSessions.find(client);
 
 		if (it == tcpSessions.end())
@@ -49,6 +72,8 @@ namespace tomato
 
 	void SessionManager::AppendSendBuffer(const SessionId& client, const uint8_t* inData, const int& len)
 	{
+		std::lock_guard<std::mutex> lock(mtx_);
+
 		auto it = tcpSessions.find(client);
 
 		if (it != tcpSessions.end())
@@ -57,6 +82,8 @@ namespace tomato
 
 	void SessionManager::SetSessionPort(SessionId& id, uint16_t inPort)
 	{
+		std::lock_guard<std::mutex> lock(mtx_);
+
 		auto it = tcpSessions.find(id);
 
 		if (it != tcpSessions.end())
@@ -65,25 +92,41 @@ namespace tomato
 
 	void SessionManager::GetWritableSockets(std::vector<TCPSocketPtr>& outVector)
 	{
+		std::lock_guard<std::mutex> lock(mtx_);
+
 		for (auto& session : tcpSessions)
 			outVector.push_back(session.second.GetSocket());
 	}
 
-	Session* SessionManager::GetSession(const TCPSocketPtr& socket)
+	SessionId SessionManager::GetSessionId(const tomato::TCPSocketPtr& client)
 	{
-		auto it = tcpSessions.find(socketToId.find(socket)->second);
-		if (it != tcpSessions.end())
-			return &it->second;
+		std::lock_guard<std::mutex> lock(mtx_);
+		auto it = socketToId.find(client);
 
-		return nullptr;
+		return it != socketToId.end() ? it->second : 0; // 0 = 없음
 	}
 
-	const SocketAddress& SessionManager::GetAddress(const SessionId& id)
+	Session* SessionManager::GetSession(const TCPSocketPtr& socket)
 	{
+		std::lock_guard<std::mutex> lock(mtx_);
+
+		auto sit = socketToId.find(socket);
+		if (sit == socketToId.end())
+			return nullptr;
+
+		auto it = tcpSessions.find(sit->second);
+		return it != tcpSessions.end() ? &it->second : nullptr;
+	}
+
+	SocketAddress SessionManager::GetAddress(SessionId id)
+	{
+		std::lock_guard<std::mutex> lock(mtx_);
+
 		auto it = tcpSessions.find(id);
 		if (it != tcpSessions.end())
 			return it->second.addr;
 
 		throw std::runtime_error("session id not found");
+		return SocketAddress{};
 	}
 }

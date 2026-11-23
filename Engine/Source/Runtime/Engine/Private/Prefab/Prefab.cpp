@@ -171,7 +171,7 @@ namespace tomato::Prefab
     {
         const entt::entity obj = CreateStaticMesh(registry, true, "Skybox");
 
-        registry.emplace<NoInspectorTag>(obj);
+        registry.emplace<NonSelectableTag>(obj);
         registry.emplace<NoSaveTag>(obj);
 
         auto& render = registry.get<RenderComponent>(obj);
@@ -191,11 +191,13 @@ namespace tomato::Prefab
         registry.emplace<GizmoTag>(center);
         registry.emplace<EditorHiddenTag>(center);
         registry.emplace<NoSaveTag>(center);
+        registry.emplace<NonSelectableTag>(center);
         // X axis
         const entt::entity x = CreateStaticMesh(registry, true, "X");
 
         registry.emplace<GizmoTag>(x);
         registry.emplace<NoSaveTag>(x);
+        registry.emplace<NonSelectableTag>(x);
 
         auto& trfX = registry.get<TransformComponent>(x);
         trfX.SetPosition(3, 0, 0);
@@ -213,6 +215,7 @@ namespace tomato::Prefab
 
         registry.emplace<GizmoTag>(y);
         registry.emplace<NoSaveTag>(y);
+        registry.emplace<NonSelectableTag>(y);
 
         auto& trfY = registry.get<TransformComponent>(y);
         trfY.SetPosition(0, 3, 0);
@@ -230,6 +233,7 @@ namespace tomato::Prefab
 
         registry.emplace<GizmoTag>(z);
         registry.emplace<NoSaveTag>(z);
+        registry.emplace<NonSelectableTag>(z);
 
         auto& trfZ = registry.get<TransformComponent>(z);
         trfZ.SetPosition(0, 0, 3);

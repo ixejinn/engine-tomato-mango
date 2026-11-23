@@ -21,6 +21,8 @@ namespace tomato
 
 		void ProcessOutgoingMessages(uint32_t tick);
 
+		void OnMatchEnded() { currentStatePtr_ = nullptr; }
+
 		void SetState(State* newState) { currentStatePtr_ = newState; }
 		void SetNetwork(ClientNetwork* network) { network_ = network; }
 
@@ -29,7 +31,7 @@ namespace tomato
 
 	private:
 		State* currentStatePtr_{ nullptr };
-		ClientNetwork* network_;
+		ClientNetwork* network_{ nullptr };
 
         int64_t confirmedTick{0};
 	};

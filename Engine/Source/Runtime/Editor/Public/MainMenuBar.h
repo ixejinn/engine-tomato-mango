@@ -23,6 +23,8 @@ namespace tomato
 	private:
 		void MenuFile(EditorContext&);
 		void MenuTools(EditorContext&);
+		void MenuProject(EditorContext&);
+
 		void EditModeButton(EditorContext&, RunMode&);
 
 		void NewScene(EditorContext&);
@@ -30,6 +32,9 @@ namespace tomato
 		void Save(EditorContext&);
 		void SaveAs(EditorContext&);
 		void ReLoadScene(EditorContext&);
+
+		void OpenProjectSettings(EditorContext&);
+		void DrawLayerMatrix(EditorContext&);
 
 		void OpenPopupModal(EditorContext&);
 		void ExecutePendingAction(EditorContext&, bool);
@@ -40,6 +45,7 @@ namespace tomato
 	private:
 		PendingAction pendingAction_ = PendingAction::None;
 		bool openNotSavedPopup = false;
+		bool openProjectSettings = false;
 
 		bool modeBtnClicked = false;
 

@@ -17,9 +17,7 @@
 #include "Utils/Logger.h"
 #include "Profiler/Profiler.h"
 #include "Profiler/CPUProfiler.h"
-#include "Input/KeyDeviceState.h"
-#include "GLFW/glfw3.h"
-
+#include "Input/InputState.h"
 namespace tomato
 {
     Engine::Engine(const int width, const int height, const char* title, NetMode netMode)
@@ -27,7 +25,8 @@ namespace tomato
         , input_(window_)
         , netMode_(netMode)
     {
-        InitializeInput();
+        ConnectInputChain();
+
         InitializeSerialization();
 
         editor_.InitImGui(window_.GetHandle(), input_, this);
@@ -48,6 +47,9 @@ namespace tomato
 
     void Engine::TryStartGame(std::unique_ptr<State>&& newState)
     {
+        if (!networkRuntime_.HasClient())
+            return;
+
         auto& network_ = networkRuntime_.Client().Network();
         if (network_.GetNetState() == ClientNetworkState::NSS_Starting)
         {
@@ -81,8 +83,7 @@ namespace tomato
 
         window_.SetWindowUserPointer(input_, tickClock);
         GarbageEntityCollectionSystem garbageCollectionSystem;
-        
-        auto& keyState = KeyDeviceState::GetInstance();
+
         auto& profiler = Profiler::GetInstance();
 
         ChangeState(tickClock);
@@ -110,7 +111,7 @@ namespace tomato
             }
             // ----------* Rollback and resimulate
 
-            ProcessInputEvents(tickClock.GetTick());
+            ProcessInputEvents();
 
             // *---------- Simulate and render
             SimContext simCtx{ currState_.get(), tickClock.GetTick() };
@@ -125,8 +126,6 @@ namespace tomato
 
             window_.SwapBuffers();
             // ----------* Simulate and render
-
-            intentTranslator_.UpdateIntentState(tickClock.GetTick());
         }
 
         //networkRuntime_.Stop();
@@ -140,6 +139,9 @@ namespace tomato
 
     void Engine::RequestMatchToServer()
     {
+        if (!networkRuntime_.HasClient())
+            return;
+
         if (!networkRuntime_.Client().Network().ConnectToServer())
         {
             std::cout << "Can not Connect Server. Please check if the server is active and try again.\n";
@@ -148,14 +150,49 @@ namespace tomato
         networkRuntime_.Client().Network().RequestMatch();
     }
 
-    void Engine::ProcessInputEvents(const uint32_t tick)
+    void Engine::SendTCPPacketToServer(TCPPacketType type)
+    {
+        if (!networkRuntime_.HasClient())
+            return;
+
+        switch (type)
+        {
+        case TCPPacketType::MATCH_LEAVE:
+            networkRuntime_.Client().Network().LeaveMatch();
+            break;
+
+        case TCPPacketType::GAME_END:
+            networkRuntime_.Client().Network().EndGame();
+            break;
+
+        default:
+            networkRuntime_.Client().Network().SendTCPPacket(type);
+        }
+    }
+
+    void Engine::ConnectInputChain()
+    {
+        auto& inputState = InputState::GetInstance();
+
+        // EnTT::sigh는 뒤에 연결한 리스너부터 호출
+        // Editor - InputState - UI - Game
+        input_.keySignal_.Connect<&PlayerInput::OnKeyEvent>(playerInput_);
+        input_.keySignal_.Connect<&InputState::OnKeyEvent>(inputState);
+        input_.keySignal_.Connect<&Editor::OnKeyEvent>();
+
+        input_.cursorSignal_.Connect<&InputUI::OnHover>(inputUI_);
+        input_.cursorSignal_.Connect<&InputState::OnCursorPosEvent>(inputState);
+
+        input_.mouseSignal_.Connect<&PlayerInput::OnMouseButtonEvent>(playerInput_);
+        input_.mouseSignal_.Connect<&InputUI::OnClick>(inputUI_);
+        input_.mouseSignal_.Connect<&InputState::OnMouseButtonEvent>(inputState);
+        input_.mouseSignal_.Connect<&Editor::OnMouseButtonEvent>();
+    }
+
+    void Engine::ProcessInputEvents()
     {
         window_.TMP_CheckEscapeKey();
-        Window::PollEvents();
-
-        currState_->SetPlayerInput(
-            tick, intentTranslator_.GetCurrInputState(),
-            networkRuntime_.GetMyPlayerID());
+        window_.PollEvents();
     }
 
     void Engine::FixedUpdate(TickClock& tc, SimContext& simCtx, RunMode mode)
@@ -165,6 +202,11 @@ namespace tomato
         {
             simCtx.tick = tc.GetTick();
             TICK_LOG("\n *--------- " << simCtx.tick << " ---------*\n");
+
+            playerInput_.UpdateSnapshot(simCtx.tick);
+            currState_->SetPlayerInput(
+                    simCtx.tick, playerInput_.GetSnapshot(),
+                networkRuntime_.GetMyPlayerID());
 
             systemManager_.FixedUpdate(simCtx, mode);
 
@@ -259,19 +301,12 @@ namespace tomato
         {
             // std::cout << "        --------- " << rbSimCtx.tick << " ---------\n";
             systemManager_.FixedUpdate(simCtx, RunMode::Rollback);
+            EventDispatcher::GetInstance().Update();
             currState_->Update();   // !!!!!! temporary !!!!!!
 
             ++simCtx.tick;
             networkRuntime_.CaptureSnapshot(simCtx);
         }
-    }
-
-    void Engine::InitializeInput()
-    {
-        input_.keySignal_.Connect<&IntentTranslator::OnKeyEvent>(intentTranslator_);
-        input_.cursorSignal_.Connect<&InputUI::OnHover>(inputUI_);
-        input_.mouseSignal_.Connect<&IntentTranslator::OnMouseButtonEvent>(intentTranslator_);
-        input_.mouseSignal_.Connect<&InputUI::OnClick>(inputUI_);
     }
 
     void Engine::InitializeSerialization()

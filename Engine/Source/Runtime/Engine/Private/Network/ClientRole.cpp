@@ -21,7 +21,6 @@ namespace tomato
 	void ClientRole::PollIncoming(TickClock& tc)
 	{
 		gameNet_.InitializeConfirmedTick(tc.GetTick());
-		network_.ProcessQueuedUDPPacket();
-		network_.ProcessQueuedTCPPacket();
+		network_.Update();
 	}
 }

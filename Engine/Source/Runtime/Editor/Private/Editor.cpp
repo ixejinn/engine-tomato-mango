@@ -20,10 +20,9 @@
 #include <implot/implot.h>
 
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
-#include "Services/Input.h"
 #include "Services/Window.h"
 #include "State/State.h"
-#include "Input/KeyDeviceState.h"
+#include "Input/InputState.h"
 
 #include "EditorPanel.h"
 #include "HierarchyPanel.h"
@@ -34,22 +33,30 @@
 
 namespace tomato
 {
+    bool Editor::OnKeyEvent(const KeyEvent&)
+    {
+        return !ImGui::GetIO().WantCaptureKeyboard;
+    }
+
+    bool Editor::OnMouseButtonEvent(const MouseButtonEvent&)
+    {
+        return !ImGui::GetIO().WantCaptureMouse;
+    }
+
 	void Editor::InitImGui(GLFWwindow* wnd, Input& input, Engine* engine)
 	{
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // 키보드 입력으로 ImGui의 포커스 이동을 막기 위해 주석 처리
 
 		// Setup ImPlot context
 		ImPlot::CreateContext();
 		
 		// Setup Platform/Renderer backends
-		ImGui_ImplGlfw_InitForOpenGL(wnd, false);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+		ImGui_ImplGlfw_InitForOpenGL(wnd, true);
 		ImGui_ImplOpenGL3_Init();
-		
-		SetInputCallbacks(input);
 
 		ImFontConfig config;
 
@@ -76,12 +83,6 @@ namespace tomato
 
 	void Editor::ShutdownImGui(Input& input)
 	{
-        input.GetMouseButtonSink().disconnect<ImGui_ImplGlfw_MouseButtonCallback>();
-        input.GetCursorPosSink().disconnect<ImGui_ImplGlfw_CursorPosCallback>();
-        input.GetScrollSink().disconnect<ImGui_ImplGlfw_ScrollCallback>();
-        input.GetKeySink().disconnect<ImGui_ImplGlfw_KeyCallback>();
-        input.GetCharSink().disconnect<ImGui_ImplGlfw_CharCallback>();
-
 		ImPlot::DestroyContext();
 
 		ImGui_ImplOpenGL3_Shutdown();
@@ -113,11 +114,13 @@ namespace tomato
 		for (auto& panel : panels)
 			panel->Draw(eCtx);
 		
-		if (KeyDeviceState::GetInstance().IsKeyPressed(Key::LeftMouseButton))
+		if (InputState::GetInstance().IsKeyPressed(Key::LeftMouseButton))
 		{
-			auto& keyDeviceState = KeyDeviceState::GetInstance();
-			PickObject(eCtx.currentState->GetRegistry(),
-				{keyDeviceState.GetKeyState(Key::MouseX), keyDeviceState.GetKeyState(Key::MouseY)});
+			auto& keyDeviceState = InputState::GetInstance();
+
+			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::GetIO().WantCaptureMouse)
+				PickObject(eCtx.currentState->GetRegistry(),
+					{keyDeviceState.GetKeyValue(Key::MouseX), keyDeviceState.GetKeyValue(Key::MouseY)});
 		}
 	}
 
@@ -127,23 +130,9 @@ namespace tomato
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	void Editor::SetInputCallbacks(Input& input)
-	{
-		input.GetMouseButtonSink().connect<ImGui_ImplGlfw_MouseButtonCallback>();
-		input.GetCursorPosSink().connect<ImGui_ImplGlfw_CursorPosCallback>();
-		input.GetScrollSink().connect<ImGui_ImplGlfw_ScrollCallback>();
-		input.GetKeySink().connect<ImGui_ImplGlfw_KeyCallback>();
-		input.GetCharSink().connect<ImGui_ImplGlfw_CharCallback>();
-	}
-
 	void Editor::PickObject(entt::registry& reg, glm::vec2 mousePos)
 	{
-		// 1. Check the first click position and exclude ImGui window areas
-		// Note: Calculated using a top-left coordinate system and assuming the pivot is (1, 1)
-		if (IsMouseOverPanel(mousePos))
-			return;
-
-		// 2-0 Check UI
+		// Check UI
 		if (TrySelectUI(reg, glm::vec2(mousePos.x, Window::GetHeight() - mousePos.y)))
 			return;
 
@@ -188,22 +177,6 @@ namespace tomato
 		eCtx.currentState = newState;
 		eCtx.sceneDirty = false;
 		eCtx.selectedEntity = entt::null;
-	}
-
-	bool Editor::IsMouseOverPanel(glm::vec2 mousePos)
-	{
-		for (auto& panel : panels)
-		{
-			glm::vec2 panelTopLeft = panel.get()->GetPos();
-			glm::vec2 panelBotRight = panelTopLeft + panel.get()->GetSize();
-
-			if (mousePos.x < panelTopLeft.x || mousePos.x > panelBotRight.x ||
-				mousePos.y < panelTopLeft.y || mousePos.y > panelBotRight.y)
-				continue;
-
-			return true;
-		}
-		return false;
 	}
 
 	bool Editor::TrySelectUI(entt::registry& reg, glm::vec2 mousePos)

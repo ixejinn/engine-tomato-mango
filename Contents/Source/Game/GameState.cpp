@@ -7,8 +7,8 @@
 #include "Resource/Render/Texture.h"
 #include "Resource/Render/ParticleEffect.h"
 #include "Resource/PathManager.h"
-#include "Input/IntentTranslator.h"
-#include "Input/InputIntent.h"
+#include "Input/PlayerInput.h"
+#include "Input/InputAction.h"
 #include "Input/KeyConstants.h"
 #include "Utils/Logger.h"
 #include "ECS/Components/Components.h"
@@ -30,6 +30,7 @@
 #include "WaveManager.h"
 #include "Wave/WaveEvent.h"
 
+#include "LobbyState.h"
 REGISTER_STATE(GameState)
 
 using namespace tomato;
@@ -101,6 +102,16 @@ void GameState::Init()
 //    eventDispatcher.Connect<TriggerExitEvent, &OnTriggerExit>();
     eventDispatcher.Connect<WaveCollisionEvent, &OnWaveCollision>();
     eventDispatcher.Connect<LandingEvent, &GameState::MakeWaveJump>(*this);
+
+    auto btn = UIPrefab::CreateButton(registry_, "Exit", { 80.f, 40.f }, {770.f, 400.f});
+    auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
+
+    mouseEvt.onClick =
+        [this](const MouseClickEvent& e)
+        {
+            engine_.SendTCPPacketToServer(TCPPacketType::MATCH_LEAVE);
+            engine_.SetNextState(std::make_unique<LobbyState>(engine_));
+        };
 }
 
 void GameState::Update()

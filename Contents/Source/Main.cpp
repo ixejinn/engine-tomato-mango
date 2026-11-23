@@ -30,7 +30,7 @@ int main() {
     Engine engine(1920, 1080, "TOMATO", NetMode::NM_Alone);
 
 #if defined(TOMATO_GREENTEA)
-    engine.SetNextState(std::make_unique<ExampleState>(engine));
+    engine.SetNextState(std::make_unique<LobbyState>(engine));
 
 #else //TOMATO_GREENTEA
     engine.SetNextState(std::make_unique<LobbyState>(engine));

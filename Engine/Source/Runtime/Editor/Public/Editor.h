@@ -5,33 +5,36 @@
 #include <memory>
 #include <glm/fwd.hpp>
 #include <entt/fwd.hpp>
-#include <State/StateFwd.h>
 
 #include "EditorPanel.h"
 #include "MainMenuBar.h"
+
 #include "Services/ServiceFwd.h"
+#include "State/StateFwd.h"
+#include "Input/InputEventFwd.h"
 
 namespace tomato
 {
 	class Editor
 	{
 	public:
-		void InitImGui(GLFWwindow* wnd, Input& input, Engine* engine);
+        static bool OnKeyEvent(const KeyEvent&);
+        static bool OnMouseButtonEvent(const MouseButtonEvent&);
+
+        void InitImGui(GLFWwindow* wnd, Input& input, Engine* engine);
+
 		void ShutdownImGui(Input& input);
+        void BeginFrame();
+        void Draw(uint64_t, State*, RunMode&);
 
-		void BeginFrame();
-		void Draw(uint64_t, State*, RunMode&);
 		void EndFrame();
-
-		void SetInputCallbacks(Input& input);
 
 		void PickObject(entt::registry& reg, glm::vec2 mousePos);
 
-	private:
+    private:
 		void LoadResources();
 		void ResetEditorContext(State*);
 
-		bool IsMouseOverPanel(glm::vec2 mousePos);
 		bool TrySelectUI(entt::registry& reg, glm::vec2 mousePos);
 
 	private:
