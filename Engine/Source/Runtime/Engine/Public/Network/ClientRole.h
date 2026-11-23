@@ -18,7 +18,7 @@ namespace tomato
 
 		void Start() { network_.ThreadStart(); }
 		void Stop() { network_.ThreadStop(); }
-		void PollIncoming(TickClock& tc);
+		bool PollIncoming(TickClock& tc);
 
 		ClientNetwork& Network() { return network_; }
 		GamePlayNetSystem& GameNet() { return gameNet_; }

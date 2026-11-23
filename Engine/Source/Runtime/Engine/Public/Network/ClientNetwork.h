@@ -41,7 +41,7 @@ namespace tomato
         explicit ClientNetwork();
         ~ClientNetwork();
 
-        void Update();
+        bool Update();
 
         bool ConnectToServer();
 
@@ -75,7 +75,6 @@ namespace tomato
         void ThreadStop();
 
         PlayerId GetMyPlayerID() const { return playerID_; }
-        PlayerId GetPeerPlayerID(const SocketAddress& addr); // no use
 
         ClientNetworkState GetNetState() const { return netState_; }
         ServerTimeMs GetLocalStartTime() const { return localStartTime; }
@@ -94,7 +93,7 @@ namespace tomato
         UDPNetDriver driver_;
         TCPNetDriver server_;
 
-        bool connectedToServer{ false };
+        std::atomic<bool> connectedToServer{ false };
 
         std::thread TCPRecvThread, UDPRecvThread;
         std::atomic<bool> TCPRecvThreadRunning_{ false }, UDPRecvThreadRunning_{ false };

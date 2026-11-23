@@ -68,6 +68,17 @@ namespace tomato
         }
     }
 
+    void Engine::OnMatchEnded()
+    {
+        if (nextState_) return;
+        if (!lobbyFactory_)
+        {
+            //TMT_WARN << "Lobby factory is not set.";
+            return;
+        }
+        SetNextState(lobbyFactory_(*this));
+    }
+
     void Engine::Run()
     {
         auto& systemRegistry = SystemRegistry::GetInstance();
@@ -96,8 +107,8 @@ namespace tomato
             CPU_PROFILER_TOTAL_BEGIN()
 
             networkRuntime_.ApplyPending(currState_.get()); // 네트워크 모드 지연 적용
-            networkRuntime_.PollIncoming(tickClock); // 패킷 처리
-
+            if (networkRuntime_.PollIncoming(tickClock)) // 패킷 처리
+                OnMatchEnded();
             // *---------- Rollback and resimulate
             auto currT = tickClock.GetTick();
             int64_t lateT;

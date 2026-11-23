@@ -11,16 +11,15 @@ namespace tomato
 
 	ClientRole::~ClientRole()
 	{
-		//auto start = std::chrono::high_resolution_clock::now();
+		if (network_.GetNetState() == ClientNetworkState::NSS_Starting || network_.IsPlaying())
+			network_.LeaveMatch();
+
 		network_.ThreadStop(); // 스레드 정리 후 나머지 멤버 파괴
-		//auto end = std::chrono::high_resolution_clock::now();
-		//std::cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "\n";
 	}
 
-
-	void ClientRole::PollIncoming(TickClock& tc)
+	bool ClientRole::PollIncoming(TickClock& tc)
 	{
 		gameNet_.InitializeConfirmedTick(tc.GetTick());
-		network_.Update();
+		return network_.Update();
 	}
 }

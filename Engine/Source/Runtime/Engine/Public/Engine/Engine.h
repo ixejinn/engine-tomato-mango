@@ -48,7 +48,9 @@ namespace tomato
         void RequestMatchToServer();
         void SendTCPPacketToServer(TCPPacketType type);
         void TryStartGame(std::unique_ptr<State>&& newState);
+        void SetLobbyFactory(std::function<std::unique_ptr<State>(Engine&)> f) { lobbyFactory_ = std::move(f); }
 
+        NetMode GetNetMode() { return networkRuntime_.GetMode(); }
         CollisionLayerMatrix collisionLayerMtx_;
 
     private:
@@ -65,6 +67,9 @@ namespace tomato
         std::unique_ptr<State> currState_{nullptr};
         std::unique_ptr<State> nextState_{nullptr};
         bool loaded{false};
+
+        void OnMatchEnded();
+        std::function<std::unique_ptr<State>(Engine&)> lobbyFactory_;
 
         Editor editor_;
 

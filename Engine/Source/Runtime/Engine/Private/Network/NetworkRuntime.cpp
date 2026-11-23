@@ -44,7 +44,7 @@ namespace tomato
 	void NetworkRuntime::ProcessOutgoingMessages(int64_t tick)
 	{
 		if (!client_) return;
-		if (client_->Network().GetNetState() == ClientNetworkState::NSS_Playing)
+		if (client_->Network().IsPlaying())
 			client_->GameNet().ProcessOutgoingMessages(tick);
 	}
 

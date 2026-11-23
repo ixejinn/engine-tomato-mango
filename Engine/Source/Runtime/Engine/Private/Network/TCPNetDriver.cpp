@@ -70,6 +70,11 @@ namespace tomato
 		return socket_->Receive(buffer, size);
 	}
 
+	int TCPNetDriver::WaitReable(int timeoutMs)
+	{
+		return socket_->WaitReadable(timeoutMs);
+	}
+
 	void TCPNetDriver::Shutdown()
 	{
 		socket_->Shutdown();

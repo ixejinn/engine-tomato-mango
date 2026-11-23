@@ -16,15 +16,15 @@ namespace tomato
 	public:
 		void RequestClient(bool enable) { pendingClient_ = enable; } // 요청 저장
 		void EnableClient(State* currentState);
-		void DisableClient() { client_.reset(); client_ = nullptr; }
+		void DisableClient() { client_.reset(); }
 
 		void ApplyPending(State* currentState);
 
 		void Start()	{ if(client_) client_->Start(); }
 		void Stop()		{ if(client_) client_->Stop(); }
-		void PollIncoming(TickClock& tc)
+		bool PollIncoming(TickClock& tc)
 		{
-			if (client_) client_->PollIncoming(tc);
+			return client_ && client_->PollIncoming(tc);
 		}
 
 		PlayerId GetMyPlayerID();
@@ -42,7 +42,7 @@ namespace tomato
 	private:
 		WinsockInitializer winsockInit_;
 
-		NetMode netMode_;
+		NetMode netMode_{ NetMode::NM_Alone };
 		std::optional<bool> pendingClient_;
 		//std::optional<bool> pendingServer_;
 

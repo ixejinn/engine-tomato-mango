@@ -100,6 +100,19 @@ namespace tomato
 		return bytesReceivedCount;
 	}
 
+	// 반환: 1 = 읽을 게 있음(데이터 또는 종료 신호), 0 = 타임아웃, 음수 = 에러
+	int TCPSocket::WaitReadable(int timeoutMs)
+	{
+		WSAPOLLFD pfd{};
+		pfd.fd = socket_;
+		pfd.events = POLLRDNORM;
+
+		int r = WSAPoll(&pfd, 1, timeoutMs);
+		if (r < 0)
+			return -WSAGetLastError();
+		return r;
+	}
+
 	void TCPSocket::Shutdown()
 	{
 		if (socket_ != INVALID_SOCKET)

@@ -103,6 +103,7 @@ void GameState::Init()
     eventDispatcher.Connect<WaveCollisionEvent, &OnWaveCollision>();
     eventDispatcher.Connect<LandingEvent, &GameState::MakeWaveJump>(*this);
 
+    engine_.SetLobbyFactory([](Engine& e) { return std::make_unique<LobbyState>(e); });
     auto btn = UIPrefab::CreateButton(registry_, "Exit", { 80.f, 40.f }, {770.f, 400.f});
     auto& mouseEvt = registry_.get<MouseEventComponent>(btn);
 
@@ -110,7 +111,8 @@ void GameState::Init()
         [this](const MouseClickEvent& e)
         {
             engine_.SendTCPPacketToServer(TCPPacketType::MATCH_LEAVE);
-            engine_.SetNextState(std::make_unique<LobbyState>(engine_));
+            if(engine_.GetNetMode() == NetMode::NM_Alone)
+                engine_.SetNextState(std::make_unique<LobbyState>(engine_));
         };
 }
 
