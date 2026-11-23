@@ -25,6 +25,10 @@ namespace tomato
 		Success,
 		Failed,
 
+		GameEnd,
+		Leave,
+		Disconnect,
+
 		COUNT
 	};
 
@@ -75,6 +79,23 @@ namespace tomato
 		Failed,
 
 		COUNT
+	};
+
+	/* Idle은 값만 존재하고 실제로 맵에 저장하지 않음 (Idle 상태 == 맵에 존재 X) */
+	enum class ClientMatchState : uint8_t { Idle, Queued, Matching, InGame, COUNT };
+	enum class MatchPlayerState : uint8_t { InGame, Finished, Left, Disconnected, COUNT };
+
+	struct ClientMatchInfo
+	{
+		ClientMatchState state;
+		MatchId matchId;
+	};
+
+	struct ActiveMatch
+	{
+		MatchId matchId;
+		std::vector<SessionId> players; // 인덱스 = playerId
+		std::vector<MatchPlayerState> playerStates;
 	};
 }
 

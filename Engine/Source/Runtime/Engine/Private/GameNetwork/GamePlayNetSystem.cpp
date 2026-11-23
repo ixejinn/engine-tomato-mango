@@ -16,6 +16,7 @@ namespace tomato
 
 	void GamePlayNetSystem::HandleInput(const InputCommand& inputCmd)
 	{
+		if (!currentStatePtr_) return;
 		currentStatePtr_->SetPlayerInput(inputCmd.snapshot.tick, inputCmd.snapshot, inputCmd.id);
         confirmedTick = std::min(confirmedTick, inputCmd.snapshot.tick);
 
@@ -26,8 +27,9 @@ namespace tomato
 
 	void GamePlayNetSystem::ProcessOutgoingMessages(uint32_t tick)
 	{
-		PlayerId myId = network_->GetMyPlayerID();
+		if (!currentStatePtr_ || !network_ || !network_->IsPlaying()) return;
 
+		PlayerId myId = network_->GetMyPlayerID();
 		auto currInput = currentStatePtr_->GetPlayerInputTimelines()[myId][tick];
 
 		InputCommand inputCmd{

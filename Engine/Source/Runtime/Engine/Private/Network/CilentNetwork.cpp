@@ -15,14 +15,42 @@ namespace tomato
         //addToId.try_emplace({ "192.168.31.231", 9000 }, 1);
     }
 
-    ClientNetwork::~ClientNetwork() {}
+    ClientNetwork::~ClientNetwork()
+    {
+        // @TODO: 게임 종료 시 GAME_END, 의도적 나가기 시 MATCH_LEAVE 서버로 보내는 동작 수정하기
+        if (netState_ >= ClientNetworkState::NSS_Hello && connectedToServer)
+            SendTCPPacket(TCPPacketType::MATCH_LEAVE);
+    }
+
+    void ClientNetwork::Update()
+    {
+        ProcessQueuedTCPPacket();
+        ProcessQueuedUDPPacket();
+
+        if (serverLost_.exchange(false)) // 옛 값이 true였으면 진입, 동시에 값은 false가 됨, 스레드 끼어들기 방지
+        {
+            pendingReset_ = true;
+            netState_ = ClientNetworkState::NSS_Uninitialized;
+        }
+
+        if (pendingReset_)
+        {
+            if (gameNetSystem_) gameNetSystem_->OnMatchEnded();
+            ResetMatchState();
+            pendingReset_ = false;
+        }
+    }
 
     void ClientNetwork::ConnectToServer()
     {
-        if (server_.IsConnectedToServer())
+        if (netState_ == ClientNetworkState::NSS_Idle)
             return;
 
-        server_.InitClientMode();
+        if (!server_.InitClientMode())
+            return;
+
+        connectedToServer = true;
+        netState_ = ClientNetworkState::NSS_Idle;
 
         TCPRecvThread = std::thread(&ClientNetwork::TCPNetRecvThreadLoop, this);
         TCPRecvThreadRunning_ = true;
@@ -30,13 +58,30 @@ namespace tomato
 
     void ClientNetwork::RequestMatch()
     {
-        if (!server_.IsConnectedToServer())
+        if (!connectedToServer)
         {
             TMT_INFO << "NOT CONNECT TO SERVER";
             return;
         }
         
+        if (netState_ != ClientNetworkState::NSS_Idle)
+            return;
+
         SendTCPPacket(TCPPacketType::MATCH_REQUEST);
+    }
+
+    void ClientNetwork::LeaveMatch()
+    {
+        if (matchID_ == 0 || pendingReset_) return;
+        SendTCPPacket(TCPPacketType::MATCH_LEAVE);
+        pendingReset_ = true;
+    }
+
+    void ClientNetwork::EndGame()
+    {
+        if(matchID_ == 0 || pendingReset_) return;
+        SendTCPPacket(TCPPacketType::GAME_END);
+        pendingReset_ = true;
     }
 
     // use network thread
@@ -86,6 +131,7 @@ namespace tomato
         case UDPPacketType::WELCOME:
             //Check the peer is connected
             std::cout << "Receive WELCOME\n";
+            if (netState_ != ClientNetworkState::NSS_Hello) break; // 중복 WELCOME 방지
             if (HandleWelcomePacket(inToAddress))
             {
                 std::cout << "All Checked\n";
@@ -98,9 +144,13 @@ namespace tomato
 
         case UDPPacketType::INPUT:
         {
+            PlayerId id;
+            if (!gameNetSystem_ || !TryGetPeerPlayerID(inToAddress, id)) // reset 후 늦게 온 패킷 무시
+                break;
+
             InputCommand inputCmd;
             inputCmd.Read(reader);
-            inputCmd.id = GetPeerPlayerID(inToAddress);
+            inputCmd.id = id;
             
             gameNetSystem_->HandleInput(inputCmd);
             break;
@@ -130,6 +180,9 @@ namespace tomato
         for (auto it = conn.begin(); it != conn.end(); it++)
         {
             if (netState_ == ClientNetworkState::NSS_Playing && it->second.playerId == playerID_)
+                continue;
+
+            if (it->second.state == PeerState::Left || it->second.state == PeerState::Disconnected)
                 continue;
 
             int byteSentCount{};
@@ -176,7 +229,10 @@ namespace tomato
 
     bool ClientNetwork::HandleWelcomePacket(const SocketAddress& inToAddress)
     {
-        PlayerId id = GetPeerPlayerID(inToAddress);
+        PlayerId id;
+        if (!TryGetPeerPlayerID(inToAddress, id) || id >= peerConnected.size())
+            return false;
+
         peerConnected[id] = true;
 
         for (const auto& peer : peerConnected)
@@ -214,6 +270,13 @@ namespace tomato
 
                 pendingTCPPackets_.Emplace(std::move(packet));
             }
+            else // 서버 TCP 끊김
+            {
+                std::cout << "Disconnected to server.\n";
+                connectedToServer = false;
+                serverLost_ = true;
+                break;
+            }
         }
     }
 
@@ -237,6 +300,15 @@ namespace tomato
     {
         switch (header)
         {
+        case TCPPacketType::MATCH_CANCEL_SUCCESS:
+            std::cout << "Success to cancel match.\n";
+            pendingReset_ = true;
+            break;
+
+        case TCPPacketType::MATCH_CANCEL_FAILED:
+            std::cout << "Falied to cancel match.\n";
+            break;
+
         case TCPPacketType::MATCH_INTRO:
             netState_ = ClientNetworkState::NSS_Hello;
             //Set NetConnections
@@ -257,6 +329,11 @@ namespace tomato
         case TCPPacketType::MATCH_START:
             std::cout << "Receive MATCH_START\n";
             HandleMatchStartPacket(reader);
+            break;
+
+        case TCPPacketType::MATCH_PEER_STATUS:
+            std::cout << "Receive MATCH_PEER_STATUS\n";
+            HandleMatchPeerStatePacket(reader);
             break;
         }
     }
@@ -284,6 +361,9 @@ namespace tomato
         }
 
         case TCPPacketType::MATCH_CANCEL:
+            std::cout << "MATCH_CANCEL\n";
+            break;
+
         case TCPPacketType::MATCH_INTRO_SUCCESS:
         case TCPPacketType::MATCH_INTRO_FAILED:
         {
@@ -303,6 +383,12 @@ namespace tomato
                 duration_cast<std::chrono::milliseconds>(
                     std::chrono::steady_clock::now().time_since_epoch()).count());
             break;
+
+        case TCPPacketType::GAME_END:
+        case TCPPacketType::MATCH_LEAVE:
+            std::cout << "GAME_END / MATCH_LEAVE\n";
+            writer.WriteInt(matchID_, std::numeric_limits<MatchId>::max());
+            break;
         }
 
         int16_t byteSize = writer.GetByteSize();
@@ -321,7 +407,11 @@ namespace tomato
         std::cout << "[MATCH ID = " << matchID_ << "]\n";
 
         reader.ReadInt(readPlayerNum, std::numeric_limits<uint8_t>::max());
-        peerConnected.resize(readPlayerNum);
+
+        /* 이전 매치 데이터가 남지 않도록 초기화 */
+        conn.clear();
+        addToId.clear();
+        peerConnected.assign(readPlayerNum, false);
 
         for (int i = 0; i < readPlayerNum; i++)
         {
@@ -343,11 +433,11 @@ namespace tomato
 
             tomato::SocketAddress readAddr(addr, readPort);
 
-            conn.try_emplace(readPlayerId, 0, readMatchId, readPlayerId, readName, readAddr);
+            conn.try_emplace(readPlayerId, PeerState::Connected, 0, readMatchId, readPlayerId, readName, readAddr);
             addToId.try_emplace(readAddr, readPlayerId);
 
             std::cout << "[Add Connection]\nmatch id\tplayer id\tname\taddr\n" <<
-                '\t' << readMatchId << '\t' << int(readPlayerId) << '\t' << readName << '\t' << readAddr.ToString() << '\n';
+                '\t' << readMatchId << "\t\t" << int(readPlayerId) << '\t' << readName << '\t' << readAddr.ToString() << '\n';
         }
 
         reader.ReadInt(readMyId, std::numeric_limits<uint8_t>::max());
@@ -416,6 +506,30 @@ namespace tomato
         }
     }
 
+    void ClientNetwork::HandleMatchPeerStatePacket(NetBitReader& reader)
+    {
+        if (netState_ != ClientNetworkState::NSS_Playing) return;
+
+        uint8_t readTargetPlayerId{ 0 }, readPeerState{ 0 };
+        uint16_t readMatchId{ 0 };
+
+        reader.ReadInt(readMatchId, std::numeric_limits<uint16_t>::max());
+        if (readMatchId != matchID_)
+            return;
+
+        reader.ReadInt(readTargetPlayerId, std::numeric_limits<uint8_t>::max());
+        reader.ReadInt(readPeerState, static_cast<uint8_t>(TCPPacketType::COUNT));
+        std::cout << "Player" << (int)readTargetPlayerId << " is disconnected.(" << (int)readPeerState << ") [match: " << readMatchId << "]\n";
+
+        // find taget player's connection
+        auto it = conn.find(readTargetPlayerId);
+        if (it != conn.end())
+            conn[readTargetPlayerId].state = static_cast<PeerState>(readPeerState);
+
+        PrintNetConnection(); // debug
+        //@Someting todo? ex.peerConnected...
+    }
+
     PlayerId ClientNetwork::GetPeerPlayerID(const SocketAddress& addr)
     {
         auto it = addToId.find(addr);
@@ -425,12 +539,65 @@ namespace tomato
         return it->second;
     }
 
+    void ClientNetwork::ResetMatchState()
+    {
+        conn.clear();
+        addToId.clear();
+        peerConnected.clear();
+        playerID_ = 0;
+        matchID_ = 0;
+        localStartTime = 0;
+        sendTime = recvTime = 0;
+        netState_ = connectedToServer ?
+            ClientNetworkState::NSS_Idle : ClientNetworkState::NSS_Uninitialized;
+    }
+
+    bool ClientNetwork::TryGetPeerPlayerID(const SocketAddress& addr, PlayerId& out) const
+    {
+        auto it = addToId.find(addr);
+        if (it == addToId.end()) return false;
+
+        out = it->second;
+
+        return true;
+    }
+
+    void ClientNetwork::PrintNetConnection()
+    {
+        std::cout << "\n========== NetConnections ==========\n";
+
+        for (const auto& [playerId, connection] : conn)
+        {
+            std::cout
+                << "[Player ID: " << (int)playerId << "]\n"
+                << "  State     : " << ToString(connection.state) << '\n'
+                << "  Session ID: " << connection.sessionId << '\n'
+                << "  Match ID  : " << connection.matchId << '\n'
+                << "  Name      : " << connection.name << '\n'
+                << "  Address   : " << connection.addr.ToString() << '\n';
+        }
+
+        std::cout << "====================================\n";
+    }
+
+    const char* ClientNetwork::ToString(PeerState state)
+    {
+        switch (state)
+        {
+        case PeerState::Connected:      return "Connected";
+        case PeerState::Finished:       return "Finished";
+        case PeerState::Left:           return "Left";
+        case PeerState::Disconnected:   return "Disconnected";
+        default:                        return "Unknown";
+        }
+    }
+
     void ClientNetwork::ThreadStart()
     {
         UDPRecvThread = std::thread(&ClientNetwork::NetThreadLoop, this);
         UDPRecvThreadRunning_ = true;
 
-        if (server_.IsConnectedToServer())
+        if (connectedToServer)
         {
             TCPRecvThread = std::thread(&ClientNetwork::TCPNetRecvThreadLoop, this);
             TCPRecvThreadRunning_ = true;
@@ -442,7 +609,7 @@ namespace tomato
         UDPRecvThreadRunning_ = false;
         UDPRecvThread.join();
 
-        if (server_.IsConnectedToServer())
+        if (connectedToServer)
         {
             TCPRecvThreadRunning_ = false;
             TCPRecvThread.join();

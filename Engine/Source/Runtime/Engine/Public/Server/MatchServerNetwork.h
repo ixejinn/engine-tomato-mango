@@ -27,14 +27,15 @@ namespace tomato
 		void Update();
 
 		void ProcessQueuedPackets();
-		void ProcessPacket(const TCPPacketType& header, NetBitReader& reader, SessionId& client);
-		void HandlePacketRequest(const TCPPacketType& header, NetBitReader& reader, SessionId& client);
-		void HandlePacketTimeSync(const TCPPacketType& header, NetBitReader& reader, SessionId& client);
+		void ProcessPacket(TCPPacketType header, NetBitReader& reader, SessionId client);
+		void HandlePacketDisconnect(SessionId client);
+		void HandlePacketRequest(TCPPacketType header, NetBitReader& reader, SessionId client);
+		void HandlePacketTimeSync(TCPPacketType header, NetBitReader& reader, SessionId client);
 
 		void ProcessNetSendRequest();
 		void ProcessSendPacket();
 
-		void ProcessDataFromClient(const SessionId& sessionId, const uint8_t* data, const int len);
+		void ProcessDataFromClient(SessionId sessionId, const uint8_t* data, const int len);
 
 		void TCPRecvThreadLoop();
 		void ThreadStart();
