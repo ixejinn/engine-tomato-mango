@@ -57,7 +57,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Input/ActionSnapshot.h
         Source/Runtime/Engine/Public/Input/PlayerInput.h
         Source/Runtime/Engine/Public/Input/InputEvents.h
-        Source/Runtime/Engine/Public/Input/InputUI.h
+		Source/Runtime/Engine/Public/UI/InputUI.h
         Source/Runtime/Engine/Public/Input/KeyConstants.h
 		Source/Runtime/Engine/Public/Input/InputEventsFwd.h
         Source/Runtime/Engine/Public/Services/Input.h
@@ -243,6 +243,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/Input/LocalPlayer.h
 		Source/Runtime/Engine/Public/Input/InputMappingContext.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterFwd.h
+		Source/Runtime/Engine/Public/GameNetwork/GameNetworkFwd.h
 )
 
 set(ENGINE_SOURCES
@@ -275,7 +276,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Math/Normal.cpp
         Source/Runtime/Engine/Private/Collision/Detection/Broad/SAP.cpp
         Source/Runtime/Engine/Private/Utils/Utf.cpp
-        Source/Runtime/Engine/Private/Input/InputUI.cpp
+		Source/Runtime/Engine/Private/UI/InputUI.cpp
         Source/Runtime/Engine/Private/ECS/Systems/UISystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/ScreenUIRenderSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/WorldUIRenderSystem.cpp
@@ -287,7 +288,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Network/SocketUtil.cpp
         Source/Runtime/Engine/Private/Network/TCPNetDriver.cpp
         Source/Runtime/Engine/Private/Network/UDPNetDriver.cpp
-        Source/Runtime/Engine/Private/Network/CilentNetwork.cpp
+		Source/Runtime/Engine/Private/Network/ClientNetwork.cpp
         Source/Runtime/Engine/Private/GameNetwork/Message/InputMessage.cpp
         Source/Runtime/Engine/Private/GameNetwork/GamePlayNetSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/IntegrationSystem.cpp

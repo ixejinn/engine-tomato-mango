@@ -8,7 +8,7 @@
 #include "Services/Input.h"
 
 #include "Input/PlayerInput.h"
-#include "Input/InputUI.h"
+#include "UI/InputUI.h"
 
 #include "Input/LocalPlayer.h"
 #include "GameObject/Character/CharacterInputActions.h"
@@ -80,13 +80,12 @@ namespace tomato
 
         void ProcessQueuedPackets(TickClock& tc);
         std::unique_ptr<ClientNetwork> network_{nullptr};
-        std::unique_ptr<GamePlayNetSystem> gameNet_{nullptr};
+        std::unique_ptr<NetInputSync> inputSync_{nullptr};
+        NetMode netMode_;
 
         void Rollback(SimContext& simCtx);
         void Resimulate(SimContext& simCtx, uint32_t currT);
         std::unique_ptr<RollbackManager> rollbackManager_{nullptr};
-
-        NetMode netMode_;
 
         void FixedUpdate(TickClock& tc, TickPolicy policy, SimContext& simCtx, RunMode mode);
         void Update(SimContext& simCtx, RunMode mode);

@@ -23,9 +23,6 @@ namespace tomato
 	class NetBitWriter;
 
 	class ClientNetwork;
-
-	struct NetMassege;
-	struct InputCommand;
 }
 
 #endif // !MANGO_NETWORKFWD_H

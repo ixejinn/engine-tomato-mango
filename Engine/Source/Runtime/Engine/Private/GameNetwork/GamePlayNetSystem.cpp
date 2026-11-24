@@ -9,15 +9,15 @@
 
 namespace tomato
 {
-	GamePlayNetSystem::GamePlayNetSystem(State* state) : currentStatePtr_(state) {}
+	NetInputSync::NetInputSync(State* state) : currentStatePtr_(state) {}
 
-	void GamePlayNetSystem::HandleInput(const InputCommand& inputCmd)
+	void NetInputSync::OnInputReceived(const InputCommand& inputCmd)
 	{
 		currentStatePtr_->SetPlayerInput(inputCmd.snapshot.tick, inputCmd.snapshot, inputCmd.id);
-        confirmedTick = std::min(confirmedTick, inputCmd.snapshot.tick);
+        rollbackTick_ = std::min(rollbackTick_, inputCmd.snapshot.tick);
 	}
 
-	void GamePlayNetSystem::ProcessOutgoingMessages(uint32_t tick)
+	void NetInputSync::SendLocalInput(uint32_t tick)
 	{
 		if (!network_)
 			return;

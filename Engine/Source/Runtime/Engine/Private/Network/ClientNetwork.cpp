@@ -15,7 +15,7 @@ namespace tomato
         //addToId.try_emplace({ "192.168.31.231", 9000 }, 1);
     }
 
-    ClientNetwork::~ClientNetwork() {}
+    ClientNetwork::~ClientNetwork() = default;
 
     void ClientNetwork::ConnectToServer()
     {
@@ -102,7 +102,7 @@ namespace tomato
             inputCmd.Read(reader);
             inputCmd.id = GetPeerPlayerID(inToAddress);
             
-            gameNetSystem_->HandleInput(inputCmd);
+            gameNetSystem_->OnInputReceived(inputCmd);
             break;
         }
         }

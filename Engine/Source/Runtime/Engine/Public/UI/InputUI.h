@@ -3,7 +3,6 @@
 
 #include <entt/entt.hpp>
 #include <glm/vec2.hpp>
-#include "Input/KeyConstants.h"
 #include "Input/InputEventsFwd.h"
 #include "State/StateFwd.h"
 #include "ECS/SystemFramework/SystemConstants.h"
@@ -31,7 +30,6 @@ namespace tomato
 		entt::entity previousHovered{ entt::null };
 		entt::entity pressed{ entt::null };
 
-	private:
 		State* currentStatePtr_{ nullptr };
 
         RunMode runMode_{RunMode::None};

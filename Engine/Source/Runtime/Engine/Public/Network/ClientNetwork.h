@@ -73,7 +73,7 @@ namespace tomato
         ClientNetworkState GetNetState() const { return netState_; }
         ServerTimeMs GetLocalStartTime() const { return localStartTime; }
 
-        void SetGameplaySystem(GamePlayNetSystem* gameNetSys) { gameNetSystem_ = gameNetSys; }
+        void SetGameplaySystem(NetInputSync* gameNetSys) { gameNetSystem_ = gameNetSys; }
 
     private:
         WinsockInitializer winsockInit_;
@@ -101,7 +101,7 @@ namespace tomato
         ServerTimeMs sendTime{ 0 }, recvTime{ 0 };
         ServerTimeMs serverTimeOffset{ 0 }, localStartTime{ 0 };
 
-        GamePlayNetSystem* gameNetSystem_{ nullptr };
+        NetInputSync* gameNetSystem_{ nullptr };
     };
 }
 
