@@ -33,7 +33,6 @@ namespace tomato
         }
 
         bool OnKeyEvent(const KeyEvent& event);
-        bool OnMouseButtonEvent(const MouseButtonEvent& event);
         bool OnCursorPosEvent(const CursorPosEvent& event);
 
         InputAxis GetKeyValue(Key key) const { return latestValues_[key]; }

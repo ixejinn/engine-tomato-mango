@@ -10,13 +10,6 @@ namespace tomato
         return true;
     }
 
-    bool KeyStateMap::OnMouseButtonEvent(const MouseButtonEvent& event)
-    {
-        if (event.event != InputEvent::Repeat)
-            UpdateInputAxis(event.key, event.value);
-        return true;
-    }
-
     bool KeyStateMap::OnCursorPosEvent(const CursorPosEvent& event)
     {
         UpdateInputAxis(Key::MouseX, event.xPos);

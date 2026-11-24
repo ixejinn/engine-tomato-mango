@@ -14,13 +14,6 @@ namespace tomato
         return true;
     }
 
-    bool PlayerInput::OnMouseButtonEvent(const MouseButtonEvent& event)
-    {
-        if (event.event == InputEvent::Pressed)
-            pendingPressed_ |= keyBindings_[event.key];
-        return true;
-    }
-
     void PlayerInput::SetMappings(const InputMappingContext& imc)
     {
         ClearMappings();

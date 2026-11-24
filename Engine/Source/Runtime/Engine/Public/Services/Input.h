@@ -22,7 +22,6 @@ namespace tomato
         static void OnCursorPosEvent(GLFWwindow* window, double xpos, double ypos);
 
         EventSignal<KeyEvent> keySignal_;
-        EventSignal<MouseButtonEvent> mouseSignal_;
         EventSignal<CursorPosEvent> cursorSignal_;
 
         /// EventSignal::Collect에 필요한 collector

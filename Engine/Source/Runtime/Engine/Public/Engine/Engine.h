@@ -66,7 +66,6 @@ namespace tomato
         InputUI inputUI_;
 
         bool OnLocalPlayerKeyEvent(const KeyEvent& event);
-        bool OnLocalPlayerMouseButtonEvent(const MouseButtonEvent& event);
         void UpdateLocalPlayerInputs(int64_t tick);
         std::vector<LocalPlayer> localPlayers_;
         CharacterInputActions characterInputActions_;   // for built-in CharacterMovementSystem

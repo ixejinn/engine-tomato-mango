@@ -10,10 +10,8 @@ namespace tomato
     struct WindowData
     {
         Input* input;
-        TickClock* tickClock;
 
-        WindowData(Input& i, TickClock& tc)
-        : input(&i), tickClock(&tc) {}
+        WindowData(Input& i) : input(&i) {}
     };
 
     /**
@@ -40,7 +38,7 @@ namespace tomato
         [[nodiscard]] bool ShouldClose() const;
         void RequestClose() const;
 
-        void SetWindowUserPointer(Input& i, TickClock& tc);
+        void SetWindowUserPointer(Input& i);
 
         /**
          * @brief Swaps the front and back buffers.

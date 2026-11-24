@@ -32,17 +32,15 @@
 
 namespace tomato
 {
-    bool Editor::OnKeyEvent(const KeyEvent&)
+    bool Editor::OnKeyEvent(const KeyEvent& event)
     {
-        return !ImGui::GetIO().WantCaptureKeyboard;
+    	if (event.key <= Key::RightMouseButton)
+    		return !ImGui::GetIO().WantCaptureMouse;
+    	else
+			return !ImGui::GetIO().WantCaptureKeyboard;
     }
 
-    bool Editor::OnMouseButtonEvent(const MouseButtonEvent&)
-    {
-        return !ImGui::GetIO().WantCaptureMouse;
-    }
-
-	void Editor::InitImGui(GLFWwindow* wnd, Input& input, Engine* engine)
+	void Editor::InitImGui(GLFWwindow* wnd, Engine* engine)
 	{
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
@@ -79,7 +77,7 @@ namespace tomato
 		panels.push_back(std::make_unique<InspectorPanel>(300.f, 600.f, Window::GetWidth(), 300.f));
 	}
 
-	void Editor::ShutdownImGui(Input& input)
+	void Editor::ShutdownImGui()
 	{
 		ImPlot::DestroyContext();
 

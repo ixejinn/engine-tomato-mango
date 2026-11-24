@@ -230,27 +230,6 @@ void TestState::PlayTest()
         TMT_INFO << "set timer";
     tMouseEvt.onClick = [&](const MouseClickEvent& e)
     {
-        if (auto* timer = registry_.try_get<TimerTestComponent>(e.e))
-        {
-            switch (timer->timer.GetState())
-            {
-                case TimerState::Idle:
-                    TMT_INFO << "   *** Timer start ***";
-                    timer->timer.Start(e.tick);
-                    break;
-                case TimerState::Running:
-                    timer->timer.Pause(e.tick);
-                    break;
-                case TimerState::Paused:
-                    timer->timer.Start(e.tick);
-                    break;
-                case TimerState::Finished:
-                    timer->timer.Reset();
-                    break;
-                default:
-                    break;
-            }
-        }
     };
 
     auto worldCanvas = UIPrefab::CreateCanvas(registry_, RenderMode::World);

@@ -19,7 +19,6 @@ namespace tomato
     {
     public:
         bool OnKeyEvent(const KeyEvent& event);
-        bool OnMouseButtonEvent(const MouseButtonEvent& event);
 
         /// 매핑 초기화 후 교체된다.
         void SetMappings(const InputMappingContext& imc);

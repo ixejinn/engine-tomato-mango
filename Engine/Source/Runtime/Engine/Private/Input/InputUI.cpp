@@ -19,7 +19,7 @@ namespace tomato
         EventDispatcher::GetInstance().Connect<ChangeRunModeEvent, &InputUI::OnChangeRunMode>(*this);
     }
 
-	bool InputUI::OnClick(const MouseButtonEvent& mouseEvent)
+	bool InputUI::OnKeyEvent(const KeyEvent& keyEvent)
 	{
 		if (currentStatePtr_ == nullptr)
 			return true;
@@ -29,7 +29,7 @@ namespace tomato
 		if (currentHovered == entt::null)
 			return true;
 
-		auto& rect = r.get<RectTransformComponent>(currentHovered);
+		// auto& rect = r.get<RectTransformComponent>(currentHovered);
 		auto& selectable = r.get<SelectableComponent>(currentHovered);
 		auto& render = r.get<RenderComponent>(currentHovered);
 		if (!r.all_of<MouseEventComponent>(currentHovered))
@@ -39,24 +39,24 @@ namespace tomato
         if (runMode_ != RunMode::Game)
             return false;
 
-		if (mouseEvent.event == InputEvent::Pressed)
+		if (keyEvent.event == InputEvent::Pressed)
 		{
 			pressed = currentHovered;
 			render.color = selectable.pressedColor;
 		}
 
-		if (mouseEvent.event == InputEvent::Released)
+		if (keyEvent.event == InputEvent::Released)
 		{
 			render.color = selectable.normalColor;
 
 			if (pressed == currentHovered && mouseEvnt.onClick)
-				mouseEvnt.onClick(MouseClickEvent{ currentHovered, &r , mouseEvent.tick});
+				mouseEvnt.onClick(MouseClickEvent{ currentHovered, &r});
 		}
 
 		return false;
 	}
 
-	bool InputUI::OnHover(const CursorPosEvent& moveEvent)
+	bool InputUI::OnCursorPosEvent(const CursorPosEvent& moveEvent)
 	{
 		if (currentStatePtr_ == nullptr)
 			return true;

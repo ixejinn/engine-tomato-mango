@@ -4,7 +4,6 @@
 namespace tomato
 {
     struct KeyEvent;
-    struct MouseButtonEvent;
     struct CursorPosEvent;
 }
 

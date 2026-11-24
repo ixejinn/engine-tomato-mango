@@ -35,14 +35,14 @@ namespace tomato
         InitializeSerialization();
         InitializeNetwork();
 
-        editor_.InitImGui(window_.GetHandle(), input_, this);
+        editor_.InitImGui(window_.GetHandle(), this);
 
         EventDispatcher::GetInstance().Connect<Event::ChangeStateRequest, &Engine::OnChangeStateRequest>(*this);
     }
 
     Engine::~Engine()
     {
-        editor_.ShutdownImGui(input_);
+        editor_.ShutdownImGui();
     }
 
     void Engine::Run()
@@ -60,7 +60,7 @@ namespace tomato
         RunMode runMode{RunMode::Game};
 #endif
 
-        window_.SetWindowUserPointer(input_, tickClock);
+        window_.SetWindowUserPointer(input_);
         GarbageEntityCollectionSystem garbageCollectionSystem;
 
         network_->ThreadStart();
@@ -176,13 +176,8 @@ namespace tomato
         input_.keySignal_.Connect<&KeyStateMap::OnKeyEvent>(keyStateMap);
         input_.keySignal_.Connect<&Editor::OnKeyEvent>();
 
-        input_.cursorSignal_.Connect<&InputUI::OnHover>(inputUI_);
+        input_.cursorSignal_.Connect<&InputUI::OnCursorPosEvent>(inputUI_);
         input_.cursorSignal_.Connect<&KeyStateMap::OnCursorPosEvent>(keyStateMap);
-
-        input_.mouseSignal_.Connect<&Engine::OnLocalPlayerMouseButtonEvent>(*this);
-        input_.mouseSignal_.Connect<&InputUI::OnClick>(inputUI_);
-        input_.mouseSignal_.Connect<&KeyStateMap::OnMouseButtonEvent>(keyStateMap);
-        input_.mouseSignal_.Connect<&Editor::OnMouseButtonEvent>();
     }
 
     void Engine::ProcessInputEvents()
@@ -195,13 +190,6 @@ namespace tomato
     {
         for (auto& localPlayer : localPlayers_)
             localPlayer.playerInput.OnKeyEvent(event);
-        return true;
-    }
-
-    bool Engine::OnLocalPlayerMouseButtonEvent(const MouseButtonEvent& event)
-    {
-        for (auto& localPlayer : localPlayers_)
-            localPlayer.playerInput.OnMouseButtonEvent(event);
         return true;
     }
 

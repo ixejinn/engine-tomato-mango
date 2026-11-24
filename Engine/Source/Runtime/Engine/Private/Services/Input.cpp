@@ -27,11 +27,10 @@ namespace tomato
 
         auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
         auto* input = winData->input;
-        auto* tickClock = winData->tickClock;
 
         const float v = (inputEvent.value() == InputEvent::Released) ? 0.0f : 1.0f;
 
-        const KeyEvent keyEvent{k, inputEvent.value(), v, tickClock->GetTick()};
+        const KeyEvent keyEvent{k, inputEvent.value(), v};
         if (inputEvent.value() == InputEvent::Released)
             input->keySignal_.Publish(keyEvent);                           // Released 이벤트는 모두에게 보냄
         else
@@ -51,19 +50,17 @@ namespace tomato
 
         auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
         auto* input = winData->input;
-        auto* tickClock = winData->tickClock;
 
         double xPos(0), yPos(0);
         glfwGetCursorPos(window, &xPos, &yPos);
 
         const float v = (inputEvent.value() == InputEvent::Released) ? 0.0f : 1.0f;
 
-        const MouseButtonEvent mouseBtnEvent{k, inputEvent.value(), v, tickClock->GetTick(),
-            static_cast<float>(xPos), static_cast<float>(yPos)};
+        const KeyEvent keyEvent{k, inputEvent.value(), v};
         if (inputEvent.value() == InputEvent::Released)
-            input->mouseSignal_.Publish(mouseBtnEvent);
+            input->keySignal_.Publish(keyEvent);
         else
-            input->mouseSignal_.Collect(input->collector_, mouseBtnEvent);
+            input->keySignal_.Collect(input->collector_, keyEvent);
 
     }
 
@@ -71,10 +68,9 @@ namespace tomato
     {
         auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
         auto* input = winData->input;
-        auto* tickClock = winData->tickClock;
 
         input->cursorSignal_.Publish(
-            CursorPosEvent{tickClock->GetTick(), static_cast<float>(xpos), static_cast<float>(ypos)});
+            CursorPosEvent{static_cast<float>(xpos), static_cast<float>(ypos)});
     }
 
     Key Input::ToEngineKey(const int glfwKey)

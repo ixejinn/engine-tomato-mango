@@ -26,7 +26,7 @@ namespace tomato
         auto& renderCtx = registry.ctx().get<RenderContext>();
         renderCtx.mainCam = renderCtx.editorCam;
 
-        auto& keyDeviceState = KeyStateMap::GetInstance();
+        auto& keyStateMap = KeyStateMap::GetInstance();
 
         if (mode_ == None)
         {
@@ -44,17 +44,17 @@ namespace tomato
             }
 
             // Start free look
-            if (keyDeviceState.IsKeyDown(Key::RightMouseButton))
+            if (keyStateMap.IsKeyDown(Key::RightMouseButton))
                 mode_ = FreeLook;
 
             // Start pan
-            if (keyDeviceState.IsKeyDown(Key::MiddleMouseButton))
+            if (keyStateMap.IsKeyDown(Key::MiddleMouseButton))
                 mode_ = Pan;
 
             if (mode_ != None)
             {
-                preCursorPos.x = keyDeviceState.GetKeyValue(Key::MouseX);
-                preCursorPos.y = keyDeviceState.GetKeyValue(Key::MouseY);
+                preCursorPos.x = keyStateMap.GetKeyValue(Key::MouseX);
+                preCursorPos.y = keyStateMap.GetKeyValue(Key::MouseY);
 
                 simCtx.state->GetWindow().SetCursorDisable(true);
             }
@@ -83,10 +83,10 @@ namespace tomato
         auto& registry = simCtx.state->GetRegistry();
         auto& renderCtx = registry.ctx().get<RenderContext>();
 
-        auto& keyDeviceState = KeyStateMap::GetInstance();
+        auto& keyStateMap = KeyStateMap::GetInstance();
 
         //// Finish free looking
-        if (keyDeviceState.IsKeyUp(Key::RightMouseButton))
+        if (keyStateMap.IsKeyUp(Key::RightMouseButton))
         {
             mode_ = None;
 
@@ -98,7 +98,7 @@ namespace tomato
         auto& trf = registry.get<TransformComponent>(renderCtx.editorCam);
 
         // Rotate camera
-        glm::vec2 currCursorPos{keyDeviceState.GetKeyValue(Key::MouseX), keyDeviceState.GetKeyValue(Key::MouseY)};
+        glm::vec2 currCursorPos{keyStateMap.GetKeyValue(Key::MouseX), keyStateMap.GetKeyValue(Key::MouseY)};
         glm::vec2 deltaCursorPos = currCursorPos - preCursorPos;
         preCursorPos = currCursorPos;
 
@@ -115,13 +115,13 @@ namespace tomato
 
         // Move camera
         int back = 0, right = 0;
-        if (keyDeviceState.IsKeyDown(Key::W))
+        if (keyStateMap.IsKeyDown(Key::W))
             --back;
-        if (keyDeviceState.IsKeyDown(Key::S))
+        if (keyStateMap.IsKeyDown(Key::S))
             ++back;
-        if (keyDeviceState.IsKeyDown(Key::A))
+        if (keyStateMap.IsKeyDown(Key::A))
             --right;
-        if (keyDeviceState.IsKeyDown(Key::D))
+        if (keyStateMap.IsKeyDown(Key::D))
             ++right;
 
         glm::vec3 dir{right, 0, back};
@@ -143,10 +143,10 @@ namespace tomato
         auto& registry = simCtx.state->GetRegistry();
         auto& renderCtx = registry.ctx().get<RenderContext>();
 
-        auto& keyDeviceState = KeyStateMap::GetInstance();
+        auto& keyStateMap = KeyStateMap::GetInstance();
 
         //// Finish pan
-        if (keyDeviceState.IsKeyUp(Key::MiddleMouseButton))
+        if (keyStateMap.IsKeyUp(Key::MiddleMouseButton))
         {
             mode_ = None;
 
@@ -158,7 +158,7 @@ namespace tomato
         auto& trf = registry.get<TransformComponent>(renderCtx.editorCam);
 
         // Move along camera's up and right vectors
-        glm::vec2 currCursorPos{keyDeviceState.GetKeyValue(Key::MouseX), keyDeviceState.GetKeyValue(Key::MouseY)};
+        glm::vec2 currCursorPos{keyStateMap.GetKeyValue(Key::MouseX), keyStateMap.GetKeyValue(Key::MouseY)};
         glm::vec2 deltaCursorPos = currCursorPos - preCursorPos;
         preCursorPos = currCursorPos;
 
@@ -169,13 +169,13 @@ namespace tomato
 
         // Move along camera's front(-back) and right vectors
         glm::vec3 keyBoardDir{0};
-        if (keyDeviceState.IsKeyDown(Key::W))
+        if (keyStateMap.IsKeyDown(Key::W))
             --keyBoardDir.z;
-        if (keyDeviceState.IsKeyDown(Key::S))
+        if (keyStateMap.IsKeyDown(Key::S))
             ++keyBoardDir.z;
-        if (keyDeviceState.IsKeyDown(Key::A))
+        if (keyStateMap.IsKeyDown(Key::A))
             --keyBoardDir.x;
-        if (keyDeviceState.IsKeyDown(Key::D))
+        if (keyStateMap.IsKeyDown(Key::D))
             ++keyBoardDir.x;
         const float keyBoardDirLen = glm::length(keyBoardDir);
         if (keyBoardDirLen > 1)
