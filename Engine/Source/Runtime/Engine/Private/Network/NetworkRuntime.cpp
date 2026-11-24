@@ -16,23 +16,57 @@ namespace tomato
 		//client_->Network().RequestMatch();
 	}
 
+	void NetworkRuntime::EnableServer()
+	{
+		auto server = std::make_unique<ServerRole>();
+		if (!server->Start())
+		{
+			std::cout << "Can not start server. Is the port already in use?\n";
+			return;
+		}
+		server_ = std::move(server);
+	}
+
 	void NetworkRuntime::ApplyPending(State* currentState)
 	{
 		if (!currentState) return;
-		if (!pendingClient_) return; // 요청 없음
-		
-		bool enable = *pendingClient_;
-		pendingClient_.reset(); // 중복 방지
 
-		if (enable && !client_)
+		// 끌 때: 클라이언트 -> 서버, 켤 때: 서버 -> 클라이언트
+		if (pendingClient_ && !*pendingClient_)
 		{
-			EnableClient(currentState);
-			std::cout << "Enable Client applied\n";
+			pendingClient_.reset();
+			if (client_)
+			{
+				DisableClient();
+				std::cout << "Disable Client applied.\n";
+			}
 		}
-		else if (!enable && client_)
+		
+		if (pendingServer_)
 		{
-			DisableClient();
-			std::cout << "Disable Client applied\n";
+			const bool enable = *pendingServer_;
+			pendingServer_.reset(); // 중복 방지
+			
+			if (enable && !server_)
+			{
+				EnableServer();
+				std::cout << "Enable Server applied\n";
+			}
+			else if (!enable && server_)
+			{
+				DisableServer();
+				std::cout << "Disable Server applied\n";
+			}
+		}
+
+		if (pendingClient_ && *pendingClient_)
+		{
+			pendingClient_.reset();
+			if (!client_)
+			{
+				EnableClient(currentState);
+				std::cout << "Enable Client applied\n";
+			}
 		}
 	}
 

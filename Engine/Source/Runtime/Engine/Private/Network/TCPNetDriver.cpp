@@ -1,7 +1,6 @@
 ﻿#include "Network/TCPNetDriver.h"
 #include "Network/TCPSocket.h"
-#include "Network/SocketAddress.h"
-#include "Network/NetworkConfig.h"
+
 #include "Utils/Logger.h"
 
 namespace tomato
@@ -41,8 +40,13 @@ namespace tomato
 
 	bool TCPNetDriver::InitClientMode()
 	{
+		return InitClientMode({ SERVER_ADDRESS, SERVER_PORT_NUM });
+	}
+
+	bool TCPNetDriver::InitClientMode(const SocketAddress& serverAddr)
+	{
 		socket_ = TCPSocket::CreateTCPSocket();
-		int err = socket_->Connect({ SERVER_ADDRESS, SERVER_PORT_NUM });
+		int err = socket_->Connect(serverAddr);
 
 		if (err == NO_ERROR)
 		{

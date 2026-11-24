@@ -19,7 +19,7 @@ namespace tomato
 		MatchRequestQueue(requestQ),
 		NetSendRequestQueue(netSendRequestQ)
 	{
-		tcpDriver_.InitDedicatedServerMode();
+		isListening_ = tcpDriver_.InitDedicatedServerMode();
 	};
 
 	void MatchServerNetwork::Update()
@@ -258,8 +258,8 @@ namespace tomato
 		uint8_t segment[MAX_PACKET_SIZE]{};
 		while (isThreadRunning)
 		{
-			if (!SocketUtil::Select(&readBlockSockets, &readableSockets,
-				nullptr, nullptr, nullptr, nullptr))
+			if (SocketUtil::Select(&readBlockSockets, &readableSockets,
+				nullptr, nullptr, nullptr, nullptr) <= 0)
 				continue;
 
 			for (const TCPSocketPtr& socket : readableSockets)
@@ -314,6 +314,9 @@ namespace tomato
 
 	void MatchServerNetwork::ThreadStart()
 	{
+		if (recvThread.joinable())
+			return;
+
 		isThreadRunning = true;
 		recvThread = std::thread(&MatchServerNetwork::TCPRecvThreadLoop, this);
 	}
@@ -321,6 +324,7 @@ namespace tomato
 	void MatchServerNetwork::ThreadStop()
 	{
 		isThreadRunning = false;
-		recvThread.join();
+		if(recvThread.joinable())
+			recvThread.join();
 	}
 }

@@ -23,12 +23,11 @@ namespace tomato
     Engine::Engine(const int width, const int height, const char* title, NetMode netMode)
         : window_(width, height, title)
         , input_(window_)
-        , netMode_(netMode)
     {
         ConnectInputChain();
 
         InitializeSerialization();
-
+        
         editor_.InitImGui(window_.GetHandle(), input_, this);
 
         EventDispatcher::GetInstance().Connect<Event::ChangeStateRequest, &Engine::OnChangeStateRequest>(*this);
@@ -264,7 +263,7 @@ namespace tomato
     void Engine::OnNetworkModeRequest(const Event::NetworkModeRequest& event)
     {
         networkRuntime_.RequestClient(event.client);
-        //networkRuntime_.RequestServer(event.server);
+        networkRuntime_.RequestServer(event.server);
     }
 
     void Engine::ChangeState(TickClock& tc)

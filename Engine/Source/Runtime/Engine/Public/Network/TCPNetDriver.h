@@ -2,8 +2,9 @@
 #define MANGO_TCPNETDRIVER_H
 
 #include "Network/NetworkFwd.h"
+#include "Network/NetworkConfig.h"
 #include "Network/NetTypes.h"
-
+#include "Network/SocketAddress.h"
 namespace tomato
 {
 	
@@ -14,6 +15,7 @@ namespace tomato
 		~TCPNetDriver();
 
 		bool InitDedicatedServerMode();
+		bool InitClientMode(const SocketAddress& serverAddr);
 		bool InitClientMode();
 
 		int SendPacket(uint8_t* buffer, int size);

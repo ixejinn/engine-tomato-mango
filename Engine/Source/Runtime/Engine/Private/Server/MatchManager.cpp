@@ -56,6 +56,9 @@ namespace tomato
 
 	void MatchManager::HandleEnqueue(SessionId client, const SocketAddress& inAddress, const std::string& name)
 	{
+		if (clientInfo_.contains(client))
+			return;
+
 		MatchRequest mRequest{
 			.sessionId = client,
 			.address = inAddress,
@@ -144,6 +147,12 @@ namespace tomato
 
 	void MatchManager::HandleGameEnd(SessionId client, MatchId matchId)
 	{
+		auto ci = clientInfo_.find(client);
+		if (ci == clientInfo_.end() ||
+			ci->second.state != ClientMatchState::InGame ||
+			ci->second.matchId != matchId)
+			return; //오래된 패킷 무시
+
 		MarkPlayer(client, matchId, MatchPlayerState::Finished);
 		clientInfo_.erase(client);
 
@@ -156,6 +165,12 @@ namespace tomato
 
 	void MatchManager::HandleLeave(SessionId client, MatchId matchId)
 	{
+		auto ci = clientInfo_.find(client);
+		if (ci == clientInfo_.end() ||
+			ci->second.state != ClientMatchState::InGame ||
+			ci->second.matchId != matchId)
+			return; //오래된 패킷 무시
+
 		// matchId에 참여한 client의 state를 갱신
 		MarkPlayer(client, matchId, MatchPlayerState::Left);
 		clientInfo_.erase(client); // 게임 종료된 client의 상태를 Idle로 갱신
@@ -496,7 +511,10 @@ namespace tomato
 				};
 
 				if (reRequest.retryCount > 3)
+				{
+					clientInfo_.erase(reRequest.sessionId);
 					continue;
+				}
 
 				requests.try_emplace(reRequest.sessionId, reRequest);
 				clientInfo_[reRequest.sessionId].state = ClientMatchState::Queued;

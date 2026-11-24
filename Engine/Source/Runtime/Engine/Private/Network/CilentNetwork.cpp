@@ -37,7 +37,7 @@ namespace tomato
         return hadMatch;
     }
 
-    bool ClientNetwork::ConnectToServer()
+    bool ClientNetwork::ConnectToServer(const SocketAddress* addr)
     {
         if (connectedToServer)
             return true;

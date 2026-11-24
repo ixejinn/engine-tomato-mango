@@ -160,7 +160,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Server/SessionManager.h
         Source/Runtime/Engine/Public/Server/Match.h
         Source/Runtime/Engine/Public/Server/MatchManager.h
-        Source/Runtime/Engine/Public/Server/MatchServer.h
+        "Source/Runtime/Engine/Public/Server/ServerRole.h"
         Source/Runtime/Editor/Public/InspectorPanel.h
         Source/Runtime/Editor/Public/InspectorDraw.h
         Source/Runtime/Editor/Public/MainMenuBar.h
@@ -244,7 +244,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Systems/ParticleSimulationSystem.h
 		Source/Runtime/Engine/Public/Particle/ParticleFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/TargetSystem.h
-)
+ )
 
 set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Collision/Layer/CollisionLayerMatrix.cpp
@@ -317,7 +317,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Server/SessionManager.cpp
         Source/Runtime/Engine/Private/Server/Match.cpp
         Source/Runtime/Engine/Private/Server/MatchManager.cpp
-        Source/Runtime/Engine/Private/Server/MatchServer.cpp
+        "Source/Runtime/Engine/Private/Server/ServerRole.cpp"
         Source/Runtime/Editor/Private/InspectorPanel.cpp
         Source/Runtime/Editor/Private/InspectorDraw.cpp
 		Source/Runtime/Core/Private/Clock/Timer.cpp

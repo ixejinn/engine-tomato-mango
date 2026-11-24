@@ -1,6 +1,7 @@
 #ifndef MANGO_MATCHSERVERNETWORK_H
 #define MANGO_MATCHSERVERNETWORK_H
 
+#include <atomic>
 #include <thread>
 
 #include "Containers/SPSCQueue.h"
@@ -41,6 +42,7 @@ namespace tomato
 		void ThreadStart();
 		void ThreadStop();
 
+		bool IsListening() const { return isListening_; }
 	private:
 		WinsockInitializer winsockInit_;
 		TCPNetDriver tcpDriver_;
@@ -53,8 +55,9 @@ namespace tomato
 		SPSCQueue<SendCommandPtr, 256>& NetSendRequestQueue;
 
 		std::thread recvThread;
-		bool isThreadRunning = false;
+		std::atomic<bool> isThreadRunning{ false };
 
+		bool isListening_{ false };
 		MatchId testMatchId = 0;
 	};
 }

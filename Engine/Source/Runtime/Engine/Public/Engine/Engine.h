@@ -79,8 +79,6 @@ namespace tomato
         void Rollback(SimContext& simCtx);
         void Resimulate(SimContext& simCtx, uint32_t currT);
 
-        NetMode netMode_;
-
         void FixedUpdate(TickClock& tc, SimContext& simCtx, RunMode mode);
         void Update(SimContext& simCtx, RunMode mode);
         void UpdateEditor(uint64_t tick, RunMode& mode);
@@ -96,8 +94,8 @@ namespace tomato
     template<typename Component>
     void Engine::SetRollbackComponent()
     {
-        if (netMode_ == NetMode::NM_Alone)
-            return;
+        /*if (netMode_ == NetMode::NM_Alone)
+            return;*/
 
         /*if (!networkRuntime_.Client().Rollback)
             rollbackManager_ = std::make_unique<RollbackManager>();*/

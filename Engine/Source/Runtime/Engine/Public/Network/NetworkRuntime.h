@@ -8,6 +8,7 @@
 #include "Network/WinsockInitializer.h"
 #include "Network/NetTypes.h"
 #include "Network/ClientRole.h"
+#include "Server/ServerRole.h"
 
 namespace tomato
 {
@@ -17,6 +18,10 @@ namespace tomato
 		void RequestClient(bool enable) { pendingClient_ = enable; } // 요청 저장
 		void EnableClient(State* currentState);
 		void DisableClient() { client_.reset(); }
+
+		void RequestServer(bool enable) { pendingServer_ = enable; }
+		void EnableServer();
+		void DisableServer() { server_.reset(); }
 
 		void ApplyPending(State* currentState);
 
@@ -37,15 +42,17 @@ namespace tomato
 		void SetMode(NetMode mode) { netMode_ = mode; }
 		NetMode GetMode() const { return netMode_; }
 
-		bool HasClient() { return client_ ? true : false; }
+		bool HasServer() const { return server_ ? true : false; }
+		bool HasClient() const { return client_ ? true : false; }
 		ClientRole& Client() { return *client_; }
 	private:
 		WinsockInitializer winsockInit_;
 
 		NetMode netMode_{ NetMode::NM_Alone };
 		std::optional<bool> pendingClient_;
-		//std::optional<bool> pendingServer_;
+		std::optional<bool> pendingServer_;
 
+		std::unique_ptr<ServerRole> server_{ nullptr };
 		std::unique_ptr<ClientRole> client_{ nullptr };
 	};
 }

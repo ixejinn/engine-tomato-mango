@@ -26,6 +26,8 @@ namespace tomato
 				DrawNetworkModeButton();
 			else if (client && !server)
 				DrawClientModeButton();
+			else if (!client && server)
+				DrawServerModeButton();
 		}
 		ImGui::End();
 	}
@@ -36,6 +38,11 @@ namespace tomato
 			client = true;
 			EventDispatcher::GetInstance().Enqueue(Event::NetworkModeRequest{ client, false }); // { client, server }
 		}
+		if (ImGui::Button("Server", ImVec2(80, 40)))
+		{
+			server = true;
+			EventDispatcher::GetInstance().Enqueue(Event::NetworkModeRequest{ false, server }); // { client, server }
+		}
 	}
 	void NetworkPanel::DrawClientModeButton()
 	{
@@ -45,6 +52,14 @@ namespace tomato
 		{
 			client = false;
 			EventDispatcher::GetInstance().Enqueue(Event::NetworkModeRequest{ client, false }); // { client, server }
+		}
+	}
+	void NetworkPanel::DrawServerModeButton()
+	{
+		if (ImGui::Button("Stop Server", ImVec2(80, 40)))
+		{
+			server = false;
+			EventDispatcher::GetInstance().Enqueue(Event::NetworkModeRequest{ false, server }); // { client, server }
 		}
 	}
 }

@@ -43,7 +43,7 @@ namespace tomato
 
         bool Update();
 
-        bool ConnectToServer();
+        bool ConnectToServer(const SocketAddress* addr = nullptr);
 
         void RequestMatch();
         void LeaveMatch();
