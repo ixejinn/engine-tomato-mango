@@ -22,7 +22,7 @@
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "Services/Window.h"
 #include "State/State.h"
-#include "Input/InputState.h"
+#include "Input/KeyStateMap.h"
 
 #include "EditorPanel.h"
 #include "HierarchyPanel.h"
@@ -32,17 +32,15 @@
 
 namespace tomato
 {
-    bool Editor::OnKeyEvent(const KeyEvent&)
+    bool Editor::OnKeyEvent(const KeyEvent& event)
     {
-        return !ImGui::GetIO().WantCaptureKeyboard;
+    	if (event.key <= Key::RightMouseButton)
+    		return !ImGui::GetIO().WantCaptureMouse;
+    	else
+			return !ImGui::GetIO().WantCaptureKeyboard;
     }
 
-    bool Editor::OnMouseButtonEvent(const MouseButtonEvent&)
-    {
-        return !ImGui::GetIO().WantCaptureMouse;
-    }
-
-	void Editor::InitImGui(GLFWwindow* wnd, Input& input, Engine* engine)
+	void Editor::InitImGui(GLFWwindow* wnd, Engine* engine)
 	{
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
@@ -79,7 +77,7 @@ namespace tomato
 		panels.push_back(std::make_unique<InspectorPanel>(300.f, 600.f, Window::GetWidth(), 300.f));
 	}
 
-	void Editor::ShutdownImGui(Input& input)
+	void Editor::ShutdownImGui()
 	{
 		ImPlot::DestroyContext();
 
@@ -111,14 +109,13 @@ namespace tomato
 		mainMenu_.Draw(eCtx, mode);
 		for (auto& panel : panels)
 			panel->Draw(eCtx);
-		
-		if (InputState::GetInstance().IsKeyPressed(Key::LeftMouseButton))
-		{
-			auto& keyDeviceState = InputState::GetInstance();
 
+    	auto& keyStateMap = KeyStateMap::GetInstance();
+		if (keyStateMap.IsKeyDown(Key::LeftMouseButton))
+		{
 			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::GetIO().WantCaptureMouse)
 				PickObject(eCtx.currentState->GetRegistry(),
-					{keyDeviceState.GetKeyValue(Key::MouseX), keyDeviceState.GetKeyValue(Key::MouseY)});
+					{keyStateMap.GetKeyValue(Key::MouseX), keyStateMap.GetKeyValue(Key::MouseY)});
 		}
 	}
 

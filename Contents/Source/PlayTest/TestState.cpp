@@ -161,8 +161,8 @@ void TestState::PlayTest()
     renderP0.mesh = GetAssetID("Primitive::Sphere_20_10");
     renderP0.color = {155.f / 255, 20.f / 255, 90.f / 255, 1.f};
 
-    auto& channelP0 = registry_.get<InputChannelComponent>(player0);
-    channelP0.channel = 0;
+    auto& channelP0 = registry_.get<PlayerControlledComponent>(player0);
+    channelP0.playerIdx = 0;
 
     registry_.emplace<CollisionTestComponent>(player0);
 
@@ -230,27 +230,6 @@ void TestState::PlayTest()
         TMT_INFO << "set timer";
     tMouseEvt.onClick = [&](const MouseClickEvent& e)
     {
-        if (auto* timer = registry_.try_get<TimerTestComponent>(e.e))
-        {
-            switch (timer->timer.GetState())
-            {
-                case TimerState::Idle:
-                    TMT_INFO << "   *** Timer start ***";
-                    timer->timer.Start(e.tick);
-                    break;
-                case TimerState::Running:
-                    timer->timer.Pause(e.tick);
-                    break;
-                case TimerState::Paused:
-                    timer->timer.Start(e.tick);
-                    break;
-                case TimerState::Finished:
-                    timer->timer.Reset();
-                    break;
-                default:
-                    break;
-            }
-        }
     };
 
     auto worldCanvas = UIPrefab::CreateCanvas(registry_, RenderMode::World);

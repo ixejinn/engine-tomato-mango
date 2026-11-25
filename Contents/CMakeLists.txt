@@ -29,6 +29,8 @@ set(CONTENTS_SOURCES
         Source/Game/LobbyState.cpp
 		Source/PlayTest/ExampleState.cpp
 		Source/PlayTest/RenderTestState.cpp
+		Source/Input/GameInput.h
+		Source/Input/GameInput.cpp
 
 )
 

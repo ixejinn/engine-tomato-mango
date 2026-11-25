@@ -1,6 +1,7 @@
 ﻿#ifndef MANGO_INPUT_H
 #define MANGO_INPUT_H
 
+#include <optional>
 #include "Input/InputEvents.h"
 #include "Event/EventSignal.h"
 #include "ServiceFwd.h"
@@ -14,14 +15,13 @@ namespace tomato
 
     private:
         static Key ToEngineKey(int glfwKey);
-        static KeyEventType ToEngineKeyAction(int glfwAction);
+        static std::optional<InputEvent> ToInputEvent(int glfwAction);
 
         static void OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void OnMouseButtonEvent(GLFWwindow* window, int button, int action, int mods);
         static void OnCursorPosEvent(GLFWwindow* window, double xpos, double ypos);
 
         EventSignal<KeyEvent> keySignal_;
-        EventSignal<MouseButtonEvent> mouseSignal_;
         EventSignal<CursorPosEvent> cursorSignal_;
 
         /// EventSignal::Collect에 필요한 collector

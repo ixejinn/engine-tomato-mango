@@ -15,9 +15,10 @@
 #include "Editor.h"
 #include "Utils/Bitmask/BitmaskOperators.h"
 #include "Utils/Logger.h"
+#include "Utils/PassKey.h"
 #include "Profiler/Profiler.h"
 #include "Profiler/CPUProfiler.h"
-#include "Input/InputState.h"
+#include "Input/KeyStateMap.h"
 
 namespace tomato
 {
@@ -28,41 +29,20 @@ namespace tomato
     {
         ConnectInputChain();
 
+        localPlayers_.reserve(MAX_PLAYER_NUM);
+        localPlayers_.emplace_back(0);
+
         InitializeSerialization();
         InitializeNetwork();
 
-        editor_.InitImGui(window_.GetHandle(), input_, this);
+        editor_.InitImGui(window_.GetHandle(), this);
 
         EventDispatcher::GetInstance().Connect<Event::ChangeStateRequest, &Engine::OnChangeStateRequest>(*this);
     }
 
     Engine::~Engine()
     {
-        editor_.ShutdownImGui(input_);
-    }
-
-    void Engine::SetNextState(std::unique_ptr<State>&& newState)
-    {
-        nextState_ = std::move(newState);
-    }
-
-    void Engine::TryStartGame(std::unique_ptr<State>&& newState)
-    {
-        if (network_->GetNetState() == ClientNetworkState::NSS_Starting)
-        {
-            ServerTimeMs startTime = network_->GetLocalStartTime();
-            if (startTime == 0) return;
-            auto now = static_cast<ServerTimeMs>(
-                duration_cast<std::chrono::milliseconds>(
-                    std::chrono::steady_clock::now().time_since_epoch()).count());
-
-            if (static_cast<int32_t>(now - startTime) >= 0)
-            {
-                network_->SetNetState(ClientNetworkState::NSS_Playing);
-                SetNextState(std::move(newState));
-                std::cout << now << "\n##### Game Start #####\n\n";
-            }
-        }
+        editor_.ShutdownImGui();
     }
 
     void Engine::Run()
@@ -72,13 +52,15 @@ namespace tomato
         systemRegistry.RegisterEventCallbacks();
 
         TickClock tickClock;
+        TickPolicy tickPolicy{netMode_ == NetMode::NM_Alone ? TickPolicy::Discard : TickPolicy::Keep};
+
 #ifdef TOMATO_ENGINE
         RunMode runMode{RunMode::Editor};
 #else
         RunMode runMode{RunMode::Game};
 #endif
 
-        window_.SetWindowUserPointer(input_, tickClock);
+        window_.SetWindowUserPointer(input_);
         GarbageEntityCollectionSystem garbageCollectionSystem;
 
         network_->ThreadStart();
@@ -98,7 +80,7 @@ namespace tomato
 
             // *---------- Rollback and resimulate
             auto currT = tickClock.GetTick();
-            auto lateT = gameNet_->GetConfirmedTick();
+            auto lateT = inputSync_->GetRollbackTick();
             if (currT > lateT &&
                 currT - lateT <= ROLLBACK_WINDOW)
             {
@@ -117,10 +99,10 @@ namespace tomato
             SimContext simCtx{ currState_.get(), tickClock.GetTick() };
             garbageCollectionSystem.Update(simCtx);
 
-            FixedUpdate(tickClock, simCtx, runMode);
+            FixedUpdate(tickClock, tickPolicy, simCtx, runMode);
 
             Update(simCtx, runMode);
-            UpdateEditor(tickClock.GetTick(), runMode);
+            UpdateEditor(tickClock, runMode);
 
             CPU_PROFILER_TOTAL_END()
 
@@ -135,6 +117,28 @@ namespace tomato
             profiler.SetActive(false);
             profiler.End();
         }
+    }
+
+    LocalPlayer* Engine::AddLocalPlayer(int playerIdx)
+    {
+        if (netMode_ == NetMode::NM_Client)
+            return nullptr;
+
+        if (playerIdx < 0 || playerIdx >= MAX_PLAYER_NUM)
+            return nullptr;
+
+        for (const auto& localPlayer : localPlayers_)
+        {
+            if (localPlayer.playerIdx == playerIdx)
+                return nullptr;
+        }
+
+        return &localPlayers_.emplace_back(playerIdx);
+    }
+
+    void Engine::SetNextState(std::unique_ptr<State>&& newState)
+    {
+        nextState_ = std::move(newState);
     }
 
     void Engine::RequestMatchToServer()
@@ -160,23 +164,37 @@ namespace tomato
         }
     }
 
+    void Engine::TryStartGame(std::unique_ptr<State>&& newState)
+    {
+        if (network_->GetNetState() == ClientNetworkState::NSS_Starting)
+        {
+            ServerTimeMs startTime = network_->GetLocalStartTime();
+            if (startTime == 0) return;
+            auto now = static_cast<ServerTimeMs>(
+                duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now().time_since_epoch()).count());
+
+            if (static_cast<int32_t>(now - startTime) >= 0)
+            {
+                network_->SetNetState(ClientNetworkState::NSS_Playing);
+                SetNextState(std::move(newState));
+                std::cout << now << "\n##### Game Start #####\n\n";
+            }
+        }
+    }
+
     void Engine::ConnectInputChain()
     {
-        auto& inputState = InputState::GetInstance();
+        auto& keyStateMap = KeyStateMap::GetInstance();
 
         // EnTT::sigh는 뒤에 연결한 리스너부터 호출
-        // Editor - InputState - UI - Game
-        input_.keySignal_.Connect<&PlayerInput::OnKeyEvent>(playerInput_);
-        input_.keySignal_.Connect<&InputState::OnKeyEvent>(inputState);
+        // Editor - KeyStateMap - UI - Game
+        input_.keySignal_.Connect<&Engine::OnLocalPlayerKeyEvent>(*this);
+        input_.keySignal_.Connect<&KeyStateMap::OnKeyEvent>(keyStateMap);
         input_.keySignal_.Connect<&Editor::OnKeyEvent>();
 
-        input_.cursorSignal_.Connect<&InputUI::OnHover>(inputUI_);
-        input_.cursorSignal_.Connect<&InputState::OnCursorPosEvent>(inputState);
-
-        input_.mouseSignal_.Connect<&PlayerInput::OnMouseButtonEvent>(playerInput_);
-        input_.mouseSignal_.Connect<&InputUI::OnClick>(inputUI_);
-        input_.mouseSignal_.Connect<&InputState::OnMouseButtonEvent>(inputState);
-        input_.mouseSignal_.Connect<&Editor::OnMouseButtonEvent>();
+        input_.cursorSignal_.Connect<&InputUI::OnCursorPosEvent>(inputUI_);
+        input_.cursorSignal_.Connect<&KeyStateMap::OnCursorPosEvent>(keyStateMap);
     }
 
     void Engine::ProcessInputEvents()
@@ -185,18 +203,32 @@ namespace tomato
         window_.PollEvents();
     }
 
-    void Engine::FixedUpdate(TickClock& tc, SimContext& simCtx, RunMode mode)
+    bool Engine::OnLocalPlayerKeyEvent(const KeyEvent& event)
     {
-        int cnt = tc.GetSimulateNum(TickPolicy::Discard);
+        for (auto& localPlayer : localPlayers_)
+            localPlayer.playerInput.OnKeyEvent(event);
+        return true;
+    }
+
+    void Engine::UpdateLocalPlayerInputs(int64_t tick)
+    {
+        for (auto& localPlayer : localPlayers_)
+        {
+            localPlayer.playerInput.UpdateSnapshot(tick);
+            currState_->SetPlayerInput(tick, localPlayer.playerInput.GetSnapshot(),
+                netMode_ == NetMode::NM_Client ? network_->GetMyPlayerID() : localPlayer.playerIdx);
+        }
+    }
+
+    void Engine::FixedUpdate(TickClock& tc, const TickPolicy policy, SimContext& simCtx, RunMode mode)
+    {
+        int cnt = tc.GetSimulateNum(policy);
         while (cnt--)
         {
             simCtx.tick = tc.GetTick();
             TICK_LOG("\n *--------- " << simCtx.tick << " ---------*\n");
 
-            playerInput_.UpdateSnapshot(simCtx.tick);
-            currState_->SetPlayerInput(
-                    simCtx.tick, playerInput_.GetSnapshot(),
-                    network_->GetMyPlayerID());
+            UpdateLocalPlayerInputs(simCtx.tick);
 
             systemManager_.FixedUpdate(simCtx, mode);
 
@@ -204,7 +236,7 @@ namespace tomato
             currState_->Update();   // !!!!!! temporary !!!!!!
 
             if (network_->GetNetState() == ClientNetworkState::NSS_Playing)
-                gameNet_->ProcessOutgoingMessages(simCtx.tick);
+                inputSync_->SendLocalInput(simCtx.tick);
 
             ++simCtx.tick;
             tc.AddTick();
@@ -218,10 +250,12 @@ namespace tomato
         systemManager_.Update(simCtx, mode);
     }
 
-    void Engine::UpdateEditor(uint64_t tick, RunMode& mode)
+    void Engine::UpdateEditor(TickClock& tc, RunMode& mode)
     {
+        RunMode before{mode};
+
         editor_.BeginFrame();
-        editor_.Draw(tick, currState_.get(), mode);
+        editor_.Draw(tc.GetTick(), currState_.get(), mode);
         editor_.EndFrame();
 
         // GL 상태 값 초기화
@@ -229,7 +263,11 @@ namespace tomato
         if (currState_)
             renderCtx.glState.Invalidate();
 
-        renderCtx.runMode = mode;
+        if (before != mode)
+        {
+            renderCtx.runMode = mode;
+            tc.ResetTick(PassKey<Engine>());
+        }
     }
 
     void Engine::OnChangeStateRequest(const Event::ChangeStateRequest& event)
@@ -267,20 +305,20 @@ namespace tomato
         loaded = false;
         inputUI_.SetState(currState_.get());
 
-        tc.ResetTick();
+        tc.ResetTick(PassKey<Engine>());
         SimContext simCtx{ currState_.get(), tc.GetTick() };
         systemManager_.Update(TickPhase::PostUpdate, simCtx, RunMode::Game | RunMode::Editor);
 
         if (netMode_ == NetMode::NM_Client)
         {
-            gameNet_->SetState(currState_.get());
+            inputSync_->SetState(currState_.get());
             rollbackManager_->Capture(simCtx);
         }
     }
 
     void Engine::ProcessQueuedPackets(TickClock& tc)
     {
-        gameNet_->InitializeConfirmedTick(tc.GetTick()); // for rollback
+        inputSync_->ResetRollbackTick(tc.GetTick()); // for rollback
         network_->Update();
     }
 
@@ -296,6 +334,7 @@ namespace tomato
         {
             // std::cout << "        --------- " << rbSimCtx.tick << " ---------\n";
             systemManager_.FixedUpdate(simCtx, RunMode::Rollback);
+            EventDispatcher::GetInstance().Update();
             currState_->Update();   // !!!!!! temporary !!!!!!
 
             ++simCtx.tick;
@@ -311,9 +350,9 @@ namespace tomato
     void Engine::InitializeNetwork()
     {
         network_ = std::make_unique<ClientNetwork>();
-        gameNet_ = std::make_unique<GamePlayNetSystem>(currState_.get());
-        network_->SetGameplaySystem(gameNet_.get());
-        gameNet_->SetNetwork(network_.get());
+        inputSync_ = std::make_unique<NetInputSync>(currState_.get());
+        network_->SetGameplaySystem(inputSync_.get());
+        inputSync_->SetNetwork(network_.get());
 
         if (!rollbackManager_)
             rollbackManager_ = std::make_unique<RollbackManager>();

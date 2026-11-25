@@ -57,9 +57,9 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Input/ActionSnapshot.h
         Source/Runtime/Engine/Public/Input/PlayerInput.h
         Source/Runtime/Engine/Public/Input/InputEvents.h
-        Source/Runtime/Engine/Public/Input/InputUI.h
+		Source/Runtime/Engine/Public/UI/InputUI.h
         Source/Runtime/Engine/Public/Input/KeyConstants.h
-        Source/Runtime/Engine/Public/Input/InputEventFwd.h
+		Source/Runtime/Engine/Public/Input/InputEventsFwd.h
         Source/Runtime/Engine/Public/Services/Input.h
         Source/Runtime/Engine/Public/Simulation/Tick/TickClock.h
         Source/Runtime/Engine/Public/Simulation/Tick/TickFwd.h
@@ -115,7 +115,7 @@ set(ENGINE_HEADERS
         Source/Runtime/Engine/Public/Network/NetTypes.h
         Source/Runtime/Engine/Public/GameNetwork/Message/InputMessage.h
         Source/Runtime/Engine/Public/GameNetwork/Message/NetMessage.h
-        Source/Runtime/Engine/Public/GameNetwork/GamePlayNetSystem.h
+        Source/Runtime/Engine/Public/GameNetwork/NetInputSync.h
         Source/Runtime/Engine/Public/ECS/Components/Hierarchy.h
         Source/Runtime/Engine/Public/ECS/Systems/IntegrationSystem.h
         Source/Runtime/Engine/Public/Prefab/Prefab.h
@@ -178,7 +178,7 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/State/StateRegistry.h
 		Source/Runtime/Engine/Public/ECS/Forward/SystemFrameworkFwd.h
 		Source/Runtime/Engine/Public/Collision/CollisionTypesFwd.h
-		Source/Runtime/Engine/Public/Input/InputActionFwd.h
+		Source/Runtime/Engine/Public/Input/InputFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/Systems.h
 		Source/Runtime/Engine/Public/Collision/CollisionCache.h
 		Source/Runtime/Engine/Private/Collision/Detection/Narrow/GJK/GJKResult.h
@@ -190,7 +190,7 @@ set(ENGINE_HEADERS
 		
 		Source/Runtime/Engine/Public/ECS/Systems/EditorCameraSystem.h
 		Source/Runtime/Engine/Public/ECS/Systems/PlayerCameraSystem.h
-		Source/Runtime/Engine/Public/Input/InputState.h
+        Source/Runtime/Engine/Public/Input/KeyStateMap.h
 		Source/Runtime/Engine/Public/ECS/SystemFramework/ChangeRunModeEvent.h
 		Source/Runtime/Engine/Public/ECS/SystemFramework/SystemFrameworkEventFwd.h
 		Source/Runtime/Engine/Public/Services/ChangeFramebufferSizeEvent.h
@@ -209,7 +209,6 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Systems/CharacterScaleSystem.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterConfig.h
 		Source/Runtime/Engine/Public/ECS/Components/ActiveTag.h
-		Source/Runtime/Engine/Public/GameObject/Character/LandingEvent.h
 		Source/Runtime/Engine/Public/GameObject/Character/CharacterMovementConfig.h
 		Source/Runtime/Engine/Public/Math/Angle.h
 		Source/Runtime/Engine/Public/Collision/Layer/CollisionLayerTypes.h
@@ -240,6 +239,11 @@ set(ENGINE_HEADERS
 		Source/Runtime/Engine/Public/ECS/Systems/ParticleSimulationSystem.h
 		Source/Runtime/Engine/Public/Particle/ParticleFwd.h
 		Source/Runtime/Engine/Public/ECS/Systems/TargetSystem.h
+		Source/Runtime/Engine/Public/GameObject/Character/CharacterInputActions.h
+		Source/Runtime/Engine/Public/Input/LocalPlayer.h
+		Source/Runtime/Engine/Public/Input/InputMappingContext.h
+		Source/Runtime/Engine/Public/GameObject/Character/CharacterFwd.h
+		Source/Runtime/Engine/Public/GameNetwork/GameNetworkFwd.h
 )
 
 set(ENGINE_SOURCES
@@ -272,7 +276,7 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Math/Normal.cpp
         Source/Runtime/Engine/Private/Collision/Detection/Broad/SAP.cpp
         Source/Runtime/Engine/Private/Utils/Utf.cpp
-        Source/Runtime/Engine/Private/Input/InputUI.cpp
+		Source/Runtime/Engine/Private/UI/InputUI.cpp
         Source/Runtime/Engine/Private/ECS/Systems/UISystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/ScreenUIRenderSystem.cpp
         Source/Runtime/Engine/Private/ECS/Systems/WorldUIRenderSystem.cpp
@@ -284,9 +288,9 @@ set(ENGINE_SOURCES
         Source/Runtime/Engine/Private/Network/SocketUtil.cpp
         Source/Runtime/Engine/Private/Network/TCPNetDriver.cpp
         Source/Runtime/Engine/Private/Network/UDPNetDriver.cpp
-        Source/Runtime/Engine/Private/Network/CilentNetwork.cpp
+		Source/Runtime/Engine/Private/Network/ClientNetwork.cpp
         Source/Runtime/Engine/Private/GameNetwork/Message/InputMessage.cpp
-        Source/Runtime/Engine/Private/GameNetwork/GamePlayNetSystem.cpp
+        Source/Runtime/Engine/Private/GameNetwork/NetInputSync.cpp
         Source/Runtime/Engine/Private/ECS/Systems/IntegrationSystem.cpp
         Source/Runtime/Engine/Private/Collision/Detection/Broad/BroadPhase.cpp
         Source/Runtime/Engine/Private/ECS/Components/Transform.cpp
@@ -323,7 +327,7 @@ set(ENGINE_SOURCES
 		Source/Runtime/Engine/Private/Math/Ray.cpp
         Source/Runtime/Engine/Private/Math/Geometry.cpp
 		Source/Runtime/Engine/Private/ECS/Systems/EditorCameraSystem.cpp
-		Source/Runtime/Engine/Private/Input/KeyDeviceState.cpp
+        Source/Runtime/Engine/Private/Input/KeyStateMap.cpp
         Source/Runtime/Engine/Private/ECS/Systems/PlayerCameraSystem.cpp
         Source/Runtime/Engine/Private/Profiler/Profiler.cpp
         Source/Runtime/Engine/Private/Math/AABB.cpp

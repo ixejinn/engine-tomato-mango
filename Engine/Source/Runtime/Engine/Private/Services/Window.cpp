@@ -7,7 +7,6 @@
 #include "Services/Window.h"
 #include "Services/ChangeFramebufferSizeEvent.h"
 #include "Utils/Logger.h"
-#include "Simulation/Tick/TickClock.h"
 #include "Event/EventDispatcher.h"
 
 namespace tomato
@@ -118,9 +117,9 @@ namespace tomato
         glfwSetWindowShouldClose(handle_, GLFW_TRUE);
     }
 
-    void Window::SetWindowUserPointer(Input& i, TickClock& tc)
+    void Window::SetWindowUserPointer(Input& i)
     {
-        data_ = std::make_unique<WindowData>(i, tc);
+        data_ = std::make_unique<WindowData>(i);
         glfwSetWindowUserPointer(handle_, data_.get());
     }
 

@@ -6,10 +6,10 @@
 
 namespace tomato {
     /**
-     * @brief Snapshot of InputAction bit states (held/down-edge) for a single simulation tick.
+     * @brief State of one player's InputActions for a single simulation tick.
      *
-     * 매 틱 모든 키를 스캔하지 않고, press/hold/release를 구분하기 위해
-     * 현재 틱과 이전 틱의 InputAction 두 개(held/down-edge)를 저장한다.
+     * State의 PlayerInputTimelines에 저장되고 네트워크로 전송되는 단위.
+     * 시뮬레이션 중 플레이어 캐릭터 조작에 사용된다.
      */
     struct ActionSnapshot
     {
@@ -18,7 +18,7 @@ namespace tomato {
 
         /// Bits currently held down.
         /// 현재 누르고 있는 액션. (언제부터 눌려있었는지는 무관)
-        InputAction held{InputAction::None};
+        InputAction down{InputAction::None};
 
         /// Bits that transitioned from up to down exactly this tick.
         /// 이번 틱에서 새로 눌린 액션.

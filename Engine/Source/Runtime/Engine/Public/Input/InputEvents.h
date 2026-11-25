@@ -1,17 +1,15 @@
 ﻿#ifndef MANGO_INPUTEVENTS_H
 #define MANGO_INPUTEVENTS_H
 
-#include <cstdint>
 #include "Input/KeyConstants.h"
 
 namespace tomato
 {
-    enum class KeyEventType
+    enum class InputEvent
     {
-        Release,
-        Press,
-        Repeat,
-        Error
+        Released,
+        Pressed,
+        Repeat
     };
 
     /**
@@ -19,26 +17,11 @@ namespace tomato
      */
     struct KeyEvent
     {
-        KeyEvent(Key k, KeyEventType a, float v, int64_t t)
-        : key(k), type(a), value(v), tick(t) {}
+        KeyEvent(Key k, InputEvent a, float v) : key(k), event(a), value(v) {}
 
         Key key;
-        KeyEventType type;
-
+        InputEvent event;
         float value;
-
-        int64_t tick;
-    };
-
-    /**
-     * @brief Input event for a mouse.
-     */
-    struct MouseButtonEvent : public KeyEvent
-    {
-        MouseButtonEvent(Key k, KeyEventType a, float v, int64_t t, float x, float y)
-        : KeyEvent(k, a, v, t), xPos(x), yPos(y) {}
-
-        float xPos, yPos;
     };
 
     /**
@@ -46,7 +29,8 @@ namespace tomato
      */
     struct CursorPosEvent
     {
-        CursorPosEvent(int64_t t, float x, float y) : xPos(x), yPos(y) {}
+        CursorPosEvent(float x, float y) : xPos(x), yPos(y) {}
+
         float xPos, yPos;
     };
 }

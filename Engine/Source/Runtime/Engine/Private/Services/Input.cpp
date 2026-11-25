@@ -1,7 +1,7 @@
 ﻿#include <GLFW/glfw3.h>
 #include "Services/Input.h"
 #include "Services/Window.h"
-#include "Input/InputState.h"
+#include "Input/KeyStateMap.h"
 #include "Simulation/Tick/TickClock.h"
 #include "Utils/Logger.h"
 
@@ -17,52 +17,50 @@ namespace tomato
 
     void Input::OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
     {
-        Key k = ToEngineKey(key);
-        KeyEventType a = ToEngineKeyAction(action);
-        if (a == KeyEventType::Error)
+        const Key k = ToEngineKey(key);
+        const auto inputEvent = ToInputEvent(action);
+        if (!inputEvent.has_value())
         {
-            TMT_WARN << "KeyEventType of " << static_cast<int>(k) << " is invalid";
+            TMT_WARN << "InputEvent of " << static_cast<int>(k) << " is invalid";
             return;
         }
 
         auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
         auto* input = winData->input;
-        auto* tickClock = winData->tickClock;
 
-        const float v = (a == KeyEventType::Release) ? 0.0f : 1.0f;
+        const float v = (inputEvent.value() == InputEvent::Released) ? 0.0f : 1.0f;
 
-        const KeyEvent event{k, a, v, tickClock->GetTick()};
-        if (a == KeyEventType::Release)
-            input->keySignal_.Publish(event);                           // Release 이벤트는 모두에게 보냄
+        const KeyEvent keyEvent{k, inputEvent.value(), v};
+        if (inputEvent.value() == InputEvent::Released)
+            input->keySignal_.Publish(keyEvent);                           // Released 이벤트는 모두에게 보냄
         else
-            input->keySignal_.Collect(input->collector_, event);    // 에디터-UI-게임 순으로 입력 우선 소비
+            input->keySignal_.Collect(input->collector_, keyEvent);    // 에디터-UI-게임 순으로 입력 우선 소비
     }
 
     void Input::OnMouseButtonEvent(GLFWwindow* window, int button, int action, int mods)
     {
         Key k = ToEngineKey(button);
-        KeyEventType a = ToEngineKeyAction(action);
+        const auto inputEvent = ToInputEvent(action);
 
-        if (a == KeyEventType::Error)
+        if (!inputEvent.has_value())
         {
-            TMT_WARN << "KeyEventType of " << static_cast<int>(k) << " is invalid";
+            TMT_WARN << "InputEvent of " << static_cast<int>(k) << " is invalid";
             return;
         }
 
         auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
         auto* input = winData->input;
-        auto* tickClock = winData->tickClock;
 
         double xPos(0), yPos(0);
         glfwGetCursorPos(window, &xPos, &yPos);
 
-        const float v = (a == KeyEventType::Release) ? 0.0f : 1.0f;
+        const float v = (inputEvent.value() == InputEvent::Released) ? 0.0f : 1.0f;
 
-        const MouseButtonEvent event{k, a, v, tickClock->GetTick(), static_cast<float>(xPos), static_cast<float>(yPos)};
-        if (a == KeyEventType::Release)
-            input->mouseSignal_.Publish(event);
+        const KeyEvent keyEvent{k, inputEvent.value(), v};
+        if (inputEvent.value() == InputEvent::Released)
+            input->keySignal_.Publish(keyEvent);
         else
-            input->mouseSignal_.Collect(input->collector_, event);
+            input->keySignal_.Collect(input->collector_, keyEvent);
 
     }
 
@@ -70,10 +68,9 @@ namespace tomato
     {
         auto* winData = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
         auto* input = winData->input;
-        auto* tickClock = winData->tickClock;
 
         input->cursorSignal_.Publish(
-            CursorPosEvent{tickClock->GetTick(), static_cast<float>(xpos), static_cast<float>(ypos)});
+            CursorPosEvent{static_cast<float>(xpos), static_cast<float>(ypos)});
     }
 
     Key Input::ToEngineKey(const int glfwKey)
@@ -201,18 +198,18 @@ namespace tomato
         }
     }
 
-    KeyEventType Input::ToEngineKeyAction(const int glfwAction)
+    std::optional<InputEvent> Input::ToInputEvent(const int glfwAction)
     {
         switch (glfwAction)
         {
         case GLFW_RELEASE:
-            return KeyEventType::Release;
+            return InputEvent::Released;
         case GLFW_PRESS:
-            return KeyEventType::Press;
+            return InputEvent::Pressed;
         case GLFW_REPEAT:
-            return KeyEventType::Repeat;
+            return InputEvent::Repeat;
         default:
-            return KeyEventType::Error;
+            return std::nullopt;
         }
     }
 }

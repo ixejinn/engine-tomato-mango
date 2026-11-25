@@ -123,7 +123,7 @@ namespace tomato::Prefab
         const entt::entity obj = CreateWorldObject(registry, active, false, false, name);
 
         registry.emplace<FrictionComponent>(obj);
-        registry.emplace<InputChannelComponent>(obj);
+        registry.emplace<PlayerControlledComponent>(obj);
         registry.emplace<MovementComponent>(obj);
         registry.emplace<CharacterTag>(obj);
         registry.emplace<RollbackEntityTag>(obj);

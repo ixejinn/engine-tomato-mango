@@ -4,8 +4,6 @@
 
 #include "Network/NetBitReader.h"
 #include "Network/NetBitWriter.h"
-#include "Network/SocketAddress.h"
-#include "Network/ClientNetwork.h"
 
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 
@@ -16,21 +14,16 @@ namespace tomato
         reader.ReadInt(snapshot.tick, std::numeric_limits<uint32_t>::max());
 
         uint32_t value = 0;
-        reader.ReadInt(value, uint32_t(InputAction::COUNT));
+        reader.ReadInt(value, std::numeric_limits<uint32_t>::max());
         snapshot.pressed = static_cast<InputAction>(value);
-        reader.ReadInt(value, uint32_t(InputAction::COUNT));
-        snapshot.held = static_cast<InputAction>(value);
-
-        //std::cout << "[ READ ] " << snapshot.tick << " " << (int)snapshot.down << " " << (int)snapshot.held << '\n';
+        reader.ReadInt(value, std::numeric_limits<uint32_t>::max());
+        snapshot.down = static_cast<InputAction>(value);
     }
 
     void InputCommand::Write(NetBitWriter& writer)
     {
         writer.WriteInt(snapshot.tick, std::numeric_limits<uint32_t>::max());
-        writer.WriteInt(static_cast<uint32_t>(snapshot.pressed), static_cast<uint32_t>(InputAction::COUNT));
-        writer.WriteInt(static_cast<uint32_t>(snapshot.held), static_cast<uint32_t>(InputAction::COUNT));
-        
-        //std::cout << "Write : " << tick << '\n';
-        //std::cout << "[ WRITE ] " << snapshot.tick << " " << (int)snapshot.down << " " << (int)snapshot.held << '\n';
+        writer.WriteInt(static_cast<uint32_t>(snapshot.pressed), std::numeric_limits<uint32_t>::max());
+        writer.WriteInt(static_cast<uint32_t>(snapshot.down), std::numeric_limits<uint32_t>::max());
     }
 }

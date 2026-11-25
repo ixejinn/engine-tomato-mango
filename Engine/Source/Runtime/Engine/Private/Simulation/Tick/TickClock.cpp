@@ -1,4 +1,5 @@
 #include "Simulation/Tick/TickClock.h"
+#include "Engine/Engine.h"
 
 namespace tomato
 {
@@ -26,7 +27,7 @@ namespace tomato
         return simulateNum;
     }
 
-    void TickClock::ResetTick()
+    void TickClock::ResetTick(PassKey<Engine>)
     {
         tick_ = Tick::zero();
         start_ = std::chrono::steady_clock::now();

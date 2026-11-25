@@ -11,7 +11,7 @@ namespace tomato
 	struct EditorContext;
 
 	bool DrawCameraInspector(EditorContext&, entt::registry&, CameraComponent&);
-	bool DrawInputChannelInspector(EditorContext&, entt::registry&, InputChannelComponent&);
+	bool DrawInputChannelInspector(EditorContext&, entt::registry&, PlayerControlledComponent&);
 	bool DrawTransformInspector(EditorContext&, entt::registry&, TransformComponent&);
 	bool DrawMovementInspector(EditorContext&, entt::registry&, MovementComponent&);
 	bool DrawVelocityInspector(EditorContext&, entt::registry&, VelocityComponent&);
@@ -27,7 +27,6 @@ namespace tomato
 	bool DrawTargetInspector(EditorContext&, entt::registry&, TargetComponent&);
 	bool DrawSelectableInspector(EditorContext&, entt::registry&, SelectableComponent&);
 	bool DrawParticleInspector(EditorContext&, entt::registry&, ParticleEmitterComponent&);
-
 	
 	std::filesystem::path DrawLoadResourceButton(const char* title, const char* filter, const std::filesystem::path& initDir);
 	bool DrawVec3Control(const char* label, float* vec, float min = 0.f, float max = 0.f, int flags = 0);

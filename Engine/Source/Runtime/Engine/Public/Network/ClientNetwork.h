@@ -18,7 +18,7 @@
 #include "Network/UDPNetDriver.h"
 #include "Network/TCPNetDriver.h"
 #include "Network/NetConnection.h"
-#include "GameNetwork/GamePlayNetSystem.h"
+#include "GameNetwork/NetInputSync.h"
 
 namespace tomato
 {
@@ -80,7 +80,7 @@ namespace tomato
         ServerTimeMs GetLocalStartTime() const { return localStartTime; }
         bool IsPlaying() const { return netState_ == ClientNetworkState::NSS_Playing && !pendingReset_; }
 
-        void SetGameplaySystem(GamePlayNetSystem* gameNetSys) { gameNetSystem_ = gameNetSys; }
+        void SetGameplaySystem(NetInputSync* gameNetSys) { gameNetSystem_ = gameNetSys; }
 
     private:
         void ResetMatchState();
@@ -119,7 +119,7 @@ namespace tomato
         ServerTimeMs sendTime{ 0 }, recvTime{ 0 };
         ServerTimeMs serverTimeOffset{ 0 }, localStartTime{ 0 };
 
-        GamePlayNetSystem* gameNetSystem_{ nullptr };
+        NetInputSync* gameNetSystem_{ nullptr };
     };
 }
 

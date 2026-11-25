@@ -11,7 +11,7 @@
 
 #include "Services/ServiceFwd.h"
 #include "State/StateFwd.h"
-#include "Input/InputEventFwd.h"
+#include "Input/InputEventsFwd.h"
 
 namespace tomato
 {
@@ -19,11 +19,10 @@ namespace tomato
 	{
 	public:
         static bool OnKeyEvent(const KeyEvent&);
-        static bool OnMouseButtonEvent(const MouseButtonEvent&);
 
-        void InitImGui(GLFWwindow* wnd, Input& input, Engine* engine);
+        void InitImGui(GLFWwindow* wnd, Engine* engine);
 
-		void ShutdownImGui(Input& input);
+		void ShutdownImGui();
         void BeginFrame();
         void Draw(uint64_t, State*, RunMode&);
 

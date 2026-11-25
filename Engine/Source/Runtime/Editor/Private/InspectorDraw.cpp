@@ -81,26 +81,9 @@ namespace tomato
 		return changed;
 	}
 
-	bool DrawInputChannelInspector(EditorContext& eCtx, entt::registry& reg, InputChannelComponent& inputCh)
+	bool DrawInputChannelInspector(EditorContext& eCtx, entt::registry& reg, PlayerControlledComponent& inputCh)
 	{
 		bool changed = false;
-
-		ImGui::SeparatorText("Key Setting");
-		if (ImGui::RadioButton("WASD", inputCh.useWASD == true))
-		{
-			inputCh.useWASD = true;
-			changed = true;
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::RadioButton("Number Keys", inputCh.useWASD == false))
-		{
-			inputCh.useWASD = false;
-			changed = true;
-		}
-
-		ImGui::NewLine();
 
 		return changed;
 	}

@@ -45,8 +45,8 @@ namespace tomato::Serialization
 	void Load(const json&, entt::registry&, HierarchyComponent&);
 
 	// Movement.h
-	void Save(json&, entt::registry&, const InputChannelComponent&);
-	void Load(const json&, entt::registry&, InputChannelComponent&);
+	void Save(json&, entt::registry&, const PlayerControlledComponent&);
+	void Load(const json&, entt::registry&, PlayerControlledComponent&);
 
 	void Save(json&, entt::registry&, const MovementComponent&);
 	void Load(const json&, entt::registry&, MovementComponent&);

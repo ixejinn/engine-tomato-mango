@@ -152,7 +152,7 @@ namespace tomato
             inputCmd.Read(reader);
             inputCmd.id = id;
             
-            gameNetSystem_->HandleInput(inputCmd);
+            gameNetSystem_->OnInputReceived(inputCmd);
             break;
         }
         }

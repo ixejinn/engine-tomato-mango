@@ -1,6 +1,6 @@
-﻿#include "Input/InputUI.h"
+﻿#include "UI/InputUI.h"
 #include "Input/InputEvents.h"
-#include "Input/InputState.h"
+#include "Input/KeyStateMap.h"
 
 #include "ECS/SystemFramework/SystemUpdateContexts.h"
 #include "ECS/SystemFramework/ChangeRunModeEvent.h"
@@ -8,7 +8,6 @@
 #include "ECS/Components/UI.h"
 #include "ECS/Components/UIEvents.h"
 #include "ECS/Components/ActiveTag.h"
-#include "Services/Input.h"
 #include "Services/Window.h"
 #include "Event/EventDispatcher.h"
 #include "State/State.h"
@@ -20,7 +19,7 @@ namespace tomato
         EventDispatcher::GetInstance().Connect<ChangeRunModeEvent, &InputUI::OnChangeRunMode>(*this);
     }
 
-	bool InputUI::OnClick(const MouseButtonEvent& mouseEvent)
+	bool InputUI::OnKeyEvent(const KeyEvent& keyEvent)
 	{
 		if (currentStatePtr_ == nullptr)
 			return true;
@@ -30,7 +29,7 @@ namespace tomato
 		if (currentHovered == entt::null)
 			return true;
 
-		auto& rect = r.get<RectTransformComponent>(currentHovered);
+		// auto& rect = r.get<RectTransformComponent>(currentHovered);
 		auto& selectable = r.get<SelectableComponent>(currentHovered);
 		auto& render = r.get<RenderComponent>(currentHovered);
 		if (!r.all_of<MouseEventComponent>(currentHovered))
@@ -40,24 +39,24 @@ namespace tomato
         if (runMode_ != RunMode::Game)
             return false;
 
-		if (mouseEvent.type == KeyEventType::Press)
+		if (keyEvent.event == InputEvent::Pressed)
 		{
 			pressed = currentHovered;
 			render.color = selectable.pressedColor;
 		}
 
-		if (mouseEvent.type == KeyEventType::Release)
+		if (keyEvent.event == InputEvent::Released)
 		{
 			render.color = selectable.normalColor;
 
 			if (pressed == currentHovered && mouseEvnt.onClick)
-				mouseEvnt.onClick(MouseClickEvent{ currentHovered, &r , mouseEvent.tick});
+				mouseEvnt.onClick(MouseClickEvent{ currentHovered, &r});
 		}
 
 		return false;
 	}
 
-	bool InputUI::OnHover(const CursorPosEvent& moveEvent)
+	bool InputUI::OnCursorPosEvent(const CursorPosEvent& moveEvent)
 	{
 		if (currentStatePtr_ == nullptr)
 			return true;
@@ -69,7 +68,7 @@ namespace tomato
 		if (currentHovered == entt::null)
 			return true;
 
-		if (previousHovered == currentHovered && InputState::GetInstance().IsKeyPressed(Key::LeftMouseButton))
+		if (previousHovered == currentHovered && KeyStateMap::GetInstance().IsKeyDown(Key::LeftMouseButton))
 			return false;
 
 		auto& rect = r.get<RectTransformComponent>(currentHovered);

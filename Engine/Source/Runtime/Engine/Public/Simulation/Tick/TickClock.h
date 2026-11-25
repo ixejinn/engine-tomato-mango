@@ -3,10 +3,12 @@
 
 #include <chrono>
 #include "Simulation/Tick/TickFwd.h"
+#include "Engine/TomatoFwd.h"
+#include "Utils/PassKey.h"
 
 namespace tomato
 {
-    enum class TickPolicy
+    enum class TickPolicy : uint8_t
     {
         Keep,
         Discard
@@ -20,7 +22,7 @@ namespace tomato
         int GetSimulateNum(TickPolicy policy);
 
         void AddTick() { ++tick_; }
-        void ResetTick();
+        void ResetTick(PassKey<Engine>);
 
     private:
         static constexpr Tick DT_{1};

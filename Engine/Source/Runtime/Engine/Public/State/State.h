@@ -11,6 +11,7 @@
 #include "Serialization/UUID.h"
 #include "Engine/TomatoFwd.h"
 #include "Collision/Layer/CollisionLayerMatrix.h"
+#include "GameObject/Character/CharacterFwd.h"
 #include "Utils/PassKey.h"
 
 namespace tomato
@@ -33,6 +34,7 @@ namespace tomato
 
         CollisionLayerMatrix& GetCollisionLayerMatrix();
         PlayerInputTimelines& GetPlayerInputTimelines() { return playerInputs_; }
+        const CharacterInputActions& GetCharacterInputActions() const;
 
         void SetPlayerInput(uint32_t tick, ActionSnapshot input, int playerID);
 
