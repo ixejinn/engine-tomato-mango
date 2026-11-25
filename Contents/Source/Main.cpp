@@ -2,7 +2,7 @@
 #include "Engine/Engine.h"
 #include "Engine/EngineConfig.h"
 
-#define TOMATO_LOG_OUTPUT
+//#define TOMATO_LOG_OUTPUT
 #ifdef TOMATO_LOG_OUTPUT
 #include <cstdio>
 #endif
@@ -41,7 +41,7 @@ int main() {
     SetDefaultGameInput(engine, true);
 
 #if defined(TOMATO_GREENTEA)
-    engine.SetNextState(std::make_unique<GameState>(engine));
+    engine.SetNextState(std::make_unique<LobbyState>(engine));
 
 #else //TOMATO_GREENTEA
     engine.SetNextState(std::make_unique<LobbyState>(engine));

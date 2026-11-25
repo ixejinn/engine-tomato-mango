@@ -190,6 +190,7 @@ namespace tomato
         // EnTT::sigh는 뒤에 연결한 리스너부터 호출
         // Editor - KeyStateMap - UI - Game
         input_.keySignal_.Connect<&Engine::OnLocalPlayerKeyEvent>(*this);
+        input_.keySignal_.Connect<&InputUI::OnKeyEvent>(inputUI_);
         input_.keySignal_.Connect<&KeyStateMap::OnKeyEvent>(keyStateMap);
         input_.keySignal_.Connect<&Editor::OnKeyEvent>();
 
