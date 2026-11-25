@@ -24,6 +24,9 @@ namespace tomato
 		if (currentStatePtr_ == nullptr)
 			return true;
 
+		if (keyEvent.key > Key::RightMouseButton)
+			return true;
+
 		auto& r = currentStatePtr_->GetRegistry();
 
 		if (currentHovered == entt::null)
